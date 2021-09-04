@@ -1,0 +1,2 @@
+ALTER SESSION SET CURRENT_SCHEMA=siga;
+insert into SIGA.EX_TIPO_MOVIMENTACAO (ID_TP_MOV,DESCR_TIPO_MOVIMENTACAO) values (65,'Solicitação de Assinatura');

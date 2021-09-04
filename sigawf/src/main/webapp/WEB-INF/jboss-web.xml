@@ -1,0 +1,5 @@
+<jboss-web>
+	<security-domain>sp</security-domain>
+	<context-root>sigawf</context-root>
+</jboss-web>
+
