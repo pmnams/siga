@@ -94,7 +94,7 @@ import br.gov.jfrj.siga.sinc.lib.Desconsiderar;
 					+ " and pes.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu"
 					+ "	and (pes.lotacao.idLotacao = :lotacao or :lotacao = 0L)"
 					+ " and pes.dataFimPessoa = null"
-					+ " and not exists (select 1 from CpIdentidade i inner join i.dpPessoa pes1 where pes1.idPessoaIni = pes.idPessoaIni and pes1.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu)"
+					+ " and not exists (select 1 from CpIdentidade i inner join i.dpPessoa pes1 where pes1.idPessoaIni = pes.idPessoaIni and pes1.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu and i.dtCancelamentoIdentidade IS NULL and i.hisAtivo = 1)"
 					+ " order by pes.nomePessoaAI, pes.cpfPessoa"),		
 		@NamedQuery(name = "consultarQuantidadeDpPessoaSemIdentidade", query = "select count(pes) from DpPessoa pes "
 				+ "  where (pes.cpfPessoa = :cpf or :cpf = 0L)"

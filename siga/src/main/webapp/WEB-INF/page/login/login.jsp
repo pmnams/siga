@@ -19,23 +19,11 @@
 	
 	<c:set var="siga_cliente_sso" scope="request" value="${f:resource('/siga.integracao.sso')}" />
 	<c:set var="siga_cliente_sso_btn_txt" scope="request" value="${f:resource('/siga.integracao.sso.btn.txt')}" />
-	
-	<c:choose>
-		<c:when test="${siga_cliente == 'GOVSP'}">
-			<c:set var="login_box_class" value="box_login" />
-			<c:set var="login_box_logo" value="/siga/imagens/logo-sem-papel-cor.png" />
-			<c:set var="login_box_logo_size" value="132" />
-			<c:set var="login_box_text" value="" />
-			<c:set var="login_titulo_modal" value="SP Sem Papel"/>
-		</c:when>
-		<c:otherwise>
-			<c:set var="login_box_class" value="" />
-			<c:set var="login_box_logo" value="" />
-			<c:set var="login_box_logo_size" value="" />
-			<c:set var="login_box_text" value="<fmt:message key='usuario.login.formulario' />" />
-			<c:set var="login_titulo_modal" value="Siga"/>
-		</c:otherwise>
-	</c:choose>
+	<c:set var="login_box_class" value="" />
+	<c:set var="login_box_logo" value="" />
+	<c:set var="login_box_logo_size" value="" />
+	<c:set var="login_box_text" value="<fmt:message key='usuario.login.formulario' />" />
+	<c:set var="login_titulo_modal" value="Siga"/>
 
 	<div class="container content pt-2">
 		<div class="row justify-content-center">
@@ -50,10 +38,6 @@
 
 					<c:if test="${not empty loginMensagem}">
 						<div class="login-invalido ">
-							<div class="login-invalido-titulo ${hide_only_GOVSP}">
-								<p class="alert alert-danger ">${loginMensagem}</p>
-							</div>
-
 							<div class="login-invalido-descricao ">	
 								<p class="alert alert-danger">${loginMensagem}</p>
 							</div>
@@ -113,19 +97,6 @@
 											<a href="/siga/public/app/loginSSO"class="btn btn-lg btn-dark btn-block">${siga_cliente_sso_btn_txt}</a>
 										</c:when>
 									</c:choose>
-									
-									<c:if test="${siga_cliente ne 'GOVSP'}">
-										<div class="mt-3">
-										    <div class="d-flex justify-content-between">
-										    	   	<div>
-										    		Versão: ${versao}
-										    	    </div>
-										    	    <div>
-										    		<a class="text-top" href="http://linksiga.trf2.jus.br" target="_blank" class="btn btn-link">Sobre o SIGA</a> 
-										    	    </div>
-										    </div>
-										</div>
-									</c:if>
 								</div>
 							</div>
 						</div>
@@ -163,8 +134,6 @@
 	</c:if>
 
 	<script type="text/javascript">
-		
-		//$('input, textarea').placeholder();
 		$("#username").focus();
 
 		function getCookie(cname) {
