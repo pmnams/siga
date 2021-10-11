@@ -2401,6 +2401,25 @@ Pede deferimento.</span><br/><br/><br/>
 [/#if]
 [/#macro]
 
+[#macro rodapeEnderecamento]
+    <!-- INICIO ENDERECAMENTO -->
+    <style>
+        .texto-enderecamento {
+            font-family: Verdana;
+            font-size: 13px;
+            text-align: left;
+        }
+    </style>
+    <p class="texto-enderecamento">
+        [#if (Vocativo!"") != ""]<b>${Vocativo!}<b><br />[/#if]
+                [#if (Orgao!"") != ""]${Orgao!}[/#if]<br />
+                [#if (Logradouro!"") != ""]${Logradouro!}[/#if][#if (Numero!"") != ""], ${Numero!}[/#if][#if (Complemento!"") != ""], ${Complemento!}<br />[/#if]
+                [#if (Bairro!"") != ""]${Bairro!}<br />[/#if]
+                [#if (CEP!"") != ""]${CEP}[/#if] [#if (Municipio!"") != ""]${Municipio!}[/#if] [#if (Municipio!"") != "" && (UF!"") != ""]- ${UF!}[/#if]
+    </p>
+    <!-- FIM ENDERECAMENTO -->
+[/#macro]
+
 [#macro rodapeNumeracaoADireita texto=""]
 <table width="100%" border="0" cellpadding="0" bgcolor="#FFFFFF">
 	[#if texto?? && texto!=""]
@@ -2660,7 +2679,7 @@ Pede deferimento.</span><br/><br/><br/>
 [/#macro]
 
 
-[#macro estiloBrasaoCentralizado tipo tamanhoLetra="11pt"  exibeAssinatura=true formatarOrgao=true orgaoCabecalho=true numeracaoCentralizada=false dataAntesDaAssinatura=false incluirMioloDJE=false omitirCodigo=false omitirData=false topoPrimeiraPagina='' incluirAssinaturaBIE=true exibeClassificacaoDocumental=true]
+[#macro estiloBrasaoCentralizado tipo tamanhoLetra="11pt"  exibeAssinatura=true formatarOrgao=true orgaoCabecalho=true numeracaoCentralizada=false dataAntesDaAssinatura=false incluirMioloDJE=false omitirCodigo=false omitirData=false topoPrimeiraPagina='' incluirAssinaturaBIE=true exibeClassificacaoDocumental=true exibeRodapeEnderecamento=false]
     [@primeiroCabecalho]${topoPrimeiraPagina!}
     [@cabecalhoCentralizadoPrimeiraPagina orgaoCabecalho/]
     [/@primeiroCabecalho]
@@ -2740,9 +2759,10 @@ Pede deferimento.</span><br/><br/><br/>
 	   [#if exibeClassificacaoDocumental]
 	   		[@rodapeClassificacaoDocumental/]
 	   [/#if]
+
    [/@primeiroRodape]
    [@rodape]
-   [@rodapeNumeracaoADireita/]
+       [@rodapeNumeracaoADireita/]
    [/@rodape]
 [/#macro]
 

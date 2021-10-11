@@ -53,6 +53,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import br.gov.jfrj.siga.ex.*;
 import org.apache.commons.beanutils.BeanUtils;
 import org.jboss.logging.Logger;
 
@@ -83,18 +84,6 @@ import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.dp.DpVisualizacao;
 import br.gov.jfrj.siga.dp.DpVisualizacaoAcesso;
 import br.gov.jfrj.siga.dp.dao.CpDao;
-import br.gov.jfrj.siga.ex.ExClassificacao;
-import br.gov.jfrj.siga.ex.ExDocumento;
-import br.gov.jfrj.siga.ex.ExMobil;
-import br.gov.jfrj.siga.ex.ExModelo;
-import br.gov.jfrj.siga.ex.ExMovimentacao;
-import br.gov.jfrj.siga.ex.ExNivelAcesso;
-import br.gov.jfrj.siga.ex.ExPapel;
-import br.gov.jfrj.siga.ex.ExPreenchimento;
-import br.gov.jfrj.siga.ex.ExProtocolo;
-import br.gov.jfrj.siga.ex.ExTipoDocumento;
-import br.gov.jfrj.siga.ex.ExTipoMobil;
-import br.gov.jfrj.siga.ex.ExTipoMovimentacao;
 import br.gov.jfrj.siga.ex.bl.AcessoConsulta;
 import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.bl.ExBL;
@@ -1430,6 +1419,31 @@ public class ExDocumentoController extends ExController {
 	@Get("app/expediente/doc/exibirProcesso")
 	public void exibeProcesso(final String sigla, final boolean podeExibir, Long idVisualizacao, boolean exibirReordenacao)
 			throws Exception {
+		if(Prop.get("pdf.tamanho.maximo.completo") != null) {
+			ExDocumentoDTO exDocumentoDto = new ExDocumentoDTO();
+			exDocumentoDto.setSigla(sigla);
+			buscarDocumento(false, exDocumentoDto);
+			List<ExArquivoNumerado> ans = exDocumentoDto.getDoc().getArquivosNumerados(exDocumentoDto.getDoc().getMobilDefaultParaReceberJuntada());
+
+			Long tamanho = 0L;
+			Long tamanhoHtml = 0L;
+			for (ExArquivoNumerado an : ans) {
+				if(an.getArquivo() instanceof ExDocumento && ((ExDocumento)an.getArquivo()).getCpArquivo() != null) {
+					tamanho += Long.valueOf(((ExDocumento)an.getArquivo()).getCpArquivo().getTamanho());
+					if(!((ExDocumento)an.getArquivo()).isCapturado()) {
+						tamanhoHtml += Long.valueOf(((ExDocumento)an.getArquivo()).getCpArquivo().getTamanho());
+					}
+					if(tamanhoHtml > Long.parseLong(Prop.get("pdf.tamanho.maximo.completo"))) {
+						result.include("mensagemCabec", "Agregação de documentos excedeu o tamanho máximo permitido.");
+						result.include("msgCabecClass", "alert-info fade-close");
+						result.redirectTo("exibir?sigla=" + exDocumentoDto.getDoc().getCodigo());
+					}
+				}
+			}
+			result.include("excedeuTamanhoMax", (tamanho > Long.parseLong(Prop.get("pdf.tamanho.maximo.completo"))));
+		}
+
+
 		exibe(false, sigla, null, null, idVisualizacao, exibirReordenacao);					
 	}
 

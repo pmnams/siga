@@ -34,7 +34,7 @@
 			}
 
 			if ("${podePesquisarDescricaoLimitada}" === "true") {
-				if ($('#orgaoUsu').val() != 0 && $('#idFormaDoc').find(':selected').val() != "0" 
+				if ($('#orgaoUsu').val() != 0 && $('#idFormaDoc').find(':selected').val() != "0"
 						&& $('#anoEmissaoString').val() != 0) {
 					habilitaDescricao();
 				} else {

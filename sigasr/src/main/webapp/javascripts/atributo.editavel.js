@@ -126,16 +126,14 @@ FormEditavel.prototype = {
 				return;
 			}
 			self.form.block(paramToBlock);
-			
-            $.ajax({
-                url: self.propriedades.urlDestino, self.form.serialize(),
-                type: "POST"
-            }).done(function(data, textStatus, jqXHR ){
+
+			$.post(self.propriedades.urlDestino, self.form.serialize(), function(response)
+			{
 				self.elementoEditavel.find('span.valor-atributo').text(response);
 				self.elementoEditavel.show();
 				self.form.unblock();
 				self.form.remove();
-            });
+			})
 		});
 	},
 	
