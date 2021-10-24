@@ -192,5 +192,9 @@
 			<groupId>com.crivano</groupId>
 			<artifactId>swaggerservlet</artifactId>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>siga</groupId>
+            <artifactId>siga-ex</artifactId>
+        </dependency>
+    </dependencies>
 </project>

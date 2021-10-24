@@ -9,12 +9,9 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 
+import br.com.caelum.vraptor.*;
 import org.jboss.logging.Logger;
 
-import br.com.caelum.vraptor.Controller;
-import br.com.caelum.vraptor.Get;
-import br.com.caelum.vraptor.Post;
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.view.Results;
 import br.gov.jfrj.siga.base.AplicacaoException;
 import br.gov.jfrj.siga.base.Correio;
@@ -488,6 +485,47 @@ public class UsuarioController extends SigaController {
 		Pattern pattern = Pattern.compile("^[\\w-]+(\\.[\\w-]+)*@([\\w-]+\\.)+[a-zA-Z]{2,7}$");   
 	    Matcher matcher = pattern.matcher(email);   
 	    return matcher.find();   
+	}
+
+	/* Reset Senha */
+	@Get
+	@Path({"/app/usuario/senha/reset", "/public/app/usuario/senha/reset" })
+	public void resetSenha() throws Exception {
+		String recaptchaSiteKey = getCaptchaSiteKey();
+		String recaptchaSitePassword = getCaptchaSitePassword();
+		result.include("captchaSiteKey", recaptchaSiteKey);
+
+		result.include("baseTeste", Prop.getBool("/siga.base.teste"));
+	}
+
+	private static String getCaptchaSiteKey() {
+		String pwd;
+		try {
+			pwd = Prop.get("/siga.hcaptcha.key");
+			if (pwd == null)
+				throw new AplicacaoException(
+						"Erro obtendo propriedade siga.hcaptcha.key");
+			return pwd;
+		} catch (Exception e) {
+			throw new AplicacaoException(
+					"Erro obtendo propriedade siga.hcaptcha.key",
+					0, e);
+		}
+	}
+
+	private static String getCaptchaSitePassword() {
+		String pwd;
+		try {
+			pwd = Prop.get("/siga.hcaptcha.pwd");
+			if (pwd == null)
+				throw new AplicacaoException(
+						"Erro obtendo propriedade siga.hcaptcha.pwd");
+			return pwd;
+		} catch (Exception e) {
+			throw new AplicacaoException(
+					"Erro obtendo propriedade siga.hcaptcha.pwd",
+					0, e);
+		}
 	}
 
 }

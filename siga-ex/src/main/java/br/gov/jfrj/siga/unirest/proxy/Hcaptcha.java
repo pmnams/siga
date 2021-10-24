@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 public class Hcaptcha {
 
-	public static JSONObject validarRecaptcha(String secretKey, String responseUIHcaptcha, String remoteip) {
+	public static JSONObject validar(String secretKey, String responseUIHcaptcha, String remoteip) {
 		String proxyHost = Prop.get("/http.proxyHost");
 		Integer proxyPort = Prop.getInt("/http.proxyPort");
 		HttpURLConnection connection = null;

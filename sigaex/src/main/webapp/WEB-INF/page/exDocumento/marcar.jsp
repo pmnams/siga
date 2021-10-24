@@ -1,99 +1,139 @@
 <!-- Marcar Modal -->
-<%@ page contentType="text/html; charset=UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib uri="http://localhost/functiontag" prefix="f"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<c:set var="podeRetroativa" scope="session" value="${f:resource('/siga.marcadores.permite.data.retroativa')}" />
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://localhost/functiontag" prefix="f" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<c:set var="podeRetroativa" scope="session" value="${f:resource('/siga.marcadores.permite.data.retroativa')}"/>
 <div class="modal fade" id="definirMarcaModal" tabindex="-1"
-	role="dialog" aria-labelledby="anotarModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="anotarModalLabel">
-					Acrescentar
-					<fmt:message key="documento.marca2" />
-				</h5>
-				<button type="button" class="close" data-dismiss="modal"
-					aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<form id="marcarForm" name="marcar_gravar" method="POST"
-					action="${linkTo[ExMovimentacaoController].aMarcarGravar()}">
-					<input type="hidden" name="sigla" value="${m.sigla}" />
-					<div class="form-group">
-						<div class="form-group">
-							<div class="text-center" v-if="carregando">
-								<div class="spinner-grow text-info text-center" role="status"></div>
-							</div>
-							<div class="form-group" v-if="!carregando">
-								<label for="marcador">Marcador</label> <select name="marcador"
-									v-model="idMarcador" id="marcador" class="form-control">
-									<optgroup v-for="grupo in listaAgrupada"
-										v-bind:label="grupo.grupo">
-										<option :disabled="!option.ativo" 
-											:style="!option.ativo ? 'color: LightGray;' : ''" 
-											v-for="option in grupo.lista" 
-											v-bind:value="option.idMarcador"
-											v-if="option.ativo || !(option.explicacao).includes('não está marcado ')"
-											>{{ option.nome }}{{option.ativo || (option.explicacao).includes('não está marcado')? '' : ' (Já marcado no documento)'}}</option>
-									</optgroup>
-								</select>
-							</div>
-							<div class="form-group" v-if="exibirInteressado">
-								<label for="marcador">Interessado</label> <select
-									name="interessado" v-model="interessado" id="interessado"
-									class="form-control">
-									<option v-if="marcador.interessado.includes('PESSOA')"
-										value="pessoa">Pessoa</option>
-									<option v-if="marcador.interessado.includes('LOTACAO')"
-										value="lotacao">Lotacao</option>
-								</select>
-							</div>
-							<div v-if="exibirLotacao" class="form-group">
-								<label for="marcador">Lotacao</label>
-								<siga:selecao tema='simple' titulo="Lotação:"
-									propriedade="lotaSubscritor" modulo="siga" />
-							</div>
-							<div v-if="exibirPessoa" class="form-group">
-								<label for="marcador">Pessoa</label>
-								<siga:selecao tema='simple' titulo="Matrícula:"
-									propriedade="subscritor" modulo="siga" />
-							</div>
-							<div
-								v-if="marcador && (marcador.planejada != 'DESATIVADA' || marcador.limite !== 'DESATIVADA')"
-								class="form-group row">
-								<div class="col col-12 col-md-6"
-									v-if="marcador && marcador.planejada != 'DESATIVADA'">
-									<label for="planejada">Data de Exibição</label> <input
-										name="planejada" id="planejada" class="form-control campoData"
-										autocomplete="off" />
-								</div>
-								<div class="col col-12 col-md-6"
-									v-if="marcador && marcador.limite != 'DESATIVADA'">
-									<label for="limite">Prazo Final</label> <input name="limite"
-										id="limite" class="form-control campoData"
-										autocomplete="off" />
-								</div>
-							</div>
-							<div class="form-group"
-								v-if="marcador && marcador.texto && marcador.texto != 'DESATIVADA'">
-								<label for="texto">Texto</label> <input name="texto" id="texto"
-									class="form-control" />
-							</div>
+     role="dialog" aria-labelledby="anotarModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="anotarModalLabel">
+                    Acrescentar
+                    <fmt:message key="documento.marca2"/>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="marcarForm" name="marcar_gravar" method="POST"
+                      action="${linkTo[ExMovimentacaoController].aMarcarGravar()}">
+                    <input type="hidden" name="sigla" value="${m.sigla}"/>
+                    <div class="form-group">
+                        <div class="form-group">
+                            <div class="text-center" v-if="carregando">
+                                <div class="spinner-grow text-info text-center" role="status"></div>
+                            </div>
+                            <div class="form-group" v-if="!carregando">
+                                <label for="marcador">Marcador</label> <select name="marcador"
+                                                                               v-model="idMarcador" id="marcador"
+                                                                               class="form-control">
+                                <optgroup v-for="grupo in listaAgrupada"
+                                          v-bind:label="grupo.grupo">
+                                    <option :disabled="!option.ativo"
+                                            :style="!option.ativo ? 'color: LightGray;' : ''"
+                                            v-for="option in grupo.lista"
+                                            v-bind:value="option.idMarcador"
+                                            v-if="option.ativo || !(option.explicacao).includes('não está marcado ')"
+                                    >{{ option.nome
+                                        }}{{option.ativo || (option.explicacao).includes('não está marcado') ? '' : ' (Já marcado no documento)'}}
+                                    </option>
+                                </optgroup>
+                            </select>
+                            </div>
+                            <div class="form-group" v-if="exibirInteressado">
+                                <label for="marcador">Interessado</label> <select
+                                    name="interessado" v-model="interessado" id="interessado"
+                                    class="form-control">
+                                <option v-if="marcador.interessado.includes('PESSOA')"
+                                        value="pessoa">Pessoa
+                                </option>
+                                <option v-if="marcador.interessado.includes('LOTACAO')"
+                                        value="lotacao">Lotacao
+                                </option>
+                            </select>
+                            </div>
+                            <div v-if="exibirLotacao" class="form-group">
+                                <label for="marcador">Lotacao</label>
+                                <siga:selecao tema='simple' titulo="Lotação:"
+                                              propriedade="lotaSubscritor" modulo="siga"/>
+                            </div>
+                            <div v-if="exibirPessoa" class="form-group">
+                                <label for="marcador">Pessoa</label>
+                                <siga:selecao tema='simple' titulo="Matrícula:"
+                                              propriedade="subscritor" modulo="siga"/>
+                            </div>
+                            <div
+                                    v-if="marcador && (marcador.planejada != 'DESATIVADA' || marcador.limite !== 'DESATIVADA')"
+                                    class="form-group row">
+                                <div class="col col-12 col-md-6"
+                                     v-if="marcador && marcador.planejada != 'DESATIVADA'">
+                                    <label for="planejada">Data de Exibição</label> <input
+                                        name="planejada" id="planejada" class="form-control campoData"
+                                        autocomplete="off"/>
+                                </div>
+                                <div class="col col-12 col-md-6"
+                                     v-if="marcador && marcador.limite != 'DESATIVADA'">
+                                    <label for="limite">Prazo Final</label> <input name="limite"
+                                                                                   id="limite"
+                                                                                   class="form-control campoData"
+                                                                                   autocomplete="off"/>
+                                </div>
+                            </div>
+                            <div class="form-group"
+                                 v-if="marcador && marcador.texto && marcador.texto != 'DESATIVADA'">
+                                <label for="texto">Texto</label> <input name="texto" id="texto"
+                                                                        class="form-control"/>
+                            </div>
 
-						</div>
-					</div>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-				<button type="button" class="btn btn-primary"
-					onclick="javascript: sbmt();">Gravar</button>
-			</div>
-		</div>
-	</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary"
+                        onclick="javascript: sbmt();">Gravar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="anotacaoObservacaoModal" tabindex="-1"
+     role="dialog" aria-labelledby="anotarModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="anotarModalLabel" style="font-weight: bold;">
+                    Anotar
+                </h5>
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="padding-top: 70px; padding-bottom: 60px;">
+                <input type="hidden" name="sigla" value="${m.sigla}"/>
+                <div class="form-group">
+                    <div class="form-group">
+                        <p style="font-size: 13px; color: #9e9e9e;"><span style="font-size: 14px; font-weight: bold;">ATENÇÃO: </span>Anotações
+                            cadastradas não
+                            constituem o documento, são apenas lembretes ou avisos
+                            para os usuários com acesso ao documento, podendo ser
+                            excluídas a qualquer tempo.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="${linkTo[ExMovimentacaoController].aAnotar()}?sigla=${mob.sigla}"
+                   style="background: #007bff; border-radius: 5px; width: 52px; height: 40px; color: white; text-align: center; padding-top: 8px;">Ok</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript" src="/sigaex/javascript/vue.min.js"></script>
@@ -282,4 +322,5 @@
 		document.getElementById('marcarForm').submit();
 	}
 	
+
 </script>

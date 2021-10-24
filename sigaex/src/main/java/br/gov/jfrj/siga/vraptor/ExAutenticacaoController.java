@@ -101,7 +101,7 @@ public class ExAutenticacaoController extends ExController {
 
 		boolean success = false;
 		if (gRecaptchaResponse != null) {
-			JSONObject body = Hcaptcha.validarRecaptcha(recaptchaSitePassword, gRecaptchaResponse, request.getRemoteAddr());
+			JSONObject body = Hcaptcha.validar(recaptchaSitePassword, gRecaptchaResponse, request.getRemoteAddr());
 
 			String hostname = request.getServerName();
 			if (body.getBoolean("success")) {
