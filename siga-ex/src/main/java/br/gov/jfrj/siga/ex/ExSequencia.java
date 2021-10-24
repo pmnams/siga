@@ -59,8 +59,7 @@ public class ExSequencia implements Serializable {
 	}
 	
 	@Id
-	@SequenceGenerator(name="EX_SEQUENCIA_NUMERACAO_GENERATOR", sequenceName="EX_SEQUENCIA_SEQ")
-	@GeneratedValue(generator="EX_SEQUENCIA_NUMERACAO_GENERATOR")
+	@GeneratedValue
 	@Column(name="ID_SEQ")
 	private long idSequencia;
 

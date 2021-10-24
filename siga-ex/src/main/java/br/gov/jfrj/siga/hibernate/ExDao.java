@@ -50,6 +50,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import br.gov.jfrj.siga.ex.*;
 import org.jboss.logging.Logger;
 
 import br.gov.jfrj.siga.base.AplicacaoException;
@@ -64,32 +65,6 @@ import br.gov.jfrj.siga.dp.CpOrgaoUsuario;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.dp.dao.CpDao;
-import br.gov.jfrj.siga.ex.AbstractExMovimentacao;
-import br.gov.jfrj.siga.ex.ExClassificacao;
-import br.gov.jfrj.siga.ex.ExConfiguracao;
-import br.gov.jfrj.siga.ex.ExDocumento;
-import br.gov.jfrj.siga.ex.ExDocumentoNumeracao;
-import br.gov.jfrj.siga.ex.ExEmailNotificacao;
-import br.gov.jfrj.siga.ex.ExEstadoDoc;
-import br.gov.jfrj.siga.ex.ExFormaDocumento;
-import br.gov.jfrj.siga.ex.ExItemDestinacao;
-import br.gov.jfrj.siga.ex.ExMarca;
-import br.gov.jfrj.siga.ex.ExMobil;
-import br.gov.jfrj.siga.ex.ExModelo;
-import br.gov.jfrj.siga.ex.ExMovimentacao;
-import br.gov.jfrj.siga.ex.ExNivelAcesso;
-import br.gov.jfrj.siga.ex.ExPapel;
-import br.gov.jfrj.siga.ex.ExPreenchimento;
-import br.gov.jfrj.siga.ex.ExProtocolo;
-import br.gov.jfrj.siga.ex.ExSequencia;
-import br.gov.jfrj.siga.ex.ExTipoDespacho;
-import br.gov.jfrj.siga.ex.ExTipoDestinacao;
-import br.gov.jfrj.siga.ex.ExTipoDocumento;
-import br.gov.jfrj.siga.ex.ExTipoFormaDoc;
-import br.gov.jfrj.siga.ex.ExTipoMobil;
-import br.gov.jfrj.siga.ex.ExTipoMovimentacao;
-import br.gov.jfrj.siga.ex.ExTpDocPublicacao;
-import br.gov.jfrj.siga.ex.ExVia;
 import br.gov.jfrj.siga.ex.BIE.ExBoletimDoc;
 import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.bl.ExBL;
@@ -274,6 +249,18 @@ public class ExDao extends CpDao {
 		
 		query.executeUpdate();
 		
+	}
+
+	public ExTipoSequencia obterTipoSequencia(String nomeTipoSequencia) {
+		final Query query = em().createNamedQuery("ExTipoSequencia.obterTipoSequencia");
+		query.setParameter("nomeTipoSequencia", nomeTipoSequencia);
+
+		try {
+			List results = query.getResultList();
+			return (ExTipoSequencia) (!results.isEmpty() ? results.get(0) : null);
+		} catch (NoResultException ne) {
+			return null;
+		}
 	}
 	
 	/*****************************/
