@@ -6,8 +6,8 @@ services:
       - target: 9990
         published: 9990
         mode: host
-      - target: 40143
-        published: 40143
+      - target: 8787
+        published: 8787
         mode: host
     volumes:
       - ../siga/:${BASE_PATH}/siga

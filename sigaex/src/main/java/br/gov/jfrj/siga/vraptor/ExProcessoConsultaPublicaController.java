@@ -11,7 +11,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import br.gov.jfrj.siga.unirest.proxy.Hcaptcha;
+import br.gov.jfrj.siga.base.client.Hcaptcha;
 import org.json.JSONException;
 
 import com.auth0.jwt.JWTSigner;

@@ -1,11 +1,13 @@
-package br.gov.jfrj.siga.unirest.proxy;
-
-import java.io.*;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
+package br.gov.jfrj.siga.base.client;
 
 import br.gov.jfrj.siga.base.Prop;
 import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
 
 public class Hcaptcha {
 
