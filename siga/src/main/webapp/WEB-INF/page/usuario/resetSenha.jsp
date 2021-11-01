@@ -9,6 +9,45 @@
     <link rel="stylesheet" href="/siga/css/siga-pin.css" type="text/css" media="screen, projection"/>
     <script src='https://hcaptcha.com/1/api.js'></script>
 
+    <style>
+        #passwordStrength {
+            height: 5px;
+            display: block;
+            float: left;
+
+        }
+
+        .strength0 {
+            width: 100%;
+            background: #cccccc;
+        }
+
+        .strength1 {
+            width: 20%;
+            background: #ff0000;
+        }
+
+        .strength2 {
+            width: 40%;
+            background: #ff5f5f;
+        }
+
+        .strength3 {
+            width: 60%;
+            background: #56e500;
+        }
+
+        .strength4 {
+            background: #4dcd00;
+            width: 80%;
+        }
+
+        .strength5 {
+            background: #399800;
+            width: 100%;
+        }
+    </style>
+
     <div class="container-fluid">
         <c:if test="${baseTeste}">
             <div class="alert alert-warning" role="alert">
@@ -51,8 +90,9 @@
                                             </div>
                                             <div class="row mt-4">
                                                 <div class="col">
+                                                    <label for="recaptcha">Verificação de Segurança</label>
                                                     <div class="form-group">
-                                                        <div class="h-captcha"
+                                                        <div class="h-captcha" id="recaptcha"
                                                              data-sitekey="${captchaSiteKey}"></div>
                                                     </div>
                                                 </div>
@@ -80,6 +120,89 @@
                                             <button type="button" id="btnEnviarCodigo"
                                                     class="btn btn-primary btn-lg mt-2">Enviar Código <i
                                                     class="fa fa-paper-plane" aria-hidden="true"></i></button>
+
+                                        </div>
+                                        <div class="col-md-4 col-lg-4"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="resetSenha" class="etapa js-etapa">
+                        <div class="row">
+                            <div class="col-md-12 col-lg-12">
+                                <div class="py-1 text-center">
+                                    <h2 class="mt-5">Cadastre uma Nova Senha</h2>
+
+
+                                    <div class="row text-center">
+                                        <div class="col-md-4 col-lg-4"></div>
+                                        <div class="col-md-4 col-lg-4">
+                                            <label for="tokenSenha">Informe o código enviado</label>
+                                            <div class="input-group input-group-lg">
+                                                <input type="text" id="tokenSenha" class="form-control "
+                                                       style="text-align: center;" aria-describedby="passwordHelp"
+                                                       minlength="8" maxlength="8" size="8" autocomplete="off" autofocus
+                                                       required/>
+                                            </div>
+                                            <div class="input-group input-group-lg text-left">
+                                                <small class="form-text text-muted">Caso não tenha recebido o e-mail com
+                                                    o código,
+                                                    <button type="button" id="btnReenviarCodigo"
+                                                            class="btn btn-link p-0 border-0">clique aqui
+                                                    </button>
+                                                    para reenviar.</small>
+                                            </div>
+                                            <hr/>
+
+                                            <label for="passNova">Nova Senha</label>
+                                            <div class="input-group input-group-lg">
+                                                <input type="password" name="usuario.senhaNova" id="passNova"
+                                                       aria-describedby="passwordHelp" minlength="6" autocomplete="off"
+                                                       autofocus required
+                                                       class="form-control" style="text-align: center;"/>
+                                                <p><small class="form-text text-muted">Utilize pelo menos 6 caracteres
+                                                    sendo eles maiúsculos, minúsculos e números para aumentar a força da
+                                                    senha.</small></p>
+                                            </div>
+
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="form-group">
+                                                        <div><small><strong>Nível de Senha: </strong><span
+                                                                id="passwordDescription" class="text-muted">Não informada</span></small>
+                                                        </div>
+                                                        <div id="passwordStrength" class="strength0"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <hr/>
+
+                                            <label for="passConfirmacao">Repetição da nova senha</label>
+                                            <div class="input-group input-group-lg">
+                                                <input type="password" name="usuario.senhaConfirma" id="passConfirmacao"
+                                                       aria-describedby="passwordHelp" minlength="6" autocomplete="off"
+                                                       autofocus required
+                                                       class="form-control" style="text-align: center;"/>
+                                            </div>
+
+                                            <hr/>
+                                            <c:if test="false">
+                                                VERIFICAR
+                                                <div class="col-sm-11">
+                                                    <div class="form-check">
+                                                        <input type="checkbox" checked="checked" id="trocarSenhaRede"
+                                                               name="usuario.trocarSenhaRede"
+                                                               class="form-check-input"></input>
+                                                        <label class="form-check-label">
+                                                            Trocar também a senha do computador, da rede e do
+                                                            e-mail </label>
+                                                    </div>
+                                                </div>
+                                            </c:if>
+
 
                                         </div>
                                         <div class="col-md-4 col-lg-4"></div>
@@ -117,6 +240,7 @@
                     <div class="text-center  pt-4">
                         <span class="indicador-etapa  js-indicador-etapa"></span>
                         <span class="indicador-etapa  js-indicador-etapa"></span>
+                        <span class="indicador-etapa js-indicador-etapa"></span>
                     </div>
                 </form>
             </div>

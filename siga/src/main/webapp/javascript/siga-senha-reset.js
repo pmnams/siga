@@ -14,6 +14,11 @@ SenhaReset.Etapas = (function () {
             this.btnGoToMesa = $('#btnGoToMesa');
             this.emailListContainer = $('#emailListContainer');
             this.cpfUser = $('#cpfUser');
+            this.btnEnviarCodigo = $('#btnEnviarCodigo');
+            this.btnReenviarCodigo = $('#btnReenviarCodigo');
+            this.passNova = $('#passNova');
+            this.passConfirmacao = $('#passConfirmacao');
+            this.tokenSenha = $('#tokenSenha');
             this.cpfResetSenhaOK = false;
             this.emailResetSenhaOK = false;
             this.emitter = $({});
@@ -23,7 +28,10 @@ SenhaReset.Etapas = (function () {
         iniciar() {
             this.btnAnterior.on('click', onBtnAnteriorClicado.bind(this));
             this.btnProximo.on('click', onBtnProximoClicado.bind(this));
+            this.btnEnviarCodigo.on('click', onBtnEnviarCodigoClicado.bind(this));
+            this.btnReenviarCodigo.on('click', onBtnReenviarCodigoClicado.bind(this));
 
+            this.passNova.on('keyup', onPassNovaKeyup.bind(this));
             exibirEtapa.call(this, this.etapaAtual);
         }
     }
@@ -42,12 +50,13 @@ SenhaReset.Etapas = (function () {
                 break;
         }
 
-        atualizarEtapa.call(this, -1, false);
+        atualizarEtapa(this, -1, false);
     }
 
 
     function onBtnProximoClicado(podeValidar) {
-        localizarAcesso.call(this);
+        if (this.etapaAtual === 0)
+            localizarAcesso.call(this);
         if (podeValidar !== false && !validarCampos.call(this, this.etapaAtual)) {
             return false;
         }
@@ -60,10 +69,43 @@ SenhaReset.Etapas = (function () {
                     break;
             }
 
-            atualizarEtapa.call(this, 1);
+            atualizarEtapa(this, 1);
         } else if (this.etapaAtual + 1 >= this.etapas.length) {
             salvar.call(this);
         }
+    }
+
+    function onPassNovaKeyup() {
+        passwordStrength(this.passNova.val());
+    }
+
+    function onBtnEnviarCodigoClicado() {
+        enviarCodigo.call(this);
+    }
+
+    function onBtnReenviarCodigoClicado() {
+        enviarCodigo.call(this);
+    }
+
+    function enviarCodigo() {
+        var form = this;
+        emailSelected = $('input[name="gridRadioEmail"]:checked').val();
+        $.ajax({
+            url: '/siga/public/app/usuario/senha/gerar-token-reset',
+            type: 'POST',
+            data: {'cpf': this.cpfUser.val(), 'emailOculto': emailSelected},
+            beforeSend: onSpinnerMostrar.bind(this),
+            success: function (result) {
+                if (form.etapaAtual === 1)
+                    atualizarEtapa(form, 1);
+                sigaModal.alerta("Código de segurança gerado e enviado para o e-mail cadastrado.");
+
+            },
+            error: function (result) {
+                erroRequisicao(form, result);
+            },
+            complete: onSpinnerOcultar.bind(this)
+        });
     }
 
     function habilitarBtnProximo(obj) {
@@ -89,10 +131,8 @@ SenhaReset.Etapas = (function () {
             this.btnProximo.css('display', 'inline');
 
             this.btnProximo.removeClass('btn-primary').addClass('btn-success');
-            this.btnProximo.html('Gerar  <i class="fas fa-check"></i>');
+            this.btnProximo.html('Redefinir Senha  <i class="fas fa-check"></i>');
             this.btnAnterior.html('<i class="fas fa-long-arrow-alt-left"></i> Anterior');
-
-
         }
 
         atualizarTituloEtapaTopo.call(this);
@@ -107,6 +147,14 @@ SenhaReset.Etapas = (function () {
         exibirEtapa.call(this, this.etapaAtual);
     }
 
+    function atualizarEtapa(form, numeroEtapa) {
+
+        form.etapas[form.etapaAtual].style.display = "none";
+        form.etapaAtual += numeroEtapa;
+        exibirEtapa.call(form, form.etapaAtual);
+
+    }
+
     function salvar() {
         if (validarCampos.call(this, this.etapaAtual)) {
             var form = this;
@@ -114,7 +162,12 @@ SenhaReset.Etapas = (function () {
                 url: '/siga/api/v1/pin',
                 contentType: 'application/x-www-form-urlencoded',
                 type: 'POST',
-                data: {'pin': $('#pinUser').val()},
+                data: {
+                    'cpf': this.cpfUser.val(),
+                    'token': this.tokenSenha.val(),
+                    'senhaNova': this.passNova.val(),
+                    'senhaConfirma': this.passConfirmacao.val()
+                },
                 beforeSend: iniciarRequisicao.bind(this),
                 success: function (result) {
                     console.log(result.mensagem);
@@ -210,17 +263,17 @@ SenhaReset.Etapas = (function () {
             switch (this.etapas[i].id) {
                 case 'cpfResetSenha':
                     titulo = 'Encontre seu Acesso';
-                    this.tituloPrincipalEtapa.append('<span class="titulo-etapa-topo  js-titulo-etapa-topo">&nbsp;<i class="fa fa-angle-right" style="color: #000;font-size: 1rem;"></i>&nbsp;' + titulo + '</span>');
                     break;
                 case 'emailResetSenha':
                     titulo = 'Gerar e Enviar Código';
-                    this.tituloPrincipalEtapa.append('<span class="titulo-etapa-topo  js-titulo-etapa-topo">&nbsp;<i class="fa fa-angle-right" style="color: #000;font-size: 1rem;"></i>&nbsp;' + titulo + '</span>');
+                    break;
+                case 'resetSenha':
+                    titulo = 'Defina uma nova Senha';
                     break;
 
             }
+            this.tituloPrincipalEtapa.append('<span class="titulo-etapa-topo  js-titulo-etapa-topo">&nbsp;<i class="fa fa-angle-right" style="color: #000;font-size: 1rem;"></i>&nbsp;' + titulo + '</span>');
         }
-
-
     }
 
     function atualizarSpanIndicadorEtapa(numeroEtapa) {
@@ -252,6 +305,63 @@ SenhaReset.Etapas = (function () {
 
         }
 
+    }
+
+    function validateUsuarioForm(form) {
+        var s = document.getElementById("passwordStrength").className;
+        if (s == "strength0" || s == "strength1" || s == "strength2") {
+            sigaModal.alerta('Senha muito fraca. Por favor, utilize uma senha com pelo menos 6 caracteres incluindo letras maiúsculas, minúsculas e números.');
+            return false;
+        }
+        var p1 = document.getElementById("pass").value;
+        var p2 = document.getElementById("pass2").value;
+        if (p1 != p2) {
+            sigaModal.alerta('Repetição da nova senha não confere, favor redigitar.');
+            return false;
+        }
+        return true;
+    }
+
+    function passwordStrength(password) {
+        var desc = new Array();
+        desc[0] = "Inaceitável";
+        desc[1] = "Muito Fraca";
+        desc[2] = "Fraca";
+        desc[3] = "Razoável";
+        desc[4] = "Boa";
+        desc[5] = "Forte";
+        var score = 0;
+
+        //if password bigger than 6 give 1 point
+        if (password.length >= 6)
+            score++;
+
+        //if password has both lower and uppercase characters give 1 point
+        if ((password.match(/[a-z]/)) && (password.match(/[A-Z]/)))
+            score++;
+
+        //if password has at least one number give 1 point
+        if ((password.match(/[a-z]/) || password.match(/[A-Z]/))
+            && (password.match(/\d+/)))
+            score++;
+
+        //if password has at least one special caracther give 1 point
+        if (password.match(/.[!,@,#,$,%,^,&,*,?,_,~,-,(,)]/))
+            score++;
+
+        //if password bigger than 12 give another 1 point
+        if (password.length >= 12)
+            score++;
+
+        //mininum requirements to be accepted by the AD
+        if (score > 2
+            && (password.length < 6 || !password.match(/[a-z]/)
+                || !password.match(/[A-Z]/) || !password.match(/\d+/)))
+            score = 2;
+
+        document.getElementById("passwordDescription").innerHTML = desc[score];
+        document.getElementById("passwordStrength").className = "strength"
+            + score;
     }
 
     return Etapas;
