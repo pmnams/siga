@@ -223,7 +223,7 @@ public class ExProcessoConsultaPublicaController extends ExController {
 	private boolean isCaptchaValido() throws JSONException {
 		String hCaptchaSitePassword = getHcaptchaSitePassword();
 
-		String gHcaptchaResponse = request.getParameter("h-captcha-response");
+		String gHcaptchaResponse = request.getParameter("captcha-response");
 		boolean success = false;
 		if (gHcaptchaResponse != null) {
 			String hostname = request.getServerName();

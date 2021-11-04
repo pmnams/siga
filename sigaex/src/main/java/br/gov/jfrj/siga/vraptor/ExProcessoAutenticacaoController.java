@@ -97,7 +97,7 @@ public class ExProcessoAutenticacaoController extends ExController {
 			return;
 		}
 
-		String gHcaptchaResponse = request.getParameter("h-captcha-response");
+		String gHcaptchaResponse = request.getParameter("captcha-response");
 		boolean success = false;
 		if (gHcaptchaResponse != null) {
 			String hostname = request.getServerName();

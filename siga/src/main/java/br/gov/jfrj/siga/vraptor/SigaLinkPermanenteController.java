@@ -99,7 +99,7 @@ public class SigaLinkPermanenteController extends SigaController {
 		}
 
 		
-		String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+		String gRecaptchaResponse = request.getParameter("captcha-response");
 		boolean success = false;
 		if (gRecaptchaResponse != null) {
 			JsonNode body = null;

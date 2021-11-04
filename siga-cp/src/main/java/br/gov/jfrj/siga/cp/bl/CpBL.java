@@ -893,6 +893,8 @@ public class CpBL {
 
 
         if (podeTrocar && senhaNova.equals(senhaConfirma)) {
+            consisteFormatoSenha(senhaNova);
+
             try {
                 Date dt = dao().consultarDataEHoraDoServidor();
                 final String hashNova = GeraMessageDigest.executaHash(senhaNova.getBytes(), "MD5");
@@ -1402,6 +1404,9 @@ public class CpBL {
             if (e.getCause() instanceof ConstraintViolationException &&
                     ("CORPORATIVO.DP_PESSOA_UNIQUE_PESSOA_ATIVA".equalsIgnoreCase(((ConstraintViolationException) e.getCause()).getConstraintName()))) {
                 throw new RegraNegocioException("Ocorreu um problema no cadastro da pessoa");
+            } else if (e.getCause() instanceof ConstraintViolationException &&
+                    ("CORPORATIVO.SIGA_VALID_UNIQUE".equalsIgnoreCase(((ConstraintViolationException) e.getCause()).getConstraintName()))) {
+                throw new RegraNegocioException("Usuário já cadastrado com estes dados: Órgão, Cargo, Função, Unidade e CPF");
             } else {
                 //	dao().em().getTransaction().rollback();
                 throw new AplicacaoException("Erro na gravação", 0, e);
@@ -1499,10 +1504,11 @@ public class CpBL {
             if (m.getIdFinalidade() == CpMarcadorFinalidadeEnum.PASTA_PADRAO)
                 cpp++;
         }
-
+        Integer qtdMaxPorUnidade = Prop.getInt("/siga.marcadores.qtd.maxima.por.unidade");
         if (idFinalidade.getIdTpMarcador() == CpTipoMarcadorEnum.TIPO_MARCADOR_LOTACAO && id == null
-                && c > 10)
-            throw new AplicacaoException("Atingiu o limite de 10 marcadores possíveis para " + msgLotacao);
+                && c > qtdMaxPorUnidade)
+            throw new AplicacaoException("Atingiu o limite de " + qtdMaxPorUnidade.toString()
+                    + " marcadores possíveis para " + msgLotacao);
 
         if (idFinalidade == CpMarcadorFinalidadeEnum.PASTA_PADRAO && id == null && cpp > 0)
             throw new AplicacaoException("Só é permitido criar uma pasta padrão");
@@ -1606,6 +1612,23 @@ public class CpBL {
         formatoPinIsValido = true;
 
         return formatoPinIsValido;
+    }
+
+    public Boolean consisteFormatoSenha(String senhaNova) throws RegraNegocioException {
+        boolean formatoSenhaValido = false;
+        final int SIZE_MIN_SENHA = 6;
+
+        if (senhaNova.isEmpty()) {
+            throw new RegraNegocioException("Senha não informada.");
+        }
+
+        if (!SigaUtil.validacaoFormatoSenha(senhaNova)) {
+            throw new RegraNegocioException("Senha inválida. Deve conter pelo menos 6 caracteres sendo eles maiúsculos, minúsculos e números para aumentar a força da senha.");
+        }
+
+        formatoSenhaValido = true;
+
+        return formatoSenhaValido;
     }
 
     public Boolean validaHashPin(String pin, CpIdentidade identidadeCadastrante) throws

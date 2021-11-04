@@ -23,25 +23,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
 
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
+import br.gov.jfrj.siga.ex.converter.ExTipoDePrincipalConverter;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDePrincipal;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Sort;
 import org.hibernate.annotations.SortType;
@@ -432,6 +417,13 @@ public abstract class AbstractExDocumento extends ExArquivo implements
 	@ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = CascadeType.ALL)
 	@JoinColumn(name = "ID_ARQ")
 	private CpArquivo cpArquivo;
+
+	@Column(name = "CD_PRINCIPAL")
+	private String principal;
+
+	@Convert(converter = ExTipoDePrincipalConverter.class)
+	@Column(name = "TP_PRINCIPAL")
+	private ExTipoDePrincipal tipoDePrincipal;
 	
 	/**
 	 * Simple constructor of AbstractExDocumento instances.
@@ -1166,5 +1158,20 @@ public abstract class AbstractExDocumento extends ExArquivo implements
 		else
 			this.descrDocumentoAI = descrDocumentoAI;
 	}
-	
+
+	public String getPrincipal() {
+		return principal;
+	}
+
+	public void setPrincipal(String principal) {
+		this.principal = principal;
+	}
+
+	public ExTipoDePrincipal getTipoDePrincipal() {
+		return tipoDePrincipal;
+	}
+
+	public void setTipoDePrincipal(ExTipoDePrincipal tipoDePrincipal) {
+		this.tipoDePrincipal = tipoDePrincipal;
+	}
 }

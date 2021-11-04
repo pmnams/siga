@@ -35,6 +35,7 @@ import br.gov.jfrj.siga.base.util.Texto;
 import br.gov.jfrj.siga.cp.bl.Cp;
 import br.gov.jfrj.siga.cp.bl.CpBL;
 import br.gov.jfrj.siga.cp.model.DpLotacaoSelecao;
+import br.gov.jfrj.siga.cp.util.SigaUtil;
 import br.gov.jfrj.siga.dp.*;
 import br.gov.jfrj.siga.dp.dao.*;
 import br.gov.jfrj.siga.model.Selecionavel;
@@ -598,6 +599,8 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
                     orgaoIdentidade, ufIdentidade, dataExpedicaoIdentidade, nomeExibicao, enviarEmail);
         } catch (RegraNegocioException e) {
             result.include(SigaModal.ALERTA, e.getMessage());
+        } catch (Exception ex) {
+            result.include(SigaModal.ALERTA, SigaModal.mensagem("Não é permitido cadastrar na mesma unidade, mais de um cargo para o mesmo CPF."));
         }
 
         lista(0, null, null, "", "", null, null, null, "", null);
@@ -888,57 +891,67 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
         String captchaSitePassword = Prop.get("/siga.hcaptcha.pwd");
         result.include("captchaSiteKey", captchaSitePassword);
 
-        if (captchaSiteKey == null || captchaSitePassword == null) {
-            throw new RuntimeException("Captcha não definido");
-        }
+        try {
+            if (captchaSiteKey == null || captchaSitePassword == null) {
+                throw new RuntimeException("Captcha não definido");
+            }
 
-        if (cpf == null) {
-            result.include("request", getRequest());
-            return;
-        }
+            if (cpf == null) {
+                result.include("request", getRequest());
+                return;
+            }
 
-        if (false) {
-            try {
-                String captchaResponse = request.getParameter("recaptcha-response");
-                boolean success = false;
-                if (captchaResponse != null) {
-                    JSONObject body = Hcaptcha.validar(captchaSitePassword, captchaResponse, request.getRemoteAddr());
+            if (false) {
+                try {
+                    String captchaResponse = request.getParameter("captcha-response");
+                    boolean success = false;
+                    if (captchaResponse != null) {
+                        JSONObject body = Hcaptcha.validar(captchaSitePassword, captchaResponse, request.getRemoteAddr());
 
-                    String hostname = request.getServerName();
-                    if (body.getBoolean("success")) {
-                        String retHostname = body.getString("hostname");
-                        success = retHostname.equals(hostname);
+                        String hostname = request.getServerName();
+                        if (body.getBoolean("success")) {
+                            String retHostname = body.getString("hostname");
+                            success = retHostname.equals(hostname);
+                        }
                     }
+                    if (!success) {
+                        result.include("request", getRequest());
+                        return;
+                    }
+                } catch (final Exception e) {
+                    throw new RuntimeException("Não é possível realizar a verificação de segurança com o Captcha: " + e.getMessage());
                 }
-                if (!success) {
-                    result.include("request", getRequest());
-                    return;
+
+            }
+            DpPessoaDaoFiltro dpPessoa = new DpPessoaDaoFiltro();
+
+            dpPessoa.setBuscarFechadas(false);
+            dpPessoa.setCpf(cpf);
+            dpPessoa.setNome("");
+
+            List<DpPessoa> usuarios = dao().consultarPorFiltro(dpPessoa);
+            List<String> emails = new ArrayList<String>();
+
+            if (!usuarios.isEmpty()) {
+                for (DpPessoa usuario : usuarios) {
+                    emails.add(usuario.getEmailPessoaAtualParcialmenteOculto());
                 }
-            } catch (final Exception e) {
-                throw new RuntimeException("Não é possível realizar a verificação de segurança com o Captcha: " + e.getMessage());
+
+            } else {
+                throw new RuntimeException("Usuário não localizado. Verifique os dados informados.");
             }
 
+            String jwt = SigaUtil.buildJwtToken("RESET-SENHA", cpf.toString());
+            HashMap<String, Object> json = new HashMap<>();
+
+            json.put("emails", emails);
+            json.put("jwt", jwt);
+
+            result.use(Results.json()).withoutRoot().from(json).serialize();
+        } catch (RuntimeException ex) {
+            result.use(Results.http()).sendError(400, ex.getMessage());
+        } catch (Exception ex) {
+            result.use(Results.http()).sendError(500, ex.getMessage());
         }
-        DpPessoaDaoFiltro dpPessoa = new DpPessoaDaoFiltro();
-
-        dpPessoa.setBuscarFechadas(false);
-        dpPessoa.setCpf(cpf);
-        dpPessoa.setNome("");
-        List<DpPessoa> usuarios = dao().consultarPorFiltro(dpPessoa);
-        List<String> emails = new ArrayList<String>();
-
-        if (!usuarios.isEmpty()) {
-            for (DpPessoa usuario : usuarios) {
-                emails.add(usuario.getEmailPessoaAtualParcialmenteOculto());
-            }
-
-        } else {
-            throw new RuntimeException("Usuário não localizado. Verifique os dados informados.");
-        }
-
-        emails.add("te******@***.om");
-        emails.add("te******@***.et");
-
-        result.use(Results.json()).from(emails).serialize();
     }
 }

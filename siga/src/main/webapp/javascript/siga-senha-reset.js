@@ -14,6 +14,7 @@ SenhaReset.Etapas = (function () {
             this.btnGoToMesa = $('#btnGoToMesa');
             this.emailListContainer = $('#emailListContainer');
             this.cpfUser = $('#cpfUser');
+            this.jwt = $('#jwt');
             this.btnEnviarCodigo = $('#btnEnviarCodigo');
             this.btnReenviarCodigo = $('#btnReenviarCodigo');
             this.passNova = $('#passNova');
@@ -42,17 +43,20 @@ SenhaReset.Etapas = (function () {
     }
 
     function onBtnAnteriorClicado() {
-        switch (this.etapas[this.etapaAtual - 1].id) {
-            case 'cpfResetSenha':
 
-                break;
-            case 'emailResetSenha':
-                break;
+        if (typeof this.etapas[this.etapaAtual - 1] !== 'undefined') {
+            switch (this.etapas[this.etapaAtual - 1].id) {
+                case 'cpfResetSenha':
+
+                    break;
+                case 'emailResetSenha':
+                    break;
+            }
+            atualizarEtapa(this, -1, false);
+        } else {
+            window.location.href = "/siga/public/app/login";
         }
-
-        atualizarEtapa(this, -1, false);
     }
-
 
     function onBtnProximoClicado(podeValidar) {
         if (this.etapaAtual === 0)
@@ -68,8 +72,6 @@ SenhaReset.Etapas = (function () {
                 case 'emailResetSenha':
                     break;
             }
-
-            atualizarEtapa(this, 1);
         } else if (this.etapaAtual + 1 >= this.etapas.length) {
             salvar.call(this);
         }
@@ -93,7 +95,7 @@ SenhaReset.Etapas = (function () {
         $.ajax({
             url: '/siga/public/app/usuario/senha/gerar-token-reset',
             type: 'POST',
-            data: {'cpf': this.cpfUser.val(), 'emailOculto': emailSelected},
+            data: {'cpf': this.cpfUser.val(), 'emailOculto': emailSelected, 'jwt': this.jwt.val()},
             beforeSend: onSpinnerMostrar.bind(this),
             success: function (result) {
                 if (form.etapaAtual === 1)
@@ -102,7 +104,8 @@ SenhaReset.Etapas = (function () {
 
             },
             error: function (result) {
-                erroRequisicao(form, result);
+                let msgError = result.responseText;
+                erroRequisicao(form, msgError);
             },
             complete: onSpinnerOcultar.bind(this)
         });
@@ -122,17 +125,22 @@ SenhaReset.Etapas = (function () {
             this.btnProximo.removeClass('btn-success').addClass('btn-primary');
             this.btnProximo.html('Próximo  <i class="fas fa-long-arrow-alt-right"></i>');
             this.btnAnterior.html('Cancelar');
+
+            this.cpfUser.focus();
             habilitarBtnProximo(this);
 
         } else if (numeroEtapa == 1) {
             this.btnProximo.css('display', 'none');
-
+            this.btnAnterior.html('<i class="fas fa-long-arrow-alt-left"></i> Anterior');
+            this.emailListContainer.innerHTML = ''; //clear
         } else {
             this.btnProximo.css('display', 'inline');
 
             this.btnProximo.removeClass('btn-primary').addClass('btn-success');
             this.btnProximo.html('Redefinir Senha  <i class="fas fa-check"></i>');
             this.btnAnterior.html('<i class="fas fa-long-arrow-alt-left"></i> Anterior');
+
+            this.tokenSenha.focus();
         }
 
         atualizarTituloEtapaTopo.call(this);
@@ -158,6 +166,8 @@ SenhaReset.Etapas = (function () {
     function salvar() {
         if (validarCampos.call(this, this.etapaAtual)) {
             var form = this;
+            emailSelected = $('input[name="gridRadioEmail"]:checked').val();
+
             $.ajax({
                 url: '/siga/api/v1/pin',
                 contentType: 'application/x-www-form-urlencoded',
@@ -166,7 +176,9 @@ SenhaReset.Etapas = (function () {
                     'cpf': this.cpfUser.val(),
                     'token': this.tokenSenha.val(),
                     'senhaNova': this.passNova.val(),
-                    'senhaConfirma': this.passConfirmacao.val()
+                    'senhaConfirma': this.passConfirmacao.val(),
+                    'jwt': this.jwt.val(),
+                    'emailOculto': emailSelected
                 },
                 beforeSend: iniciarRequisicao.bind(this),
                 success: function (result) {
@@ -174,14 +186,14 @@ SenhaReset.Etapas = (function () {
                     finalizarRequisicao(form);
                 },
                 error: function (result) {
-                    erroRequisicao(form, result);
+                    erroRequisicao(form, result.responseText);
                 },
             });
         }
     }
 
     function localizarAcesso() {
-        var form = this;
+        let form = this;
 
         if (this.cpfUser.val() === "") {
             sigaModal.alerta('CPF não informado. Favor inserí-lo.').select(this.cpfUser);
@@ -195,17 +207,28 @@ SenhaReset.Etapas = (function () {
             return false;
         }
 
+        if (grecaptcha.getResponse().length == 0) {
+            sigaModal.alerta('Verificação de Segurança não efetuada.').select(grecaptcha);
+            validacao.resultado = false;
+            return false;
+
+        }
+
         $.ajax({
             url: '/siga/public/app/pessoa/usuarios/buscarEmailParcialmenteOculto/' + this.cpfUser.val(),
             contentType: 'application/json',
             type: 'GET',
-            data: {'g-recaptcha-response': grecaptcha.getResponse()},
+            data: {'captcha-response': grecaptcha.getResponse()},
             beforeSend: onSpinnerMostrar.bind(this),
             success: function (result) {
-                createRadioEmail(result.list);
+                grecaptcha.reset();
+                form.jwt.val(result.jwt);
+                createRadioEmail(result.emails);
+                atualizarEtapa(form, 1);
             },
             error: function (result) {
-                erroRequisicao(form, "Usuário não localizado. Verifique as informações fornecidas.");
+                grecaptcha.reset();
+                erroRequisicao(form,result.responseText);
             },
             complete: onSpinnerOcultar.bind(this)
         });
@@ -228,6 +251,7 @@ SenhaReset.Etapas = (function () {
         form.spanIndicadorEtapa.parent().show();
         form.btnProximo.parent().show();
         form.spinner.parent().parent().parent().hide();
+        errormsg = errormsg.replace('<html><head><title>Error</title></head><body>','').replace('</body></html>','');
 
         sigaModal.alerta(errormsg, false, "Erro");
         console.log(errormsg);
@@ -282,6 +306,7 @@ SenhaReset.Etapas = (function () {
     }
 
     function createRadioEmail(list) {
+        this.emailListContainer.innerHTML = ''; //clear
 
         for (var idx in list) {
             $('<div>', {

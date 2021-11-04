@@ -72,8 +72,8 @@
                             <div class="col-md-12 col-lg-12">
                                 <div class="py-1 text-center">
                                     <h2 class="mt-5">Esqueceu sua Senha?</h2>
-                                    <p>Não se preocupe! Um código de segurança para definir uma nova SENHA será enviado
-                                        para seu e-mail cadastrado:</p>
+                                    <p>Não se preocupe! Vamos localizar seu acesso e enviar um código de verificação
+                                        para seu e-mail</p>
 
                                     <div class="row text-left">
                                         <div class="col-md-4 col-lg-4"></div>
@@ -90,11 +90,12 @@
                                             </div>
                                             <div class="row mt-4">
                                                 <div class="col">
-                                                    <label for="recaptcha">Verificação de Segurança</label>
+                                                    <label for="captcha">Verificação de Segurança</label>
                                                     <div class="form-group">
-                                                        <div class="h-captcha" id="recaptcha"
+                                                        <div class="h-captcha" id="captcha"
                                                              data-sitekey="${captchaSiteKey}"></div>
                                                     </div>
+                                                    <input type="hidden" name="jwt" id="jwt" value="${jwt}" />
                                                 </div>
                                             </div>
                                         </div>
@@ -109,7 +110,7 @@
                         <div class="row">
                             <div class="col-md-12 col-lg-12">
                                 <div class="py-1 text-center">
-                                    <h2 class="mt-5">Enviar código de Recuperação</h2>
+                                    <h2 class="mt-5">Receber um código de verificação</h2>
                                     <p>Um código de segurança para definir uma nova SENHA será enviado para seu e-mail
                                         cadastrado:</p>
 
@@ -139,14 +140,14 @@
                                     <div class="row text-center">
                                         <div class="col-md-4 col-lg-4"></div>
                                         <div class="col-md-4 col-lg-4">
-                                            <label for="tokenSenha">Informe o código enviado</label>
-                                            <div class="input-group input-group-lg">
+                                            <label for="tokenSenha">Informe o código de verificação enviado</label>
+                                            <div class="input-group">
                                                 <input type="text" id="tokenSenha" class="form-control "
                                                        style="text-align: center;" aria-describedby="passwordHelp"
                                                        minlength="8" maxlength="8" size="8" autocomplete="off" autofocus
                                                        required/>
                                             </div>
-                                            <div class="input-group input-group-lg text-left">
+                                            <div class="input-group text-left">
                                                 <small class="form-text text-muted">Caso não tenha recebido o e-mail com
                                                     o código,
                                                     <button type="button" id="btnReenviarCodigo"
@@ -157,9 +158,9 @@
                                             <hr/>
 
                                             <label for="passNova">Nova Senha</label>
-                                            <div class="input-group input-group-lg">
+                                            <div class="input-group">
                                                 <input type="password" name="usuario.senhaNova" id="passNova"
-                                                       aria-describedby="passwordHelp" minlength="6" autocomplete="off"
+                                                       aria-describedby="passwordHelp" minlength="6" autocomplete="new-password"
                                                        autofocus required
                                                        class="form-control" style="text-align: center;"/>
                                                 <p><small class="form-text text-muted">Utilize pelo menos 6 caracteres
@@ -181,9 +182,9 @@
                                             <hr/>
 
                                             <label for="passConfirmacao">Repetição da nova senha</label>
-                                            <div class="input-group input-group-lg">
+                                            <div class="input-group">
                                                 <input type="password" name="usuario.senhaConfirma" id="passConfirmacao"
-                                                       aria-describedby="passwordHelp" minlength="6" autocomplete="off"
+                                                       aria-describedby="passwordHelp" minlength="6" autocomplete="new-password"
                                                        autofocus required
                                                        class="form-control" style="text-align: center;"/>
                                             </div>

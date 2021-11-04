@@ -18,50 +18,51 @@
  ******************************************************************************/
 package br.gov.jfrj.siga.ex.bl;
 
-import static br.gov.jfrj.siga.ex.ExMobil.isMovimentacaoComOrigemPeloBotaoDeRestricaoDeAcesso;
-import static br.gov.jfrj.siga.ex.ExTipoMovimentacao.TIPO_MOVIMENTACAO_ASSINATURA_COM_SENHA;
-import static br.gov.jfrj.siga.ex.ExTipoMovimentacao.TIPO_MOVIMENTACAO_ASSINATURA_DIGITAL_DOCUMENTO;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.persistence.Query;
-import javax.servlet.http.HttpServletRequest;
-
+import br.gov.jfrj.itextpdf.ConversorHtml;
+import br.gov.jfrj.itextpdf.Documento;
+import br.gov.jfrj.siga.Service;
+import br.gov.jfrj.siga.base.GeraMessageDigest;
+import br.gov.jfrj.siga.base.*;
+import br.gov.jfrj.siga.base.util.SetUtils;
+import br.gov.jfrj.siga.base.util.Texto;
+import br.gov.jfrj.siga.base.util.Utils;
+import br.gov.jfrj.siga.bluc.service.*;
+import br.gov.jfrj.siga.cp.*;
+import br.gov.jfrj.siga.cp.bl.Cp;
+import br.gov.jfrj.siga.cp.bl.CpBL;
+import br.gov.jfrj.siga.cp.bl.CpConfiguracaoBL;
+import br.gov.jfrj.siga.cp.model.enm.CpMarcadorEnum;
+import br.gov.jfrj.siga.cp.model.enm.CpMarcadorFinalidadeEnum;
+import br.gov.jfrj.siga.cp.model.enm.CpMarcadorFinalidadeGrupoEnum;
+import br.gov.jfrj.siga.cp.model.enm.CpSituacaoDeConfiguracaoEnum;
+import br.gov.jfrj.siga.dp.*;
+import br.gov.jfrj.siga.dp.dao.CpDao;
 import br.gov.jfrj.siga.ex.*;
+import br.gov.jfrj.siga.ex.ExMobil.Pendencias;
+import br.gov.jfrj.siga.ex.bl.BIE.BoletimInternoBL;
+import br.gov.jfrj.siga.ex.ext.AbstractConversorHTMLFactory;
+import br.gov.jfrj.siga.ex.logic.ExPodeCancelarMarcacao;
+import br.gov.jfrj.siga.ex.logic.ExPodeMarcar;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDePrincipal;
+import br.gov.jfrj.siga.ex.service.ExService;
+import br.gov.jfrj.siga.ex.util.BIE.ManipuladorEntrevista;
+import br.gov.jfrj.siga.ex.util.*;
+import br.gov.jfrj.siga.hibernate.ExDao;
+import br.gov.jfrj.siga.model.ContextoPersistencia;
+import br.gov.jfrj.siga.model.Objeto;
+import br.gov.jfrj.siga.model.ObjetoBase;
+import br.gov.jfrj.siga.model.Selecionavel;
+import br.gov.jfrj.siga.parser.PessoaLotacaoParser;
+import br.gov.jfrj.siga.parser.SiglaParser;
+import br.gov.jfrj.siga.sinc.lib.*;
+import br.gov.jfrj.siga.wf.service.WfProcedimentoWSTO;
+import br.gov.jfrj.siga.wf.service.WfService;
+import com.crivano.swaggerservlet.ISwaggerRequest;
+import com.crivano.swaggerservlet.ISwaggerResponse;
+import com.crivano.swaggerservlet.SwaggerAsyncResponse;
+import com.crivano.swaggerservlet.SwaggerCall;
+import com.google.gson.*;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.proxy.HibernateProxy;
@@ -72,95 +73,26 @@ import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 
-import com.crivano.swaggerservlet.ISwaggerRequest;
-import com.crivano.swaggerservlet.ISwaggerResponse;
-import com.crivano.swaggerservlet.SwaggerAsyncResponse;
-import com.crivano.swaggerservlet.SwaggerCall;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import javax.persistence.Query;
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
+import java.lang.reflect.*;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import br.gov.jfrj.itextpdf.ConversorHtml;
-import br.gov.jfrj.itextpdf.Documento;
-import br.gov.jfrj.siga.Service;
-import br.gov.jfrj.siga.base.AplicacaoException;
-import br.gov.jfrj.siga.base.Correio;
-import br.gov.jfrj.siga.base.CurrentRequest;
-import br.gov.jfrj.siga.base.Data;
-import br.gov.jfrj.siga.base.GeraMessageDigest;
-import br.gov.jfrj.siga.base.HttpRequestUtils;
-import br.gov.jfrj.siga.base.Par;
-import br.gov.jfrj.siga.base.Prop;
-import br.gov.jfrj.siga.base.RegraNegocioException;
-import br.gov.jfrj.siga.base.RequestInfo;
-import br.gov.jfrj.siga.base.SigaMessages;
-import br.gov.jfrj.siga.base.UsuarioDeSistemaEnum;
-import br.gov.jfrj.siga.base.util.SetUtils;
-import br.gov.jfrj.siga.base.util.Texto;
-import br.gov.jfrj.siga.base.util.Utils;
-import br.gov.jfrj.siga.bluc.service.BlucService;
-import br.gov.jfrj.siga.bluc.service.EnvelopeRequest;
-import br.gov.jfrj.siga.bluc.service.EnvelopeResponse;
-import br.gov.jfrj.siga.bluc.service.ValidateRequest;
-import br.gov.jfrj.siga.bluc.service.ValidateResponse;
-import br.gov.jfrj.siga.cp.CpArquivo;
-import br.gov.jfrj.siga.cp.CpConfiguracao;
-import br.gov.jfrj.siga.cp.CpConfiguracaoCache;
-import br.gov.jfrj.siga.cp.CpIdentidade;
-import br.gov.jfrj.siga.cp.CpToken;
-import br.gov.jfrj.siga.cp.TipoConteudo;
-import br.gov.jfrj.siga.cp.bl.Cp;
-import br.gov.jfrj.siga.cp.bl.CpBL;
-import br.gov.jfrj.siga.cp.bl.CpConfiguracaoBL;
-import br.gov.jfrj.siga.cp.model.enm.CpMarcadorEnum;
-import br.gov.jfrj.siga.cp.model.enm.CpMarcadorFinalidadeEnum;
-import br.gov.jfrj.siga.cp.model.enm.CpMarcadorFinalidadeGrupoEnum;
-import br.gov.jfrj.siga.cp.model.enm.CpSituacaoDeConfiguracaoEnum;
-import br.gov.jfrj.siga.dp.CpMarcador;
-import br.gov.jfrj.siga.dp.CpOrgao;
-import br.gov.jfrj.siga.dp.CpOrgaoUsuario;
-import br.gov.jfrj.siga.dp.DpLotacao;
-import br.gov.jfrj.siga.dp.DpPessoa;
-import br.gov.jfrj.siga.dp.DpResponsavel;
-import br.gov.jfrj.siga.dp.DpSubstituicao;
-import br.gov.jfrj.siga.dp.dao.CpDao;
-import br.gov.jfrj.siga.ex.ExMobil.Pendencias;
-import br.gov.jfrj.siga.ex.bl.BIE.BoletimInternoBL;
-import br.gov.jfrj.siga.ex.ext.AbstractConversorHTMLFactory;
-import br.gov.jfrj.siga.ex.logic.ExPodeCancelarMarcacao;
-import br.gov.jfrj.siga.ex.logic.ExPodeMarcar;
-import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
-import br.gov.jfrj.siga.ex.service.ExService;
-import br.gov.jfrj.siga.ex.util.DatasPublicacaoDJE;
-import br.gov.jfrj.siga.ex.util.FuncoesEL;
-import br.gov.jfrj.siga.ex.util.GeradorRTF;
-import br.gov.jfrj.siga.ex.util.MascaraUtil;
-import br.gov.jfrj.siga.ex.util.Notificador;
-import br.gov.jfrj.siga.ex.util.ProcessadorHtml;
-import br.gov.jfrj.siga.ex.util.ProcessadorModelo;
-import br.gov.jfrj.siga.ex.util.ProcessadorModeloFreemarker;
-import br.gov.jfrj.siga.ex.util.PublicacaoDJEBL;
-import br.gov.jfrj.siga.ex.util.BIE.ManipuladorEntrevista;
-import br.gov.jfrj.siga.hibernate.ExDao;
-import br.gov.jfrj.siga.model.ContextoPersistencia;
-import br.gov.jfrj.siga.model.Objeto;
-import br.gov.jfrj.siga.model.ObjetoBase;
-import br.gov.jfrj.siga.model.Selecionavel;
-import br.gov.jfrj.siga.parser.PessoaLotacaoParser;
-import br.gov.jfrj.siga.parser.SiglaParser;
-import br.gov.jfrj.siga.sinc.lib.Desconsiderar;
-import br.gov.jfrj.siga.sinc.lib.Item;
-import br.gov.jfrj.siga.sinc.lib.Sincronizador;
-import br.gov.jfrj.siga.sinc.lib.Sincronizavel;
-import br.gov.jfrj.siga.sinc.lib.SincronizavelSuporte;
-import br.gov.jfrj.siga.wf.service.WfService;
+import static br.gov.jfrj.siga.ex.ExMobil.isMovimentacaoComOrigemPeloBotaoDeRestricaoDeAcesso;
+import static br.gov.jfrj.siga.ex.ExTipoMovimentacao.TIPO_MOVIMENTACAO_ASSINATURA_COM_SENHA;
+import static br.gov.jfrj.siga.ex.ExTipoMovimentacao.TIPO_MOVIMENTACAO_ASSINATURA_DIGITAL_DOCUMENTO;
 
 public class ExBL extends CpBL {
     private static final String ERRO_EXCLUIR_ARQUIVO = "Erro ao excluir o arquivo";
@@ -4277,7 +4209,7 @@ public class ExBL extends CpBL {
                             ExTipoMovimentacao.TIPO_MOVIMENTACAO_REFAZER,
                             cadastrante, lotaCadastrante, doc.getExMobilPai(), null, null, null,
                             null, null, null);
-                    mov.setDescrMov("Documento refeito. <br /> Documento Cancelado: " + doc.getSigla() + ".<br /> Novo Documento:  " + novoDoc);
+                    mov.setDescrMov("Documento refeito. <br /> Documento Cancelado: " + doc.getSigla() + ".<br /> Novo Documento:  " + novoDoc.getSigla());
 
                     gravarMovimentacao(mov);
                 }
@@ -5592,6 +5524,23 @@ public class ExBL extends CpBL {
         if (acao != null)
             attrs.put(acao, "1");
         attrs.put("doc", doc);
+
+        // Incluir um atributo chamado "wf" que contém os dados do procedimento vinculado
+        if (doc.getTipoDePrincipal() != null && doc.getTipoDePrincipal() == ExTipoDePrincipal.PROCEDIMENTO && doc.getPrincipal() != null) {
+            WfProcedimentoWSTO wf = Service.getWfService().consultarProcedimento(doc.getPrincipal());
+            Map<String, Object> vars = wf.getVar();
+
+            // Converter boolean em Sim/Não
+            if (vars != null)
+                for (String key : vars.keySet()) {
+                    Object val = vars.get(key);
+                    if (val instanceof Boolean)
+                        vars.put(key, ((Boolean) val) ? "Sim" : "Não");
+                }
+
+            attrs.put("wf", wf);
+        }
+
         // rw.setAttribute("modelo", doc.getExModelo());
         if (mov == null) {
             if (doc.getExModelo() != null) {
