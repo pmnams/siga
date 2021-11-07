@@ -1,19 +1,15 @@
 package br.gov.jfrj.siga.wf.logic;
 
-import com.crivano.jlogic.And;
-import com.crivano.jlogic.CompositeExpressionSuport;
-import com.crivano.jlogic.Expression;
-
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.wf.model.WfProcedimento;
-import com.crivano.jlogic.Or;
+import com.crivano.jlogic.*;
 
 public class WfPodeTerminar extends CompositeExpressionSuport {
 
-    private WfProcedimento pi;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final WfProcedimento pi;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public WfPodeTerminar(WfProcedimento pi, DpPessoa titular, DpLotacao lotaTitular) {
         this.pi = pi;
@@ -23,7 +19,8 @@ public class WfPodeTerminar extends CompositeExpressionSuport {
 
     @Override
     protected Expression create() {
-        return Or.of(new WfEstaResponsavel(pi, titular, lotaTitular), And.of(new WfEstaSemResponsavel(pi),
-                new WfPodeEditarDiagrama(pi.getDefinicaoDeProcedimento(), titular, lotaTitular)));
+        return And.of(Not.of(new WfEstaTerminado(pi)),
+                Or.of(new WfEstaResponsavel(pi, titular, lotaTitular),
+                        new WfPodeEditarDiagrama(pi.getDefinicaoDeProcedimento(), titular, lotaTitular)));
     }
 }

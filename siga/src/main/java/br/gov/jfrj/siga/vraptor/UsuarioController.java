@@ -535,7 +535,7 @@ public class UsuarioController extends SigaController {
                 for (DpPessoa usuario : usuarios) {
                     if (emailOculto.equals(usuario.getEmailPessoaAtualParcialmenteOculto())) {
                         CpToken token = Cp.getInstance().getBL().gerarTokenResetSenha(cpf);
-                        Cp.getInstance().getBL().enviarEmailTokenResetPIN(usuario, "Código para redefinição de SENHA ", token.getToken());
+                        Cp.getInstance().getBL().enviarEmailTokenResetSenha(usuario, "Código para redefinição de SENHA ", token.getToken());
                         emailLocalizado = true;
                         break;
                     }
@@ -563,6 +563,7 @@ public class UsuarioController extends SigaController {
         String senhaConfirma = request.getParameter("senhaConfirma");
         String jwt = request.getParameter("jwt");
         String emailOculto = request.getParameter("emailOculto");
+        String trocarSenhaRede = request.getParameter("trocarSenhaRede");
 
         try {
             /* --- Verifica Token gerado na pesquisa de acesso: buscarEmailUsuarioPorCpf */
@@ -586,11 +587,29 @@ public class UsuarioController extends SigaController {
 
                 Cp.getInstance().getBL().invalidarTokenUtilizado(3L, cpf, token);
 
+                //Redefinir senha de rede de todas as matrículas envolvidas
+                if (!listaIdentidadesCpf.isEmpty()) {
+                    for (CpIdentidade usuario : listaIdentidadesCpf) {
+                        if ("true".equals(trocarSenhaRede)) {
+                            String nomeUsuario = usuario.getPessoaAtual().getSiglaCompleta();
+                            try {
+                                IntegracaoLdapViaWebService.getInstancia().trocarSenha(nomeUsuario, senhaNova);
+                            } catch (Exception e) {
+                                LOG.error("Não foi possível alterar a senha de rede de " + nomeUsuario + ". "
+                                        + "Tente novamente em alguns instantes", e);
+                                throw new RegraNegocioException("Senha do siga alterada com sucesso. Não foi possível alterar a senha de rede e do email. "
+                                        + "Tente novamente em alguns instantes ou repita a operação desmarcando a caixa \"Trocar também a senha...\"");
+                            }
+                        }
+                    }
+                }
+
                 //Obter email usado e enviar notificação
                 if (!listaIdentidadesCpf.isEmpty()) {
                     for (CpIdentidade usuario : listaIdentidadesCpf) {
                         if (emailOculto.equals(usuario.getDpPessoa().getEmailPessoaAtualParcialmenteOculto())) {
-                            Cp.getInstance().getBL().enviarEmailDefinicaoPIN(usuario.getDpPessoa(), "Redefinição de Senha", "Você redefiniu sua Senha.");
+                            Cp.getInstance().getBL().enviarEmailDefinicaoSenha(usuario.getDpPessoa(), "Redefinição de SENHA", "Você redefiniu sua Senha.");
+                            break;
                         }
                     }
                 }

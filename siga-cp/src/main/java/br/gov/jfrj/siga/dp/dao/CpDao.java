@@ -1710,37 +1710,41 @@ public class CpDao extends ModeloDao {
         if (id == null || id == 0)
             return null;
 
-        List<DpPessoa> lstCompleta = new ArrayList<DpPessoa>();
-
         DpLotacao lotacao = consultar(id, DpLotacao.class, false);
-
         lotacao = lotacao.getLotacaoAtual();
 
-        if (lotacao == null)
-            return lstCompleta;
+        if (lotacao == null) {
+            return new ArrayList<DpPessoa>();
+        } else {
 
-        List<DpLotacao> sublotacoes = new ArrayList<DpLotacao>();
-        sublotacoes.add(lotacao);
-        if (incluirSublotacoes) {
-            List<DpLotacao> lotacoes = listarLotacoes();
-            boolean continuar = true;
-            while (continuar) {
-                continuar = false;
-                for (DpLotacao lot : lotacoes) {
-                    if (sublotacoes.contains(lot))
-                        continue;
-                    if (sublotacoes.contains(lot.getLotacaoPai())) {
-                        if (!lot.isSubsecretaria()) {
-                            sublotacoes.add(lot);
-                            continuar = true;
+            List<DpLotacao> sublotacoes = new ArrayList<DpLotacao>();
+            sublotacoes.add(lotacao);
+            if (incluirSublotacoes) {
+                List<DpLotacao> lotacoes = listarLotacoes();
+                boolean continuar = true;
+                while (continuar) {
+                    continuar = false;
+                    for (DpLotacao lot : lotacoes) {
+                        if (sublotacoes.contains(lot))
+                            continue;
+                        if (sublotacoes.contains(lot.getLotacaoPai())) {
+                            if (!lot.isSubsecretaria()) {
+                                sublotacoes.add(lot);
+                                continuar = true;
+                            }
                         }
                     }
                 }
             }
+            return obterListaPessoaPorLotacoes(somenteServidor, situacoesFuncionais, sublotacoes);
         }
+    }
+
+    private List<DpPessoa> obterListaPessoaPorLotacoes(Boolean somenteServidor,SituacaoFuncionalEnum situacoesFuncionais, List<DpLotacao> sublotacoes) {
+        List<DpPessoa> lstCompleta = new ArrayList<DpPessoa>();
 
         for (DpLotacao lot : sublotacoes) {
-            final String[] values = new String[]{"ESTAGIARIO", "JUIZ SUBSTITUTO", "JUIZ FEDERAL"};
+            final String[] values = new String[]{"ESTAGIARIO", "JUIZ SUBSTITUTO", "JUIZ FEDERAL", "DESEMBARGADOR FEDERAL"};
             CriteriaQuery<DpPessoa> q = cb().createQuery(DpPessoa.class);
             Root<DpPessoa> c = q.from(DpPessoa.class);
             q.select(c);
@@ -1750,7 +1754,7 @@ public class CpDao extends ModeloDao {
             whereList.add(cb().equal(joinLotacao.get("idLotacao"), lot.getId()));
             if (somenteServidor) {
                 Join<DpPessoa, DpCargo> joinCargo = c.join("cargo", JoinType.LEFT);
-                whereList.add(joinCargo.get("nomeCargo").in(values));
+                whereList.add(joinCargo.get("nomeCargo").in(values).not());
             }
             whereList.add(c.get("situacaoFuncionalPessoa").in(situacoesFuncionais.getValor()));
             whereList.add(cb().isNull(c.get("dataFimPessoa")));

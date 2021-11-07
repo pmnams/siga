@@ -760,13 +760,13 @@ public class ExServiceImpl implements ExService {
         }
     }
 
-    public Boolean isModeloIncluso(String codigoDocumento, Long idModelo) throws Exception {
+    public Boolean isModeloIncluso(String codigoDocumento, Long idModelo, Date depoisDaData) throws Exception {
         try (ExSoapContext ctx = new ExSoapContext(true)) {
             try {
                 ExMobil mob = buscarMobil(codigoDocumento);
                 if (mob.isGeral())
                     mob = mob.getDoc().getPrimeiroMobil();
-                return mob.isModeloIncluso(idModelo);
+                return mob.isModeloIncluso(idModelo, depoisDaData);
             } catch (Exception ex) {
                 ctx.rollback(ex);
                 throw ex;
@@ -993,6 +993,55 @@ public class ExServiceImpl implements ExService {
                         + ex.getMessage(), ex);
             }
             return "Ocorreu um problema na publicação de documento em Portal.";
+        }
+    }
+
+    @Override
+    public void incluirCopiaDeDocumento(String siglaCadastrante, String siglaMobilPai, String siglaMobilFilho) throws Exception {
+        try (ExSoapContext ctx = new ExSoapContext(true)) {
+            try {
+                if (siglaMobilPai == null)
+                    throw new Exception("Informe a sigla do móbil pai");
+                ExMobil mobPai = buscarMobil(siglaMobilPai);
+                if (siglaMobilFilho == null)
+                    throw new Exception("Informe a sigla do móbil filho");
+                ExMobil mobFilho = buscarMobil(siglaMobilFilho);
+
+                PessoaLotacaoParser cadastranteParser = new PessoaLotacaoParser(siglaCadastrante);
+//				if (cadastranteParser.getLotacao() == null && cadastranteParser.getPessoa() == null)
+//					throw new Exception("Cadastrante inválido");
+
+                Ex.getInstance().getBL().copiar(cadastranteParser.getPessoa(),
+                        cadastranteParser.getLotacaoOuLotacaoPrincipalDaPessoa(), mobPai, mobFilho, null, null, null);
+                return;
+            } catch (Exception ex) {
+                ctx.rollback(ex);
+                throw ex;
+            }
+        }
+    }
+
+    @Override
+    public boolean isJuntado(String siglaMobilFilho, String siglaMobilPai) throws Exception {
+        try (ExSoapContext ctx = new ExSoapContext(false)) {
+            if (siglaMobilFilho == null)
+                throw new Exception("Informe a sigla do móbil filho");
+            ExMobil mobFilho = buscarMobil(siglaMobilFilho);
+
+            if (mobFilho.isGeralDeExpediente())
+                mobFilho = mobFilho.doc().getPrimeiraVia();
+            else if (mobFilho.isGeralDeProcesso())
+                mobFilho = mobFilho.doc().getUltimoVolume();
+
+            if (!mobFilho.isJuntado())
+                return false;
+
+            if (siglaMobilPai == null)
+                return mobFilho.isJuntado();
+            ExMobil mobPai = buscarMobil(siglaMobilPai);
+
+            return mobFilho.getMobilPrincipal().equals(mobPai)
+                    || mobFilho.getMobilPrincipal().equals(mobPai.doc().getMobilGeral());
         }
     }
 

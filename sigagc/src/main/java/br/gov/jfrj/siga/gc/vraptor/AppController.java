@@ -195,6 +195,14 @@ public class AppController extends GcController {
 				pagina);
 	}
 
+	@Path("/app/knowledgeInplaceMinimal")
+	public void knowledgeInplaceMinimal(Long id, String[] tags, String msgvazio, String urlvazio, String titulo,
+										boolean testarAcesso, boolean popup, String estiloBusca, Boolean podeCriar, String pagina)
+			throws Exception {
+		renderKnowledge(id, tags, "inplace", msgvazio, urlvazio, titulo, testarAcesso, popup, estiloBusca, podeCriar,
+				pagina);
+	}
+
 	public void knowledgeSidebar(Long id, String[] tags, String msgvazio, String urlvazio, String titulo,
 			boolean testarAcesso, boolean popup, String estiloBusca, Boolean podeCriar, String pagina)
 			throws Exception {
@@ -1078,8 +1086,15 @@ public class AppController extends GcController {
 		// ideal seria injetar null se nenhum parâmetro for especificado.
 		if (pessoa != null && pessoa.getId() == null)
 			pessoa = null;
+
+		if (pessoa != null && pessoa.getId() != null)
+			pessoa = dao().consultar(pessoa.getId(),DpPessoa.class,false);
+
 		if (lotacao != null && lotacao.getId() == null)
 			lotacao = null;
+
+		if (lotacao != null && lotacao.getId() != null)
+			lotacao = dao().consultar(lotacao.getId(),DpLotacao.class,false);
 
 		if (pessoa != null || lotacao != null || email != null) {
 

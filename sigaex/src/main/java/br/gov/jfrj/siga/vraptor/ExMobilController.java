@@ -758,6 +758,29 @@ public class ExMobilController extends
 		return flt;
 	}
 
+	@Get
+	@Path({"/app/mobil/buscar-json/{sigla}"})
+	public void buscaParaIncluir(String sigla) throws Exception{
+		try {
+			final ExMobilDaoFiltro filter = new ExMobilDaoFiltro();
+			filter.setSigla(sigla);
+			ExMobil mob = (ExMobil) dao().consultarPorSigla(filter);
+
+			RetornoJson l = new RetornoJson();
+			if (mob != null) {
+				RetornoJsonItem i = new RetornoJsonItem();
+				i.key = Long.toString(mob.getId());
+				i.firstLine = mob.getSigla();
+				i.secondLine = mob.getDescricao();
+				l.list.add(i);
+			}
+			jsonSuccess(l);
+		} catch (Exception e) {
+			jsonError(e);
+		}
+
+	}
+
 	@Get("app/expediente/doc/carregar_lista_formas")
 	public void aCarregarListaFormas(Long tipoForma, Long idFormaDoc) {
 		result.include("todasFormasDocPorTipoForma",

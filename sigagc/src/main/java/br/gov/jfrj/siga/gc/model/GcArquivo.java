@@ -23,7 +23,7 @@ public class GcArquivo extends Objeto implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID_CONTEUDO")
-	private Long id;
+	private long id;
 
 	@Column(name = "TITULO")
 	private String titulo;

@@ -95,7 +95,7 @@
                                                         <div class="h-captcha" id="captcha"
                                                              data-sitekey="${captchaSiteKey}"></div>
                                                     </div>
-                                                    <input type="hidden" name="jwt" id="jwt" value="${jwt}" />
+                                                    <input type="hidden" name="jwt" id="jwt" value="${jwt}"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -160,7 +160,8 @@
                                             <label for="passNova">Nova Senha</label>
                                             <div class="input-group">
                                                 <input type="password" name="usuario.senhaNova" id="passNova"
-                                                       aria-describedby="passwordHelp" minlength="6" autocomplete="new-password"
+                                                       aria-describedby="passwordHelp" minlength="6"
+                                                       autocomplete="new-password"
                                                        autofocus required
                                                        class="form-control" style="text-align: center;"/>
                                                 <p><small class="form-text text-muted">Utilize pelo menos 6 caracteres
@@ -184,22 +185,21 @@
                                             <label for="passConfirmacao">Repetição da nova senha</label>
                                             <div class="input-group">
                                                 <input type="password" name="usuario.senhaConfirma" id="passConfirmacao"
-                                                       aria-describedby="passwordHelp" minlength="6" autocomplete="new-password"
+                                                       aria-describedby="passwordHelp" minlength="6"
+                                                       autocomplete="new-password"
                                                        autofocus required
                                                        class="form-control" style="text-align: center;"/>
                                             </div>
 
                                             <hr/>
-                                            <c:if test="false">
-                                                VERIFICAR
+                                            <c:if test="${f:podeUtilizarServicoPorConfiguracao(titular,lotaTitular,'SIGA;GI;INT_LDAP:Integrar ao Ldap')}">
                                                 <div class="col-sm-11">
                                                     <div class="form-check">
                                                         <input type="checkbox" checked="checked" id="trocarSenhaRede"
                                                                name="usuario.trocarSenhaRede"
                                                                class="form-check-input"></input>
-                                                        <label class="form-check-label">
-                                                            Trocar também a senha do computador, da rede e do
-                                                            e-mail </label>
+                                                        <label class="form-check-label">Redefinir também a senha do
+                                                            computador, da rede e do e-mail</label>
                                                     </div>
                                                 </div>
                                             </c:if>

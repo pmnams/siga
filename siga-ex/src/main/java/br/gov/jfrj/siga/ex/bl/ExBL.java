@@ -962,7 +962,7 @@ public class ExBL extends CpBL {
             if (mobVerif.isApensadoAVolumeDoMesmoProcesso())
                 continue;
 
-            if (!mobVerif.isApensadoAVolumeDoMesmoProcesso() && !mobVerif.isAtendente(cadastrante, lotaCadastrante))
+            if (lotaCadastrante != null && !mobVerif.isApensadoAVolumeDoMesmoProcesso() && !mobVerif.isAtendente(cadastrante, lotaCadastrante))
                 foraDaLota += (foraDaLota.length() < 2
                         ? " Os seguintes volumes ou vias encontram-se em lotação diferente de " + lotaCadastrante.getSigla()
                         + ": "
@@ -5009,6 +5009,12 @@ public class ExBL extends CpBL {
                             mov.setExMovimentacaoRef(t);
                             break;
                         }
+                    }
+
+                    // Titular é a origem e deve sempre ser preenchido
+                    if (mov.getExMovimentacaoRef() == null && p.fIncluirCadastrante) {
+                        mov.setTitular(mov.mob().doc().getCadastrante());
+                        mov.setLotaTitular(mov.mob().doc().getLotaCadastrante());
                     }
 
                     // Cancelar trâmite pendente quando é para forçar para outro destino

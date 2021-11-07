@@ -356,9 +356,16 @@ public class WfDiagramaController extends WfSelecionavelController<WfDefinicaoDe
 				result.redirectTo("editar?id=" + pd.getId());
 				return;
 			}
-			jsonSuccess("OK");
+			jsonSuccess(new GravarResultado(pd.getId()));
 		} catch (Exception e) {
 			jsonError(e);
+		}
+	}
+
+	private static class GravarResultado {
+		String id;
+		public GravarResultado(Long id) {
+			this.id = id.toString();
 		}
 	}
 

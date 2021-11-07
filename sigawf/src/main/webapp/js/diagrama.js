@@ -117,7 +117,7 @@ app
                         if (t.tipoResponsavel == 'RESPONSAVEL')
                             td.definicaoDeResponsavelId = t.refResponsavel;
 
-                        if ((t.tipo == 'INCLUIR_DOCUMENTO' || t.tipo == 'CRIAR_DOCUMENTO') && t.ref && t.ref.originalObject && t.ref.originalObject.key) {
+                        if ((t.tipo == 'INCLUIR_DOCUMENTO' || t.tipo == 'INCLUIR_COPIA' || t.tipo == 'CRIAR_DOCUMENTO') && t.ref && t.ref.originalObject && t.ref.originalObject.key) {
                             td.refId = t.ref.originalObject.key;
                             td.refSigla = t.ref.originalObject.firstLine;
                         }
@@ -368,7 +368,6 @@ app
                             id: "fim",
                             nome: "[Fim]"
                         })
-
                         $scope.tarefas = tarefas;
 
                         // Atualizar lista de preenchimentos automáticos da tarefa
@@ -384,16 +383,7 @@ app
                                 t.preenchimentoPessoaId = undefined;
                                 if (t.tipoResponsavel == 'PESSOA')
                                     t.preenchimentoPessoaId = t.refPessoaResponsavel.originalObject.key;
-                                var tarefa = t;
-                                $http({
-                                    url: '/sigaex/api/v1/modelos/' + t.ref.originalObject.key + (t.tipoResponsavel == 'PESSOA' ? '/pessoas/' + t.preenchimentoPessoaId : '/lotacoes/' + t.preenchimentoLotacaoId) + '/preenchimentos',
-                                    method: "GET"
-                                }).then(
-                                    function (response) {
-                                        tarefa.preenchimentos = response.data.list;
-                                    },
-                                    function (response) {
-                                    });
+                                $scope.atualizarPreenchimentos(t);
                             }
                         }
 
@@ -401,6 +391,18 @@ app
                         console.log('graphDrawDebounced')
                         $scope.graphDrawDebounced();
                     }, true);
+
+            $scope.atualizarPreenchimentos = function (t) {
+                $http({
+                    url: '/sigaex/api/v1/modelos/' + t.ref.originalObject.key + (t.tipoResponsavel == 'PESSOA' ? '/pessoas/' + t.preenchimentoPessoaId : '/lotacoes/' + t.preenchimentoLotacaoId) + '/preenchimentos',
+                    method: "GET"
+                }).then(
+                    function (response) {
+                        t.preenchimentos = response.data.list;
+                    },
+                    function (response) {
+                    });
+            }
 
             $scope.getResponsavelNome = function (s) {
                 if (!$scope.responsaveis)
