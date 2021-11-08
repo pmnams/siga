@@ -381,7 +381,7 @@ public class ExServiceImpl implements ExService {
     public String criarDocumento(String cadastranteStr, String subscritorStr, String destinatarioStr,
                                  String destinatarioCampoExtraStr, String descricaoTipoDeDocumento, String nomeForma, String nomeModelo, String nomePreenchimento,
                                  String classificacaoStr, String descricaoStr, Boolean eletronico, String nomeNivelDeAcesso, String conteudo,
-                                 String siglaMobilPai, String tipoPrincipal, String siglaPrincipal, Boolean finalizar) throws Exception {
+                                 String siglaMobilPai, String siglaMobilFilho, String tipoPrincipal, String siglaPrincipal, Boolean finalizar) throws Exception {
         try (ExSoapContext ctx = new ExSoapContext(true)) {
             try {
                 DpPessoa cadastrante = null;
@@ -472,7 +472,7 @@ public class ExServiceImpl implements ExService {
                 lotaCadastrante = cadastranteParser.getLotacaoOuLotacaoPrincipalDaPessoa();
 
                 if (cadastrante == null && lotaCadastrante != null) {
-                    if (subscritor != null && lotaCadastrante.equivale(subscritor.getLotacao()))
+                    if (subscritor != null)
                         cadastrante = subscritor;
                     else {
                         List<DpPessoa> pessoas = dao().pessoasPorLotacao(lotaCadastrante.getId(), false, false);
@@ -584,8 +584,11 @@ public class ExServiceImpl implements ExService {
 
                 doc.setCadastrante(cadastrante);
                 doc.setLotaCadastrante(lotaCadastrante);
-                doc.setTitular(cadastrante);
-                doc.setLotaTitular(lotaCadastrante);
+
+                if (subscritor != null && doc.getTitular() == null) {
+                    doc.setTitular(subscritor);
+                    doc.setLotaTitular(subscritor.getLotacao());
+                }
 
                 if (destinatarioStr != null) {
                     try {
@@ -664,6 +667,25 @@ public class ExServiceImpl implements ExService {
                                     + docPai.getSigla() + ") ainda não foi assinado.");
 
                         doc.setExMobilPai(mobPai);
+                    }
+                }
+
+                if (siglaMobilFilho != null && !siglaMobilFilho.isEmpty()) {
+                    final ExMobilDaoFiltro filter = new ExMobilDaoFiltro();
+                    filter.setSigla(siglaMobilFilho);
+                    ExMobil mobFilho = (ExMobil) dao().consultarPorSigla(filter);
+                    if (mobFilho != null) {
+                        ExDocumento docFilho = mobFilho.getExDocumento();
+
+                        if (docFilho.getExMobilAutuado() != null)
+                            throw new AplicacaoException("Não foi possível criar o documento pois o documento filho ("
+                                    + docFilho.getSigla() + ") já é autuado.");
+
+                        if (docFilho.isPendenteDeAssinatura())
+                            throw new AplicacaoException("Não foi possível criar o documento pois o documento filho ("
+                                    + docFilho.getSigla() + ") ainda não foi assinado.");
+
+                        doc.setExMobilAutuado(mobFilho);
                     }
                 }
 
@@ -1040,8 +1062,32 @@ public class ExServiceImpl implements ExService {
                 return mobFilho.isJuntado();
             ExMobil mobPai = buscarMobil(siglaMobilPai);
 
+            if (mobPai.isGeralDeExpediente())
+                mobPai = mobPai.doc().getPrimeiraVia();
+            else if (mobPai.isGeralDeProcesso())
+                mobPai = mobPai.doc().getUltimoVolume();
+
             return mobFilho.getMobilPrincipal().equals(mobPai)
                     || mobFilho.getMobilPrincipal().equals(mobPai.doc().getMobilGeral());
+        }
+    }
+
+    @Override
+    public Boolean atualizarPrincipal(String codigoDocumento, String tipoPrincipal,
+                                      String siglaPrincipal)
+            throws Exception {
+        try (ExSoapContext ctx = new ExSoapContext(true)) {
+            try {
+                ExMobil mob = buscarMobil(codigoDocumento);
+                ExTipoDePrincipal tipo = null;
+                if (tipoPrincipal != null)
+                    tipo = ExTipoDePrincipal.valueOf(tipoPrincipal);
+                Ex.getInstance().getBL().atualizarPrincipal(mob.doc(), tipo, siglaPrincipal);
+                return true;
+            } catch (Exception ex) {
+                ctx.rollback(ex);
+                throw ex;
+            }
         }
     }
 

@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -537,6 +538,11 @@ public class UsuarioController extends SigaController {
                         CpToken token = Cp.getInstance().getBL().gerarTokenResetSenha(cpf);
                         Cp.getInstance().getBL().enviarEmailTokenResetSenha(usuario, "Código para redefinição de SENHA ", token.getToken());
                         emailLocalizado = true;
+
+                        HashMap<String, Object> json = new HashMap<>();
+                        json.put("ldapEnable", Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(usuario,usuario.getLotacao(),"SIGA;GI;INT_LDAP"));
+                        result.use(Results.json()).withoutRoot().from(json).serialize();
+
                         break;
                     }
                 }
@@ -545,7 +551,6 @@ public class UsuarioController extends SigaController {
             if (!emailLocalizado) {
                 throw new RuntimeException("Usuário não localizado. Verifique os dados informados.");
             }
-            result.use(Results.status()).noContent();
         } catch (RuntimeException ex) {
             result.use(Results.http()).sendError(400, ex.getMessage());
         } catch (Exception ex) {
@@ -566,7 +571,7 @@ public class UsuarioController extends SigaController {
         String trocarSenhaRede = request.getParameter("trocarSenhaRede");
 
         try {
-            /* --- Verifica Token gerado na pesquisa de acesso: buscarEmailUsuarioPorCpf */
+            /* - Valida JWT gerado na pesquisa de acesso: buscarEmailUsuarioPorCpf */
             SigaUtil.verifyGetJwtToken(jwt).get("sub").toString();
             final String TIPO_JWT = "RESET-SENHA";
             if (!TIPO_JWT.equals(SigaUtil.verifyGetJwtToken(jwt).get("tipo").toString()) || !strCpf.equals(SigaUtil.verifyGetJwtToken(jwt).get("sub").toString())) {
@@ -578,19 +583,20 @@ public class UsuarioController extends SigaController {
                 throw new RuntimeException("Repetição da nova senha não confere, favor redigitar.");
             }
 
+            //Prosseguir com redefinição se JWT é válido e Token enviado para email é válido
             long cpf = Long.valueOf(request.getParameter("cpf"));
-            if (Cp.getInstance().getBL().isTokenValido(3L, cpf, token)) {
-
+            if (Cp.getInstance().getBL().isTokenValido(CpToken.TOKEN_SENHA, cpf, token)) {
+                //Obter Todas as identidade para o CPF e redefinir a senha
                 List<CpIdentidade> listaIdentidadesCpf = new ArrayList<CpIdentidade>();
                 listaIdentidadesCpf = CpDao.getInstance().consultaIdentidadesPorCpf(strCpf);
                 Cp.getInstance().getBL().redefinirSenha(token, senhaNova, senhaConfirma, strCpf, listaIdentidadesCpf);
 
-                Cp.getInstance().getBL().invalidarTokenUtilizado(3L, cpf, token);
+                Cp.getInstance().getBL().invalidarTokenUtilizado(CpToken.TOKEN_SENHA, cpf, token);
 
                 //Redefinir senha de rede de todas as matrículas envolvidas
                 if (!listaIdentidadesCpf.isEmpty()) {
                     for (CpIdentidade usuario : listaIdentidadesCpf) {
-                        if ("true".equals(trocarSenhaRede)) {
+                        if ("true".equals(trocarSenhaRede) && Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(usuario.getPessoaAtual(),usuario.getPessoaAtual().getLotacao(),"SIGA;GI;INT_LDAP")) {
                             String nomeUsuario = usuario.getPessoaAtual().getSiglaCompleta();
                             try {
                                 IntegracaoLdapViaWebService.getInstancia().trocarSenha(nomeUsuario, senhaNova);

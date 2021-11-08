@@ -222,6 +222,9 @@
                                                     ng-if="data.workflow.tipoDePrincipal == 'DOCUMENTO'">
                                                 Incluir Cópia
                                             </option>
+                                            <option value="AUTUAR_DOCUMENTO"
+                                                    ng-if="data.workflow.tipoDePrincipal == 'DOCUMENTO'">
+                                                Autuar Documento</option>
                                             <option value="TRAMITAR_PRINCIPAL"
                                                     ng-if="data.workflow.tipoDePrincipal == 'DOCUMENTO'">
                                                 Tramitar
@@ -252,7 +255,7 @@
                                 </select>
                                     <i></i></section>
                                 <section
-                                        ng-show="tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL'"
+                                        ng-show="tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL'"
                                         class="col col-12 col-md-2 col-lg-2 form-group">
                                     <label
                                             for="tipoResponsavel" title="" class="label">Tipo Resp.<i
@@ -325,7 +328,7 @@
                                     </select>
                                 </section>
                                 <section
-                                        ng-show="(tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL') && tarefaItem.tipoResponsavel == 'LOTACAO'"
+                                        ng-show="(tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL') && tarefaItem.tipoResponsavel == 'LOTACAO'"
                                         class="col col-12 col-md-3 col-lg-3 form-group">
                                     <label
                                             for="refUnidadeResponsavel" title="" class="label">Lotação
@@ -347,7 +350,7 @@
                                          template-url="/siga/javascript/angucomplete-alt/custom-template.html"></div>
                                 </section>
                                 <section
-                                        ng-show="(tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL') && tarefaItem.tipoResponsavel == 'PESSOA'"
+                                        ng-show="(tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL') && tarefaItem.tipoResponsavel == 'PESSOA'"
                                         class="col col-12 col-md-3 col-lg-3 form-group">
                                     <label for="refPessoaResponsavel" title="" class="label">Pessoa</label>
                                     Resp.
@@ -367,7 +370,7 @@
                                          template-url="/siga/javascript/angucomplete-alt/custom-template.html"></div>
                                 </section>
                                 <section
-                                        ng-show="(tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL') && tarefaItem.tipoResponsavel == 'RESPONSAVEL'"
+                                        ng-show="(tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL') && tarefaItem.tipoResponsavel == 'RESPONSAVEL'"
                                         class="col col-12 col-md-3 col-lg-3 form-group">
                                     <label for="refResponsavel" title="" class="label">Responsável</label>
                                     <select ng-model="tarefaItem.refResponsavel"
@@ -375,7 +378,7 @@
                                             class="form-control"></select>
                                 </section>
                                 <section
-                                        ng-show="tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO'"
+                                        ng-show="tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO'"
                                         class="col col-12 col-md-3 col-lg-3 form-group">
                                     <label for="ref" title="" class="label">Modelo</label>
                                     <div minlength="1" selected-object="selectedObject"
@@ -389,9 +392,9 @@
                                          text-no-results="Não encontrei nenhuma Tipologia Documental."
                                          match-class="highlight"
                                          selected-object-data="{context:tarefaItem, variable: 'ref', full:false}"
-                                         remote-url="/sigaex/app/modelo/buscar-json-para-incluir/"
+                                         remote-url="{{'/sigaex/app/modelo/buscar-json-para-' + (tarefaItem.tipo == 'CRIAR_DOCUMENTO' ? 'incluir' : 'autuar') + '/'}}"
                                          angucomplete-alt name="ref"
-                                         placeholder="Pesquisar Tipologia Documental" id="ref"
+                                         placeholder="Pesquisar Modelo de Documento" id="ref"
                                          class="angucomplete-ctrl"
                                          template-url="/siga/javascript/angucomplete-alt/custom-template.html"></div>
                                 </section>
@@ -416,20 +419,20 @@
                                          template-url="/siga/javascript/angucomplete-alt/custom-template.html"></div>
                                 </section>
                                 <section
-                                        ng-show="tarefaItem.tipo == 'CRIAR_DOCUMENTO'"
+                                        ng-if="tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO'"
                                         ng-if="tarefaItem.preenchimentos"
                                         class="col col-12 col-md-3 col-lg-3 form-group">
                                     <label for="ref2" title="" class="label">Preenchimento</label>
                                     <select ng-model="tarefaItem.ref2"
                                             ng-options="item.idPreenchimento as item.nome for item in tarefaItem.preenchimentos"
                                             class="form-control"></select></section>
-                                <section ng-if="tarefaItem.tipo == 'CRIAR_DOCUMENTO'"
+                                <section ng-if="tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO'"
                                          class="col col-12 col-md-3 col-lg-3 form-group"><label
                                         for="param" title="" class="label mb-0">Finalizar</label> <select
                                         ng-model="tarefaItem.param"
                                         ng-options="item.id as item.nome for item in [{id: 'NAO_FINALIZAR', nome: 'Não Finalizar'},{id: 'FINALIZAR', nome: 'Finalizar'}]"
                                         class="form-control"></select></section>
-                                <section ng-if="tarefaItem.tipo == 'CRIAR_DOCUMENTO' && tarefaItem.param == 'FINALIZAR'"
+                                <section ng-if="(tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO') && tarefaItem.param == 'FINALIZAR'"
                                          class="col col-12 col-md-3 col-lg-3 form-group"><label
                                         for="param2" title="" class="label mb-0">Aguardar</label>
                                     <select ng-model="tarefaItem.param2"

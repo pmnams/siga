@@ -18,16 +18,9 @@
  ******************************************************************************/
 package br.gov.jfrj.siga.ex.bl;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Set;
-
 import br.gov.jfrj.siga.base.Prop;
 import br.gov.jfrj.siga.base.SigaMessages;
+import br.gov.jfrj.siga.base.util.Utils;
 import br.gov.jfrj.siga.cp.CpComplexo;
 import br.gov.jfrj.siga.cp.bl.Cp;
 import br.gov.jfrj.siga.cp.bl.CpCompetenciaBL;
@@ -35,32 +28,17 @@ import br.gov.jfrj.siga.cp.model.enm.CpMarcadorEnum;
 import br.gov.jfrj.siga.cp.model.enm.CpSituacaoDeConfiguracaoEnum;
 import br.gov.jfrj.siga.cp.model.enm.CpTipoDeConfiguracao;
 import br.gov.jfrj.siga.cp.model.enm.ITipoDeConfiguracao;
-import br.gov.jfrj.siga.dp.CpMarca;
-import br.gov.jfrj.siga.dp.CpOrgaoUsuario;
-import br.gov.jfrj.siga.dp.DpCargo;
-import br.gov.jfrj.siga.dp.DpFuncaoConfianca;
-import br.gov.jfrj.siga.dp.DpLotacao;
-import br.gov.jfrj.siga.dp.DpPessoa;
-import br.gov.jfrj.siga.dp.DpResponsavel;
+import br.gov.jfrj.siga.dp.*;
 import br.gov.jfrj.siga.dp.dao.CpDao;
-import br.gov.jfrj.siga.ex.ExClassificacao;
-import br.gov.jfrj.siga.ex.ExConfiguracao;
-import br.gov.jfrj.siga.ex.ExConfiguracaoCache;
-import br.gov.jfrj.siga.ex.ExDocumento;
-import br.gov.jfrj.siga.ex.ExFormaDocumento;
-import br.gov.jfrj.siga.ex.ExMobil;
+import br.gov.jfrj.siga.ex.*;
 import br.gov.jfrj.siga.ex.ExMobil.Pendencias;
-import br.gov.jfrj.siga.ex.ExModelo;
-import br.gov.jfrj.siga.ex.ExMovimentacao;
-import br.gov.jfrj.siga.ex.ExNivelAcesso;
-import br.gov.jfrj.siga.ex.ExPapel;
-import br.gov.jfrj.siga.ex.ExTipoDocumento;
-import br.gov.jfrj.siga.ex.ExTipoFormaDoc;
-import br.gov.jfrj.siga.ex.ExTipoMovimentacao;
-import br.gov.jfrj.siga.ex.ExVia;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDePrincipal;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.parser.PessoaLotacaoParser;
+
+import java.lang.reflect.Method;
+import java.util.*;
 
 public class ExCompetenciaBL extends CpCompetenciaBL {
 
@@ -4145,7 +4123,7 @@ public class ExCompetenciaBL extends CpCompetenciaBL {
             return false;
         ExMovimentacao ultMov = mob.getUltimaMovimentacaoNaoCancelada();
         if (ultMov.getExTipoMovimentacao().getIdTpMov() == ExTipoMovimentacao.TIPO_MOVIMENTACAO_TRANSFERENCIA
-                && ultMov.getCadastrante().equivale(titular) && ultMov.getLotaResp().equivale(lotaTitular))
+                && Utils.equivale(ultMov.getCadastrante(), titular) && Utils.equivale(ultMov.getLotaResp(), lotaTitular))
             return false;
         return true;
     }
@@ -4553,6 +4531,9 @@ public class ExCompetenciaBL extends CpCompetenciaBL {
                                              final DpPessoa titular, final DpLotacao lotaTitular, final ExMobil mob) {
 
         if (lotaDestinatario == null && destinatario == null)
+            return false;
+
+        if (mob.doc().getPrincipal() != null && ExTipoDePrincipal.PROCEDIMENTO == mob.doc().getTipoDePrincipal())
             return false;
 
         if (!podeReceberPorConfiguracao(destinatario, lotaDestinatario))

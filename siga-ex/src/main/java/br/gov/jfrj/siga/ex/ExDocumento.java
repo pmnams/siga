@@ -21,38 +21,6 @@ package br.gov.jfrj.siga.ex;
 /*
  */
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.DynamicUpdate;
-import org.jboss.logging.Logger;
-
 import br.gov.jfrj.itextpdf.Documento;
 import br.gov.jfrj.siga.base.AplicacaoException;
 import br.gov.jfrj.siga.base.Prop;
@@ -65,15 +33,25 @@ import br.gov.jfrj.siga.dp.DpResponsavel;
 import br.gov.jfrj.siga.ex.BIE.ExBoletimDoc;
 import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.bl.ExAcesso;
-import br.gov.jfrj.siga.ex.util.AnexoNumeradoComparator;
-import br.gov.jfrj.siga.ex.util.Compactador;
-import br.gov.jfrj.siga.ex.util.DocumentoFilhoComparator;
-import br.gov.jfrj.siga.ex.util.DocumentoUtil;
-import br.gov.jfrj.siga.ex.util.ProcessadorHtml;
-import br.gov.jfrj.siga.ex.util.ProcessadorReferencias;
-import br.gov.jfrj.siga.ex.util.TipoMobilComparatorInverso;
+import br.gov.jfrj.siga.ex.util.*;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.model.CarimboDeTempo;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.DynamicUpdate;
+import org.jboss.logging.Logger;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * A class that represents a row in the 'EX_DOCUMENTO' table. This class may be
@@ -3019,5 +2997,9 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
 
     public void setNumeroSequenciaGenerica(String numeroSequenciaGenerica) {
         this.numeroSequenciaGenerica = numeroSequenciaGenerica;
+    }
+
+    public ExRef getRef() {
+        return new ExRef(this);
     }
 }

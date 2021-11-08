@@ -237,8 +237,6 @@ public class CpConfiguracaoBL {
     /**
      * Varre as entidades definidas na configuração para evitar que o hibernate
      * guarde versões lazy delas.
-     *
-     * @param listaCfg - lista de configurações que podem ter objetos lazy
      */
     protected void evitarLazy(List<CpConfiguracao> provResults) {
         for (CpConfiguracao cfg : provResults) {
@@ -329,7 +327,6 @@ public class CpConfiguracaoBL {
      *
      * @param cpConfiguracaoFiltro
      * @param atributoDesconsideradoFiltro
-     * @param lista
      * @return
      * @throws Exception
      */
@@ -414,8 +411,6 @@ public class CpConfiguracaoBL {
                 if (cfg.cpGrupo == 0 || cfg.cpPerfil == null || !cfg.ativaNaData(dtEvn))
                     continue;
 
-                Object g = dao().consultar(cfg.cpGrupo, CpPerfil.class, false);
-
                 if (cfg.dpPessoa != 0 && cfg.dpPessoa != pessoa.getIdInicial())
                     continue;
 
@@ -431,6 +426,7 @@ public class CpConfiguracaoBL {
                 if (cfg.orgaoUsuario != 0 && cfg.lotacao != lotacao.getIdInicial())
                     continue;
 
+                Object g = dao().consultar(cfg.cpGrupo, CpPerfil.class, false);
                 if (g instanceof CpPerfil && cfg.dscFormula != null) {
                     Map<String, DpPessoa> pessoaMap = new HashMap<String, DpPessoa>();
                     pessoaMap.put("pessoa", pessoa);
@@ -439,13 +435,16 @@ public class CpConfiguracaoBL {
                     }
                 }
 
-                do {
-                    perfis.add(cfg.cpPerfil);
-                    g = cfg.cpPerfil.getCpGrupoPai();
-                    if (g instanceof HibernateProxy) {
-                        g = (CpPerfil) ((HibernateProxy) g).getHibernateLazyInitializer().getImplementation();
-                    }
-                } while (g != null);
+                CpPerfil perfil = cfg.cpPerfil;
+                while (perfil != null) {
+                    perfis.add(perfil);
+                    CpGrupo grp = cfg.cpPerfil.getCpGrupoPai();
+                    if (!(grp instanceof CpPerfil))
+                        break;
+                    perfil = (CpPerfil) grp;
+                    if (perfil != null && perfil instanceof HibernateProxy)
+                        perfil = (CpPerfil) ((HibernateProxy) perfil).getHibernateLazyInitializer().getImplementation();
+                }
             }
         }
         return perfis;
@@ -566,19 +565,6 @@ public class CpConfiguracaoBL {
     /**
      * Método com implementação completa, chamado pelas outras sobrecargas
      *
-     * @param cpTpDoc
-     * @param cpFormaDoc
-     * @param cpMod
-     * @param cpClassificacao
-     * @param cpVia
-     * @param cpTpMov
-     * @param cargo
-     * @param cpOrgaoUsu
-     * @param dpFuncaoConfianca
-     * @param dpLotacao
-     * @param dpPessoa
-     * @param nivelAcesso
-     * @param idTpConf
      * @throws Exception
      */
     public boolean podePorConfiguracao(CpOrgaoUsuario cpOrgaoUsu, DpLotacao dpLotacao, DpCargo cargo,
@@ -761,7 +747,6 @@ public class CpConfiguracaoBL {
     /**
      * Localiza as ConfiguracaoGrupoEmail pertencentes a um determinado grupo
      *
-     * @param CpGrupo p_grpGrupo - O grupo que deseja localizar.
      * @throws Exception
      */
     public ArrayList<ConfiguracaoGrupo> obterCfgGrupo(CpGrupo grp) throws Exception {
@@ -802,9 +787,11 @@ public class CpConfiguracaoBL {
             if (configs != null) {
                 for (CpConfiguracaoCache c : configs) {
                     DpPessoa pesAtual = CpDao.getInstance().consultarPorIdInicial(c.dpPessoa);
-                    if (c.dpPessoa == pesAtual.getIdInicial()) {
-                        if (c.hisDtFim == null && pesAtual.getDataFim() == null && c.lotacao == lot.getIdInicial()) {
-                            resultado.add(pesAtual);
+                    if (pesAtual != null) {
+                        if (c.dpPessoa == pesAtual.getIdInicial()) {
+                            if (c.hisDtFim == null && pesAtual.getDataFim() == null && c.lotacao == lot.getIdInicial()) {
+                                resultado.add(pesAtual);
+                            }
                         }
                     }
                 }
@@ -882,8 +869,6 @@ public class CpConfiguracaoBL {
 
     /**
      * Retorna uma lista de (ex)configurações vigentes de acordo com um certo tipo
-     *
-     * @param CpConfiguracao
      */
     public List<CpConfiguracao> buscarConfiguracoesVigentes(final CpConfiguracao exemplo) {
         Date hoje = new Date();

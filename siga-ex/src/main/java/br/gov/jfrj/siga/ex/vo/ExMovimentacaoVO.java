@@ -20,13 +20,13 @@ package br.gov.jfrj.siga.ex.vo;
 
 import br.gov.jfrj.siga.base.*;
 import br.gov.jfrj.siga.base.util.Texto;
+import br.gov.jfrj.siga.cp.util.CpProcessadorReferencias;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.ExMovimentacao;
 import br.gov.jfrj.siga.ex.ExTipoMovimentacao;
 import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.logic.ExPodeCancelarMarcacao;
-import br.gov.jfrj.siga.ex.util.ProcessadorReferencias;
 import com.auth0.jwt.JWTSigner;
 import com.auth0.jwt.JWTVerifier;
 import org.apache.commons.lang3.StringUtils;
@@ -534,7 +534,7 @@ public class ExMovimentacaoVO extends ExVO {
         }
 
         if (descricao != null && descricao.equals(mov.getObs())) {
-            descricao = ProcessadorReferencias.marcarReferenciasParaDocumentos(descricao, null);
+            descricao = CpProcessadorReferencias.marcarReferenciasParaDocumentos(descricao, null);
         }
     }
 

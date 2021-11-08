@@ -9,56 +9,69 @@ import com.crivano.jflow.task.TaskEval;
 
 public enum WfTipoDeTarefa implements TaskKind {
 
-	//
-	AGUARDAR_ASSINATURA_PRINCIPAL("Aguardar Assinatura", "rectangle", WfTarefaDocAguardarAssinatura.class, true),
-	//
-	TRAMITAR_PRINCIPAL("Enviar", "rectangle", WfTarefaTramitar.class, true),
-	//
-	ARQUIVAR_PRINCIPAL("Arquivar", "rectangle", WfTarefaArquivar.class, false),
-	//
-	INCLUIR_DOCUMENTO("Incluir Documento", "rectangle", WfTarefaDocAguardarJuntada.class, true),
-	//
-	CRIAR_DOCUMENTO("Criar Documento", "rectangle", WfTarefaDocCriar.class, true),
-	//
-	FORMULARIO("Formulário", "rectangle", WfTarefaFormulario.class, true),
-	//
-	DECISAO("Decisão", "diamond", TaskDecision.class, false),
-	//
-	EXECUTAR("Executar", "rectangle", TaskEval.class, false),
-	//
-	EMAIL("Email", "folder", TaskEmail.class, true);
+    //
+    AGUARDAR_ASSINATURA_PRINCIPAL("Aguardar Assinatura", "rectangle", "Aguardar Assinatura",
+            WfTarefaDocAguardarAssinatura.class, true),
+    //
+    TRAMITAR_PRINCIPAL("Enviar", "rectangle", "Enviar", WfTarefaTramitar.class, true),
+    //
+    ARQUIVAR_PRINCIPAL("Arquivar", "rectangle", "Arquivar", WfTarefaArquivar.class, false),
+    //
+    INCLUIR_DOCUMENTO("Incluir Documento", "rectangle", "Incluir Documento", WfTarefaDocAguardarJuntada.class, true),
+    //
+    INCLUIR_COPIA("Incluir Cópia", "rectangle", "Incluir Cópia", WfTarefaDocIncluirCopia.class, false),
+    //
+    CRIAR_DOCUMENTO("Criar Documento", "rectangle", "Criar Documento", WfTarefaDocCriar.class, true),
+    //
+    AUTUAR_DOCUMENTO("Autuar Documento", "rectangle", "Autuar", WfTarefaDocAutuar.class, true),
+    //
+    FORMULARIO("Formulário", "tab", null, WfTarefaFormulario.class, true),
+    //
+    DECISAO("Decisão", "diamond", null, TaskDecision.class, false),
+    //
+    EXECUTAR("Executar", "rectangle", null, TaskEval.class, false),
+    //
+    EMAIL("Email", "folder", null, TaskEmail.class, true);
 
-	private final String descr;
+    private final String descr;
 
-	private Class<? extends Task> clazz;
+    private Class<? extends Task> clazz;
 
-	private String graphKind;
+    private final String graphKind;
+    private final String graphTitle;
 
-	private boolean exigirResponsavel;
+    private final boolean exigirResponsavel;
 
-	WfTipoDeTarefa(String descr, String graphKind, Class<? extends Task> clazz, boolean exigirResponsavel) {
-		this.descr = descr;
-		this.graphKind = graphKind;
-		this.clazz = clazz;
-		this.exigirResponsavel = exigirResponsavel;
-	}
+    WfTipoDeTarefa(String descr, String graphKind, String graphTitle, Class<? extends Task> clazz,
+                   boolean exigirResponsavel) {
+        this.descr = descr;
+        this.graphKind = graphKind;
+        this.graphTitle = graphTitle;
+        this.clazz = clazz;
+        this.exigirResponsavel = exigirResponsavel;
+    }
 
-	@Override
-	public String getDescr() {
-		return this.descr;
-	}
+    @Override
+    public String getDescr() {
+        return this.descr;
+    }
 
-	@Override
-	public Class<? extends Task> getClazz() {
-		return this.clazz;
-	}
+    @Override
+    public Class<? extends Task> getClazz() {
+        return this.clazz;
+    }
 
-	@Override
-	public String getGraphKind() {
-		return this.graphKind;
-	}
+    @Override
+    public String getGraphKind() {
+        return this.graphKind;
+    }
 
-	public boolean isExigirResponsavel() {
-		return exigirResponsavel;
-	}
+    @Override
+    public String getGraphTitle() {
+        return this.graphTitle;
+    }
+
+    public boolean isExigirResponsavel() {
+        return exigirResponsavel;
+    }
 }

@@ -51,6 +51,7 @@ public class ExModeloController extends ExSelecionavelController {
 	private static final Logger LOGGER = Logger
 			.getLogger(ExModeloController.class);
 	private boolean paraIncluir;
+	private boolean paraAutuar;
 
 	/**
 	 * @deprecated CDI eyes only
@@ -75,6 +76,13 @@ public class ExModeloController extends ExSelecionavelController {
 	@Path({"/app/modelo/buscar-json-para-incluir/{sigla}"})
 	public void buscaParaIncluir(String sigla) throws Exception{
 		this.paraIncluir  = true;
+		aBuscarJson(sigla);
+	}
+
+	@Get
+	@Path({ "/app/modelo/buscar-json-para-autuar/{sigla}" })
+	public void buscaParaAutuar(String sigla) throws Exception {
+		this.paraAutuar = true;
 		aBuscarJson(sigla);
 	}
 	
@@ -459,7 +467,6 @@ public class ExModeloController extends ExSelecionavelController {
 	protected DaoFiltroSelecionavel createDaoFiltro() {
 		ExModeloDaoFiltro flt = new ExModeloDaoFiltro();
 		flt.setSigla(getNome());
-		flt.setParaIncluir(this.paraIncluir);
 		return flt;
 	}
 	
@@ -471,7 +478,16 @@ public class ExModeloController extends ExSelecionavelController {
 			List<ExModelo> lExcluir = new ArrayList<>();
 			for (ExModelo mod : (List<ExModelo>)getItens()) {
 				if (!Ex.getInstance().getConf().podePorConfiguracao(getTitular(), getLotaTitular(), mod,
-				ExTipoDeConfiguracao.DESPACHAVEL)) {
+						ExTipoDeConfiguracao.DESPACHAVEL)) {
+					lExcluir.add(mod);
+				}
+			}
+			getItens().removeAll(lExcluir);
+		} else if (paraAutuar) {
+			List<ExModelo> lExcluir = new ArrayList<>();
+			for (ExModelo mod : (List<ExModelo>) getItens()) {
+				if (!Ex.getInstance().getConf().podePorConfiguracao(getTitular(), getLotaTitular(), mod,
+				ExTipoDeConfiguracao.AUTUAVEL)) {
 					lExcluir.add(mod);
 				}
 			}

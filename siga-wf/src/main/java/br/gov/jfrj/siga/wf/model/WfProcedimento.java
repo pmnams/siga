@@ -29,6 +29,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import br.gov.jfrj.siga.cp.util.CpProcessadorReferencias;
 import br.gov.jfrj.siga.wf.model.enm.WfTarefaDocCriarParam2;
 import br.gov.jfrj.siga.wf.model.task.WfTarefaDocCriar;
 import org.hibernate.annotations.BatchSize;
@@ -590,9 +591,8 @@ public class WfProcedimento extends Objeto
         return set;
     }
 
-    public boolean isFormulario() {
-        return status == ProcessInstanceStatus.PAUSED
-                && getCurrentTaskDefinition().getTipoDeTarefa() == WfTipoDeTarefa.FORMULARIO;
+    public boolean isPausado() {
+        return status == ProcessInstanceStatus.PAUSED;
     }
 
     public boolean isDesabilitarFormulario(DpPessoa titular, DpLotacao lotaTitular) {
@@ -607,6 +607,13 @@ public class WfProcedimento extends Objeto
     }
 
     public String getMsgAviso(DpPessoa titular, DpLotacao lotaTitular) throws Exception {
+        String s = getMsgAvisoSemReferencias(titular, lotaTitular);
+        if (s == null)
+            return null;
+        return CpProcessadorReferencias.marcarReferenciasParaDocumentos(s, null);
+    }
+
+    public String getMsgAvisoSemReferencias(DpPessoa titular, DpLotacao lotaTitular) throws Exception {
 //		WfConhecimento c = WfDao.getInstance().consultarConhecimento(ti.getDefinicaoDeTarefa().getId());
 //		if (c != null) {
 //			this.setDescricao(WfWikiParser.renderXHTML(c.getDescricao()));
@@ -680,16 +687,23 @@ public class WfProcedimento extends Objeto
         }
 
         if (getDefinicaoDeTarefaCorrente() != null
-                && getDefinicaoDeTarefaCorrente().getTipoDeTarefa() == WfTipoDeTarefa.CRIAR_DOCUMENTO) {
+                && (getDefinicaoDeTarefaCorrente().getTipoDeTarefa() == WfTipoDeTarefa.CRIAR_DOCUMENTO
+                || getDefinicaoDeTarefaCorrente().getTipoDeTarefa() == WfTipoDeTarefa.AUTUAR_DOCUMENTO)) {
             String siglaDoDocumentoCriado = WfTarefaDocCriar.getSiglaDoDocumentoCriado(this);
             if (WfTarefaDocCriarParam2.AGUARDAR_ASSINATURA.name().equals(getDefinicaoDeTarefaCorrente().getParam2())) {
                 return "Este workflow prosseguirá automaticamente quando o documento " + siglaDoDocumentoCriado
                         + " estiver assinado. Clique <a href=\"/sigaex/app/expediente/mov/assinar?sigla="
                         + siglaDoDocumentoCriado + "\">aqui</a> para assinar.";
-            } else if (WfTarefaDocCriarParam2.AGUARDAR_JUNTADA.name()
+            } else if (getDefinicaoDeTarefaCorrente().getTipoDeTarefa() == WfTipoDeTarefa.CRIAR_DOCUMENTO
+                    && WfTarefaDocCriarParam2.AGUARDAR_JUNTADA.name()
                     .equals(getDefinicaoDeTarefaCorrente().getParam2())) {
                 return "Este workflow prosseguirá automaticamente quando o documento " + siglaDoDocumentoCriado
-                        + " for juntado ao documento" + getPrincipal() + ".";
+                        + " for juntado ao documento " + getPrincipal() + ".";
+            } else if (getDefinicaoDeTarefaCorrente().getTipoDeTarefa() == WfTipoDeTarefa.AUTUAR_DOCUMENTO
+                    && WfTarefaDocCriarParam2.AGUARDAR_JUNTADA.name()
+                    .equals(getDefinicaoDeTarefaCorrente().getParam2())) {
+                return "Este workflow prosseguirá automaticamente quando o documento " + getPrincipal()
+                        + " for juntado ao documento " + siglaDoDocumentoCriado + ".";
             }
         }
 
@@ -794,7 +808,7 @@ public class WfProcedimento extends Objeto
     }
 
     @Override
-    public String getEvent() {
+    public String getIdEvent() {
         return getEventoNome();
     }
 
