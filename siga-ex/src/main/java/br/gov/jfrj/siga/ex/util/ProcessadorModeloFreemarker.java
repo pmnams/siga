@@ -20,6 +20,7 @@ package br.gov.jfrj.siga.ex.util;
 
 import br.gov.jfrj.siga.base.AplicacaoException;
 import br.gov.jfrj.siga.base.Prop;
+import br.gov.jfrj.siga.base.SigaFormats;
 import br.gov.jfrj.siga.cp.CpModelo;
 import br.gov.jfrj.siga.dp.CpOrgaoUsuario;
 import br.gov.jfrj.siga.ex.bl.Ex;
@@ -69,6 +70,7 @@ public class ProcessadorModeloFreemarker implements ProcessadorModelo,
         Map<String, Object> root = new HashMap();
         root.put("root", root);
         root.put("func", new FuncoesEL());
+        root.put("fmt", new SigaFormats());
         root.put("exbl", Ex.getInstance().getBL());
 
         root.putAll(attrs);

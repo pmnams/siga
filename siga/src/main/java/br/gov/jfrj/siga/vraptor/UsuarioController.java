@@ -297,103 +297,6 @@ public class UsuarioController extends SigaController {
         result.use(Results.page()).forwardTo("/WEB-INF/page/usuario/esqueciSenha.jsp");
     }
 
-    @Get({"/app/usuario/esqueci_senha", "/public/app/usuario/esqueci_senha"})
-    public void esqueciSenha() {
-        result.include("baseTeste", Prop.getBool("/siga.base.teste"));
-        result.include("titulo", "Esqueci Minha Senha");
-        result.include("proxima_acao", "esqueci_senha_gravar");
-    }
-
-    @Transacional
-    @Post({"/app/usuario/esqueci_senha_gravar", "/public/app/usuario/esqueci_senha_gravar"})
-    public void gravarEsqueciSenha(UsuarioAction usuario) throws Exception {
-        // caso LDAP, orientar troca pelo Windows / central
-        final CpIdentidade id = dao().consultaIdentidadeCadastrante(usuario.getMatricula(), true);
-        if (id == null)
-            throw new AplicacaoException("O usuário não está cadastrado.");
-        boolean autenticaPeloBanco = Cp.getInstance().getBL().buscarModoAutenticacao(id.getCpOrgaoUsuario().getSiglaOrgaoUsu())
-                .equals(GiService._MODO_AUTENTICACAO_BANCO);
-        if (!autenticaPeloBanco)
-            throw new AplicacaoException("O usuário deve modificar sua senha usando a interface do Windows "
-                    + "(acionando as teclas Ctrl, Alt e Del / Delete, opção 'Alterar uma senha')"
-                    + ", ou entrando em contato com a Central de Atendimento.");
-
-        String msgAD = "";
-        String cpfNumerico = null;
-        String cpfNumerico1 = null;
-        String cpfNumerico2 = null;
-        boolean senhaTrocadaAD = false;
-        if (usuario.getCpf() != null && !"".equals(usuario.getCpf())) {
-            cpfNumerico = usuario.getCpf().replace(".", "").replace("-", "");
-        }
-        if (usuario.getCpf1() != null && !"".equals(usuario.getCpf())) {
-            cpfNumerico1 = usuario.getCpf1().replace(".", "").replace("-", "");
-        }
-        if (usuario.getCpf2() != null && !"".equals(usuario.getCpf())) {
-            cpfNumerico2 = usuario.getCpf2().replace(".", "").replace("-", "");
-        }
-
-        switch (usuario.getMetodo()) {
-            case 1:
-//			verificarMetodoIntegracaoAD(usuario.getMatricula());
-
-                if (Prop.isGovSP()) {
-                    String msg = Cp.getInstance().getBL().alterarSenha(cpfNumerico, null, usuario.getMatricula());
-                    if (msg != "OK") {
-                        result.include("mensagemCabec", msg);
-                        result.include("msgCabecClass", "alert-danger");
-                        result.include("valCpf", usuario.getCpf());
-                        result.include("titulo", "Esqueci Minha Senha");
-                        result.use(Results.page()).forwardTo("/WEB-INF/page/usuario/esqueciSenha.jsp");
-                        return;
-                    }
-                } else {
-                    String[] senhaGerada = new String[1];
-                    Cp.getInstance().getBL().alterarSenhaDeIdentidade(usuario.getMatricula(), cpfNumerico,
-                            getIdentidadeCadastrante(), senhaGerada);
-                }
-                break;
-            case 2:
-                if (!Cp.getInstance().getBL().podeAlterarSenha(usuario.getAuxiliar1(), cpfNumerico1, usuario.getSenha1(),
-                        usuario.getAuxiliar2(), cpfNumerico2, usuario.getSenha2(), usuario.getMatricula(), cpfNumerico,
-                        usuario.getSenhaNova())) {
-                    String mensagem = "Não foi possível alterar a senha!<br/>"
-                            + "1) As pessoas informadas não podem ser as mesmas;<br/>"
-                            + "2) Verifique se as matrículas e senhas foram informadas corretamente;<br/>"
-                            + "3) Verifique se as pessoas são da mesma lotação ou da lotação imediatamente superior em relação à matrícula que terá a senha alterada;<br/>";
-                    result.include("mensagemCabec", mensagem);
-                    result.include("msgCabecClass", "alert-danger");
-                    result.redirectTo("/app/usuario/esqueci_senha");
-                    return;
-                }
-
-                CpIdentidade idAux1 = dao.consultaIdentidadeCadastrante(usuario.getAuxiliar1(), true);
-                Cp.getInstance().getBL().definirSenhaDeIdentidade(usuario.getSenhaNova(), usuario.getSenhaConfirma(),
-                        usuario.getMatricula(), usuario.getAuxiliar1(), usuario.getAuxiliar2(), idAux1);
-//			senhaTrocadaAD = IntegracaoLdap.getInstancia().atualizarSenhaLdap(idNovaDefinida,senhaNova);
-                break;
-
-            default:
-                result.include("mensagemCabec", "Método inválido!");
-                result.include("msgCabecClass", "alert-danger");
-                result.redirectTo("/app/usuario/esqueci_senha");
-                return;
-        }
-
-        if (isIntegradoAD(usuario.getMatricula()) && senhaTrocadaAD) {
-            msgAD = "<br/><br/><br/>OBS: A senha de rede e e-mail também foi alterada.";
-        }
-
-        if (isIntegradoAD(usuario.getMatricula()) && !senhaTrocadaAD) {
-            msgAD = "<br/><br/><br/>ATENÇÃO: A senha de rede e e-mail NÃO foi alterada embora o seu órgão esteja configurado para integrar as senhas do SIGA, rede e e-mail.";
-        }
-
-        result.include("mensagem", SigaMessages.getMessage("usuario.esqueciminhasenha.sucesso") + msgAD);
-        result.include("volta", "esqueci");
-        result.include("titulo", "Esqueci Minha Senha");
-        result.use(Results.page()).forwardTo("/WEB-INF/page/usuario/esqueciSenha.jsp");
-    }
-
     @Get({"/app/usuario/integracao_ldap", "/public/app/usuario/integracao_ldap"})
     public void isIntegradoLdap(String matricula) throws AplicacaoException {
         try {
@@ -535,12 +438,19 @@ public class UsuarioController extends SigaController {
             if (!usuarios.isEmpty()) {
                 for (DpPessoa usuario : usuarios) {
                     if (emailOculto.equals(usuario.getEmailPessoaAtualParcialmenteOculto())) {
+                        boolean autenticaPeloBanco = Cp.getInstance().getBL().buscarModoAutenticacao(usuario.getOrgaoUsuario().getSiglaOrgaoUsu()).equals(GiService._MODO_AUTENTICACAO_BANCO);
+                        //Autenticação não for via banco
+                        if (!autenticaPeloBanco)
+                            throw new RuntimeException("O usuário deve modificar sua senha usando a interface do Windows "
+                                    + "(acionando as teclas Ctrl, Alt e Del / Delete, opção 'Alterar uma senha')"
+                                    + ", ou entrando em contato com a Central de Atendimento.");
+
                         CpToken token = Cp.getInstance().getBL().gerarTokenResetSenha(cpf);
                         Cp.getInstance().getBL().enviarEmailTokenResetSenha(usuario, "Código para redefinição de SENHA ", token.getToken());
                         emailLocalizado = true;
 
                         HashMap<String, Object> json = new HashMap<>();
-                        json.put("ldapEnable", Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(usuario,usuario.getLotacao(),"SIGA;GI;INT_LDAP"));
+                        json.put("ldapEnable", Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(usuario, usuario.getLotacao(), "SIGA;GI;INT_LDAP"));
                         result.use(Results.json()).withoutRoot().from(json).serialize();
 
                         break;
@@ -596,7 +506,7 @@ public class UsuarioController extends SigaController {
                 //Redefinir senha de rede de todas as matrículas envolvidas
                 if (!listaIdentidadesCpf.isEmpty()) {
                     for (CpIdentidade usuario : listaIdentidadesCpf) {
-                        if ("true".equals(trocarSenhaRede) && Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(usuario.getPessoaAtual(),usuario.getPessoaAtual().getLotacao(),"SIGA;GI;INT_LDAP")) {
+                        if ("true".equals(trocarSenhaRede) && Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(usuario.getPessoaAtual(), usuario.getPessoaAtual().getLotacao(), "SIGA;GI;INT_LDAP")) {
                             String nomeUsuario = usuario.getPessoaAtual().getSiglaCompleta();
                             try {
                                 IntegracaoLdapViaWebService.getInstancia().trocarSenha(nomeUsuario, senhaNova);

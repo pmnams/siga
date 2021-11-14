@@ -28,6 +28,7 @@ import br.gov.jfrj.siga.ex.service.ExService;
 import br.gov.jfrj.siga.wf.dao.WfDao;
 import br.gov.jfrj.siga.wf.logic.WfPodePegar;
 import br.gov.jfrj.siga.wf.logic.WfPodeRedirecionar;
+import br.gov.jfrj.siga.wf.logic.WfPodeRetomar;
 import br.gov.jfrj.siga.wf.logic.WfPodeTerminar;
 import br.gov.jfrj.siga.wf.model.*;
 import br.gov.jfrj.siga.wf.model.enm.WfTipoDePrincipal;
@@ -381,6 +382,13 @@ public class WfBL extends CpBL {
         gravarMovimentacao(mov);
         pi.end();
         dao().gravar(pi);
+    }
+
+    public void retomar(WfProcedimento pi, DpPessoa titular, DpLotacao lotaTitular, CpIdentidade identidade)
+            throws Exception {
+        assertLogic(new WfPodeRetomar(pi, titular, lotaTitular), "retomar");
+        WfEngine engine = new WfEngine(dao(), new WfHandler(titular, lotaTitular, identidade));
+        engine.resume(pi);
     }
 
     private static void assertLogic(Expression expr, String descr) {
