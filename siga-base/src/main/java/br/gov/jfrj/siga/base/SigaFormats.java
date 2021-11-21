@@ -1,6 +1,7 @@
 package br.gov.jfrj.siga.base;
 
 import javax.swing.text.MaskFormatter;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -71,6 +72,8 @@ public class SigaFormats {
     }
 
     public static BigDecimal bigdecimal(Object o) {
+        if (o == null)
+            return null;
         String s = null;
         BigDecimal dec = null;
         if (o instanceof String) {
@@ -101,14 +104,14 @@ public class SigaFormats {
         if (dec == null)
             return null;
         ReaisPorExtenso r = new ReaisPorExtenso(dec);
-        return "R$" + bigDecimalParaMonetario(dec) + " (" + r.toString() + ")";
+        return "R$ " + bigDecimalParaMonetario(dec) + " (" + r.toString() + ")";
     }
 
     public static String reais(Object o) {
         BigDecimal dec = bigdecimal(o);
         if (dec == null)
             return null;
-        return "R$" + bigDecimalParaMonetario(dec);
+        return "R$ " + bigDecimalParaMonetario(dec);
     }
 
     public static String monetario(Object o) {
@@ -179,11 +182,16 @@ public class SigaFormats {
     }
 
     public static Date date(Object o) {
+        if (o == null)
+            return null;
+
         Date d = null;
         if (o instanceof String)
             d = Data.parse((String) o);
         else if (o instanceof Date)
             d = (Date) o;
+        else if (o instanceof XMLGregorianCalendar)
+            d = ((XMLGregorianCalendar)o).toGregorianCalendar().getTime();
         return d;
     }
 

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -53,6 +53,9 @@ import br.gov.jfrj.siga.model.Objeto;
  */
 @MappedSuperclass
 @NamedQueries({
+        @NamedQuery(name = "consultarPorModeloExPreenchimento", query = "from ExPreenchimento pre "
+                + "	      where (:modelo=null or :modelo = 0L or pre.exModelo.hisIdIni = :modelo) "
+                + "order by nomePreenchimento"),
         @NamedQuery(name = "consultarPorLotacaoModeloExPreenchimento", query = "from ExPreenchimento pre "
                 + "	      where (:lotacao = null or :lotacao = 0L or pre.dpLotacao.idLotacaoIni = :lotacao)"
                 + "			and (:modelo=null or :modelo = 0L or pre.exModelo.hisIdIni = :modelo) "

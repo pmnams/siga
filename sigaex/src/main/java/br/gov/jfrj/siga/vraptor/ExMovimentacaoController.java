@@ -4409,12 +4409,14 @@ public class ExMovimentacaoController extends ExController {
         final ExMovimentacao mov = builder.getMov();
 
         try {
-            final String s = Ex
-                    .getInstance()
-                    .getBL()
-                    .verificarAssinatura(doc.getConteudoBlobPdf(),
-                            mov.getConteudoBlobMov2(), mov.getConteudoTpMov(),
-                            mov.getDtIniMov());
+//			final String s = Ex
+//					.getInstance()
+//					.getBL()
+//					.verificarAssinatura(doc.getConteudoBlobPdf(),
+//							mov.getConteudoBlobMov2(), mov.getConteudoTpMov(),
+//							mov.getDtIniMov());
+
+            final String s = mov.assertAssinaturaValida(true);
             getRequest().setAttribute("assinante", s);
 
             result.use(Results.page()).forwardTo(
@@ -4437,12 +4439,14 @@ public class ExMovimentacaoController extends ExController {
         final ExMovimentacao movRef = mov.getExMovimentacaoRef();
 
         try {
-            final String s = Ex
-                    .getInstance()
-                    .getBL()
-                    .verificarAssinatura(movRef.getConteudoBlobpdf(),
-                            mov.getConteudoBlobMov2(), mov.getConteudoTpMov(),
-                            mov.getDtIniMov());
+//            final String s = Ex
+//					.getInstance()
+//					.getBL()
+//					.verificarAssinatura(movRef.getConteudoBlobpdf(),
+//							mov.getConteudoBlobMov2(), mov.getConteudoTpMov(),
+//							mov.getDtIniMov());
+
+            final String s = mov.assertAssinaturaValida(true);
             getRequest().setAttribute("assinante", s);
 
             result.use(Results.page()).forwardTo(

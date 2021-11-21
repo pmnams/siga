@@ -3,6 +3,7 @@ package br.gov.jfrj.siga.wf.model;
 import br.gov.jfrj.siga.cp.model.HistoricoAuditavelSuporte;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
+import br.gov.jfrj.siga.model.ActiveRecord;
 import br.gov.jfrj.siga.model.Assemelhavel;
 import br.gov.jfrj.siga.sinc.lib.Desconsiderar;
 import br.gov.jfrj.siga.sinc.lib.Sincronizavel;
@@ -24,6 +25,8 @@ import java.util.List;
 public class WfDefinicaoDeTarefa extends HistoricoAuditavelSuporte
         implements TaskDefinition<WfTipoDeTarefa, WfTipoDeResponsavel, WfDefinicaoDeVariavel, WfDefinicaoDeDesvio>,
         Sincronizavel, Comparable<Sincronizavel> {
+    public static ActiveRecord<WfDefinicaoDeTarefa> AR = new ActiveRecord<>(WfDefinicaoDeTarefa.class);
+
     @Id
     @GeneratedValue
     @Column(name = "DEFT_ID", unique = true, nullable = false)

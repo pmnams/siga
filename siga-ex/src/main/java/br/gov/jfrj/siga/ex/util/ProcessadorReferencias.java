@@ -16,11 +16,12 @@
  *     You should have received a copy of the GNU General Public License
  *     along with SIGA.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+
 package br.gov.jfrj.siga.ex.util;
 
 import br.gov.jfrj.siga.cp.util.CpProcessadorReferencias;
-import br.gov.jfrj.siga.dp.CpOrgaoUsuario;
-import br.gov.jfrj.siga.hibernate.ExDao;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.io.KXmlSerializer;
 import org.xmlpull.v1.XmlPullParser;
@@ -30,18 +31,16 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ProcessadorReferencias {
     XmlPullParser parser;
 
     XmlSerializer serializer;
 
-    private Set<String> htIgnorar = new HashSet<String>();
+    private final Set<String> htIgnorar = new HashSet<>();
 
     public ProcessadorReferencias() {
         parser = new KXmlParser();
@@ -50,10 +49,6 @@ public class ProcessadorReferencias {
 
     public void ignorar(String s) {
         htIgnorar.add(s);
-    }
-
-    public void limparIgnorar() {
-        htIgnorar.clear();
     }
 
     public String processarReferencias(String s) throws Exception {
@@ -82,12 +77,12 @@ public class ProcessadorReferencias {
         s = s.replace("<!-- FIM PRIMEIRO RODAPE -->", "FIM PRIMEIRO RODAPE -->");
         s = s.replace("<!-- INICIO RODAPE -->", "<!-- INICIO RODAPE");
         s = s.replace("<!-- FIM RODAPE -->", "FIM RODAPE -->");
+
         return s;
     }
 
     public void writeStartTag(final XmlPullParser parser,
-                              final XmlSerializer serializer) throws XmlPullParserException,
-            IOException {
+                              final XmlSerializer serializer) throws IOException {
         final String sName = parser.getName();
         serializer.startTag(null, sName);
         for (int i = 0; i < parser.getAttributeCount(); i++) {
@@ -114,15 +109,10 @@ public class ProcessadorReferencias {
 
             case XmlPullParser.END_TAG:
                 // serializer.endTag(parser.getNamespace(), parser.getName());
-                final String sEndTag = parser.getName();
                 serializer.endTag(null, parser.getName());
                 break;
 
             case XmlPullParser.IGNORABLE_WHITESPACE:
-                // comment it to remove ignorable whtespaces from XML
-                // infoset
-                // serializer.ignorableWhitespace(parser.getText().replace(" ",
-                // "@"));
                 break;
 
             case XmlPullParser.TEXT:
@@ -134,7 +124,7 @@ public class ProcessadorReferencias {
 
                     s = CpProcessadorReferencias.marcarReferenciasParaDocumentos(s, htIgnorar);
                     serializer.flush();
-                    os.write(s.getBytes("utf-8"));
+                    os.write(s.getBytes(StandardCharsets.UTF_8));
                 }
                 break;
 
@@ -162,8 +152,6 @@ public class ProcessadorReferencias {
                 break;
 
             default:
-                // throw new RuntimeException("unrecognized event: "
-                // + parser.getEventType());
         }
     }
 
@@ -171,7 +159,12 @@ public class ProcessadorReferencias {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
 
-            parser.setInput(new StringReader(sHtml));
+            final Document document = Jsoup.parse(sHtml);
+            document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
+            document.outputSettings().escapeMode(org.jsoup.nodes.Entities.EscapeMode.xhtml);
+            String html = document.html();
+
+            parser.setInput(new StringReader(html));
             serializer.setOutput(os, "utf-8");
 
             while (parser.getEventType() != XmlPullParser.END_DOCUMENT) {
@@ -180,8 +173,7 @@ public class ProcessadorReferencias {
             }
             writeToken(parser, serializer, os);
             serializer.flush();
-            final String s = new String(os.toByteArray(), "utf-8");
-            return s;
+            return new String(os.toByteArray(), StandardCharsets.UTF_8);
         } catch (final Exception ex) {
             return sHtml;
         }

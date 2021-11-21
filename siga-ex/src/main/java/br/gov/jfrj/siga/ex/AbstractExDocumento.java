@@ -21,6 +21,7 @@ package br.gov.jfrj.siga.ex;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.TreeSet;
 
 import javax.persistence.*;
@@ -1124,12 +1125,16 @@ public abstract class AbstractExDocumento extends ExArquivo implements
 	
 	
 	private boolean orgaoPermiteHcp() {
-		final String sigla = this.orgaoUsuario!=null?this.orgaoUsuario.getSigla():(this.getCadastrante()!=null?this.getCadastrante().getOrgaoUsuario().getSigla():null);
 		List<String> orgaos = Prop.getList("/siga.armazenamento.orgaos");
 
-		if(orgaos != null && ("*".equals(orgaos.get(0)) || orgaos.stream().anyMatch(siglaFiltro -> siglaFiltro.equals(sigla))) )
+		if (orgaos == null)
+			return false;
+
+		if ("*".equals(orgaos.get(0)))
 			return true;
-		return false;
+
+		final String sigla = this.orgaoUsuario != null ? this.orgaoUsuario.getSigla():(this.getCadastrante()!=null?this.getCadastrante().getOrgaoUsuario().getSigla():null);
+		return orgaos.stream().anyMatch(siglaFiltro -> siglaFiltro.equals(sigla));
 	}
 	
 	public ExProtocolo getExProtocolo() {

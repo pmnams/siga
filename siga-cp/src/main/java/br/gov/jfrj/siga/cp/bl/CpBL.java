@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -1483,9 +1483,9 @@ public class CpBL {
         if (dataAtivacao != null)
             dtAtivacao = Data.parse(dataAtivacao);
 
-        if (id == null && (listaMarcadoresLotacaoEGerais.stream()
+        if (listaMarcadoresLotacaoEGerais.stream()
                 .filter(mar -> mar.getDescrMarcador()
-                        .equals(descricao)).count() > 0))
+                        .equals(descricao)).count() > 0)
             throw new AplicacaoException("Já existe um marcador Geral ou da " + msgLotacao
                     + " com este nome: " + descricao);
 

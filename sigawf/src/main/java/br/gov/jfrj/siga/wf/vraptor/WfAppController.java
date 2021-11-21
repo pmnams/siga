@@ -23,6 +23,7 @@ import br.gov.jfrj.siga.wf.util.WfTarefa;
 import br.gov.jfrj.siga.wf.util.WfUtil;
 import com.crivano.jflow.model.enm.ProcessInstanceStatus;
 import com.crivano.jflow.model.enm.VariableEditingKind;
+import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -134,7 +135,7 @@ public class WfAppController extends WfController {
 
         WfProcedimento pi = Wf.getInstance().getBL().createProcessInstance(pdId, idx, getTitular(), getLotaTitular(),
                 getIdentidadeCadastrante(), tipoDePrincipal, principal, null, null, true);
-        result.redirectTo(this).procedimento(pi.getId());
+        result.redirectTo(this).procedimento(pi.getId().toString());
     }
 
     /**
@@ -158,8 +159,12 @@ public class WfAppController extends WfController {
      * @return Action.SUCCESS
      */
     @Path("/app/procedimento/{piId}")
-    public void procedimento(Long piId) throws Exception {
-        WfProcedimento pi = loadTaskInstance(piId);
+    public void procedimento(String piId) throws Exception {
+        WfProcedimento pi;
+        if (StringUtils.isNumeric(piId))
+            pi = loadTaskInstance(Long.valueOf(piId));
+        else
+            pi = WfProcedimento.findBySigla(piId);
         List<SigaIdDescr> prioridades = new ArrayList<SigaIdDescr>();
 
         prioridades.add(new SigaIdDescr(WfPrioridade.MUITO_ALTA, "Muito Alta"));
@@ -187,7 +192,7 @@ public class WfAppController extends WfController {
 
         List<WfProcedimento> taskInstances = Wf.getInstance().getBL().getTaskList(sigla);
         for (WfProcedimento pi : taskInstances) {
-            if (pi.getStatus() != ProcessInstanceStatus.PAUSED)
+            if (pi.getStatus() != ProcessInstanceStatus.PAUSED && pi.getStatus() != ProcessInstanceStatus.RESUMING)
                 continue;
             String principal = pi.getPrincipal();
             if (principal == null)
@@ -209,7 +214,6 @@ public class WfAppController extends WfController {
      * imediatamente.
      *
      * @return
-     * @throws CsisException
      */
     @Transacional
     @Post
@@ -312,11 +316,11 @@ public class WfAppController extends WfController {
         // página inicial.
         if (pi.getStatus() == ProcessInstanceStatus.PAUSED && pi.getEventoLotacao() != null
                 && pi.getEventoLotacao().equivale(getLotaTitular())) {
-            result.redirectTo(this).procedimento(pi.getId());
+            result.redirectTo(this).procedimento(pi.getId().toString());
             return;
         }
 
-        result.redirectTo(this).procedimento(pi.getId());
+        result.redirectTo(this).procedimento(pi.getId().toString());
     }
 
     private Boolean converterParaBoolean(StringQualquer campo) {
@@ -353,7 +357,7 @@ public class WfAppController extends WfController {
             result.redirectTo("/../sigaex/app/expediente/doc/exibir?sigla=" + siglaPrincipal);
             return;
         }
-        result.redirectTo(this).procedimento(pi.getId());
+        result.redirectTo(this).procedimento(pi.getId().toString());
     }
 
     @Transacional
@@ -375,7 +379,7 @@ public class WfAppController extends WfController {
             result.redirectTo("/../sigaex/app/expediente/doc/exibir?sigla=" + siglaPrincipal);
             return;
         }
-        result.redirectTo(this).procedimento(pi.getId());
+        result.redirectTo(this).procedimento(pi.getId().toString());
     }
 
     @Transacional
@@ -390,7 +394,7 @@ public class WfAppController extends WfController {
             result.redirectTo("/../sigaex/app/expediente/doc/exibir?sigla=" + siglaPrincipal);
             return;
         }
-        result.redirectTo(this).procedimento(pi.getId());
+        result.redirectTo(this).procedimento(pi.getId().toString());
     }
 
     @Transacional
@@ -406,7 +410,7 @@ public class WfAppController extends WfController {
             result.redirectTo("/../sigaex/app/expediente/doc/exibir?sigla=" + siglaPrincipal);
             return;
         }
-        result.redirectTo(this).procedimento(pi.getId());
+        result.redirectTo(this).procedimento(pi.getId().toString());
     }
 
     // TODO Pensar se queremos ter o conceito de conhecimento dentro do WF mesmo ou
@@ -442,7 +446,6 @@ public class WfAppController extends WfController {
      * Action que finaliza uma tarefa com as variaveis atribuidas.
      *
      * @return
-     * @throws CsisException
      */
     @Transacional
     public void assignTask(Long piId, DpPessoaSelecao ator_pessoaSel, DpLotacaoSelecao lotaAtor_lotacaoSel,
@@ -480,14 +483,13 @@ public class WfAppController extends WfController {
 
         // TODO Acrescentar uma movimentação de atribuição aqui!
 
-        result.redirectTo(this).procedimento(pi.getId());
+        result.redirectTo(this).procedimento(pi.getId().toString());
     }
 
     /**
      * Insere um comentário à tarefa.
      *
      * @return
-     * @throws CsisException
      */
     @Transacional
     @Post
@@ -495,14 +497,13 @@ public class WfAppController extends WfController {
     public void anotar(Long id, String descrMov) throws Exception {
         WfProcedimento pi = dao().consultar(id, WfProcedimento.class, false);
         Wf.getInstance().getBL().anotar(pi, descrMov, getTitular(), getLotaTitular(), getIdentidadeCadastrante());
-        result.redirectTo(this).procedimento(id);
+        result.redirectTo(this).procedimento(id.toString());
     }
 
     /**
      * Insere um comentário à tarefa.
      *
      * @return
-     * @throws CsisException
      */
     @Transacional
     @Post
@@ -512,7 +513,7 @@ public class WfAppController extends WfController {
         for (WfMov mov : pi.getMovimentacoes()) {
             if (mov.getId().equals(idMov) && mov instanceof WfMovAnotacao) {
                 Wf.getInstance().getBL().excluirAnotacao(pi, (WfMovAnotacao) mov);
-                result.redirectTo(this).procedimento(id);
+                result.redirectTo(this).procedimento(id.toString());
             }
         }
         throw new Exception("Movimentação não encontrada.");
