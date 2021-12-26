@@ -31,7 +31,7 @@ import org.hibernate.annotations.BatchSize;
 
 /**
  * A class that represents a row in the EX_DOCUMENTO table. You can customize
- * the behavior of this class by editing the class, {@link ExDocumento()}.
+ * the behavior of this class by editing the class
  */
 @Entity
 @BatchSize(size = 500)

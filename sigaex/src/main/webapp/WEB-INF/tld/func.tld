@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <taglib version="2.0" xmlns="http://java.sun.com/xml/ns/j2ee"
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd">
  <description>Siga</description>
  <tlib-version>1.0</tlib-version>
  <short-name>siga</short-name>
@@ -126,12 +126,12 @@
   <function-signature>java.lang.String selDescricaoConfidencial(br.gov.jfrj.siga.model.Selecionavel, br.gov.jfrj.siga.dp.DpLotacao, br.gov.jfrj.siga.dp.DpPessoa)</function-signature>
  </function>
  <function>
-   <name>mostraDescricaoConfidencial</name>
+  <name>mostraDescricaoConfidencial</name>
   <function-class>br.gov.jfrj.siga.ex.bl.ExBL</function-class>
   <function-signature>java.lang.Boolean mostraDescricaoConfidencial( br.gov.jfrj.siga.ex.ExDocumento, br.gov.jfrj.siga.dp.DpPessoa, br.gov.jfrj.siga.dp.DpLotacao)</function-signature>
  </function>
-  <function>
-   <name>exibirQuemTemAcessoDocumentosLimitados</name>
+ <function>
+  <name>exibirQuemTemAcessoDocumentosLimitados</name>
   <function-class>br.gov.jfrj.siga.ex.bl.ExBL</function-class>
   <function-signature>java.lang.Boolean exibirQuemTemAcessoDocumentosLimitados( br.gov.jfrj.siga.ex.ExDocumento, br.gov.jfrj.siga.dp.DpPessoa, br.gov.jfrj.siga.dp.DpLotacao)</function-signature>
  </function>
@@ -199,7 +199,7 @@
   <name>obterHierarquizadorBIETRF2</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>br.gov.jfrj.siga.ex.bl.HierarquizadorBoletimInternoTRF2 obterHierarquizadorBIETRF2(br.gov.jfrj.siga.dp.CpOrgaoUsuario, br.gov.jfrj.siga.ex.ExDocumento)</function-signature>
- </function> 
+ </function>
  <function>
   <name>obterHierarquizadorBIEES</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
@@ -209,7 +209,7 @@
   <name>obterHierarquizadorBIECJF</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>br.gov.jfrj.siga.ex.bl.HierarquizadorBoletimInternoCJF obterHierarquizadorBIECJF(br.gov.jfrj.siga.dp.CpOrgaoUsuario, br.gov.jfrj.siga.ex.ExDocumento)</function-signature>
- </function> 
+ </function>
  <function>
   <name>editalEliminacao</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
@@ -239,7 +239,7 @@
   <name>floatParaMonetario</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>java.lang.String floatParaMonetario(java.lang.Float)</function-signature>
- </function>  
+ </function>
  <function>
   <name>monetarioParaBigDecimal</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
@@ -254,6 +254,11 @@
   <name>quebraLinhas</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>java.lang.String quebraLinhas(java.lang.String)</function-signature>
+ </function>
+ <function>
+  <name>stringParaMinusculaNomes</name>
+  <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
+  <function-signature>java.lang.String f:stringParaMinusculaNomes(java.lang.String)</function-signature>
  </function>
  <function>
   <name>primeiraMaiuscula</name>
@@ -310,7 +315,7 @@
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>java.lang.String formatarCNPJ(java.lang.String)</function-signature>
  </function>
-  <function>
+ <function>
   <name>formatarCPF</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>java.lang.String formatarCPF(java.lang.String)</function-signature>
@@ -340,7 +345,7 @@
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>java.lang.String obterExtensaoBuscaTextual(br.gov.jfrj.siga.dp.CpOrgaoUsuario, java.lang.String)</function-signature>
  </function>
-  <function>
+ <function>
   <name>obterExtensaoBuscaTextualbs4</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>java.lang.String obterExtensaoBuscaTextualbs4(br.gov.jfrj.siga.dp.CpOrgaoUsuario, java.lang.String)</function-signature>
@@ -350,22 +355,22 @@
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>java.lang.String obterExtensaoEditor(br.gov.jfrj.siga.dp.CpOrgaoUsuario, java.lang.String, java.lang.String, java.lang.String)</function-signature>
  </function>
-  
+
  <function>
   <name>obterExtensaoAssinador</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>java.lang.String obterExtensaoAssinador(br.gov.jfrj.siga.dp.CpOrgaoUsuario, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)</function-signature>
- </function> 
+ </function>
  <function>
   <name>listaPublicacao</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>List&lt;ExTpDocPublicacao&gt; listaPublicacao(java.lang.Long)</function-signature>
  </function>
-  <function>
+ <function>
   <name>calculoPCD</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
-  <function-signature>CalculoPCD calculoPCD(java.lang.String, java.lang.String, br.gov.jfrj.siga.dp.DpPessoa, java.lang.String, java.lang.String, 
-			java.lang.Boolean, java.lang.Boolean, java.lang.Integer, java.lang.Float, java.lang.Float, java.lang.Boolean)</function-signature>
+  <function-signature>CalculoPCD calculoPCD(java.lang.String, java.lang.String, br.gov.jfrj.siga.dp.DpPessoa, java.lang.String, java.lang.String,
+   java.lang.Boolean, java.lang.Boolean, java.lang.Integer, java.lang.Float, java.lang.Float, java.lang.Boolean)</function-signature>
  </function>
  <function>
   <name>listaDocsAPublicarBoletim</name>
@@ -396,7 +401,7 @@
   <name>deveAssinarComSenha</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>java.lang.Boolean deveAssinarComSenha(br.gov.jfrj.siga.dp.DpPessoa, br.gov.jfrj.siga.dp.DpLotacao, br.gov.jfrj.siga.ex.ExMobil)</function-signature>
- </function> 
+ </function>
  <function>
   <name>podeAssinarPor</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
@@ -425,7 +430,7 @@
  <function>
   <name>podeAssinarMovimentacaoDoMobilComSenha</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
-  <function-signature>java.lang.Boolean podeAssinarMovimentacaoComSenha(br.gov.jfrj.siga.dp.DpPessoa, br.gov.jfrj.siga.dp.DpLotacao, br.gov.jfrj.siga.ex.ExMobil)</function-signature>
+  <function-signature>java.lang.Boolean podeAssinarMovimentacaoDoMobilComSenha(br.gov.jfrj.siga.dp.DpPessoa, br.gov.jfrj.siga.dp.DpLotacao, br.gov.jfrj.siga.ex.ExMobil)</function-signature>
  </function>
  <function>
   <name>podeAutenticarComSenha</name>
@@ -441,17 +446,12 @@
   <name>podeAutenticarDocumento</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>java.lang.Boolean podeAutenticarDocumento(br.gov.jfrj.siga.dp.DpPessoa, br.gov.jfrj.siga.dp.DpLotacao, br.gov.jfrj.siga.ex.ExDocumento)</function-signature>
- </function> 
+ </function>
  <function>
   <name>podeDisponibilizarNoAcompanhamentoDoProtocolo</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>java.lang.Boolean podeDisponibilizarNoAcompanhamentoDoProtocolo(br.gov.jfrj.siga.dp.DpPessoa, br.gov.jfrj.siga.dp.DpLotacao, br.gov.jfrj.siga.ex.ExDocumento)</function-signature>
  </function>
- <function>
-  <name>stringParaMinusculaNomes</name>
-  <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
-  <function-signature>java.lang.String stringParaMinusculaNomes(java.lang.String)</function-signature>
- </function> 
  <function>
   <name>calculaDiasAPartirDeHoje</name>
   <function-class>br.gov.jfrj.siga.jee.SigaLibsEL</function-class>
@@ -461,17 +461,17 @@
   <name>podeUtilizarSegundoFatorPin</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>java.lang.Boolean podeUtilizarSegundoFatorPin(br.gov.jfrj.siga.dp.DpPessoa, br.gov.jfrj.siga.dp.DpLotacao)</function-signature>
- </function>  
+ </function>
  <function>
   <name>deveUtilizarSegundoFatorPin</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>java.lang.Boolean deveUtilizarSegundoFatorPin(br.gov.jfrj.siga.dp.DpPessoa, br.gov.jfrj.siga.dp.DpLotacao)</function-signature>
- </function>  
+ </function>
  <function>
   <name>defaultUtilizarSegundoFatorPin</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
   <function-signature>java.lang.Boolean defaultUtilizarSegundoFatorPin(br.gov.jfrj.siga.dp.DpPessoa, br.gov.jfrj.siga.dp.DpLotacao)</function-signature>
- </function>  
+ </function>
  <function>
   <name>podeDelegarVisualizacao</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>

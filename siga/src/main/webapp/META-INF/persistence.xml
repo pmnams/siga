@@ -23,8 +23,6 @@
 		<class>br.gov.jfrj.siga.dp.CpTipoPessoa</class>
 		<class>br.gov.jfrj.siga.cp.CpConfiguracao</class>
 		<class>br.gov.jfrj.siga.cp.CpConfiguracaoCache</class>
-		<class>br.gov.jfrj.siga.cp.CpSituacaoConfiguracao</class>
-		<class>br.gov.jfrj.siga.cp.CpTipoConfiguracao</class>
 		<class>br.gov.jfrj.siga.cp.CpServico</class>
 		<class>br.gov.jfrj.siga.cp.CpTipoGrupo</class>
 		<class>br.gov.jfrj.siga.cp.CpGrupo</class>
@@ -57,7 +55,7 @@
 		<class>br.gov.jfrj.siga.cp.model.enm.CpMarcadorTipoInteressadoEnum</class>
 		<class>br.gov.jfrj.siga.cp.model.enm.CpMarcadorTipoTextoEnum</class>
 		<class>br.gov.jfrj.siga.cp.CpTipoMarcadorEnum</class>
-		<class>br.gov.jfrj.siga.cp.CpSituacaoDeConfiguracaoEnum</class>
+		<class>br.gov.jfrj.siga.cp.model.enm.CpSituacaoDeConfiguracaoEnum</class>
 
 		<class>br.gov.jfrj.siga.cp.converter.CpMarcadorCorEnumConverter</class>
 		<class>br.gov.jfrj.siga.cp.converter.CpMarcadorIconeEnumConverter</class>
@@ -72,9 +70,11 @@
 		<class>br.gov.jfrj.siga.cp.converter.CpSituacaoDeConfiguracaoEnumConverter</class>
 
 		<properties>
+			<property name="hibernate.cache.use_second_level_cache" value="true" />
 			<property name="hibernate.cache.use_query_cache" value="true" />
-			<property name="hibernate.cache.use_second_level_cache"
-				value="true" />
+			<property name="hibernate.cache.infinispan.shared" value="false"/>
+			<property name="hibernate.cache.region.factory_class"
+					  value="org.infinispan.hibernate.cache.v53.InfinispanRegionFactory" />
 
 			<property name="hibernate.current_session_context_class"
 				value="thread" />

@@ -5,10 +5,8 @@ services:
     ports:
       - target: 9990
         published: 9990
-        mode: host
       - target: 8787
         published: 8787
-        mode: host
     volumes:
       - ../siga/:${BASE_PATH}/siga
       - ../sigaex/:${BASE_PATH}/sigaex

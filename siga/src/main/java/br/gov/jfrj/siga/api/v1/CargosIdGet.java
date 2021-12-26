@@ -47,6 +47,7 @@ public class CargosIdGet implements ICargosIdGet {
         crgo.idCargoIni = cargo.getIdCargoIni().toString();
         crgo.idExterna = (cargo.getIdExterna() != null ? cargo.getIdExterna().toString() : null);
         crgo.nome = (cargo.getNomeCargo() != null ? cargo.getNomeCargo() : null);
+
         return crgo;
     }
 

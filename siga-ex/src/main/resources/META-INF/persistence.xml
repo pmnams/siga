@@ -24,8 +24,6 @@
 		<class>br.gov.jfrj.siga.dp.CpTipoPessoa</class>
 		<class>br.gov.jfrj.siga.cp.CpConfiguracao</class>
 		<class>br.gov.jfrj.siga.cp.CpConfiguracaoCache</class>
-		<class>br.gov.jfrj.siga.cp.CpSituacaoConfiguracao</class>
-		<class>br.gov.jfrj.siga.cp.CpTipoConfiguracao</class>
 		<class>br.gov.jfrj.siga.cp.CpServico</class>
 		<class>br.gov.jfrj.siga.cp.CpTipoGrupo</class>
 		<class>br.gov.jfrj.siga.cp.CpGrupo</class>
@@ -58,7 +56,6 @@
 		<class>br.gov.jfrj.siga.ex.ExTipoFormaDoc</class>
 		<class>br.gov.jfrj.siga.ex.ExVia</class>
 		<class>br.gov.jfrj.siga.ex.ExNivelAcesso</class>
-		<class>br.gov.jfrj.siga.ex.ExTipoMovimentacao</class>
 		<class>br.gov.jfrj.siga.ex.ExEstadoDoc</class>
 		<class>br.gov.jfrj.siga.ex.ExTipoDespacho</class>
 		<class>br.gov.jfrj.siga.ex.ExEmailNotificacao</class>
@@ -82,15 +79,15 @@
 		<class>br.gov.jfrj.siga.cp.CpArquivo</class>
 		<class>br.gov.jfrj.siga.cp.CpArquivoBlob</class>
 		<class>br.gov.jfrj.siga.cp.CpArquivoExcluir</class>
-		<class>br.gov.jfrj.siga.cp.CpMarcadorCorEnum</class>
-		<class>br.gov.jfrj.siga.cp.CpMarcadorIconeEnum</class>
-		<class>br.gov.jfrj.siga.cp.CpMarcadorTipoAplicacaoEnum</class>
-		<class>br.gov.jfrj.siga.cp.CpMarcadorTipoDataEnum</class>
-		<class>br.gov.jfrj.siga.cp.CpMarcadorTipoExibicaoEnum</class>
-		<class>br.gov.jfrj.siga.cp.CpMarcadorTipoInteressadoEnum</class>
-		<class>br.gov.jfrj.siga.cp.CpMarcadorTipoTextoEnum</class>
+		<class>br.gov.jfrj.siga.cp.model.enm.CpMarcadorCorEnum</class>
+		<class>br.gov.jfrj.siga.cp.model.enm.CpMarcadorIconeEnum</class>
+		<class>br.gov.jfrj.siga.cp.model.enm.CpMarcadorTipoAplicacaoEnum</class>
+		<class>br.gov.jfrj.siga.cp.model.enm.CpMarcadorTipoDataEnum</class>
+		<class>br.gov.jfrj.siga.cp.model.enm.CpMarcadorTipoExibicaoEnum</class>
+		<class>br.gov.jfrj.siga.cp.model.enm.CpMarcadorTipoInteressadoEnum</class>
+		<class>br.gov.jfrj.siga.cp.model.enm.CpMarcadorTipoTextoEnum</class>
 		<class>br.gov.jfrj.siga.cp.CpTipoMarcadorEnum</class>
-		<class>br.gov.jfrj.siga.cp.CpSituacaoDeConfiguracaoEnum</class>
+		<class>br.gov.jfrj.siga.cp.model.enm.CpSituacaoDeConfiguracaoEnum</class>
 		<class>br.gov.jfrj.siga.cp.converter.CpMarcadorCorEnumConverter</class>
 		<class>br.gov.jfrj.siga.cp.converter.CpMarcadorIconeEnumConverter</class>
 		<class>br.gov.jfrj.siga.cp.converter.CpMarcadorFinalidadeEnumConverter</class>

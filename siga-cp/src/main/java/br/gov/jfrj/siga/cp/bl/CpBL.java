@@ -508,7 +508,6 @@ public class CpBL {
      * {@link DpPessoa#getLotacao() lotação}. Entretanto durante a migração para o
      * EAP 7.2, verificou-se que quando o método <code>criarIdentidade</code> era
      * chamado a partir de
-     * {@link #criarUsuario(String, Long, Long, Long, Long, Long, String, String, String, String)},
      * ao se chamar {@link DpPessoa#getLotacao()} dentro de
      * {@link DpPessoa#isUsuarioExterno()} acontecia um
      * {@link NullPointerException}, mesmo que essa pessoa tivesse acabado de ter

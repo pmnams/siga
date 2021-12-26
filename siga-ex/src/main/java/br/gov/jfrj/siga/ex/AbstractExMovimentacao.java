@@ -17,6 +17,8 @@
  *     You should have received a copy of the GNU General Public License
  *     along with SIGA.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/*
+ */
 package br.gov.jfrj.siga.ex;
 
 import br.gov.jfrj.siga.base.AplicacaoException;
@@ -24,6 +26,8 @@ import br.gov.jfrj.siga.base.Prop;
 import br.gov.jfrj.siga.cp.CpArquivo;
 import br.gov.jfrj.siga.cp.CpArquivoTipoArmazenamentoEnum;
 import br.gov.jfrj.siga.cp.CpIdentidade;
+import br.gov.jfrj.siga.cp.converter.ITipoDeMovimentacaoConverter;
+import br.gov.jfrj.siga.cp.model.enm.ITipoDeMovimentacao;
 import br.gov.jfrj.siga.dp.*;
 import org.hibernate.annotations.BatchSize;
 
@@ -121,13 +125,12 @@ import java.util.List;
                 + "                ) order by mar.dtIniMarca desc"),
         @NamedQuery(name = "listarAnexoPendenteAssinatura", query = "select mov from ExMovimentacao mov join mov.exMobil mobil "
                 + "					where mobil in (select distinct(mob) from ExMobil mob join mob.exMarcaSet mar"
-                + "               		where mar.cpMarcador.idMarcador = 30) and (mov.exTipoMovimentacao.idTpMov = 2)"
+                + "               		where mar.cpMarcador.idMarcador = 30) and (mov.exTipoMovimentacao in :enumList)"
                 + "					and mov.subscritor.idPessoaIni = :idPessoaIni"
                 + "					order by mov.dtIniMov desc"),
         @NamedQuery(name = "listarDespachoPendenteAssinatura", query = "select mov from ExMovimentacao mov join mov.exMobil mobil "
                 + "					where mobil in (select distinct(mob) from ExMobil mob join mob.exMarcaSet mar"
-                + "               		where mar.cpMarcador.idMarcador = 29) and (mov.exTipoMovimentacao.idTpMov = 5 or mov.exTipoMovimentacao.idTpMov = 6 "
-                + "               			or mov.exTipoMovimentacao.idTpMov = 7 or mov.exTipoMovimentacao.idTpMov = 8 or mov.exTipoMovimentacao.idTpMov = 18)"
+                + "               		where mar.cpMarcador.idMarcador = 29) and (mov.exTipoMovimentacao in :enumList)"
                 + "					and mov.subscritor.idPessoaIni = :idPessoaIni"
                 + "					order by mov.dtIniMov desc"),
         // Somente os "em transferencia", "em transferencia eletronica" ou
@@ -158,28 +161,7 @@ public abstract class AbstractExMovimentacao extends ExArquivo implements Serial
     private static final String CONSULTAR_TRAMITACOES_POR_MOVIMENTACAO_BEGIN = "SELECT mov FROM ExMovimentacao mov WHERE ";
 
     private static final String CONSULTAR_TRAMITACOES_POR_MOVIMENTACAO_END = //
-            "AND (" //
-                    + " (mov.exTipoMovimentacao.idTpMov = " + ExTipoMovimentacao.TIPO_MOVIMENTACAO_TRANSFERENCIA
-                    + ") OR"//
-                    // Recebimento não exibido! apenas para indicar o instante de recebimento da tramitação.
-                    + " (mov.exTipoMovimentacao.idTpMov = " + ExTipoMovimentacao.TIPO_MOVIMENTACAO_RECEBIMENTO + ") OR"//
-                    + " (mov.exTipoMovimentacao.idTpMov = " + ExTipoMovimentacao.TIPO_MOVIMENTACAO_JUNTADA + ") OR"//
-                    + " (mov.exTipoMovimentacao.idTpMov = " + ExTipoMovimentacao.TIPO_MOVIMENTACAO_ARQUIVAMENTO_CORRENTE
-                    + ") OR"//
-                    + " (mov.exTipoMovimentacao.idTpMov = "
-                    + ExTipoMovimentacao.TIPO_MOVIMENTACAO_ARQUIVAMENTO_INTERMEDIARIO + ") OR"//
-                    + " (mov.exTipoMovimentacao.idTpMov = "
-                    + ExTipoMovimentacao.TIPO_MOVIMENTACAO_DESARQUIVAMENTO_CORRENTE + ") OR"//
-                    + " (mov.exTipoMovimentacao.idTpMov = "
-                    + ExTipoMovimentacao.TIPO_MOVIMENTACAO_DESARQUIVAMENTO_INTERMEDIARIO + ") OR"//
-                    + " (mov.exTipoMovimentacao.idTpMov = " + ExTipoMovimentacao.TIPO_MOVIMENTACAO_CANCELAMENTO_JUNTADA
-                    + ") OR"//
-                    + " (mov.exTipoMovimentacao.idTpMov = "
-                    + ExTipoMovimentacao.TIPO_MOVIMENTACAO_CANCELAMENTO_DE_MOVIMENTACAO + ") OR"//
-                    + " (mov.exTipoMovimentacao.idTpMov = " + ExTipoMovimentacao.TIPO_MOVIMENTACAO_TORNAR_SEM_EFEITO
-                    + ")"//
-                    + ") " //
-                    + "ORDER BY mov.dtTimestamp DESC";
+            "AND mov.exTipoMovimentacao = :enumList ORDER BY mov.dtTimestamp DESC";
 
     /**
      * Nome da {@link NamedQuery} usada para a consulta das {@link ExMovimentacao
@@ -222,8 +204,7 @@ public abstract class AbstractExMovimentacao extends ExArquivo implements Serial
                     + "mov.exMobil.idMobil = :idMobil " //
                     + "AND mov.dtTimestamp >= (SELECT MIN(tramitacao.dtTimestamp) " //
                     + "FROM ExMovimentacao tramitacao "
-                    + "WHERE tramitacao.exMobil.idMobil = :idMobil AND tramitacao.exTipoMovimentacao.idTpMov = "
-                    + ExTipoMovimentacao.TIPO_MOVIMENTACAO_TRANSFERENCIA + ") " //
+                    + "WHERE tramitacao.exMobil.idMobil = :idMobil AND tramitacao.exTipoMovimentacao in :enumList ) " //
                     + CONSULTAR_TRAMITACOES_POR_MOVIMENTACAO_END;
 
     /**
@@ -267,8 +248,7 @@ public abstract class AbstractExMovimentacao extends ExArquivo implements Serial
                     + "mov.exMobil.exDocumento = (SELECT mobBase.exDocumento FROM ExMobil mobBase WHERE mobBase.idMobil = :idMobil) "
                     + "AND mov.dtTimestamp >= (SELECT MIN(tramitacao.dtTimestamp) " //
                     + "FROM ExMovimentacao tramitacao "
-                    + "WHERE tramitacao.exMobil.exDocumento = mov.exMobil.exDocumento AND tramitacao.exTipoMovimentacao.idTpMov = "
-                    + ExTipoMovimentacao.TIPO_MOVIMENTACAO_TRANSFERENCIA + ") " //
+                    + "WHERE tramitacao.exMobil.exDocumento = mov.exMobil.exDocumento AND tramitacao.exTipoMovimentacao in :enumList ) " //
                     + CONSULTAR_TRAMITACOES_POR_MOVIMENTACAO_END;
 
     @Id
@@ -371,9 +351,9 @@ public abstract class AbstractExMovimentacao extends ExArquivo implements Serial
     @JoinColumn(name = "id_classificacao")
     private ExClassificacao exClassificacao;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_tp_mov", nullable = false)
-    private ExTipoMovimentacao exTipoMovimentacao;
+    @Convert(converter = ITipoDeMovimentacaoConverter.class)
+    @Column(name = "id_tp_mov", nullable = false)
+    private ITipoDeMovimentacao exTipoMovimentacao;
 
     // private Long idTpMov;
 
@@ -402,6 +382,9 @@ public abstract class AbstractExMovimentacao extends ExArquivo implements Serial
 
     // private Integer numViaDocRef;
 
+    // Aqui era armazenado o atendente, mas com o trâmite paralelo isso
+    // passou a ser calculado de outra forma. Mesmo assim, o destinatário
+    // e o recebedor ficam gravados aqui.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_resp")
     private DpPessoa resp;
@@ -521,7 +504,7 @@ public abstract class AbstractExMovimentacao extends ExArquivo implements Serial
         return exClassificacao;
     }
 
-    public ExTipoMovimentacao getExTipoMovimentacao() {
+    public ITipoDeMovimentacao getExTipoMovimentacao() {
         return exTipoMovimentacao;
     }
 
@@ -599,7 +582,7 @@ public abstract class AbstractExMovimentacao extends ExArquivo implements Serial
         this.exClassificacao = exClassificacao;
     }
 
-    public void setExTipoMovimentacao(final ExTipoMovimentacao exTipoMovimentacao) {
+    public void setExTipoMovimentacao(final ITipoDeMovimentacao exTipoMovimentacao) {
         this.exTipoMovimentacao = exTipoMovimentacao;
     }
 
@@ -878,16 +861,12 @@ public abstract class AbstractExMovimentacao extends ExArquivo implements Serial
 
     private boolean orgaoPermiteHcp() {
         List<String> orgaos = Prop.getList("/siga.armazenamento.orgaos");
-
-        if (orgaos == null)
-            return false;
-
         if ("*".equals(orgaos.get(0)))
             return true;
-
         if (exMobil != null && exMobil.getDoc() != null && exMobil.getDoc().getCadastrante() != null && exMobil.getDoc().getCadastrante().getOrgaoUsuario() != null) {
             CpOrgaoUsuario orgaoUsuario = exMobil.getDoc().getCadastrante().getOrgaoUsuario();
-            return orgaoUsuario != null && orgaos.stream().anyMatch(orgao -> orgao.equals(orgaoUsuario.getSigla()));
+            if (orgaos != null && orgaoUsuario != null && (orgaos.stream().anyMatch(orgao -> orgao.equals(orgaoUsuario.getSigla()))))
+                return true;
         }
         return false;
     }

@@ -1,18 +1,18 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
- * 
+ *
  *     This file is part of SIGA.
- * 
+ *
  *     SIGA is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     SIGA is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with SIGA.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -30,7 +30,7 @@ import org.hibernate.annotations.Immutable;
 import br.gov.jfrj.siga.base.util.Texto;
 import br.gov.jfrj.siga.dp.dao.CpDao;
 
-@SuppressWarnings("serial")
+
 @Entity
 @BatchSize(size = 500)
 @Immutable
@@ -42,13 +42,13 @@ public class ExPapel extends AbstractExPapel {
 	final static public long PAPEL_GESTOR = 1;
 
 	final static public long PAPEL_INTERESSADO = 2;
-	
+
 	final static public long PAPEL_FISCAL_ADMINISTRATIVO = 3;
-	
+
 	final static public long PAPEL_FISCAL_TECNICO = 4;
-	
+
 	final static public long PAPEL_LIQUIDANTE = 5;
-	
+
 	final static public long PAPEL_AUTORIZADOR = 6;
 
 	final static public long PAPEL_REVISOR = 7;
@@ -58,9 +58,9 @@ public class ExPapel extends AbstractExPapel {
 		s = Texto.removeAcento(s);
 		StringBuilder sb = new StringBuilder();
 		for (char ch : s.toCharArray()) {
-			if (ch >='a' && ch <='z') {
+			if (ch >= 'a' && ch <= 'z') {
 				sb.append(ch);
-			} else if (ch == ' ' || ch == '-' || ch == '/'){
+			} else if (ch == ' ' || ch == '-' || ch == '/') {
 				sb.append('_');
 			}
 		}
@@ -72,5 +72,25 @@ public class ExPapel extends AbstractExPapel {
 		if (getDescPapel() == null)
 			return null;
 		return getComoNomeDeVariavel();
+	}
+
+	static public String nomeDoPerfil(long id) {
+		switch ((int) id) {
+			case (int) PAPEL_GESTOR:
+				return "Gestor";
+			case (int) PAPEL_INTERESSADO:
+				return "Interessado";
+			case (int) PAPEL_FISCAL_ADMINISTRATIVO:
+				return "Fiscal Administrativo";
+			case (int) PAPEL_FISCAL_TECNICO:
+				return "Fiscal Técnico";
+			case (int) PAPEL_LIQUIDANTE:
+				return "Liquidante";
+			case (int) PAPEL_AUTORIZADOR:
+				return "Autorizador";
+			case (int) PAPEL_REVISOR:
+				return "Revisor";
+		}
+		return null;
 	}
 }

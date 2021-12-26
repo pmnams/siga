@@ -159,7 +159,10 @@ public class FlyingSaucer implements ConversorHtml {
     private static Extraido extrair(String str, String ini, String fim, String substituto) {
         Extraido e = new Extraido();
         int iIni = str.indexOf(ini);
-        int iFim = str.indexOf(fim);
+        if (iIni == -1)
+            return null;
+        int iFim = str.substring(iIni).indexOf(fim) + iIni;
+
         if (iIni == -1 || iFim == -1)
             return null;
         String sPre = str.substring(0, iIni);
@@ -284,6 +287,19 @@ public class FlyingSaucer implements ConversorHtml {
     }
 
     private static String substituiEstilos(String html) {
+        // <style> que estiverem fora do <head> devem ser inseridos no <head>
+        String htmlHead = html.substring(0, html.indexOf("</head>"));
+        String htmlSemHead = html.substring(html.indexOf("</head>"));
+        String htmlEstilo = "";
+        Extraido estiloForaDoHead;
+        do {
+            estiloForaDoHead = extrair(htmlSemHead, "<style>", "</style>", "");
+            if (estiloForaDoHead != null) {
+                htmlSemHead = estiloForaDoHead.strRestante;
+                htmlEstilo = htmlEstilo + "<style>" + estiloForaDoHead.strExtraida + "</style>";
+            }
+        } while (estiloForaDoHead != null);
+
         // Substitui os estilos presentes no HTML por estilos encontrados no arquivo
         // pagina.html, somente se detectar que não se trata de uma definição completa
         // de estilos, e nesse caso deve ser um HTML no padrão do Nheengatu. A definição
@@ -301,19 +317,16 @@ public class FlyingSaucer implements ConversorHtml {
         }
 
         if (strEstilosPadrao == null)
-            return html;
+            return htmlHead + htmlEstilo + htmlSemHead;
 
-        Extraido estilos = extrair(html, "<style>", "</style>", "<style>" + strEstilosPadrao + "</style>");
-        // Quando o <style> já contém um "page :first", então não há necessidade de
-        // fazer a substituição
+        Extraido estilos = extrair(htmlHead, "<style type=\"text/css\">", "</style>", "<style>" + strEstilosPadrao + "</style>");
         if (estilos != null && !estilos.strExtraida.contains(":first"))
-            return estilos.strRestante;
+            return estilos.strRestante + htmlEstilo + htmlSemHead;
 
-        estilos = extrair(html, "<style type=\"text/css\">", "</style>", "<style>" + strEstilosPadrao + "</style>");
         if (estilos != null && !estilos.strExtraida.contains(":first"))
-            return estilos.strRestante;
+            return estilos.strRestante + htmlEstilo + htmlSemHead;
 
-        return html;
+        return htmlHead + htmlEstilo + htmlSemHead;
     }
 
     // Esta rotina pode ser usada para testar a produção de PDFs sem necessitar que

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  * 
  *     This file is part of SIGA.
@@ -36,8 +36,8 @@ class Sample {
 		boolean[][] matrix = x.calQrcode(args[0].getBytes());
 
 		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix.length; j++) {
-				if (matrix[j][i]) {
+			for (boolean[] booleans : matrix) {
+				if (booleans[i]) {
 					System.out.print("@");
 				} else {
 					System.out.print(" ");
@@ -49,29 +49,8 @@ class Sample {
 	}
 
 	/**
-	 * Gets an <CODE>Image</CODE> with the barcode. The image will have to be
-	 * scaled in the Y direction by <CODE>yHeight</CODE>for the barcode to
-	 * have the right printing aspect.
-	 * 
-	 * @return the barcode <CODE>Image</CODE>
-	 * @throws BadElementException
-	 *             on error
-	 */
-//	public Image getImage() throws BadElementException {
-//		paintCode();
-//		byte g4[] = CCITTG4Encoder.compress(outBits, bitColumns, codeRows);
-//		return Image.getInstance(bitColumns, codeRows, false, Image.CCITTG4,
-//				(options & PDF417_INVERT_BITMAP) == 0 ? 0
-//						: Image.CCITT_BLACKIS1, g4, null);
-//	}
-
-	/**
 	 * Creates a <CODE>java.awt.Image</CODE>.
-	 * 
-	 * @param foreground
-	 *            the color of the bars
-	 * @param background
-	 *            the color of the background
+	 *
 	 * @return the image
 	 */
 	public static java.awt.Image createQRCodeImage(String url) {

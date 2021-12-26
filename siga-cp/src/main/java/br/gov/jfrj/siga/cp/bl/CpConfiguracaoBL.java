@@ -25,6 +25,7 @@ import br.gov.jfrj.siga.cp.grupo.ConfiguracaoGrupoFabrica;
 import br.gov.jfrj.siga.cp.model.enm.CpSituacaoDeConfiguracaoEnum;
 import br.gov.jfrj.siga.cp.model.enm.CpTipoDeConfiguracao;
 import br.gov.jfrj.siga.cp.model.enm.ITipoDeConfiguracao;
+import br.gov.jfrj.siga.cp.model.enm.ITipoDeMovimentacao;
 import br.gov.jfrj.siga.dp.*;
 import br.gov.jfrj.siga.dp.dao.CpDao;
 import br.gov.jfrj.siga.dp.dao.CpGrupoDaoFiltro;
@@ -542,6 +543,12 @@ public class CpConfiguracaoBL {
     protected boolean desigual(long cfg, long filtro, Set<Integer> atributosDesconsiderados, int atributo) {
         return cfg != 0
                 && ((filtro != 0 && cfg != filtro) || ((filtro == 0) && !atributosDesconsiderados.contains(atributo)));
+    }
+
+    protected boolean desigual(ITipoDeMovimentacao cfg, ITipoDeMovimentacao filtro,
+                               Set<Integer> atributosDesconsiderados, int atributo) {
+        return cfg != null
+                && ((filtro != null && cfg != filtro) || ((filtro == null) && !atributosDesconsiderados.contains(atributo)));
     }
 
     /**

@@ -28,9 +28,10 @@ import br.gov.jfrj.siga.cp.util.SigaUtil;
 import br.gov.jfrj.siga.dp.*;
 import br.gov.jfrj.siga.ex.*;
 import br.gov.jfrj.siga.ex.bl.Ex;
-import br.gov.jfrj.siga.ex.bl.ExCompetenciaBL;
 import br.gov.jfrj.siga.ex.bl.ExConfiguracaoBL;
+import br.gov.jfrj.siga.ex.logic.*;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDePrincipal;
 import br.gov.jfrj.siga.ex.service.ExService;
 import br.gov.jfrj.siga.ex.util.NivelDeAcessoUtil;
@@ -111,7 +112,7 @@ public class ExServiceImpl implements ExService {
                     Ex.getInstance().getBL().transferir(null, null, cadastranteParser.getPessoa(),
                             cadastranteParser.getLotacao(), mob, null, null, null, destinoParser.getLotacao(),
                             destinoParser.getPessoa(), null, null, null, null, null, false, null, null, null,
-                            forcarTransferencia, false, ExTipoMovimentacao.TIPO_MOVIMENTACAO_TRANSFERENCIA);
+                            forcarTransferencia, false, ExTipoDeMovimentacao.TRANSFERENCIA);
                 }
                 return true;
             } catch (Exception ex) {
@@ -204,7 +205,7 @@ public class ExServiceImpl implements ExService {
             try {
                 PessoaLotacaoParser cadastranteParser = new PessoaLotacaoParser(siglaCadastrante);
                 ExMobil mob = buscarMobil(codigoDocumento);
-                return Ex.getInstance().getComp().podeMovimentar(cadastranteParser.getPessoa(),
+                return Ex.getInstance().getComp().pode(ExPodeMovimentar.class, cadastranteParser.getPessoa(),
                         cadastranteParser.getLotacao() == null ? cadastranteParser.getPessoa().getLotacao()
                                 : cadastranteParser.getLotacao(),
                         mob);
@@ -226,9 +227,9 @@ public class ExServiceImpl implements ExService {
                 mob = mob.doc().getPrimeiraVia();
             }
             if (forcarTransferencia)
-                return Ex.getInstance().getComp().podeSerTransferido(mob);
+                return new ExPodeSerTransferido(mob).eval();
             else
-                return Ex.getInstance().getComp().podeTransferir(cadastranteParser.getPessoa(),
+                return Ex.getInstance().getComp().pode(ExPodeTransferir.class, cadastranteParser.getPessoa(),
                         cadastranteParser.getLotacao(), mob);
         }
     }
@@ -244,12 +245,27 @@ public class ExServiceImpl implements ExService {
         return mob.doc().getPrimeiraVia() != null && mob.doc().getSetVias().size() == 1;
     }
 
+    private static boolean isAtendente(final DpPessoa titular,
+                                       final DpLotacao lotaTitular, final ExMobil mob) throws Exception {
+        if (mob.isGeral()) {
+            for (ExMobil m : mob.doc().getExMobilSet()) {
+                if (!m.isGeral() && m.isAtendente(titular, lotaTitular))
+                    return true;
+            }
+            return false;
+        }
+        if (!mob.isVia() && !mob.isVolume())
+            return false;
+
+        return mob.isAtendente(titular, lotaTitular);
+    }
+
     public Boolean isAtendente(String codigoDocumento, String siglaTitular) throws Exception {
         try (ExSoapContext ctx = new ExSoapContext(true)) {
             try {
                 PessoaLotacaoParser cadastranteParser = new PessoaLotacaoParser(siglaTitular);
                 ExMobil mob = buscarMobil(codigoDocumento);
-                return ExCompetenciaBL.isAtendente(cadastranteParser.getPessoa(), cadastranteParser.getLotacao(), mob);
+                return isAtendente(cadastranteParser.getPessoa(), cadastranteParser.getLotacao(), mob);
             } catch (Exception ex) {
                 ctx.rollback(ex);
                 throw ex;
@@ -823,7 +839,7 @@ public class ExServiceImpl implements ExService {
 
                     idDocNumeracao = dao().existeRangeNumeroDocumento(idOrgaoUsu, idFormaDoc);
 
-                    if ((idDocNumeracao != null) && !Ex.getInstance().getComp().podeReiniciarNumeracao(orgaoUsuario, formaDocumento)) { //Existe Range Anterior e Não pode Resetar numeracao
+                    if ((idDocNumeracao != null) && !new ExPodeReiniciarNumeracao(orgaoUsuario, formaDocumento).eval()) { //Existe Range Anterior e Não pode Resetar numeracao
                         dao().updateMantemRangeNumeroDocumento(idDocNumeracao);
 
                     } else { //Não existe ou deve resetar numeração
@@ -998,10 +1014,8 @@ public class ExServiceImpl implements ExService {
                     /* Valida se usuário WS pode movimentar */
                     DpPessoa cadastranteWS = null;
                     cadastranteWS = dao().getPessoaFromSigla(SigaUtil.getInstance().parseTokenJwt(token).get("sub").toString());
-                    if (!Ex.getInstance().getComp().podePublicarPortalTransparenciaWS(cadastranteWS, cadastranteWS.getLotacao(), mob)) {
-                        throw new AplicacaoException(
-                                "Não é possível " + SigaMessages.getMessage("documento.publicar.portaltransparencia"));
-                    }
+                    Ex.getInstance().getComp().afirmar("Não é possível " + SigaMessages.getMessage("documento.publicar.portaltransparencia"),
+                            ExPodePublicarPortalDaTransparencia.class, cadastranteWS, cadastranteWS.getLotacao(), mob);
                     /* Fim da Validação */
                     String[] listaMarcadores = null;
                     if (!"".equals(marcadoresStr)) {

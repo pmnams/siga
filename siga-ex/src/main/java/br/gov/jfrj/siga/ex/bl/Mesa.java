@@ -14,8 +14,8 @@ import com.crivano.swaggerservlet.ISwaggerModel;
 import br.gov.jfrj.siga.base.Data;
 import br.gov.jfrj.siga.base.Prop;
 import br.gov.jfrj.siga.base.SigaMessages;
-import br.gov.jfrj.siga.cp.model.enm.CpMarcadorGrupoEnum;
 import br.gov.jfrj.siga.cp.model.enm.CpMarcadorEnum;
+import br.gov.jfrj.siga.cp.model.enm.CpMarcadorGrupoEnum;
 import br.gov.jfrj.siga.cp.model.enm.TipoDePainelEnum;
 import br.gov.jfrj.siga.dp.CpMarcador;
 import br.gov.jfrj.siga.dp.DpLotacao;
@@ -23,7 +23,7 @@ import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.ExMarca;
 import br.gov.jfrj.siga.ex.ExMobil;
 import br.gov.jfrj.siga.ex.ExMovimentacao;
-import br.gov.jfrj.siga.ex.ExTipoMovimentacao;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import br.gov.jfrj.siga.hibernate.ExDao;
 
 public class Mesa {
@@ -63,8 +63,8 @@ public class Mesa {
 	}
 
 	public static List<MesaItem> listarReferencias(TipoDePainelEnum tipo,
-			Map<ExMobil, List<MeM>> references, DpPessoa pessoa,
-			DpLotacao unidade, Date currentDate) {
+												   Map<ExMobil, List<MeM>> references, DpPessoa pessoa,
+												   DpLotacao unidade, Date currentDate) {
 		List<MesaItem> l = new ArrayList<>();
 
 		for (ExMobil mobil : references.keySet()) {
@@ -91,7 +91,7 @@ public class Mesa {
 							.getOrgaoUsuario()
 							+ "/"
 							+ mobil.doc().getSubscritor().getLotacao()
-									.getSigla();
+							.getSigla();
 				} else {
 					r.origem = mobil.doc().getSubscritor().getLotacao()
 							.getSigla();
@@ -114,11 +114,11 @@ public class Mesa {
 									+ "");
 
 					String qtdDias = Prop.get("/siga.devolucao.dias");
-					
+
 					if(qtdDias == null){
 						qtdDias = "5";
 					}
-					
+
 					if (dias <= Integer.parseInt(qtdDias)) {
 						r.dataDevolucao = "alerta";
 					}
@@ -140,11 +140,11 @@ public class Mesa {
 			for (MeM tag : references.get(mobil)) {
 				if (tag.marca.getDtIniMarca() != null
 						&& tag.marca.getDtIniMarca().getTime() > currentDate
-								.getTime())
+						.getTime())
 					continue;
 				if (tag.marca.getDtFimMarca() != null
 						&& tag.marca.getDtFimMarca().getTime() < currentDate
-								.getTime())
+						.getTime())
 					continue;
 
 				Marca t = new Marca();
@@ -169,8 +169,7 @@ public class Mesa {
 				if(tag.marca.getCpMarcador().isDemandaJudicial()) {
 					t.nome += " até " + tag.marca.getExMobil().getDoc().getMobilGeral()
 							.getExMovimentacaoSet().stream() //
-							.filter(mov -> mov.getExTipoMovimentacao().getId()
-									.equals(ExTipoMovimentacao.TIPO_MOVIMENTACAO_MARCACAO))
+							.filter(mov -> mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.MARCACAO)
 							.filter(mov -> !mov.isCancelada()) //
 							.filter(mov -> mov.getMarcador().equals(tag.marca.getCpMarcador())) //
 							.map(ExMovimentacao::getDtFimMovDDMMYY) //
@@ -196,7 +195,7 @@ public class Mesa {
 				if (unidade != null
 						&& tag.marca.getDpLotacaoIni() != null
 						&& unidade.getId().equals(
-								tag.marca.getDpLotacaoIni().getId()))
+						tag.marca.getDpLotacaoIni().getId()))
 					t.daLotacao = true;
 			}
 			l.add(r);
@@ -219,7 +218,7 @@ public class Mesa {
 	}
 
 	public static List<MesaItem> getMesa(ExDao dao, DpPessoa titular,
-			DpLotacao lotaTitular) {
+										 DpLotacao lotaTitular) {
 		List<Object[]> l = dao.listarDocumentosPorPessoaOuLotacao(titular,
 				lotaTitular);
 
@@ -242,13 +241,13 @@ public class Mesa {
 				&& !Ex.getInstance().getComp().ehPublicoExterno(titular)) {
 			List<Object[]> lLota = dao.listarDocumentosCxEntradaPorPessoaOuLotacao(null,
 					lotaTitular);
-	
+
 			for (Object[] reference : lLota) {
 				ExMarca marca = (ExMarca) reference[0];
 				if (marca.getCpMarcador().getIdMarcador() == CpMarcadorEnum.CAIXA_DE_ENTRADA.getId()) {
 					CpMarcador marcador = (CpMarcador) reference[1];
 					ExMobil mobil = (ExMobil) reference[2];
-		
+
 					if (!map.containsKey(mobil))
 						map.put(mobil, new ArrayList<MeM>());
 					MeM mm = new MeM();
@@ -258,7 +257,7 @@ public class Mesa {
 				}
 			}
 		}
-			
+
 		return Mesa.listarReferencias(TipoDePainelEnum.UNIDADE, map, titular,
 				titular.getLotacao(), dao.consultarDataEHoraDoServidor());
 	}
