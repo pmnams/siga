@@ -368,6 +368,7 @@ public class AcaoVO {
         public static String formatarExplicacao(Expression exp, boolean f) {
             String s = produzirExplicacao(exp, f);
             s = (f ? "Permitido" : "Proibido") + " porque " + s;
+            s = Texto.removerEspacosExtra(s);
             return s;
         }
 

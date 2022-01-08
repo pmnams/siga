@@ -7,7 +7,6 @@ import br.gov.jfrj.siga.dp.DpCargo;
 import br.gov.jfrj.siga.dp.dao.CpDao;
 import com.crivano.swaggerservlet.SwaggerException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CargosIdGet implements ICargosIdGet {
@@ -21,15 +20,11 @@ public class CargosIdGet implements ICargosIdGet {
     }
 
     private Cargo pesquisarPorId(Request req, Response resp) throws SwaggerException {
-        List<DpCargo> l = (ArrayList<DpCargo>) CpDao.getInstance().consultarPorIdOuIdInicial(DpCargo.class,
+        List<DpCargo> l = CpDao.getInstance().consultarPorIdOuIdInicial(DpCargo.class,
                 "idCargoIni", "dataFimCargo", Long.valueOf(req.id));
         if (l.size() == 0)
             throw new SwaggerException("Nenhum cargo foi encontrado para os parâmetros informados.", 404, null, req,
                     resp, null);
-
-//		if (Long.valueOf(cargo.getOrgaoUsuario().getIdOrgaoUsu()) != so.getTitular().getOrgaoUsuario().getIdOrgaoUsu()) 
-//			throw new SwaggerException(
-//					"Usuário não autorizado para consultar dados deste órgão.", 403, null, req, resp, null);
 
         return cargoToResultadoPesquisa(l.get(0));
     }
@@ -45,7 +40,7 @@ public class CargosIdGet implements ICargosIdGet {
         crgo.sigla = (cargo.getSigla() != null ? cargo.getSigla() : null);
         crgo.idCargo = cargo.getId().toString();
         crgo.idCargoIni = cargo.getIdCargoIni().toString();
-        crgo.idExterna = (cargo.getIdExterna() != null ? cargo.getIdExterna().toString() : null);
+        crgo.idExterna = (cargo.getIdExterna() != null ? cargo.getIdExterna() : null);
         crgo.nome = (cargo.getNomeCargo() != null ? cargo.getNomeCargo() : null);
 
         return crgo;

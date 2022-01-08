@@ -9,8 +9,8 @@ import com.crivano.jlogic.JLogic;
 
 public class ExMovimentacaoECadastrante implements Expression {
     ExMovimentacao mov;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public ExMovimentacaoECadastrante(ExMovimentacao mov, DpPessoa titular) {
         this(mov, titular, null);

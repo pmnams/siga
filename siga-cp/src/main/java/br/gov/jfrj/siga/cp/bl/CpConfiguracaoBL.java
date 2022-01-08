@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -557,7 +557,6 @@ public class CpConfiguracaoBL {
      *
      * @param cfg    - A configuração a ser verificada
      * @param perfis - os perfis da pessoa/lotacao
-     * @return
      */
     private boolean perfisContemGrupo(CpConfiguracaoCache cfg, SortedSet<CpPerfil> perfis) {
         for (CpPerfil cpPerfil : perfis) {

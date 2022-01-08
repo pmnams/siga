@@ -8,9 +8,9 @@ import com.crivano.jlogic.*;
 
 public class ExPodeSobrestar extends CompositeExpressionSupport {
 
-    private ExMobil mob;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final ExMobil mob;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public ExPodeSobrestar(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;
@@ -31,9 +31,6 @@ public class ExPodeSobrestar extends CompositeExpressionSupport {
      * <li>Móbil não pode estar em trânsito</li>
      * <li>Não pode haver configuração impeditiva</li>
      * </ul>
-     *
-     * @return
-     * @throws Exception
      */
     @Override
     protected Expression create() {

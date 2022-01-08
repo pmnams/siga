@@ -72,9 +72,10 @@ public class ExAutenticacaoController extends ExController {
 
         // Só para já dar o erro logo.
         String pwd = getJwtPassword();
-        String recaptchaSiteKey = getRecaptchaSiteKey();
-        String recaptchaSitePassword = getRecaptchaSitePassword();
-        result.include("recaptchaSiteKey", recaptchaSiteKey);
+        String captchaSiteKey = Prop.get("/siga.hcaptcha.key");
+        String captchaSitePassword = Prop.get("/siga.hcaptcha.pwd");
+
+        result.include("hcaptchaSiteKey", captchaSiteKey);
         result.include("n", n);
 
         if (n == null || n.trim().length() == 0) {
@@ -83,17 +84,17 @@ public class ExAutenticacaoController extends ExController {
         }
 
         String gRecaptchaResponse = request
-                .getParameter("captcha-response");
+                .getParameter("g-recaptcha-response");
 
         boolean success = false;
         if (gRecaptchaResponse != null) {
-            JSONObject body = Hcaptcha.validar(recaptchaSitePassword, gRecaptchaResponse, request.getRemoteAddr());
+            JSONObject body = Hcaptcha.validar(captchaSitePassword, gRecaptchaResponse, request.getRemoteAddr());
 
             String hostname = request.getServerName();
             if (body.getBoolean("success")) {
                 String retHostname = body.getString("hostname");
                 // Aceitando também o site-key de desenvolvimento padrão do reCaptcha
-                success = retHostname.equals(hostname) || ("6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI".equals(recaptchaSiteKey) && "testkey.google.com".equals(retHostname));
+                success = retHostname.equals(hostname);
             }
         }
         if (!success) {
@@ -302,14 +303,6 @@ public class ExAutenticacaoController extends ExController {
 
             result.include("docVO", docVO);
         }
-    }
-
-    private static String getRecaptchaSiteKey() {
-        return Prop.get("/siga.recaptcha.key");
-    }
-
-    private static String getRecaptchaSitePassword() {
-        return Prop.get("/siga.recaptcha.pwd");
     }
 
     private static String getJwtPassword() {

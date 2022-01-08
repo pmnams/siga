@@ -557,6 +557,7 @@
 							</div>
 						</c:if>
 						<div class="form-group col-md-3">
+							<label for="dtDocString">Data Inicial</label> <input
 							class="form-control campoData" placeholder="dd/mm/aaaa" autocomplete="off"
 							type="text" name="dtDocString" id="dtDocString" value="${dtDocString}"
 								onblur="javascript:verifica_data(this,0);" />

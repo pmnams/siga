@@ -18,17 +18,16 @@
  ******************************************************************************/
 package br.gov.jfrj.siga.ex;
 
-import javax.persistence.Cacheable;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
+import br.gov.jfrj.siga.base.util.Texto;
+import br.gov.jfrj.siga.dp.dao.CpDao;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Immutable;
 
-import br.gov.jfrj.siga.base.util.Texto;
-import br.gov.jfrj.siga.dp.dao.CpDao;
+import javax.persistence.Cacheable;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 
 @Entity
@@ -39,58 +38,58 @@ import br.gov.jfrj.siga.dp.dao.CpDao;
 @Table(name = "siga.ex_papel")
 public class ExPapel extends AbstractExPapel {
 
-	final static public long PAPEL_GESTOR = 1;
+    final static public long PAPEL_GESTOR = 1;
 
-	final static public long PAPEL_INTERESSADO = 2;
+    final static public long PAPEL_INTERESSADO = 2;
 
-	final static public long PAPEL_FISCAL_ADMINISTRATIVO = 3;
+    final static public long PAPEL_FISCAL_ADMINISTRATIVO = 3;
 
-	final static public long PAPEL_FISCAL_TECNICO = 4;
+    final static public long PAPEL_FISCAL_TECNICO = 4;
 
-	final static public long PAPEL_LIQUIDANTE = 5;
+    final static public long PAPEL_LIQUIDANTE = 5;
 
-	final static public long PAPEL_AUTORIZADOR = 6;
+    final static public long PAPEL_AUTORIZADOR = 6;
 
-	final static public long PAPEL_REVISOR = 7;
+    final static public long PAPEL_REVISOR = 7;
 
-	public String getComoNomeDeVariavel() {
-		String s = getDescPapel().trim().toLowerCase();
-		s = Texto.removeAcento(s);
-		StringBuilder sb = new StringBuilder();
-		for (char ch : s.toCharArray()) {
-			if (ch >= 'a' && ch <= 'z') {
-				sb.append(ch);
-			} else if (ch == ' ' || ch == '-' || ch == '/') {
-				sb.append('_');
-			}
-		}
-		return sb.toString();
-	}
+    public String getComoNomeDeVariavel() {
+        String s = getDescPapel().trim().toLowerCase();
+        s = Texto.removeAcento(s);
+        StringBuilder sb = new StringBuilder();
+        for (char ch : s.toCharArray()) {
+            if (ch >= 'a' && ch <= 'z') {
+                sb.append(ch);
+            } else if (ch == ' ' || ch == '-' || ch == '/') {
+                sb.append('_');
+            }
+        }
+        return sb.toString();
+    }
 
-	@Override
-	public String toString() {
-		if (getDescPapel() == null)
-			return null;
-		return getComoNomeDeVariavel();
-	}
+    @Override
+    public String toString() {
+        if (getDescPapel() == null)
+            return null;
+        return getComoNomeDeVariavel();
+    }
 
-	static public String nomeDoPerfil(long id) {
-		switch ((int) id) {
-			case (int) PAPEL_GESTOR:
-				return "Gestor";
-			case (int) PAPEL_INTERESSADO:
-				return "Interessado";
-			case (int) PAPEL_FISCAL_ADMINISTRATIVO:
-				return "Fiscal Administrativo";
-			case (int) PAPEL_FISCAL_TECNICO:
-				return "Fiscal Técnico";
-			case (int) PAPEL_LIQUIDANTE:
-				return "Liquidante";
-			case (int) PAPEL_AUTORIZADOR:
-				return "Autorizador";
-			case (int) PAPEL_REVISOR:
-				return "Revisor";
-		}
-		return null;
-	}
+    static public String nomeDoPerfil(long id) {
+        switch ((int) id) {
+            case (int) PAPEL_GESTOR:
+                return "Gestor";
+            case (int) PAPEL_INTERESSADO:
+                return "Interessado";
+            case (int) PAPEL_FISCAL_ADMINISTRATIVO:
+                return "Fiscal Administrativo";
+            case (int) PAPEL_FISCAL_TECNICO:
+                return "Fiscal Técnico";
+            case (int) PAPEL_LIQUIDANTE:
+                return "Liquidante";
+            case (int) PAPEL_AUTORIZADOR:
+                return "Autorizador";
+            case (int) PAPEL_REVISOR:
+                return "Revisor";
+        }
+        return null;
+    }
 }

@@ -6,7 +6,7 @@ import com.crivano.jlogic.Expression;
 
 public class ExEMarcadorUnico extends CompositeExpressionSupport {
 
-    private CpMarcador marcador;
+    private final CpMarcador marcador;
 
     public ExEMarcadorUnico(CpMarcador marcador) {
         this.marcador = marcador;

@@ -8,8 +8,8 @@ import com.crivano.jlogic.Or;
 
 public class ExEstaMarcadoComMarcadorOuOGeral extends CompositeExpressionSupport {
 
-    private CpMarcador marcador;
-    private ExMobil mob;
+    private final CpMarcador marcador;
+    private final ExMobil mob;
 
     public ExEstaMarcadoComMarcadorOuOGeral(ExMobil mob, CpMarcador marcador) {
         this.mob = mob;

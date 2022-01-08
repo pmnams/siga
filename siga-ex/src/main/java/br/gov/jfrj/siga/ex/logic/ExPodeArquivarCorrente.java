@@ -14,6 +14,9 @@ public class ExPodeArquivarCorrente extends CompositeExpressionSupport {
     private DpLotacao lotaTitular;
 
     public ExPodeArquivarCorrente(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
+        if (mob.isGeralDeProcesso() && mob.doc().isFinalizado())
+            mob = mob.doc().getUltimoVolume();
+
         this.mob = mob;
         this.titular = titular;
         this.lotaTitular = lotaTitular;
@@ -34,12 +37,6 @@ public class ExPodeArquivarCorrente extends CompositeExpressionSupport {
      * <li>Móbil não pode estar em trânsito</li>
      * <li>Não pode haver configuração impeditiva</li>
      * </ul>
-     *
-     * @param titular
-     * @param lotaTitular
-     * @param mob
-     * @return
-     * @throws Exception
      */
     @Override
     protected Expression create() {

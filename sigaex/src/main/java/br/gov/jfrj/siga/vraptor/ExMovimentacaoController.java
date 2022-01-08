@@ -1776,7 +1776,7 @@ public class ExMovimentacaoController extends ExController {
             }
         }
 
-        boolean podeTramitar = Ex.getInstance().getComp().pode(ExPodeTransferir.class,getTitular(), getLotaTitular(), builder.getMob());
+        boolean podeTramitar = Ex.getInstance().getComp().pode(ExPodeTransferir.class, getTitular(), getLotaTitular(), builder.getMob());
         boolean podeTramitarEmParalelo = Ex.getInstance().getComp().pode(ExPodeTramitarEmParalelo.class, getTitular(), getLotaTitular(), builder.getMob());
         boolean podeNotificar = Ex.getInstance().getComp().pode(ExPodeNotificar.class, getTitular(), getLotaTitular(), builder.getMob());
         boolean podeDespachar = Ex.getInstance().getComp().pode(ExPodeDespachar.class, getTitular(), getLotaTitular(), builder.getMob());
@@ -2364,9 +2364,9 @@ public class ExMovimentacaoController extends ExController {
         Ex.getInstance().getComp().afirmar("Não é possível fazer vinculação de papel", ExPodeFazerVinculacaoDePapel.class, getTitular(), getLotaTitular(), builder.getMob());
 
         if (!new ExPodeRestringirDefAcompanhamento(getTitular(), getLotaTitular(), responsavelSel.getObjeto(), lotaResponsavelSel.getObjeto(),
-                        responsavelSel.getObjeto() != null ? responsavelSel.getObjeto().getCargo() : null,
-                        responsavelSel.getObjeto() != null ? responsavelSel.getObjeto().getFuncaoConfianca() : null,
-                        responsavelSel.getObjeto() != null ? responsavelSel.getObjeto().getOrgaoUsuario() : lotaResponsavelSel.getObjeto().getOrgaoUsuario()).eval()) {
+                responsavelSel.getObjeto() != null ? responsavelSel.getObjeto().getCargo() : null,
+                responsavelSel.getObjeto() != null ? responsavelSel.getObjeto().getFuncaoConfianca() : null,
+                responsavelSel.getObjeto() != null ? responsavelSel.getObjeto().getOrgaoUsuario() : lotaResponsavelSel.getObjeto().getOrgaoUsuario()).eval()) {
             result.include(SigaModal.ALERTA, SigaModal.mensagem("Esse usuário / unidade não está disponível para ser marcado em definição de acompanhamento."));
             result.forwardTo(this).aVincularPapel(sigla, responsavelSel, lotaResponsavelSel, tipoResponsavel, idPapel);
 
@@ -2459,7 +2459,7 @@ public class ExMovimentacaoController extends ExController {
      * Retorna a relação das opções de {@link CpMarcador Marcadores} que podem ser
      * atribuídos a um {@link ExDocumento Documento}. A ordenação é feita aqui ao
      * invés do método de origem pois
-      mais de um lugar e além disso nele é retornado a união de 2 queries
+     * mais de um lugar e além disso nele é retornado a união de 2 queries
      * diferentes.
      *
      * @return opções de {@link CpMarcador Marcadores} que podem ser atribuídos a um
@@ -4467,7 +4467,7 @@ public class ExMovimentacaoController extends ExController {
         } catch (final Exception e) {
         }
 
-        Ex.getInstance().getComp().afirmar("Publicação não permitida", ExPodePublicar.class, getTitular(), getLotaTitular(),mob);
+        Ex.getInstance().getComp().afirmar("Publicação não permitida", ExPodePublicar.class, getTitular(), getLotaTitular(), mob);
 
         result.include("sigla", sigla);
         result.include("doc", mob.getDoc());
@@ -4518,7 +4518,7 @@ public class ExMovimentacaoController extends ExController {
             throw new AplicacaoException(
                     "A solicitação de publicação no DJE somente é permitida para documentos com nível de acesso Público.");
 
-        Ex.getInstance().getComp().afirmar("Publicação não permitida", ExPodePedirPublicacao.class, getTitular(), getLotaTitular(),	mob);
+        Ex.getInstance().getComp().afirmar("Publicação não permitida", ExPodePedirPublicacao.class, getTitular(), getLotaTitular(), mob);
 
         lot.setId(doc.getSubscritor().getLotacao().getId());
         lot.buscar();

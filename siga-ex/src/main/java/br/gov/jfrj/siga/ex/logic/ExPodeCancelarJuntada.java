@@ -8,10 +8,10 @@ import com.crivano.jlogic.*;
 
 public class ExPodeCancelarJuntada extends CompositeExpressionSupport {
 
-    private ExMobil mob;
+    private final ExMobil mob;
     private ExMobil mobPai;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public ExPodeCancelarJuntada(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;

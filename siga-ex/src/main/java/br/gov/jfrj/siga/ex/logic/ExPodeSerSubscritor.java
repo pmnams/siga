@@ -9,7 +9,7 @@ import com.crivano.jlogic.Or;
 
 public class ExPodeSerSubscritor extends CompositeExpressionSupport {
 
-    private ExDocumento doc;
+    private final ExDocumento doc;
 
     public ExPodeSerSubscritor(ExDocumento doc) {
         this.doc = doc;
