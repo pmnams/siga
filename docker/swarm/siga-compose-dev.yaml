@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  app:
+    ports:
+      - target: 9990
+        published: 9990
+      - target: 8787
+        published: 8787
+    volumes:
+      - ../siga/:${BASE_PATH:?Defina o path}/siga
+      - ../sigaex/:${BASE_PATH}/sigaex
+      - ../sigawf/:${BASE_PATH}/sigawf
+      - ../sigagc/:${BASE_PATH}/sigagc
