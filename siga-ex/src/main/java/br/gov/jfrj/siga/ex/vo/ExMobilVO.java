@@ -32,7 +32,6 @@ import br.gov.jfrj.siga.ex.ExMovimentacao;
 import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.bl.ExParte;
 import br.gov.jfrj.siga.ex.logic.*;
-import br.gov.jfrj.siga.ex.logic.ExPodeEncerrarVolume;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import org.jboss.logging.Logger;
 
@@ -569,7 +568,7 @@ public class ExMobilVO extends ExVO {
     }
 
     public boolean marcaEDeDeterminadaLotacao(ExMarca mar, DpLotacao lota) {
-        return mar.getDpLotacaoIni() != null
+        return mar.getDpLotacaoIni() != null && lota != null
                 && lota.getIdInicial().equals(mar.getDpLotacaoIni().getIdInicial());
     }
 

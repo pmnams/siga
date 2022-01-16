@@ -1528,7 +1528,7 @@ public class ExDocumentoController extends ExController {
 
         verificaDocumento(exDocumentoDto.getDoc());
 
-        Ex.getInstance().getComp().afirmar("Não é possível Finalizar", ExPodeFinalizar.class, getTitular(), getLotaTitular(), exDocumentoDto.getMob());
+        Ex.getInstance().getComp().afirmar("Não é possível Finalizar", ExPodeFinalizar.class, getTitular(), getLotaTitular(), exDocumentoDto.getMob().doc());
 
         try {
             exDocumentoDto.setMsg(Ex
