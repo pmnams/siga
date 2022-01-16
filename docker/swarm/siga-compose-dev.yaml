@@ -8,19 +8,7 @@ services:
       - target: 8787
         published: 8787
     volumes:
-      - ../siga/:${BASE_PATH}/siga
+      - ../siga/:${BASE_PATH:?Defina o path}/siga
       - ../sigaex/:${BASE_PATH}/sigaex
       - ../sigawf/:${BASE_PATH}/sigawf
       - ../sigagc/:${BASE_PATH}/sigagc
-
-  phpmyadmin:
-    image: phpmyadmin
-    environment:
-      - PMA_ARBITRARY=1
-    networks:
-      - siga-network
-    ports:
-      - target: 80
-        published: 8080
-        mode: host
-

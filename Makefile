@@ -1,5 +1,8 @@
+#!make
+
 IMAGENAME=siga-full
 REPO=brunocasas
+verssion=latest
 
 .PHONY: help build push all
 
@@ -15,15 +18,12 @@ help:
 
 .DEFAULT_GOAL := build
 
-
-
-
 IMAGEFULLNAME=${REPO}/${IMAGENAME}:${verssion}
 
 start-dev: export BASE_PATH = $(shell pwd)
 start-dev:
-	@docker stack deploy -c infra/siga-compose.yml -c infra/siga-compose-hom.yaml -c docker/swarm/siga-compose-dev.yaml siga
-	@docker stack deploy -c infra/traefik-compose.yaml traefik
+	@bash infra/bin/siga-infra.sh deploy siga --desenv -a docker/swarm/siga-compose-dev.yaml
+	@bash infra/bin/siga-infra.sh deploy traefik
 
 stop-dev:
 	@docker stack rm siga
@@ -31,6 +31,11 @@ stop-dev:
 
 restart-dev:
 	@docker service update siga_app --force
+
+build-all:
+	@mvn clean
+	@mvn package -DshipTests=true
+	@docker build --rm -t ${IMAGEFULLNAME} .
 
 build:
 	@docker build --rm -t ${IMAGEFULLNAME} .
