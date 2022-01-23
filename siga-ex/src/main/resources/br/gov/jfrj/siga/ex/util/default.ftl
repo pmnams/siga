@@ -8,43 +8,43 @@
             [/#if]
             [#local body][#nested/][/#local]
             [#local hash = false/]
-			<parte id="${id}" titulo="${titulo}" preenchido="${(preenchido == "Sim")?string("1","0")}"
-				   responsavel="${responsavel}" [#if .vars["parte_mensagem_" + id]??] mensagem="${.vars["parte_mensagem_" + id]!default}" [/#if]>
+            <parte id="${id}" titulo="${titulo}" preenchido="${(preenchido == "Sim")?string("1","0")}"
+                   responsavel="${responsavel}" [#if .vars["parte_mensagem_" + id]??] mensagem="${.vars["parte_mensagem_" + id]!default}" [/#if]>
                 [#if depende!=""]
                     [#list depende?split(";") as dependencia]
-						<depende id="${dependencia}" hash="hash"/>
+                        <depende id="${dependencia}" hash="hash"/>
                     [/#list]
                 [/#if]
-			</parte>
+            </parte>
         [#else]
             [#local idDiv = "parte_div_" + id /]
             [@div id=idDiv depende=depende suprimirIndependente=true]
-				<input type="hidden" id="parte_dependentes_${id}" class="parte_dependentes"
-					   value="${id}:${depende}:${bloquear?c}:${responsavel}"/>
+                <input type="hidden" id="parte_dependentes_${id}" class="parte_dependentes"
+                       value="${id}:${depende}:${bloquear?c}:${responsavel}"/>
                 [@oculto var="parte_mensagem_${id}" /]
 
-				<table class="parte" width="100%">
-					<tr class="header">
-						<td>${titulo}
-							<span style="float: right"><input type="button" value="Solicitar Alteração"
-															  onclick="parte_solicitar_alteracao('${id}', '${titular}', '${lotaTitular}');"/> [@checkbox titulo="Preenchimento Concluído" var=id reler=true idAjax=id id="parte_chk_"+id onclique="parte_atualizar('${titular}', '${lotaTitular}');" /]</span>
-							<span style="float: right; padding-right: 2em;">Responsável: ${responsavel}</span>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<div id="parte_div_mensagem_${id}" class="gt-error"></div>
-							<fieldset id="parte_fieldset_${id}">[#nested]</fieldset>
-						</td>
-					</tr>
-				</table>
+                <table class="parte" width="100%">
+                    <tr class="header">
+                        <td>${titulo}
+                            <span style="float: right"><input type="button" value="Solicitar Alteração"
+                                                              onclick="parte_solicitar_alteracao('${id}', '${titular}', '${lotaTitular}');"/> [@checkbox titulo="Preenchimento Concluído" var=id reler=true idAjax=id id="parte_chk_"+id onclique="parte_atualizar('${titular}', '${lotaTitular}');" /]</span>
+                            <span style="float: right; padding-right: 2em;">Responsável: ${responsavel}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div id="parte_div_mensagem_${id}" class="gt-error"></div>
+                            <fieldset id="parte_fieldset_${id}">[#nested]</fieldset>
+                        </td>
+                    </tr>
+                </table>
                 [#local titular = .vars['sigla_titular']!""]
                 [#local lotaTitular = .vars['sigla_lota_titular']!""]
-				<script type="text/javascript">
+                <script type="text/javascript">
                     $(document).ready(function () {
                         parte_atualizar('${titular}', '${lotaTitular}')
                     });
-				</script>
+                </script>
             [/@div]
         [/#if]
     [#else]
@@ -59,7 +59,7 @@
         [#recover]
             [#return]
     [/#attempt]
-	<p style="font-family: Arial; font-size: 11pt; text-align: center">
+    <p style="font-family: Arial; font-size: 11pt; text-align: center">
         ${(mov.subscritor.descricao)!}<br/>
 
         [#if mov.nmFuncao??]
@@ -75,14 +75,14 @@
         [#else]
             ${(mov.subscritor.cargo.nomeCargo)!}
         [/#if]
-		<br/>
+        <br/>
 
         [#if mov.nmLotacao??]
             ${mov.nmLotacao}
         [#else]
             ${(mov.titular.lotacao.nomeLotacao)!}
         [/#if]
-	</p>
+    </p>
 [/#macro]
 
 
@@ -428,13 +428,13 @@ root                                     +-------------+
 
 --]
 
-	Cada template roda no NAMESPACE default chamado Main, onde constam as variáveis definidas via diretiva Assign [@br/]
-	Nas macros e functions sao permitidas  a criação de variáveis locais via diretiva Local [@br/]
-	As variáveis definidas via diretiva Global podem ser utilizadas em todo o ambiente do freemarker [@br/]
-	O DATA MODEL e o Hash Root são idênticos [@br/]
+    Cada template roda no NAMESPACE default chamado Main, onde constam as variáveis definidas via diretiva Assign [@br/]
+    Nas macros e functions sao permitidas  a criação de variáveis locais via diretiva Local [@br/]
+    As variáveis definidas via diretiva Global podem ser utilizadas em todo o ambiente do freemarker [@br/]
+    O DATA MODEL e o Hash Root são idênticos [@br/]
 
     [@separador/]
-	=================================== VARIÁVEIS DO DATA MODEL ============================================================
+    =================================== VARIÁVEIS DO DATA MODEL ============================================================
     [@separador/]
     [#list .data_model?keys as chave]
         [#assign key = chave! /]
@@ -444,7 +444,7 @@ root                                     +-------------+
 
     [@separador/]
 
-	================================== VARIÁVEIS DO TEMPLATE SENDO EXECUTADO (NAMESPACE MAIN)=================================
+    ================================== VARIÁVEIS DO TEMPLATE SENDO EXECUTADO (NAMESPACE MAIN)=================================
     [@separador/]
     [#list .main?keys as chave]
         [#assign key = chave! /]
@@ -453,7 +453,7 @@ root                                     +-------------+
     [/#list]
     [@separador/]
 
-	================================== VARIÁVEIS DO HASH ROOT (Idêntica do DATA_MODEL) ========================================
+    ================================== VARIÁVEIS DO HASH ROOT (Idêntica do DATA_MODEL) ========================================
     [@separador/]
     [#list root?keys as chave]
         [#assign key = chave! /]
@@ -462,7 +462,7 @@ root                                     +-------------+
     [/#list]
     [@separador/]
 
-	================================== VARIÁVEIS DO HASH (DA CLASSE) FUNC  =====================================================
+    ================================== VARIÁVEIS DO HASH (DA CLASSE) FUNC  =====================================================
     [@separador/]
     [#list func?keys as chave]
         [#assign key = chave! /]
@@ -471,7 +471,7 @@ root                                     +-------------+
     [/#list]
     [@separador/]
 
-	================================== VARIÁVEIS DO HASH (DA CLASSE) EXBL  =====================================================
+    ================================== VARIÁVEIS DO HASH (DA CLASSE) EXBL  =====================================================
     [@separador/]
     [#list exbl?keys as chave]
         [#assign key = chave! /]
@@ -480,7 +480,7 @@ root                                     +-------------+
     [/#list]
     [@separador/]
 
-	================================== VARIÁVEIS DO HASH (DA CLASSE) DOC  =====================================================
+    ================================== VARIÁVEIS DO HASH (DA CLASSE) DOC  =====================================================
     [@separador/]
     [#list doc?keys as chave]
         [#assign key = chave! /]
@@ -489,7 +489,7 @@ root                                     +-------------+
     [/#list]
     [@separador/]
 
-	================================== VARIÁVEIS DEFINIDAS COMO LOCAL  ==========================================================
+    ================================== VARIÁVEIS DEFINIDAS COMO LOCAL  ==========================================================
     [@separador/]
     [#list .locals?keys as chave]
         [#assign key = chave! /]
@@ -551,7 +551,7 @@ Descrição: É o dump simplificado da macro @dumpall
 [/#macro]
 
 [#macro br]
-	<br>
+    <br>
 [/#macro]
 
 [#macro atualizaoculto var valor="" default="1"]
@@ -562,9 +562,9 @@ Data:     13/05/2012
 Descrição: Rcebe o nome da variável e o valor que se deseja modificar, sendo "1" o default
 --]
     [#local v = (valor != "")?string(valor,.vars[var]!default) /]
-	<script type="text/javascript">
+    <script type="text/javascript">
         document.getElementById("${var}").value = "${v}";
-	</script>
+    </script>
 [/#macro]
 
 
@@ -575,9 +575,9 @@ Autor:    Ruben
 Data:     13/05/2012
 Descrição: Recebe o nome da variável que deve ser modificada e a variável com conteúdo novo
 --]
-	<script type="text/javascript">
+    <script type="text/javascript">
         document.getElementsByName("${varantigo}")[0].value = "${varnovo}";
-	</script>
+    </script>
 [/#macro]
 
 
@@ -588,7 +588,7 @@ Autor:    Ruben
 Data:     13/05/2012
 Descrição: Recebe o id e o texto da mensagem para que se possa alterar o style.diplay para "none" ou "inline"
 --]
-	<span id="idspan" style="[#if vermelho]color=#ff0000[/#if]"> ${texto!""}</span>
+    <span id="idspan" style="[#if vermelho]color=#ff0000[/#if]"> ${texto!""}</span>
 [/#macro]
 
 [#macro memooculto var titulo colunas linhas reler=false obrigatorio=false default=""]
@@ -602,7 +602,7 @@ Descrição: Cria um campo memo (textarea) oculto
         [#local jreler = " onchange=\"javascript: sbmt();\""]
     [/#if]
     [#local v = .vars[var]!default]
-	<input type="hidden" name="vars" value="${var}"/>
+    <input type="hidden" name="vars" value="${var}"/>
     [#if (alerta!"Não") = 'Sim' && v = ""]
         [#list obrigatorios?split(",") as campo]
             [#if campo == var]
@@ -612,16 +612,16 @@ Descrição: Cria um campo memo (textarea) oculto
     [/#if]
     [#if obrigatorio]
         [#local negrito = "font-weight:bold"]
-		<input type="hidden" name="obrigatorios" value="${var}"/>
+        <input type="hidden" name="obrigatorios" value="${var}"/>
     [/#if]
-	<div style="padding-top:5px;">
+    <div style="padding-top:5px;">
         [#if !gerar_formulario!false]
-			<textarea cols="${colunas}" rows="${linhas}" style="display: none"
-					  name="${var}" ${jreler!""}>${v}</textarea>
+            <textarea cols="${colunas}" rows="${linhas}" style="display: none"
+                      name="${var}" ${jreler!""}>${v}</textarea>
         [#else]
-			<span class="valor">${v}</span>
+            <span class="valor">${v}</span>
         [/#if]
-	</div>
+    </div>
 [/#macro]
 
 [#macro dumpvarantes]
@@ -634,15 +634,15 @@ Descrição: Esta macro é utilizada pelo Integrador
     [#assign datahoje = doc.getData()?substring(0,10)/]
     [#assign horahoje = doc.getData()?substring(11,19)/]
     [#assign fm_logDump]
-		==================================================================================
-		DUMP INÍCIO     do DATA-MODEL / Variáveis do Template  ${datahoje} às ${horahoje}
-		==================================================================================
-		-
-		---------------------------------
-		LISTAGEM DO DATA-MODEL
-		--------------------------------
-		LINHA  VARIÁVEL / CONTEÚDO
-		------       ------------------------------------------------
+        ==================================================================================
+        DUMP INÍCIO     do DATA-MODEL / Variáveis do Template  ${datahoje} às ${horahoje}
+        ==================================================================================
+        -
+        ---------------------------------
+        LISTAGEM DO DATA-MODEL
+        --------------------------------
+        LINHA  VARIÁVEL / CONTEÚDO
+        ------       ------------------------------------------------
         [#assign fm_i = 1/]
         [#list .data_model?keys as chave]
             [#assign key = chave! /]
@@ -663,13 +663,13 @@ Descrição: Esta macro é utilizada pelo Integrador
                 [/#if]
             [/#if]
         [/#list]
-		-
-		-
-		---------------------------------------------
-		LISTAGEM DAS VARIÁVEIS DO TEMPLATE
-		--------------------------------------------
-		LINHA  VARIÁVEL / CONTEÚDO
-		------      ------------------------------------------------
+        -
+        -
+        ---------------------------------------------
+        LISTAGEM DAS VARIÁVEIS DO TEMPLATE
+        --------------------------------------------
+        LINHA  VARIÁVEL / CONTEÚDO
+        ------      ------------------------------------------------
         [#assign fm_i = 1/]
         [#list .main?keys as chave]
             [#assign key = chave! /]
@@ -694,13 +694,13 @@ Descrição: Esta macro é utilizada pelo Integrador
     [/#assign]
     [@oculto var="fm_dumpAntesFm" valor="${fm_logDump?html}"/]
     [@grupo titulo="DUMP"]
-		<input id="fm_verdumpantes" type=button onClick="fm_verDumpFm(1);" value='Início da execução'>
-		<span>    </span>
-		<input id="fm_verdumpdepois" type=button onClick="fm_verDumpFm(2);" value='Fim da execução'>
+        <input id="fm_verdumpantes" type=button onClick="fm_verDumpFm(1);" value='Início da execução'>
+        <span>    </span>
+        <input id="fm_verdumpdepois" type=button onClick="fm_verDumpFm(2);" value='Fim da execução'>
         [@separador/]
     [/@grupo]
 
-	<script type="text/javascript" language="javascript">
+    <script type="text/javascript" language="javascript">
         function fm_verDumpFm(tipoDump) {
             try {
                 if (tipoDump == 1) {
@@ -732,7 +732,7 @@ Descrição: Esta macro é utilizada pelo Integrador
                 }
             } // do if tipoDump = 2
         } //da function
-	</script>
+    </script>
 [/#macro]
 
 
@@ -746,15 +746,15 @@ Descrição: Esta macro é utilizada pelo Integrador
     [#assign datahoje = doc.getData()?substring(0,10)/]
     [#assign horahoje = doc.getData()?substring(11,19)/]
     [#assign fm_logDump]
-		==========================================================================
-		DUMP FIM do DATA-MODEL / Variáveis do Template  ${datahoje} às ${horahoje}
-		==========================================================================
-		-
-		----------------------
-		LISTAGEM DO DATA-MODEL
-		----------------------
-		LINHA  VARIÁVEL / CONTEÚDO
-		------ ------------------------------------------------
+        ==========================================================================
+        DUMP FIM do DATA-MODEL / Variáveis do Template  ${datahoje} às ${horahoje}
+        ==========================================================================
+        -
+        ----------------------
+        LISTAGEM DO DATA-MODEL
+        ----------------------
+        LINHA  VARIÁVEL / CONTEÚDO
+        ------ ------------------------------------------------
         [#assign fm_i = 1/]
         [#list .data_model?keys as chave]
             [#assign key = chave! /]
@@ -775,13 +775,13 @@ Descrição: Esta macro é utilizada pelo Integrador
                 [/#if]
             [/#if]
         [/#list]
-		-
-		-
-		------------------------------------------
-		LISTAGEM DAS VARIÁVEIS DO TEMPLATE
-		------------------------------------------
-		LINHA  VARIÁVEL / CONTEÚDO
-		------      ------------------------------------------------
+        -
+        -
+        ------------------------------------------
+        LISTAGEM DAS VARIÁVEIS DO TEMPLATE
+        ------------------------------------------
+        LINHA  VARIÁVEL / CONTEÚDO
+        ------      ------------------------------------------------
         [#assign fm_i = 1/]
         [#list .main?keys as chave]
             [#assign key = chave! /]
@@ -873,7 +873,7 @@ Descrição: Esta macro é utilizada pelo Integrador
 [/#function]
 
 [#macro retorna tag valor]
-	<!-- ${tag} --><!--{${valor}}--><!-- /${tag} -->
+    <!-- ${tag} --><!--{${valor}}--><!-- /${tag} -->
 [/#macro]
 
 [#if gerar_descricaodefault!false]
@@ -883,20 +883,20 @@ Descrição: Esta macro é utilizada pelo Integrador
 [#macro entrevista acaoGravar="" acaoExcluir="" acaoCancelar="" acaoFinalizar="" descricao=""]
     [#if gerar_entrevista!false || gerar_formulario!false || gerar_partes!false]
         [#if acaoGravar!=""]
-			<input type="hidden" name="acaoGravar" id="acaoGravar" value="${acaoGravar}"/>
-			<input type="hidden" name="vars" value="acaoGravar"/>
+            <input type="hidden" name="acaoGravar" id="acaoGravar" value="${acaoGravar}"/>
+            <input type="hidden" name="vars" value="acaoGravar"/>
         [/#if]
         [#if acaoExcluir!=""]
-			<input type="hidden" name="acaoExcluir" id="acaoExcluir" value="${acaoExcluir}"/>
-			<input type="hidden" name="vars" value="acaoExcluir"/>
+            <input type="hidden" name="acaoExcluir" id="acaoExcluir" value="${acaoExcluir}"/>
+            <input type="hidden" name="vars" value="acaoExcluir"/>
         [/#if]
         [#if acaoCancelar!=""]
-			<input type="hidden" name="acaoCancelar" id="acaoCancelar" value="${acaoCancelar}"/>
-			<input type="hidden" name="vars" value="acaoCancelar"/>
+            <input type="hidden" name="acaoCancelar" id="acaoCancelar" value="${acaoCancelar}"/>
+            <input type="hidden" name="vars" value="acaoCancelar"/>
         [/#if]
         [#if acaoFinalizar!=""]
-			<input type="hidden" name="acaoFinalizar" id="acaoFinalizar" value="${acaoFinalizar}"/>
-			<input type="hidden" name="vars" value="acaoFinalizar"/>
+            <input type="hidden" name="acaoFinalizar" id="acaoFinalizar" value="${acaoFinalizar}"/>
+            <input type="hidden" name="vars" value="acaoFinalizar"/>
         [/#if]
         [#if descricao!=""]
             [@retorna tag="descricaoentrevista" valor=descricao /]
@@ -907,9 +907,9 @@ Descrição: Esta macro é utilizada pelo Integrador
 
 [#macro documento formato="A4" orientacao="retrato" margemEsquerda="3cm" margemDireita="2cm" margemSuperior="1cm" margemInferior="2cm"]
     [#if !gerar_entrevista!false || gerar_finalizacao!false || gerar_assinatura!false]
-		<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-		<head>
-			<style type="text/css">
+        <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+        <head>
+            <style type="text/css">
                 @page {
                     margin-left: ${margemEsquerda};
                     margin-right: ${margemDireita};
@@ -934,18 +934,18 @@ Descrição: Esta macro é utilizada pelo Integrador
                     text-decoration: none;
                 }
 
-			</style>
-		</head>
-		<body>
+            </style>
+        </head>
+        <body>
         [#if func.resource('conversor.html.ext') == 'br.gov.jfrj.itextpdf.MyPD4ML']
             [#nested]
         [#else]
-			<div style="word-wrap: break-word" class="divDoc">
+            <div style="word-wrap: break-word" class="divDoc">
                 [#nested]
-			</div>
+            </div>
         [/#if]
-		</body>
-		</html>
+        </body>
+        </html>
     [/#if]
 [/#macro]
 
@@ -976,19 +976,19 @@ Descrição: Esta macro é utilizada pelo Integrador
 [#macro resumo visivel=false]
     [#assign visivel = visivel /]
     [#if gerar_resumo!false]
-		<!-- resumo -->
+        <!-- resumo -->
         [#nested]
-		<!-- /resumo -->
+        <!-- /resumo -->
     [/#if]
 [/#macro]
 
 [#macro topico descricao valor]
     [#if visivel!false]
-		<li>${descricao}=${valor}</li>
+        <li>${descricao}=${valor}</li>
     [/#if]
-	<!-- topico -->
-	<input type="hidden" name="${descricao}" value="${valor}"/>
-	<!-- /topico -->
+    <!-- topico -->
+    <input type="hidden" name="${descricao}" value="${valor}"/>
+    <!-- /topico -->
 [/#macro]
 
 [#macro grupo titulo="" largura=0 depende="" esconder=false atts={}]
@@ -998,27 +998,27 @@ Descrição: Esta macro é utilizada pelo Integrador
             [#if largura != 0]
                 [#if !grupoLarguraTotal??]
                     [#assign grupoLarguraTotal = 0/]
-					<table width="100%">
-					<tr>
+                    <table width="100%">
+                    <tr>
                 [/#if]
                 [#assign grupoLarguraTotal = grupoLarguraTotal + largura/]
-				<td width="${largura}%" valign="top">
+                <td width="${largura}%" valign="top">
             [/#if]
-			<table class="entrevista" width="100%">
+            <table class="entrevista" width="100%">
                 [#if titulo != ""]
-					<tr class="header">
-						<td>${titulo}</td>
-					</tr>
+                    <tr class="header">
+                        <td>${titulo}</td>
+                    </tr>
                 [/#if]
-				<tr>
-					<td>[#nested]</td>
-				</tr>
-			</table>
+                <tr>
+                    <td>[#nested]</td>
+                </tr>
+            </table>
             [#if largura != 0]
-				</td>
+                </td>
                 [#if (grupoLarguraTotal >= 100)]
-					</td>
-					</table>
+                    </td>
+                    </table>
                     [#assign grupoLarguraTotal = 0/]
                 [/#if]
             [/#if]
@@ -1031,7 +1031,7 @@ Descrição: Esta macro é utilizada pelo Integrador
 [#macro div id="" depende="" suprimirIndependente=false atts={}]
     [#assign attsHtml][#list atts?keys as k]${k}="${atts[k]}"[/#list][/#assign]
     [#if suprimirIndependente || depende != ""]
-		<div[#if id != ""] id="${id}"[/#if][#if depende != ""] depende=";${depende};"[/#if] ${attsHtml}>
+        <div[#if id != ""] id="${id}"[/#if][#if depende != ""] depende=";${depende};"[/#if] ${attsHtml}>
             [#if id != ""]<!--ajax:${id}-->[/#if][#nested][#if id != ""]<!--/ajax:${id}-->[/#if]</div>
     [#else]
         [#nested]
@@ -1064,8 +1064,8 @@ Descrição: Esta macro é utilizada pelo Integrador
         [#local v = default/]
     [/#if]
 
-	<div class="form-group" style="margin-bottom:0">
-		<input type="hidden" name="vars" value="${var}"/>
+    <div class="form-group" style="margin-bottom:0">
+        <input type="hidden" name="vars" value="${var}"/>
 
         [#if (alerta!"Não") = 'Sim' && v = ""]
             [#list obrigatorios?split(",") as campo]
@@ -1077,21 +1077,21 @@ Descrição: Esta macro é utilizada pelo Integrador
 
         [#if obrigatorio == 'Sim']
             [#local negrito = "font-weight:bold"]
-			<input type="hidden" name="obrigatorios" value="${var}"/>
+            <input type="hidden" name="obrigatorios" value="${var}"/>
         [/#if]
 
         [#assign attsHtml][#list atts?keys as k]${k}="${atts[k]}"[/#list][/#assign]
         [#if !gerar_formulario!false]
         [#if titulo != ""]
-			<label for="${var}" title="campo: ${var}" style="${negrito!};${vermelho!}">${titulo}</label>
+            <label for="${var}" style="${negrito!};${vermelho!}">${titulo}</label>
         [/#if]
 
-			<input type="text" id="${var}" name="${var}" value="${v}" ${jreler!""}${jrelertab!""} ${attsHtml}
-				   onkeyup="${onkeyup}"
-				   class="form-control" [#if isCpf]data-formatar-cpf="true" placeholder="000.000.000-00" maxlength="14" style="max-width: 150px"[#elseif isCnpj]data-formatar-cnpj="true" placeholder="00.000.000/000-00" maxlength="18" style="max-width: 180px"[#else]${jlargura!""}${jmaxcaracteres!""}[/#if]/>
-			<div class="invalid-feedback  invalid-feedback-${var}">Preenchimento obrigatório</div>
+            <input type="text" id="${var}" name="${var}" value="${v}" ${jreler!""}${jrelertab!""} ${attsHtml}
+                   onkeyup="${onkeyup}"
+                   class="form-control" [#if isCpf]data-formatar-cpf="true" placeholder="000.000.000-00" maxlength="14" style="max-width: 150px"[#elseif isCnpj]data-formatar-cnpj="true" placeholder="00.000.000/000-00" maxlength="18" style="max-width: 180px"[#else]${jlargura!""}${jmaxcaracteres!""}[/#if]/>
+            <div class="invalid-feedback  invalid-feedback-${var}">Preenchimento obrigatório</div>
         [#if isCpf]
-			<script>
+            <script>
                 function aplicarMascaraCPF(evento) {
                     cpf = this.value.replace(/([^\d])/g, '');
 
@@ -1108,9 +1108,9 @@ Descrição: Esta macro é utilizada pelo Integrador
 
                 document.querySelector('input[name=${var}]').addEventListener('input', aplicarMascaraCPF);
                 document.querySelector('input[name=${var}]').addEventListener('change', aplicarMascaraCPF);
-			</script>
+            </script>
         [#elseif isCnpj]
-			<script>
+            <script>
                 function aplicarMascaraCNPJ(evento) {
                     cnpj = this.value.replace(/([^\d])/g, '');
 
@@ -1128,19 +1128,19 @@ Descrição: Esta macro é utilizada pelo Integrador
 
                 document.querySelector('input[name=${var}]').addEventListener('input', aplicarMascaraCNPJ);
                 document.querySelector('input[name=${var}]').addEventListener('change', aplicarMascaraCNPJ);
-			</script>
+            </script>
         [/#if]
         [#else]
-			<span class="valor">${v}</span>
+            <span class="valor">${v}</span>
         [/#if]
-	</div>
+    </div>
 [/#macro]
 
 [#macro oculto var valor="" default=""]
     [#local v = (valor != "")?string(valor,.vars[var]!default) /]
-	<input type="hidden" name="vars" value="${var}"/>
+    <input type="hidden" name="vars" value="${var}"/>
     [#if !gerar_formulario!false]
-		<input type="hidden" id="${var}" name="${var}" value="${v}"/>
+        <input type="hidden" id="${var}" name="${var}" value="${v}"/>
     [/#if]
 [/#macro]
 
@@ -1159,9 +1159,9 @@ Descrição: Esta macro é utilizada pelo Integrador
         [@inlineTemplate/]
     [/#if]
 
-	<div class="form-group" style="margin-bottom:0">
-		<input type="hidden" name="vars" value="${var}"/>
-		<input type="hidden" id="${var}" name="${var}" value="${v}"/>
+    <div class="form-group" style="margin-bottom:0">
+        <input type="hidden" name="vars" value="${var}"/>
+        <input type="hidden" id="${var}" name="${var}" value="${v}"/>
 
         [#if (alerta!"Não") = 'Sim' && v = ""]
             [#list obrigatorios?split(",") as campo]
@@ -1173,24 +1173,24 @@ Descrição: Esta macro é utilizada pelo Integrador
 
         [#if obrigatorio]
             [#local negrito = "font-weight:bold"]
-			<input type="hidden" name="obrigatorios" value="${var}_chk"/>
+            <input type="hidden" name="obrigatorios" value="${var}_chk"/>
         [/#if]
 
         [#if !gerar_formulario!false]
-			<div class="form-check">
-				<input class="form-check-input" id="${id}" type="checkbox" name="${var}_chk" value="Sim"
+            <div class="form-check">
+                <input class="form-check-input" id="${id}" type="checkbox" name="${var}_chk" value="Sim"
                        [#if v=='Sim']checked[/#if]
-					   onclick="javascript: if (this.checked) document.getElementById('${var}').value = 'Sim'; else document.getElementById('${var}').value = '${default}'; ${onclique!""}; ${jreler!""}" [#if id == ""]data-criar-id="true"[/#if]/>
-				<label title="campo: ${var}" class="form-check-label" for="${id}" style="${negrito!""};${vermelho!""}"
+                       onclick="javascript: if (this.checked) document.getElementById('${var}').value = 'Sim'; else document.getElementById('${var}').value = '${default}'; ${onclique!""}; ${jreler!""}" [#if id == ""]data-criar-id="true"[/#if]/>
+                <label class="form-check-label" for="${id}" style="${negrito!""};${vermelho!""}"
                        [#if id == ""]data-nome-ref="${var}_chk"[/#if]>${titulo!""}</label>
                 [#if obrigatorio]
-					<div class="invalid-feedback  invalid-feedback-${var}_chk">Preenchimento obrigatório</div>
+                    <div class="invalid-feedback  invalid-feedback-${var}_chk">Preenchimento obrigatório</div>
                 [/#if]
-			</div>
+            </div>
         [#else]
-			<span class="valor">${v}</span>
+            <span class="valor">${v}</span>
         [/#if]
-	</div>
+    </div>
 [/#macro]
 
 [#macro radio titulo var reler=false idAjax="" default="Não" valor="Sim" onclique="" atts={} obrigatorio=false id=""]
@@ -1202,39 +1202,38 @@ Descrição: Esta macro é utilizada pelo Integrador
 
     [#local v = .vars[var]!(default == "Sim")?string(valor, "") /]
 
-	<div class="form-group" style="margin-bottom:0">
+    <div class="form-group" style="margin-bottom:0">
         [#if !.vars["temRadio_"+var]??]
-			<input type="hidden" name="vars" value="${var}"/>
-			<input type="hidden" id="${var}" name="${var}" value="${v}"/>
+            <input type="hidden" name="vars" value="${var}"/>
+            <input type="hidden" id="${var}" name="${var}" value="${v}"/>
             [#assign inlineTemplate = ["[#assign temRadio_${var} = true/]", "assignInlineTemplate"]?interpret /]
             [@inlineTemplate/]
         [/#if]
         [#if v == valor]
-			<script>document.getElementById('${var}').value = '${valor}';</script>
+            <script>document.getElementById('${var}').value = '${valor}';</script>
         [/#if]
 
         [#if obrigatorio]
             [#local negrito = "font-weight:bold"]
-			<input type="hidden" name="obrigatorios" value="${var}_chk"/>
+            <input type="hidden" name="obrigatorios" value="${var}_chk"/>
         [/#if]
 
         [#assign attsHtml][#list atts?keys as k]${k}="${atts[k]}"[/#list][/#assign]
         [#if !gerar_formulario!false]
-			<div class="custom-control custom-radio">
-				<input class="custom-control-input" type="radio" id="${id}" name="${var}_chk" value="${valor}"
+            <div class="custom-control custom-radio">
+                <input class="custom-control-input" type="radio" id="${id}" name="${var}_chk" value="${valor}"
                        [#if v == valor]checked[/#if]
-					   onclick="javascript: if (this.checked) document.getElementById('${var}').value = '${valor}'; ${onclique}; ${jreler!};" ${attsHtml} [#if id == ""]data-criar-id="true"[/#if]/>
-				<label title="campo: ${var}" class="custom-control-label" for="${id}"
-					   style="${negrito!""};${vermelho!""}"
+                       onclick="javascript: if (this.checked) document.getElementById('${var}').value = '${valor}'; ${onclique}; ${jreler!};" ${attsHtml} [#if id == ""]data-criar-id="true"[/#if]/>
+                <label class="custom-control-label" for="${id}" style="${negrito!""};${vermelho!""}"
                        [#if id == ""]data-nome-ref="${var}_chk"[/#if]>${titulo!""}</label>
                 [#if obrigatorio]
-					<div class="invalid-feedback  invalid-feedback-${var}_chk">Preenchimento obrigatório</div>
+                    <div class="invalid-feedback  invalid-feedback-${var}_chk">Preenchimento obrigatório</div>
                 [/#if]
-			</div>
+            </div>
         [#else]
-			<span class="valor">${v}</span>
+            <span class="valor">${v}</span>
         [/#if]
-	</div>
+    </div>
 [/#macro]
 
 [#macro editor_antigo var titulo="" default=""]
@@ -1249,35 +1248,35 @@ Descrição: Esta macro é utilizada pelo Integrador
         [#local v = '<p style="text-indent:2cm; text-align: justify">&nbsp;</p>'/]
     [/#if]
 
-	<div>
+    <div>
         [#if titulo != ""]
-			<b>${titulo}</b>
+            <b>${titulo}</b>
         [/#if]
 
         [#if !gerar_formulario!false]
 
-			<input type="hidden" name="vars" value="${var}"/>
-			<input type="hidden" id="desconsiderarExtensao" name="desconsiderarExtensao"
-				   value="${desconsiderarExtensao!'false'}"/>
+            <input type="hidden" name="vars" value="${var}"/>
+            <input type="hidden" id="desconsiderarExtensao" name="desconsiderarExtensao"
+                   value="${desconsiderarExtensao!'false'}"/>
 
             [#if ( (func.podeUtilizarExtensaoEditor(lotaCadastrante, doc.exModelo.idMod?number)!false)
             && (!((desconsiderarExtensao == 'true')!false)) )]
             [#else]
-				<textarea id="${var}" name="${var}" class="form-control">${default!}${v?html}</textarea>
+                <textarea id="${var}" name="${var}" class="form-control">${default!}${v?html}</textarea>
             [/#if]
-			<table class="entrevista" width="100%">
-				<tr>
-					<td></td>
-					<td colspan="3">
+            <table class="entrevista" width="100%">
+                <tr>
+                    <td></td>
+                    <td colspan="3">
 
 
                         [#if ( (func.podeUtilizarExtensaoEditor(lotaCadastrante, doc.exModelo.idMod?number)!false)
                         && (!((desconsiderarExtensao == 'true')!false)) )]
-							<input type="hidden" id="${var}" name="${var}" value="${v?html}">
+                            <input type="hidden" id="${var}" name="${var}" value="${v?html}">
                             [@extensaoEditor nomeExtensao=var conteudoExtensao=v/]
                         [#else]
 
-							<script type="text/javascript">
+                            <script type="text/javascript">
 
                                 CKEDITOR.config.scayt_autoStartup = true;
                                 CKEDITOR.config.scayt_sLang = 'pt_BR';
@@ -1339,17 +1338,17 @@ Descrição: Esta macro é utilizada pelo Integrador
                                             toolbar: 'SigaToolbar'
                                         });
                                 }
-							</script>
+                            </script>
 
                         [/#if]
 
-					</td>
-				</tr>
-			</table>
+                    </td>
+                </tr>
+            </table>
         [#else]
-			<br>${v}<br><br>
+            <br>${v}<br><br>
         [/#if]
-	</div>
+    </div>
 [/#macro]
 
 [#macro editor var titulo="" default=""]
@@ -1364,79 +1363,75 @@ Descrição: Esta macro é utilizada pelo Integrador
         [#local v = '<p style="text-indent:2cm; text-align: justify">&nbsp;</p>'/]
     [/#if]
 
-	<div>
+    <div>
         [#if titulo != ""]
-			<span title="campo: ${var}"><b>${titulo}</b></span>
+            <b>${titulo}</b>
         [/#if]
 
         [#if !gerar_formulario!false]
-			<input type="hidden" name="vars" value="${var}"/>
-			<input type="hidden" id="desconsiderarExtensao" name="desconsiderarExtensao"
-				   value="${desconsiderarExtensao!'false'}"/>
+            <input type="hidden" name="vars" value="${var}"/>
+            <input type="hidden" id="desconsiderarExtensao" name="desconsiderarExtensao"
+                   value="${desconsiderarExtensao!'false'}"/>
 
             [#if ( (func.podeUtilizarExtensaoEditor(lotaCadastrante, doc.exModelo.idMod?number)!false)
             && (!((desconsiderarExtensao == 'true')!false)) )]
             [#else]
-				<textarea id="${var}" name="${var}" class="editor"> ${default!}${v?html}</textarea>
+                <textarea id="${var}" name="${var}" class="editor"> ${default!}${v?html}</textarea>
             [/#if]
-			<table class="entrevista" width="100%">
-				<tr>
-					<td></td>
-					<td colspan="3">
+            <table class="entrevista" width="100%">
+                <tr>
+                    <td></td>
+                    <td colspan="3">
 
 
                         [#if ( (func.podeUtilizarExtensaoEditor(lotaCadastrante, doc.exModelo.idMod?number)!false)
                         && (!((desconsiderarExtensao == 'true')!false)) )]
-							<input type="hidden" id="${var}" name="${var}" value="${v?html}">
+                            <input type="hidden" id="${var}" name="${var}" value="${v?html}">
                             [@extensaoEditor nomeExtensao=var conteudoExtensao=v/]
                         [#else]
-							<script type="text/javascript">
+                            <script type="text/javascript">
 
                                 CKEDITOR.config.disableNativeSpellChecker = false;
                                 CKEDITOR.config.scayt_autoStartup = false;
                                 CKEDITOR.config.scayt_sLang = 'pt_BR';
                                 CKEDITOR.config.stylesSet = 'siga_ckeditor_styles';
 
-                                if (CKEDITOR.stylesSet.get('siga_ckeditor_styles') == null) {
-
-                                    CKEDITOR.stylesSet.add('siga_ckeditor_styles', [{
-                                        name: 'Título',
-                                        element: 'h1',
+                                CKEDITOR.stylesSet.add('siga_ckeditor_styles', [{
+                                    name: 'Título',
+                                    element: 'h1',
+                                    styles: {
+                                        'text-align': 'justify',
+                                        'text-indent': '2cm'
+                                    }
+                                },
+                                    {
+                                        name: 'Subtítulo',
+                                        element: 'h2',
                                         styles: {
                                             'text-align': 'justify',
                                             'text-indent': '2cm'
                                         }
                                     },
-                                        {
-                                            name: 'Subtítulo',
-                                            element: 'h2',
-                                            styles: {
-                                                'text-align': 'justify',
-                                                'text-indent': '2cm'
-                                            }
-                                        },
-                                        {
-                                            name: 'Com recuo',
-                                            element: 'p',
-                                            styles: {
-                                                'text-align': 'justify',
-                                                'text-indent': '2cm'
-                                            }
-                                        },
-                                        {
-                                            name: 'Marcador',
-                                            element: 'span',
-                                            styles: {
-                                                'background-color' : '#FFFF00'
-                                            }
-                                        },
-                                        {
-                                            name: 'Normal',
-                                            element: 'span'
+                                    {
+                                        name: 'Com recuo',
+                                        element: 'p',
+                                        styles: {
+                                            'text-align': 'justify',
+                                            'text-indent': '2cm'
                                         }
-                                    ]);
-
-                                };
+                                    },
+                                    {
+                                        name: 'Marcador',
+                                        element: 'span',
+                                        styles: {
+                                            'background-color': '#FFFF00'
+                                        }
+                                    },
+                                    {
+                                        name: 'Normal',
+                                        element: 'span'
+                                    }
+                                ]);
                                 CKEDITOR.config.toolbar = 'SigaToolbar';
 
                                 CKEDITOR.config.toolbar_SigaToolbar = [{
@@ -1467,171 +1462,9 @@ Descrição: Esta macro é utilizada pelo Integrador
                                     {
                                         name: 'document',
                                         items: ['Source']
-                                    },
-                                    {
-                                        name: 'extra',
-                                        items: ['strinsert']
                                     }
                                 ];
-
-                                // @license Copyright © 2013 Stuart Sillitoe <stuart@vericode.co.uk>
-                                // This is open source, can modify it as you wish.
-                                // Stuart Sillitoe - stuartsillitoe.co.uk
-                                CKEDITOR.config.strinsert_strings = [
-                                    {'name': 'Documento em Elaboração'},
-                                    {'name': 'Número', 'value': '$' + '{doc.sigla}'},
-                                    {'name': 'Data', 'value': '$' + '{doc.dtDocDDMMYYYY}'},
-                                    {'name': 'Nome do Subscritor', 'value': '$' + '{doc.subscritor.descricao}'},
-                                    {
-                                        'name': 'Nome da Lotação do Subscritor',
-                                        'value': '$' + '{doc.subscritor.lotacao.descricao}'
-                                    },
-                                    {
-                                        'name': 'Sigla da Lotação do Subscritor',
-                                        'value': '$' + '{doc.lotaSubscritor.sigla}'
-                                    },
-                                    {
-                                        'name': 'Sigla da Lotação do Cadastrante',
-                                        'value': '$' + '{doc.lotaCadastrante.sigla}'
-                                    },
-                                    {'name': 'Destinatário', 'value': '$' + '{doc.destinatarioString}'},
-                                    {'name': 'Campo da Entrevista', 'value': '$' + '{doc.form.NOMECAMPO}'},
-                                    {'name': 'Descrição', 'value': '$' + '{doc.descrDocumento}'},
-                                    {'name': 'Documento Pai'},
-                                    {'name': 'Número', 'value': '$' + '{doc.pai.sigla}'},
-                                    {'name': 'Data', 'value': '$' + '{doc.pai.dtDocDDMMYYYY}'},
-                                    {'name': 'Nome do Subscritor', 'value': '$' + '{doc.pai.subscritor.descricao}'},
-                                    {
-                                        'name': 'Nome da Lotação do Subscritor',
-                                        'value': '$' + '{doc.pai.subscritor.lotacao.descricao}'
-                                    },
-                                    {
-                                        'name': 'Sigla da Lotação do Subscritor',
-                                        'value': '$' + '{doc.pai.lotaSubscritor.sigla}'
-                                    },
-                                    {
-                                        'name': 'Sigla da Lotação do Cadastrante',
-                                        'value': '$' + '{doc.pai.lotaCadastrante.lotacao.sigla}'
-                                    },
-                                    {'name': 'Destinatário', 'value': '$' + '{doc.pai.destinatarioString}'},
-                                    {'name': 'Campo da Entrevista', 'value': '$' + '{doc.pai.form.NOMECAMPO}'},
-                                    {'name': 'Descrição', 'value': '$' + '{doc.pai.descrDocumento}'},
-
-                                    {'name': 'Documento Autuado'},
-                                    {'name': 'Número', 'value': '$' + '{doc.sigla}'},
-                                    {'name': 'Data', 'value': '$' + '{ref.pai.autuado.doc.dtDocDDMMYYYY}'},
-                                    {
-                                        'name': 'Nome do Subscritor',
-                                        'value': '$' + '{ref.pai.autuado.doc.subscritor.descricao}'
-                                    },
-                                    {
-                                        'name': 'Nome da Lotação do Subscritor',
-                                        'value': '$' + '{ref.pai.autuado.doc.subscritor.lotacao.descricao}'
-                                    },
-                                    {
-                                        'name': 'Sigla da Lotação do Subscritor',
-                                        'value': '$' + '{ref.pai.autuado.doc.lotaSubscritor.sigla}'
-                                    },
-                                    {
-                                        'name': 'Sigla da Lotação do Cadastrante',
-                                        'value': '$' + '{ref.pai.autuado.doc.lotaCadastrante.sigla}'
-                                    },
-                                    {'name': 'Destinatário', 'value': '$' + '{ref.pai.autuado.doc.destinatarioString}'},
-                                    {
-                                        'name': 'Campo da Entrevista do Autuado',
-                                        'value': '$' + '{ref.pai.autuado.form.NOMECAMPO}'
-                                    },
-                                    {'name': 'Descrição', 'value': '$' + '{ref.pai.autuado.doc.descrDocumento}'},
-
-
-                                    {'name': 'Outros Documentos'},
-                                    {
-                                        'name': 'Lista de números por modelo',
-                                        'value': '$' + "{ref.modelo('MODELO DESEJADO 1','MODELO DESEJADO 2')}"
-                                    },
-                                    {
-                                        'name': 'Número do último modelo juntado',
-                                        'value': '$' + "{ref.modelo('MODELO DESEJADO').ultimo}"
-                                    },
-                                    {
-                                        'name': 'Campo do último modelo juntado',
-                                        'value': '$' + "{ref.modelo('memorando').form.NOMECAMPO}"
-                                    },
-                                    {'name': 'Workflow'},
-                                    {'name': 'Sigla do Procedimento', 'value': '$' + '{wf.sigla}'},
-                                    {'name': 'Principal', 'value': '$' + '{wf.principal}'},
-                                    {'name': 'Nome do Titular', 'value': '$' + '{wf.titular}'},
-                                    {'name': 'Nome da Lotação do Titular', 'value': '$' + '{wf.lotaTitular}'},
-                                    {'name': 'Variável', 'value': '$' + '{wf.var.NOMEVARIAVEL}'},
-                                    {'name': 'Data', 'value': '$' + '{fmt.data(wf.var.NOMEVARIAVEL)}'},
-                                    {'name': 'Reais', 'value': '$' + '{fmt.reais(wf.var.NOMEVARIAVEL)}'},
-                                    {'name': 'Reais por Extenso', 'value': '$' + '{fmt.reaisPorExtenso(wf.var.NOMEVARIAVEL)}'},
-                                    {'name': 'Documento Criado', 'value': '$' + '{wf.var.doc_NOMETAREFA}'},
-
-                                ];
-                                CKEDITOR.config.strinsert_button_label = 'Variável';
-                                CKEDITOR.config.strinsert_button_title = 'Inserir Variável';
-                                CKEDITOR.config.strinsert_button_voice = 'Inserir Variável';
-
-                                CKEDITOR.plugins.add('strinsert',
-                                    {
-                                        requires: ['richcombo'],
-                                        init: function (editor) {
-                                            var config = editor.config;
-
-                                            // Gets the list of insertable strings from the settings.
-                                            var strings = config.strinsert_strings;
-
-                                            // add the menu to the editor
-                                            editor.ui.addRichCombo('strinsert',
-                                                {
-                                                    label: config.strinsert_button_label,
-                                                    title: config.strinsert_button_title,
-                                                    voiceLabel: config.strinsert_button_voice,
-                                                    toolbar: 'insert',
-                                                    className: 'cke_format',
-                                                    multiSelect: false,
-                                                    panel:
-                                                        {
-                                                            css: [editor.config.contentsCss, CKEDITOR.skin.getPath('editor')],
-                                                            voiceLabel: editor.lang.panelVoiceLabel
-                                                        },
-
-                                                    init: function () {
-                                                        var lastgroup = '';
-                                                        for (var i = 0, len = strings.length; i < len; i++) {
-                                                            string = strings[i];
-                                                            // If there is no value, make a group header using the name.
-                                                            if (!string.value) {
-                                                                this.startGroup(string.name);
-                                                            }
-                                                            // If we have a value, we have a string insert row.
-                                                            else {
-                                                                // If no name provided, use the value for the name.
-                                                                if (!string.name) {
-                                                                    string.name = string.value;
-                                                                }
-                                                                // If no label provided, use the name for the label.
-                                                                if (!string.label) {
-                                                                    string.label = string.name;
-                                                                }
-                                                                this.add(string.value, string.name, string.label);
-                                                            }
-                                                        }
-                                                    },
-
-                                                    onClick: function (value) {
-                                                        editor.focus();
-                                                        editor.fire('saveSnapshot');
-                                                        editor.insertHtml(value);
-                                                        editor.fire('saveSnapshot');
-                                                    },
-
-                                                });
-                                        }
-                                    });
-                                CKEDITOR.config.extraPlugins = ['footnotes', 'strinsert'];
-
+                                CKEDITOR.config.extraPlugins = 'footnotes';
                                 window.onload = function () {
                                     $("textarea.editor").each(function (index) {
                                         CKEDITOR.replace(this, {
@@ -1640,17 +1473,17 @@ Descrição: Esta macro é utilizada pelo Integrador
                                     });
                                 }
 
-							</script>
+                            </script>
 
                         [/#if]
 
-					</td>
-				</tr>
-			</table>
+                    </td>
+                </tr>
+            </table>
         [#else]
-			<br>${v}<br><br>
+            <br>${v}<br><br>
         [/#if]
-	</div>
+    </div>
 [/#macro]
 
 
@@ -1670,29 +1503,29 @@ Descrição: Esta macro é utilizada pelo Integrador
     [#assign attsHtml][#list atts?keys as k]${k}="${atts[k]}"[/#list][/#assign]
 
     [#if !gerar_formulario!false]
-		<div class="form-group" style="margin-bottom:0">
-            [#if titulo?? && titulo != ""]<label title="campo: ${var}" for="${var}"
+        <div class="form-group" style="margin-bottom:0">
+            [#if titulo?? && titulo != ""]<label for="${var}"
                                                  [#if obrigatorio]style="font-weight:bold"[/#if]>${titulo}</label>[/#if]
-			<select id="${var}"
-					name="${var}" [#if reler] onchange="javascript: sbmt([#if idAjax != ""]'${idAjax}'[/#if]);"[/#if]
-					onclick="${onclick}" class="form-control" ${attsHtml}>
+            <select id="${var}"
+                    name="${var}" [#if reler] onchange="javascript: sbmt([#if idAjax != ""]'${idAjax}'[/#if]);"[/#if]
+                    onclick="${onclick}" class="form-control" ${attsHtml}>
                 [#if opcaoNeutra?? && opcaoNeutra != "" && obrigatorio]
-					<option id="opcaoNeutra" value="${opcaoNeutra}"
+                    <option id="opcaoNeutra" value="${opcaoNeutra}"
                             [#if !(temValor??)]selected[/#if]>${opcaoNeutra}</option>
                 [/#if]
                 [#list l as opcao]
-					<option value="${opcao}" [#if v == opcao && (opcaoNeutra == "" || (temValor?? && temValor != ""))] selected[/#if]>${opcao}</option>
-					<br/>
+                    <option value="${opcao}" [#if v == opcao && (opcaoNeutra == "" || (temValor?? && temValor != ""))] selected[/#if]>${opcao}</option>
+                    <br/>
                 [/#list]
-			</select>
+            </select>
             [#if obrigatorio]
-				<div class="invalid-feedback  invalid-feedback-${var}">Selecione um opção</div>
-				<input type="hidden" name="obrigatorios" value="${var}"/>
+                <div class="invalid-feedback  invalid-feedback-${var}">Selecione um opção</div>
+                <input type="hidden" name="obrigatorios" value="${var}"/>
             [/#if]
-			<input type="hidden" name="vars" value="${var}"/>
-		</div>
+            <input type="hidden" name="vars" value="${var}"/>
+        </div>
     [#else]
-		<span class="valor">${v}</span>
+        <span class="valor">${v}</span>
     [/#if]
 [/#macro]
 
@@ -1712,12 +1545,12 @@ Descrição: Esta macro é utilizada pelo Integrador
     ${titulo!""}[#if titulo != ""]${pontuacao!""}[/#if]
 
     [#if !gerar_formulario!false]
-		<input type="hidden" name="vars" value="${var}"/>
+        <input type="hidden" name="vars" value="${var}"/>
         [#assign hiddens = "" /]
-		<select name="${var}" [#if reler] dados="${v}" onchange="javascript: sbmt([#if idAjax != ""]'${idAjax}'[/#if]);"[/#if]
-				onclick="${onclick}"[#if multiplo] multiple size="${tamanho}"[/#if][#if disabled] disabled[/#if]>
+        <select name="${var}" [#if reler] dados="${v}" onchange="javascript: sbmt([#if idAjax != ""]'${idAjax}'[/#if]);"[/#if]
+                onclick="${onclick}"[#if multiplo] multiple size="${tamanho}"[/#if][#if disabled] disabled[/#if]>
             [#if mostrarSelecione && !estamosRelendo]
-				<option>Selecione...</option>[/#if]
+                <option>Selecione...</option>[/#if]
             [#list l as opcao]
                 [#local tupla=opcao?split("*") /]
                 [#local opcaoValue = tupla?first /]
@@ -1730,16 +1563,16 @@ Descrição: Esta macro é utilizada pelo Integrador
                 [#if v?contains(",") && (v?contains(",${opcaoValue},") || v?starts_with("${opcaoValue},") || v?ends_with(",${opcaoValue}"))]
                     [#assign selecionado = true /]
                 [/#if]
-				<option[#if selecionado] selected[/#if] value="${opcaoValue}">${opcaoOption}</option><br/>
+                <option[#if selecionado] selected[/#if] value="${opcaoValue}">${opcaoOption}</option><br/>
                 [#assign hiddens = hiddens + "<input type=\"hidden\" name=\"vars\" value=\"${var}_${opcaoValue}\" /><input type=\"hidden\" name=\"${var}_${opcaoValue}\" value=\"${opcaoOption}\" />" /]
             [/#list]
-		</select>
+        </select>
         [#if disabled]
-			<input type="hidden" name="${var}" value="${v}"/>
+            <input type="hidden" name="${var}" value="${v}"/>
         [/#if]
         ${hiddens}
     [#else]
-		<span class="valor">${v}</span>
+        <span class="valor">${v}</span>
     [/#if]
 [/#macro]
 
@@ -1750,8 +1583,8 @@ Descrição: Esta macro é utilizada pelo Integrador
 
     [#local v = .vars[var]!default]
 
-	<div class="form-group" style="margin-bottom:0">
-		<input type="hidden" name="vars" value="${var}"/>
+    <div class="form-group" style="margin-bottom:0">
+        <input type="hidden" name="vars" value="${var}"/>
 
         [#if (alerta!"Não") = 'Sim' && v = ""]
             [#list obrigatorios?split(",") as campo]
@@ -1763,21 +1596,21 @@ Descrição: Esta macro é utilizada pelo Integrador
 
         [#if obrigatorio]
             [#local negrito = "font-weight:bold"]
-			<input title="campo: ${var}" type="hidden" name="obrigatorios" value="${var}"/>
+            <input type="hidden" name="obrigatorios" value="${var}"/>
         [/#if]
 
         [#if titulo != ""]
-			<label for="${var}" style="${negrito!};${vermelho!}">${titulo}</label>
+            <label for="${var}" style="${negrito!};${vermelho!}">${titulo}</label>
         [/#if]
 
         [#if !gerar_formulario!false]
-			<textarea id="${var}" cols="${colunas}" rows="${linhas}" name="${var}" ${jreler!""} style="width:100%;"
-					  class="form-control">${v}</textarea>
-			<div class="invalid-feedback  invalid-feedback-${var}">Preenchimento obrigatório</div>
+            <textarea id="${var}" cols="${colunas}" rows="${linhas}" name="${var}" ${jreler!""} style="width:100%;"
+                      class="form-control">${v}</textarea>
+            <div class="invalid-feedback  invalid-feedback-${var}">Preenchimento obrigatório</div>
         [#else]
-			<span class="valor">${v}</span>
+            <span class="valor">${v}</span>
         [/#if]
-	</div>
+    </div>
 [/#macro]
 
 [#macro memocomposto var titulo colunas linhas reler=false obrigatorio=false default="" forceDefault=false disabled=false]
@@ -1790,8 +1623,8 @@ Descrição: Esta macro é utilizada pelo Integrador
     [#else]
         [#local v = .vars[var]!default]
     [/#if]
-	<div class="form-group" style="margin-bottom:0">
-		<input type="hidden" name="vars" value="${var}"/>
+    <div class="form-group" style="margin-bottom:0">
+        <input type="hidden" name="vars" value="${var}"/>
 
         [#if (alerta!"Não") = 'Sim' && v = ""]
             [#list obrigatorios?split(",") as campo]
@@ -1803,25 +1636,25 @@ Descrição: Esta macro é utilizada pelo Integrador
 
         [#if obrigatorio]
             [#local negrito = "font-weight:bold"]
-			<input type="hidden" name="obrigatorios" value="${var}"/>
+            <input type="hidden" name="obrigatorios" value="${var}"/>
         [/#if]
 
 
         [#if titulo != ""]
-			<label for="${var}" style="${negrito!};${vermelho!}">${titulo}</label>
+            <label for="${var}" style="${negrito!};${vermelho!}">${titulo}</label>
         [/#if]
 
         [#if !gerar_formulario!false]
-			<textarea class="form-control" cols="${colunas}" rows="${linhas}"
-					  name="${var}" ${jreler!""} style="width:100%;"[#if disabled == true] readonly[/#if]>${v}</textarea>
-			<div class="invalid-feedback  invalid-feedback-${var}">Preenchimento obrigatório</div>
+            <textarea class="form-control" cols="${colunas}" rows="${linhas}"
+                      name="${var}" ${jreler!""} style="width:100%;"[#if disabled == true] readonly[/#if]>${v}</textarea>
+            <div class="invalid-feedback  invalid-feedback-${var}">Preenchimento obrigatório</div>
         [#else]
-			<span class="valor">${v}</span>
+            <span class="valor">${v}</span>
         [/#if]
-	</div>
+    </div>
 [/#macro]
 [#macro XStandard nome="" conteudo=""]
-	<script type="text/javascript" language="Javascript1.1">
+    <script type="text/javascript" language="Javascript1.1">
 
         var insertingTable = false;
 
@@ -1866,61 +1699,59 @@ Descrição: Esta macro é utilizada pelo Integrador
         }
 
 
+    </script>
 
-
-	</script>
-
-	<div id="xstandard_temp" style="display:none">
+    <div id="xstandard_temp" style="display:none">
         ${conteudo}
-	</div>
+    </div>
 
-	<object classid="clsid:0EED7206-1661-11D7-84A3-00606744831D"
-			codebase="http://${serverAndPort}/siga-ext-editor/XStandard/XStandard.cab#Version=3,0,0,0"
-			type="application/x-xstandard" id="xstandard" width="100%" height="400">
-		<param nams="ImageLibraryURL"
-			   value="http://soap.xstandard.com/imagelibrary.aspx"/>
-		<param name="AttachmentLibraryURL"
-			   value="http://soap.xstandard.com/attachmentlibrary.aspx"/>
-		<param name="SpellCheckerURL"
-			   value="http://soap.xstandard.com/spellchecker.aspx"/>
-		<param name="DirectoryURL"
-			   value="http://soap.xstandard.com/directory.aspx"/>
-		<param name="SubdocumentURL"
-			   value="http://soap.xstandard.com/subdocument.aspx"/>
-		<param name="EscapeUnicode" value="false"/>
+    <object classid="clsid:0EED7206-1661-11D7-84A3-00606744831D"
+            codebase="http://${serverAndPort}/siga-ext-editor/XStandard/XStandard.cab#Version=3,0,0,0"
+            type="application/x-xstandard" id="xstandard" width="100%" height="400">
+        <param nams="ImageLibraryURL"
+               value="http://soap.xstandard.com/imagelibrary.aspx"/>
+        <param name="AttachmentLibraryURL"
+               value="http://soap.xstandard.com/attachmentlibrary.aspx"/>
+        <param name="SpellCheckerURL"
+               value="http://soap.xstandard.com/spellchecker.aspx"/>
+        <param name="DirectoryURL"
+               value="http://soap.xstandard.com/directory.aspx"/>
+        <param name="SubdocumentURL"
+               value="http://soap.xstandard.com/subdocument.aspx"/>
+        <param name="EscapeUnicode" value="false"/>
 
 
-		<param name="Value" value="${conteudo?html}"/>
+        <param name="Value" value="${conteudo?html}"/>
 
-		<param name="SpellCheckerLangFilter" value="pt"/>
-		<param name="SpellCheckerLang" value="pt"/>
-		<param name="License" value="http://${serverAndPort}/siga-ext-editor/XStandard/license.txt"/>
-		<param name="CSS" value="http://${serverAndPort}/siga-ext-editor/XStandard/format.css"/>
-		<param name="Styles" value="http://${serverAndPort}/siga-ext-editor/XStandard/styles-pt.xml"/>
-		<param name="Buttons" value="http://${serverAndPort}/siga-ext-editor/XStandard/buttons-pt.xml"/>
-		<param name="Icons" value="http://${serverAndPort}/siga-ext-editor/XStandard/icons.xml"/>
-		<!-- Ver como coloca português -->
-		<param name="Lang" value="pt"/>
-		<param name="Localization" value="http://${serverAndPort}/siga-ext-editor/XStandard/localization-pt.xml"/>
-		<param name="EnablePasteMarkup" value="yes"/>
-		<param name="ToolbarWysiwyg"
-			   value="cut,copy,paste,undo,redo,find-replace,,strong,em,underline,,align-left,align-center,align-right,justify,,undo-blockquote,blockquote,,undo-indent-first,indent-first,,ordered-list,unordered-list,,draw-data-table,,separator,pagebreak,,spellchecker,,source,,help"/>
-		<param name="BackgroundColor" value="white"/>
-		<param name="BorderColor" value="#888888"/>
-		<!-- <param name="Base" value="http://soap.xstandard.com/library/" /> -->
-		<param name="LatestVersion" value="2.0.5.0"/>
-		<param name="ToolbarEffect" value="linear-gradient"/>
-		<param name="ShowStyles" value="yes"/>
-		<param name="ShowToolbar" value="yes"/>
-		<param name="Mode" value="wysiwyg"/>
-		<param name="Options" value="0"/>
-		<param name="IndentOutput" value="yes"/>
-		<param name="ProxySetting" value="platform"/>
-		<param name="Debug" value="yes"/>
+        <param name="SpellCheckerLangFilter" value="pt"/>
+        <param name="SpellCheckerLang" value="pt"/>
+        <param name="License" value="http://${serverAndPort}/siga-ext-editor/XStandard/license.txt"/>
+        <param name="CSS" value="http://${serverAndPort}/siga-ext-editor/XStandard/format.css"/>
+        <param name="Styles" value="http://${serverAndPort}/siga-ext-editor/XStandard/styles-pt.xml"/>
+        <param name="Buttons" value="http://${serverAndPort}/siga-ext-editor/XStandard/buttons-pt.xml"/>
+        <param name="Icons" value="http://${serverAndPort}/siga-ext-editor/XStandard/icons.xml"/>
+        <!-- Ver como coloca português -->
+        <param name="Lang" value="pt"/>
+        <param name="Localization" value="http://${serverAndPort}/siga-ext-editor/XStandard/localization-pt.xml"/>
+        <param name="EnablePasteMarkup" value="yes"/>
+        <param name="ToolbarWysiwyg"
+               value="cut,copy,paste,undo,redo,find-replace,,strong,em,underline,,align-left,align-center,align-right,justify,,undo-blockquote,blockquote,,undo-indent-first,indent-first,,ordered-list,unordered-list,,draw-data-table,,separator,pagebreak,,spellchecker,,source,,help"/>
+        <param name="BackgroundColor" value="white"/>
+        <param name="BorderColor" value="#888888"/>
+        <!-- <param name="Base" value="http://soap.xstandard.com/library/" /> -->
+        <param name="LatestVersion" value="2.0.5.0"/>
+        <param name="ToolbarEffect" value="linear-gradient"/>
+        <param name="ShowStyles" value="yes"/>
+        <param name="ShowToolbar" value="yes"/>
+        <param name="Mode" value="wysiwyg"/>
+        <param name="Options" value="0"/>
+        <param name="IndentOutput" value="yes"/>
+        <param name="ProxySetting" value="platform"/>
+        <param name="Debug" value="yes"/>
 
-		<!-- Tem duas opções que talvez sejam úteis: PreviewXSLT e ScreenReaderXSLT -->
-		<!-- A opção icons é pros ícones das operações principais. O Placeholders é pros ícones das tags customizadas -->
-		<!-- Ver qual a utilidade desse aqui: param name = EditorCSS --> <!-- Essas abaixo definem os botões em outros modos de visualização
+        <!-- Tem duas opções que talvez sejam úteis: PreviewXSLT e ScreenReaderXSLT -->
+        <!-- A opção icons é pros ícones das operações principais. O Placeholders é pros ícones das tags customizadas -->
+        <!-- Ver qual a utilidade desse aqui: param name = EditorCSS --> <!-- Essas abaixo definem os botões em outros modos de visualização
         <param name="ToolbarSource" value="" />
         <param name="ToolbarPreview" value="" />
         <param name="ToolbarScreenReader" value="" />
@@ -1930,7 +1761,7 @@ Descrição: Esta macro é utilizada pelo Integrador
         Talvez algumas subs sejam úteis para mudar os contexts menus. Ver na seção Hooks & Extensions
         Funções TagList, Path e QPath e TagListXML são interessantes
         -->
-	</object>
+    </object>
 [/#macro]
 [#macro formulario texto fecho="" tamanhoLetra="Normal" _tipo="FORMULÁRIO"]
 [#--
@@ -1949,8 +1780,8 @@ Descrição: Esta macro é utilizada pelo Integrador
     [/#if]
 
     [@estiloBrasaoCentralizado tipo=_tipo tamanhoLetra=tl formatarOrgao=false]
-		<span style="font-size: ${tl}"> ${texto!} </span>
-		<p style="align: justify; TEXT-INDENT: 2cm">${fecho}</p>
+        <span style="font-size: ${tl}"> ${texto!} </span>
+        <p style="align: justify; TEXT-INDENT: 2cm">${fecho}</p>
     [/@estiloBrasaoCentralizado]
 [/#macro]
 
@@ -1971,8 +1802,8 @@ Descrição: Esta macro é utilizada pelo Integrador
     [/#if]
 
     [@estiloBrasaoCentralizado tipo=_tipo tamanhoLetra=tl formatarOrgao=false]
-		<span style="font-size: ${tl}"> ${texto!} </span>
-		<p style="align: justify; TEXT-INDENT: 2cm">${fecho}</p>
+        <span style="font-size: ${tl}"> ${texto!} </span>
+        <p style="align: justify; TEXT-INDENT: 2cm">${fecho}</p>
     [/@estiloBrasaoCentralizado]
 [/#macro]
 
@@ -1993,8 +1824,8 @@ Descrição: Esta macro é utilizada pelo Integrador
     [/#if]
 
     [@estiloBrasaoCentralizado tipo=_tipo tamanhoLetra=tl formatarOrgao=false dataAntesDaAssinatura=true]
-		<span style="font-size: ${tl}"> ${texto!} </span>
-		<p style="align: justify; TEXT-INDENT: 2cm">${fecho}</p>
+        <span style="font-size: ${tl}"> ${texto!} </span>
+        <p style="align: justify; TEXT-INDENT: 2cm">${fecho}</p>
     [/@estiloBrasaoCentralizado]
 [/#macro]
 
@@ -2004,11 +1835,11 @@ Descrição: Esta macro é utilizada pelo Integrador
   Autor:     Priscila
   Data:      30/05/2012
 --]
-	<span style="align: justify; font-family: Arial; font-size: 15pt; font-weight: bold;">
+    <span style="align: justify; font-family: Arial; font-size: 15pt; font-weight: bold;">
 ${enderecamentoDiretorDeRH}<br/>
 </span>
     ${texto}<br/><br/>
-	<span style="align: right; TEXT-INDENT: 2cm">Nestes termos,<br/>
+    <span style="align: right; TEXT-INDENT: 2cm">Nestes termos,<br/>
 Pede deferimento.</span><br/><br/><br/>
     [#if mov??]
         [@assinaturaMovCentro formatarOrgao=formatarOrgao/]
@@ -2021,12 +1852,12 @@ Pede deferimento.</span><br/><br/><br/>
 [/#macro]
 
 [#macro mensagem texto titulo="" vermelho=false]
-	<span style="[#if vermelho]color=#ff0000[/#if]">[#if titulo?? && titulo!=""]
-			<b>${titulo}</b>: [/#if]${texto!""}</span>
+    <span style="[#if vermelho]color=#ff0000[/#if]">[#if titulo?? && titulo!=""]
+            <b>${titulo}</b>: [/#if]${texto!""}</span>
 [/#macro]
 
 [#macro mensagem2 texto titulo="" cor="black"]
-	<span style="color:${cor}"> [#if titulo?? && titulo!=""]<b>${titulo}</b>:[/#if] <b>${texto}</b></span>
+    <span style="color:${cor}"> [#if titulo?? && titulo!=""]<b>${titulo}</b>:[/#if] <b>${texto}</b></span>
 [/#macro]
 
 
@@ -2035,7 +1866,7 @@ Pede deferimento.</span><br/><br/><br/>
 [/#macro --]
 
 [#macro separador]
-	<hr color="#FFFFFF"/>
+    <hr color="#FFFFFF"/>
 [/#macro]
 
 [#macro caixaSelecao titulo var tipo="" idInicial="" siglaInicial="" descricaoInicial="" modulo="" desativar=false buscar=true ocultarDescricao=false reler=false idAjax="" default="" obrigatorio=false relertab="" paramList="" grande=false]
@@ -2053,7 +1884,7 @@ Pede deferimento.</span><br/><br/><br/>
         [/#list]
     [/#if]
 
-	<script type="text/javascript">
+    <script type="text/javascript">
 
         self.retorna_${var}${tipoSel} = function (id, sigla, descricao) {
             try {
@@ -2129,38 +1960,38 @@ Pede deferimento.</span><br/><br/><br/>
             PassAjaxResponseToFunction(url, 'resposta_ajax_${var}${tipoSel}', false);
         }
 
-	</script>
+    </script>
 
-	<input type="hidden" name="${var}${tipoSel}Sel.id" value="${.vars[var+tipoSel+"Sel.id"]!}"/>
-	<input type="hidden" name="${var}${tipoSel}Sel.descricao"/>
-	<input type="hidden" name="${var}${tipoSel}Sel.buscar"/>
-	<input type="hidden" name="req${var}${tipoSel}Sel"/>
-	<input type="hidden" name="alterouSel" value="" id="alterouSel"/>
-	<div class="input-group">
-		<input type="text" class="form-control" name="${var}${tipoSel}Sel.sigla"
-			   value="${.vars[var+tipoSel+"Sel.sigla"]!}" onkeypress="return handleEnter(this, event)"
-			   onblur="javascript: ajax_${var}${tipoSel}();" size="25" ${desativar?string('disabled="true"','')} />
+    <input type="hidden" name="${var}${tipoSel}Sel.id" value="${.vars[var+tipoSel+"Sel.id"]!}"/>
+    <input type="hidden" name="${var}${tipoSel}Sel.descricao"/>
+    <input type="hidden" name="${var}${tipoSel}Sel.buscar"/>
+    <input type="hidden" name="req${var}${tipoSel}Sel"/>
+    <input type="hidden" name="alterouSel" value="" id="alterouSel"/>
+    <div class="input-group">
+        <input type="text" class="form-control" name="${var}${tipoSel}Sel.sigla"
+               value="${.vars[var+tipoSel+"Sel.sigla"]!}" onkeypress="return handleEnter(this, event)"
+               onblur="javascript: ajax_${var}${tipoSel}();" size="25" ${desativar?string('disabled="true"','')} />
         [#if buscar]
-			<div class="input-group-append">
-				<input type="button" class="btn btn-secondary" id="${var}${tipoSel}SelButton" value="..."
-					   onclick="javascript: popitup_${var}${tipoSel}('');"
+            <div class="input-group-append">
+                <input type="button" class="btn btn-secondary" id="${var}${tipoSel}SelButton" value="..."
+                       onclick="javascript: popitup_${var}${tipoSel}('');"
                         ${desativar?string("disabled","")} theme="simple">
-			</div>
+            </div>
         [/#if]
-		<div class="invalid-feedback  invalid-feedback-${var}${tipoSel}Sel.sigla">Preenchimento obrigatório</div>
-	</div>
+        <div class="invalid-feedback  invalid-feedback-${var}${tipoSel}Sel.sigla">Preenchimento obrigatório</div>
+    </div>
     [#if !ocultarDescricao]
-		<span id="${var}${tipoSel}SelSpan">${.vars[var+tipoSel+"Sel.descricao"]!}</span>
+        <span id="${var}${tipoSel}SelSpan">${.vars[var+tipoSel+"Sel.descricao"]!}</span>
     [/#if]
 
-	<script type="text/javascript">
+    <script type="text/javascript">
         document.getElementsByName('${var}${tipoSel}Sel.id')[0].value = '${(idInicial=="")?string(.vars[var+tipoSel+"Sel.id"]!, idInicial)}';
         document.getElementsByName('${var}${tipoSel}Sel.sigla')[0].value = '${(siglaInicial=="")?string(.vars[var+tipoSel+"Sel.sigla"]!, siglaInicial)}';
         document.getElementsByName('${var}${tipoSel}Sel.descricao')[0].value = '${(descricaoInicial=="")?string(.vars[var+tipoSel+"Sel.descricao"]!, descricaoInicial)}';
         [#if !ocultarDescricao]
         document.getElementById('${var}${tipoSel}SelSpan').innerHTML = '${(descricaoInicial=="")?string(.vars[var+tipoSel+"Sel.descricao"]!, descricaoInicial)}';
         [/#if]
-	</script>
+    </script>
 [/#macro]
 
 [#macro selecionavel titulo var tipo reler=false idAjax="" default="" obrigatorio=false relertab="" paramList="" modulo=""]
@@ -2168,16 +1999,16 @@ Pede deferimento.</span><br/><br/><br/>
 
     [#assign varName = var + tipoSel + "Sel.id" /]
     [#local vId = .vars[varName]!default]
-	<div class="form-group" style="margin-bottom:0">
-		<input type="hidden" name="vars" value="${varName}"/>
+    <div class="form-group" style="margin-bottom:0">
+        <input type="hidden" name="vars" value="${varName}"/>
 
         [#assign varName = var + tipoSel + "Sel.sigla" /]
         [#local vSigla = .vars[varName]!default]
-		<input type="hidden" name="vars" value="${varName}"/>
+        <input type="hidden" name="vars" value="${varName}"/>
 
         [#assign varName = var + tipoSel + "Sel.descricao" /]
         [#local vDescricao = .vars[varName]!default]
-		<input type="hidden" name="vars" value="${varName}"/>
+        <input type="hidden" name="vars" value="${varName}"/>
 
         [#if (alerta!"Não") = 'Sim' && vId == ""]
             [#list obrigatorios?split(",") as campo]
@@ -2189,19 +2020,19 @@ Pede deferimento.</span><br/><br/><br/>
         [#if obrigatorio]
             [#local negrito = "font-weight:bold"]
             [#assign varName = var + tipoSel + "Sel.sigla" /]
-			<input type="hidden" name="obrigatorios" value="${varName}"/>
+            <input type="hidden" name="obrigatorios" value="${varName}"/>
         [/#if]
 
         [#if titulo?? && titulo != ""]
-			<label for="${varName}" style="${negrito!};${vermelho!}">${titulo}</label>
+            <label for="${varName}" style="${negrito!};${vermelho!}">${titulo}</label>
         [/#if]
 
         [#if !gerar_formulario!false]
             [@caixaSelecao titulo=titulo var=var tipo=tipo reler=reler idAjax=idAjax relertab=relertab paramList=paramList modulo=modulo /]
         [#else]
-			<span class="valor">[#if vSigla??]${vSigla} - [/#if]${vDescricao}</span>
+            <span class="valor">[#if vSigla??]${vSigla} - [/#if]${vDescricao}</span>
         [/#if]
-	</div>
+    </div>
 [/#macro]
 
 [#macro pessoa titulo var reler=false relertab="" buscarFechadas=false idAjax="" default="" obrigatorio=false paramList=""]
@@ -2251,24 +2082,24 @@ Pede deferimento.</span><br/><br/><br/>
         [/#list]
     [/#if]
 
-	<div class="form-group" style="margin-bottom:0">
+    <div class="form-group" style="margin-bottom:0">
         [#if obrigatorio]
             [#local negrito = "font-weight:bold"]
-			<input type="hidden" name="obrigatorios" value="${var}"/>
+            <input type="hidden" name="obrigatorios" value="${var}"/>
         [/#if]
 
         [#if !gerar_formulario!false]
-			<input type="hidden" name="vars" value="${var}"/>
+            <input type="hidden" name="vars" value="${var}"/>
 
             [#if titulo?? && titulo != ""]<label for="${var}" style="${negrito!};${vermelho!}">${titulo}</label>[/#if]
             [#assign attsHtml][#list atts?keys as k]${k}="${atts[k]}"[/#list][/#assign]
-			<input type="text" id="${var}" name="${var}" value="${v}" size="10" maxlength="10"
-				   class="form-control  campoData" ${attsHtml} style="max-width: 115px" placeholder="00/00/0000"/>
-			<div class="invalid-feedback  invalid-feedback-${var}">Preenchimento obrigatório</div>
+            <input type="text" id="${var}" name="${var}" value="${v}" size="10" maxlength="10"
+                   class="form-control  campoData" ${attsHtml} style="max-width: 115px" placeholder="00/00/0000"/>
+            <div class="invalid-feedback  invalid-feedback-${var}">Preenchimento obrigatório</div>
         [#else]
-			<span class="valor">${v}</span>
+            <span class="valor">${v}</span>
         [/#if]
-		<script>
+        <script>
             $('.campoData').mousedown(function () {
                 $('.campoData').datepicker({
                     onSelect: function () {
@@ -2276,13 +2107,13 @@ Pede deferimento.</span><br/><br/><br/>
                     }
                 });
             });
-		</script>
-	</div>
+        </script>
+    </div>
 [/#macro]
 
 [#macro letra tamanho]
     [#local body][#nested/][/#local]
-	<span style="font-size:${tamanho}">
+    <span style="font-size:${tamanho}">
         ${func.fixFontSize(body,tamanho)}
     </span>
 [/#macro]
@@ -2292,381 +2123,355 @@ Pede deferimento.</span><br/><br/><br/>
 [/#macro]
 
 [#macro primeiroCabecalho]
-	<!-- INICIO PRIMEIRO CABECALHO
+    <!-- INICIO PRIMEIRO CABECALHO
         [#nested/]
     FIM PRIMEIRO CABECALHO -->
 [/#macro]
 
 [#macro cabecalho]
-	<!-- INICIO CABECALHO
+    <!-- INICIO CABECALHO
         [#nested/]
     FIM CABECALHO -->
 [/#macro]
 
 [#macro primeiroRodape exibeClassificacaoDocumental=true]
-	<!-- INICIO PRIMEIRO RODAPE
+    <!-- INICIO PRIMEIRO RODAPE
         [#nested/]
     FIM PRIMEIRO RODAPE -->
 [/#macro]
 
 [#macro rodape]
-	<!-- INICIO RODAPE
+    <!-- INICIO RODAPE
         [#nested/]
     FIM RODAPE -->
 [/#macro]
 
 [#macro aberturaBIE]
-	<!-- INICIO ABERTURA -->
+    <!-- INICIO ABERTURA -->
     [#nested/]
-	<!-- FIM ABERTURA -->
+    <!-- FIM ABERTURA -->
 [/#macro]
 
 [#macro corpoBIE]
-	<!-- INICIO CORPO -->
+    <!-- INICIO CORPO -->
     [#nested/]
-	<!-- FIM CORPO -->
+    <!-- FIM CORPO -->
 [/#macro]
 
 [#macro fechoBIE]
-	<!-- INICIO FECHO -->
+    <!-- INICIO FECHO -->
     [#nested/]
-	<!-- FIM FECHO -->
+    <!-- FIM FECHO -->
 [/#macro]
 
 [#macro assinaturaBIE]
-	<!-- INICIO ASSINATURA -->
+    <!-- INICIO ASSINATURA -->
     [#nested/]
-	<!-- FIM ASSINATURA -->
+    <!-- FIM ASSINATURA -->
 [/#macro]
 
 [#macro numeroDJE]
-	<!-- INICIO NUMERO -->
+    <!-- INICIO NUMERO -->
     [#nested/]
-	<!-- FIM NUMERO -->
+    <!-- FIM NUMERO -->
 [/#macro]
 
 [#macro mioloDJE]
-	<!-- INICIO MIOLO -->
+    <!-- INICIO MIOLO -->
     [#nested/]
-	<!-- FIM MIOLO -->
+    <!-- FIM MIOLO -->
 [/#macro]
 
 [#macro inicioMioloDJE]
-	<!-- INICIO MIOLO -->
+    <!-- INICIO MIOLO -->
 [/#macro]
 
 [#macro fimMioloDJE]
-	<!-- FIM MIOLO -->
+    <!-- FIM MIOLO -->
 [/#macro]
 
 [#macro tituloDJE]
-	<!-- INICIO TITULO
+    <!-- INICIO TITULO
         [#nested/]
     FIM TITULO -->
 [/#macro]
 
 [#macro inicioSubscritor sigla]
-	<!-- INICIO SUBSCRITOR [#nested/] --><!-- SIGLA ${sigla!} -->
+    <!-- INICIO SUBSCRITOR [#nested/] --><!-- SIGLA ${sigla!} -->
 [/#macro]
 
 [#macro fimSubscritor]
-	<!-- FIM SUBSCRITOR [#nested/] -->
+    <!-- FIM SUBSCRITOR [#nested/] -->
 [/#macro]
 
-[#macro cabecalhoCentralizadoPrimeiraPagina orgaoCabecalho=false exibeRodapeEnderecamento=false]
-	<table style="float:none; clear:both;" width="100%" align="left" border="0" cellpadding="0"
-		   cellspacing="0" bgcolor="#FFFFFF">
-		<tr bgcolor="#FFFFFF">
-			<td width="100%">
-				<table width="100%" border="0" cellpadding="2">
-					<tr>
-						<td width="100%" align="center" valign="bottom"><img src="${_pathBrasao}"
-																			 width="${_widthBrasao}"
-																			 height="${_heightBrasao}"/></td>
-					</tr>
-					<tr>
-						<td width="100%" align="center">
-							<p style="font-family: AvantGarde Bk BT, Arial; font-size: 11pt;">${_tituloGeral}</p>
-						</td>
-					</tr>
+[#macro cabecalhoCentralizadoPrimeiraPagina orgaoCabecalho=false]
+    <table style="float:none; clear:both;" width="100%" align="left" border="0" cellpadding="0"
+           cellspacing="0" bgcolor="#FFFFFF">
+        <tr bgcolor="#FFFFFF">
+            <td width="100%">
+                <table width="100%" border="0" cellpadding="2">
+                    <tr>
+                        <td width="100%" align="center" valign="bottom"><img src="${_pathBrasao}"
+                                                                             width="${_widthBrasao}"
+                                                                             height="${_heightBrasao}"/></td>
+                    </tr>
+                    <tr>
+                        <td width="100%" align="center">
+                            <p style="font-family: AvantGarde Bk BT, Arial; font-size: 11pt;">${_tituloGeral}</p>
+                        </td>
+                    </tr>
                     [#if _subtituloGeral?has_content]
-						<tr>
-							<td width="100%" align="center">
-								<p style="font-family: Arial; font-size: 10pt; font-weight: bold;">${_subtituloGeral}</p>
-							</td>
-						</tr>
+                        <tr>
+                            <td width="100%" align="center">
+                                <p style="font-family: Arial; font-size: 10pt; font-weight: bold;">${_subtituloGeral}</p>
+                            </td>
+                        </tr>
                     [/#if]
                     [#if orgaoCabecalho?? && orgaoCabecalho]
-						<tr>
-							<td width="100%" align="center">
-								<p style="font-family: AvantGarde Bk BT, Arial; font-size: 8pt;">
+                        <tr>
+                            <td width="100%" align="center">
+                                <p style="font-family: AvantGarde Bk BT, Arial; font-size: 8pt;">
                                     [#if mov??]
                                         ${(mov.lotaTitular.orgaoUsuario.descricaoMaiusculas)!}
                                     [#else]
                                         ${(doc.lotaTitular.orgaoUsuario.descricaoMaiusculas)!}
                                     [/#if]</p>
-							</td>
-						</tr>
+                            </td>
+                        </tr>
                     [/#if]
-				</table>
-			</td>
-		</tr>
-	</table>
-    [#if exibeRodapeEnderecamento]
-        [@rodapeEnderecamento/]
-    [/#if]
+                </table>
+            </td>
+        </tr>
+    </table>
 [/#macro]
 
 [#macro cabecalhoCentralizado orgaoCabecalho=true]
-	<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
-		<tr bgcolor="#FFFFFF">
-			<td width="100%">
-				<table width="100%" border="0" cellpadding="2">
-					<tr>
-						<td width="100%" align="center">
-							<p style="font-family: AvantGarde Bk BT, Arial; font-size: 11pt;">${_tituloGeral}</p>
-						</td>
-					</tr>
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+        <tr bgcolor="#FFFFFF">
+            <td width="100%">
+                <table width="100%" border="0" cellpadding="2">
+                    <tr>
+                        <td width="100%" align="center">
+                            <p style="font-family: AvantGarde Bk BT, Arial; font-size: 11pt;">${_tituloGeral}</p>
+                        </td>
+                    </tr>
                     [#if _subtituloGeral?has_content]
-						<tr>
-							<td width="100%" align="center">
-								<p style="font-family: Arial; font-size: 10pt; font-weight: bold;">${_subtituloGeral}</p>
-							</td>
-						</tr>
+                        <tr>
+                            <td width="100%" align="center">
+                                <p style="font-family: Arial; font-size: 10pt; font-weight: bold;">${_subtituloGeral}</p>
+                            </td>
+                        </tr>
                     [/#if]
                     [#if orgaoCabecalho?? && orgaoCabecalho]
-						<tr>
-							<td width="100%" align="center">
-								<p style="font-family: AvantGarde Bk BT, Arial; font-size: 8pt;">
+                        <tr>
+                            <td width="100%" align="center">
+                                <p style="font-family: AvantGarde Bk BT, Arial; font-size: 8pt;">
                                     [#if mov??]
                                         ${(mov.lotaTitular.orgaoUsuario.descricaoMaiusculas)!}
                                     [#else]
                                         ${(doc.lotaTitular.orgaoUsuario.descricaoMaiusculas)!}
                                     [/#if]</p>
-							</td>
-						</tr>
+                            </td>
+                        </tr>
                     [/#if]
-				</table>
-			</td>
-		</tr>
-	</table>
+                </table>
+            </td>
+        </tr>
+    </table>
 [/#macro]
 
 [#macro cabecalhoEsquerdaPrimeiraPagina width=65 height=65 exibirOrgao=true]
-	<table width="100%" align="left" border="0">
-		<tr>
-			<td align="left" valign="bottom" width="15%"><img src="${_pathBrasao}" width="${width}" height="${height}"/>
-			</td>
-			<td align="left" width="1%"></td>
-			<td width="84%">
-				<table align="left" width="100%">
-					<tr>
-						<td width="100%" align="left">
-							<p style="font-family: AvantGarde Bk BT, Arial; font-size: 11pt;">${_tituloGeral}</p>
-						</td>
-					</tr>
+    <table width="100%" align="left" border="0">
+        <tr>
+            <td align="left" valign="bottom" width="15%"><img src="${_pathBrasao}" width="${width}" height="${height}"/>
+            </td>
+            <td align="left" width="1%"></td>
+            <td width="84%">
+                <table align="left" width="100%">
+                    <tr>
+                        <td width="100%" align="left">
+                            <p style="font-family: AvantGarde Bk BT, Arial; font-size: 11pt;">${_tituloGeral}</p>
+                        </td>
+                    </tr>
                     [#if _subtituloGeral?has_content]
-						<tr>
-							<td width="100%" align="center">
-								<p style="font-family: Arial; font-size: 10pt; font-weight: bold;">${_subtituloGeral}</p>
-							</td>
-						</tr>
+                        <tr>
+                            <td width="100%" align="center">
+                                <p style="font-family: Arial; font-size: 10pt; font-weight: bold;">${_subtituloGeral}</p>
+                            </td>
+                        </tr>
                     [/#if]
                     [#if exibirOrgao]
-						<tr>
-							<td width="100%" align="left">
-								<p style="font-family: AvantGarde Bk BT, Arial; font-size: 8pt;">
+                        <tr>
+                            <td width="100%" align="left">
+                                <p style="font-family: AvantGarde Bk BT, Arial; font-size: 8pt;">
                                     [#if mov??]
                                         ${(mov.lotaTitular.orgaoUsuario.descricaoMaiusculas)!}
                                     [#else]
                                         ${(doc.lotaTitular.orgaoUsuario.descricaoMaiusculas)!}
                                     [/#if]</p>
-							</td>
-						</tr>
+                            </td>
+                        </tr>
                     [/#if]
-				</table>
-			</td>
-		</tr>
-	</table>
+                </table>
+            </td>
+        </tr>
+    </table>
 [/#macro]
 
 [#macro cabecalhoEsquerda]
-	<table width="100%" border="0" bgcolor="#FFFFFF">
-		<tr bgcolor="#FFFFFF">
-			<td width="100%">
-				<table width="100%">
-					<tr>
-						<td width="100%" align="left">
-							<p style="font-family: AvantGarde Bk BT, Arial; font-size: 11pt;">${_tituloGeral}</p>
-						</td>
-					</tr>
+    <table width="100%" border="0" bgcolor="#FFFFFF">
+        <tr bgcolor="#FFFFFF">
+            <td width="100%">
+                <table width="100%">
+                    <tr>
+                        <td width="100%" align="left">
+                            <p style="font-family: AvantGarde Bk BT, Arial; font-size: 11pt;">${_tituloGeral}</p>
+                        </td>
+                    </tr>
                     [#if _subtituloGeral?has_content]
-						<tr>
-							<td width="100%" align="center">
-								<p style="font-family: Arial; font-size: 10pt; font-weight: bold;">${_subtituloGeral}</p>
-							</td>
-						</tr>
+                        <tr>
+                            <td width="100%" align="center">
+                                <p style="font-family: Arial; font-size: 10pt; font-weight: bold;">${_subtituloGeral}</p>
+                            </td>
+                        </tr>
                     [/#if]
-					<tr>
-						<td width="100%" align="left">
-							<p style="font-family: AvantGarde Bk BT, Arial; font-size: 8pt;">
+                    <tr>
+                        <td width="100%" align="left">
+                            <p style="font-family: AvantGarde Bk BT, Arial; font-size: 8pt;">
                                 [#if mov??]
                                     ${(mov.lotaTitular.orgaoUsuario.descricaoMaiusculas)!}
                                 [#else]
                                     ${(doc.lotaTitular.orgaoUsuario.descricaoMaiusculas)!}
                                 [/#if]<br/>
-							</p>
-						</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-	</table>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 [/#macro]
 
-[#macro cabecalhoDireitaGenerico width="65" height="65" exibirOrgao=false exibeRodapeEnderecamento=false]
-	<table width="100%" border="0" bgcolor="#FFFFFF">
-		<tr bgcolor="#FFFFFF">
-			<td width="100%">
-				<table width="100%">
-					<tr>
-						<td align="right" valign="bottom"><img src="${_pathBrasaoSecundario}" width="200"/></td>
-						<td width="1%">
-							<table align="right" width="100%">
-							</table>
-						</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-	</table>
-    [#if exibeRodapeEnderecamento]
-        [@rodapeEnderecamento/]
-    [/#if]
+[#macro cabecalhoDireitaGenerico width="65" height="65" exibirOrgao=false]
+    <table width="100%" border="0" bgcolor="#FFFFFF">
+        <tr bgcolor="#FFFFFF">
+            <td width="100%">
+                <table width="100%">
+                    <tr>
+                        <td align="right" valign="bottom"><img src="${_pathBrasaoSecundario}" width="200"/></td>
+                        <td width="1%">
+                            <table align="right" width="100%">
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 [/#macro]
 
 [#macro cabecalhoDireita]
-	<table width="100%" border="0" bgcolor="#FFFFFF">
-		<tr bgcolor="#FFFFFF">
-			<td width="100%">
-				<table width="100%">
-					<tr>
-						<td width="100%" align="left">
-							<p style="font-family: AvantGarde Bk BT, Arial; font-size: 11pt;">${_tituloGeral}</p>
-						</td>
-					</tr>
+    <table width="100%" border="0" bgcolor="#FFFFFF">
+        <tr bgcolor="#FFFFFF">
+            <td width="100%">
+                <table width="100%">
+                    <tr>
+                        <td width="100%" align="left">
+                            <p style="font-family: AvantGarde Bk BT, Arial; font-size: 11pt;">${_tituloGeral}</p>
+                        </td>
+                    </tr>
                     [#if _subtituloGeral?has_content]
-						<tr>
-							<td width="100%" align="center">
-								<p style="font-family: Arial; font-size: 10pt; font-weight: bold;">${_subtituloGeral}</p>
-							</td>
-						</tr>
+                        <tr>
+                            <td width="100%" align="center">
+                                <p style="font-family: Arial; font-size: 10pt; font-weight: bold;">${_subtituloGeral}</p>
+                            </td>
+                        </tr>
                     [/#if]
-					<tr>
-						<td width="100%" align="left">
-							<p style="font-family: AvantGarde Bk BT, Arial; font-size: 8pt;">
+                    <tr>
+                        <td width="100%" align="left">
+                            <p style="font-family: AvantGarde Bk BT, Arial; font-size: 8pt;">
                                 [#if mov??]
                                     ${(mov.lotaTitular.orgaoUsuario.descricaoMaiusculas)!}
                                 [#else]
                                     ${(doc.lotaTitular.orgaoUsuario.descricaoMaiusculas)!}
                                 [/#if]<br/>
-							</p>
-						</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-	</table>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 [/#macro]
 
 [#macro rodapeClassificacaoDocumental align="left" somenteTR=false texto=""]
     [#if !somenteTR]
-		<table align="left" width="100%" bgcolor="#FFFFFF">
+        <table align="left" width="100%" bgcolor="#FFFFFF">
     [/#if]
     [#if texto?? && texto!=""]
-		<tr>
-			<td colspan="2" align="${align}"
-				style="border-collapse: collapse; border-color: black; font-family:Arial; font-size:8pt;">
+        <tr>
+            <td colspan="2" align="${align}"
+                style="border-collapse: collapse; border-color: black; font-family:Arial; font-size:8pt;">
                 ${texto}
-			</td>
-		</tr>
+            </td>
+        </tr>
     [/#if]
-	<tr>
-		<td width="60%"></td>
-		<td width="40%">
-			<table align="right" width="100%" border="1"
-				   style="border-color: black; border-spacing: 0px; border-collapse: collapse" bgcolor="#000000">
-				<tr>
-					<td align="center" width="55%"
-						style="border-collapse: collapse; border-color: black; font-family:Arial; font-size:8pt;"
-						bgcolor="#FFFFFF">
-						<i>Classif. documental</i>
-					</td>
-					<td align="center" width="45%"
-						style="border-collapse: collapse; border-color: black; font-family:Arial;font-size:8pt;"
-						bgcolor="#FFFFFF">
-						<span>${(doc.exClassificacao.sigla)!}</span>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
+    <tr>
+        <td width="60%"></td>
+        <td width="40%">
+            <table align="right" width="100%" border="1"
+                   style="border-color: black; border-spacing: 0px; border-collapse: collapse" bgcolor="#000000">
+                <tr>
+                    <td align="center" width="55%"
+                        style="border-collapse: collapse; border-color: black; font-family:Arial; font-size:8pt;"
+                        bgcolor="#FFFFFF">
+                        <i>Classif. documental</i>
+                    </td>
+                    <td align="center" width="45%"
+                        style="border-collapse: collapse; border-color: black; font-family:Arial;font-size:8pt;"
+                        bgcolor="#FFFFFF">
+                        <span>${(doc.exClassificacao.sigla)!}</span>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
     [#if !somenteTR]
-		</table>
+        </table>
     [/#if]
-[/#macro]
-
-[#macro rodapeEnderecamento]
-	<!-- INICIO ENDERECAMENTO -->
-	<style>
-        .texto-enderecamento {
-            font-family: Verdana;
-            font-size: 13px;
-            text-align: left;
-        }
-	</style>
-	<p class="texto-enderecamento">
-        [#if (Vocativo!"") != ""]<b>${Vocativo!}<b><br/>[/#if]
-                [#if (Orgao!"") != ""]${Orgao!}[/#if]<br/>
-                [#if (Logradouro!"") != ""]${Logradouro!}[/#if][#if (Numero!"") != ""], ${Numero!}[/#if][#if (Complemento!"") != ""], ${Complemento!}
-					<br/>[/#if]
-                [#if (Bairro!"") != ""]${Bairro!}<br/>[/#if]
-                [#if (CEP!"") != ""]${CEP}[/#if] [#if (Municipio!"") != ""]${Municipio!}[/#if] [#if (Municipio!"") != "" && (UF!"") != ""]- ${UF!}[/#if]
-	</p>
-	<!-- FIM ENDERECAMENTO -->
 [/#macro]
 
 [#macro rodapeNumeracaoADireita texto=""]
-	<table width="100%" border="0" cellpadding="0" bgcolor="#FFFFFF">
+    <table width="100%" border="0" cellpadding="0" bgcolor="#FFFFFF">
         [#if texto?? && texto!=""]
-			<tr>
-				<td align="left"
-					style="border-collapse: collapse; border-color: black; font-family:Arial; font-size:8pt;">
+            <tr>
+                <td align="left"
+                    style="border-collapse: collapse; border-color: black; font-family:Arial; font-size:8pt;">
                     ${texto}
-				</td>
-			</tr>
+                </td>
+            </tr>
         [/#if]
 
-		<tr>
-			<td width="100%" align="right">#pg</td>
-		</tr>
-	</table>
+        <tr>
+            <td width="100%" align="right">#pg</td>
+        </tr>
+    </table>
 [/#macro]
 
 [#macro rodapeNumeracaoCentralizada]
-	<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
-		<tr>
-			<td width="100%" align="center">#pg</td>
-		</tr>
-	</table>
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+        <tr>
+            <td width="100%" align="center">#pg</td>
+        </tr>
+    </table>
 [/#macro]
 
 [#macro assinaturaCentro formatarOrgao=false incluirAssinaturaBIE=true]
     [#if incluirAssinaturaBIE == true]
-		<!-- INICIO ASSINATURA -->
+        <!-- INICIO ASSINATURA -->
     [/#if]
-	<p style="font-family: Arial; font-size: 11pt;" align="center">
-		<br/>
+    <p style="font-family: Arial; font-size: 11pt;" align="center">
+        <br/>
         [#if (doc.subscritor)??]
             [@inicioSubscritor sigla=doc.codigoCompacto]${(doc.subscritor.idPessoa)!}[/@inicioSubscritor]
         [/#if]
@@ -2680,7 +2485,7 @@ Pede deferimento.</span><br/><br/><br/>
             [/#if]
         [/#if]
         [#if !apenasNome??]
-			<br/>
+            <br/>
             [#if apenasCargo??]
                 ${(doc.subscritor.cargo.nomeCargo)!}
             [#else]
@@ -2697,7 +2502,7 @@ Pede deferimento.</span><br/><br/><br/>
             [/#if]
 
             [#if formatarOrgao]
-				<br>
+                <br>
                 [#if (doc.nmLotacao)??]
                     ${doc.nmLotacao}
                 [#else]
@@ -2711,7 +2516,7 @@ Pede deferimento.</span><br/><br/><br/>
             [#if (doc.mobilGeral.exMovimentacaoSet)??]
                 [#list doc.mobilGeral.exMovimentacaoSet as mov]
                     [#if (mov.exTipoMovimentacao.idTpMov)! == 24]
-						<br/><br/><br/>
+                        <br/><br/><br/>
                         [@inicioSubscritor sigla=doc.codigoCompacto]${(mov.subscritor.idPessoa)}[/@inicioSubscritor]
                         [#if mov.nmSubscritor??]
                             ${mov.nmSubscritor}
@@ -2722,7 +2527,7 @@ Pede deferimento.</span><br/><br/><br/>
                                 ${(mov.subscritor.nomePessoa)!}
                             [/#if]
                         [/#if]
-						<br>
+                        <br>
                         [#if mov.nmFuncao??]
                             ${mov.nmFuncao}
                         [#elseif (mov.titular.funcaoConfianca.nomeFuncao)??]
@@ -2734,7 +2539,7 @@ Pede deferimento.</span><br/><br/><br/>
                             ${(mov.subscritor.cargo.nomeCargo)!}
                         [/#if]
                         [#if formatarOrgao]
-							<br>
+                            <br>
                             [#if mov.nmLotacao??]
                                 ${mov.nmLotacao}
                             [#else]
@@ -2747,23 +2552,23 @@ Pede deferimento.</span><br/><br/><br/>
             [/#if]
         [/#if]
         [#if textoFinal??]
-			<br/>${textoFinal}
+            <br/>${textoFinal}
         [/#if]
-	</p>
+    </p>
     [#if incluirAssinaturaBIE == true]
-		<!-- FIM ASSINATURA -->
+        <!-- FIM ASSINATURA -->
     [/#if]
 [/#macro]
 
 [#macro assinaturaMovCentro formatarOrgao=false]
-	<!-- INICIO ASSINATURA -->
-	<p style="font-family: Arial; font-size: 11pt;" align="center">
+    <!-- INICIO ASSINATURA -->
+    <p style="font-family: Arial; font-size: 11pt;" align="center">
         [#list doc.mobilGeral.exMovimentacaoSet as movim]
             [#if movim.exTipoMovimentacao.idTpMov == 24 && ((mov.titular?? && movim.titular?? && mov.titular.idPessoa == movim.titular.idPessoa) || (mov.subscritor?? && movim.subscritor?? && mov.subscritor.idPessoa == movim.subscritor.idPessoa)) && movim.descrMov??]
-				[local funcSubscrDoc = movim.descrMov /]
+                [local funcSubscrDoc = movim.descrMov /]
             [/#if]
         [/#list]
-	<p align="center" style="font-family:Arial;font-size:11pt;">${(mov.subscritor.descricao)!}<br/>
+    <p align="center" style="font-family:Arial;font-size:11pt;">${(mov.subscritor.descricao)!}<br/>
         [#if mov.nmFuncao??]
             ${mov.nmFuncao}
         [#elseif mov.titular?? && doc.titular?? && mov.titular.idPessoa == doc.titular.idPessoa && doc.nmFuncao??]
@@ -2779,7 +2584,7 @@ Pede deferimento.</span><br/><br/><br/>
         [#else]
             ${(mov.subscritor.cargo.nomeCargo)!}
         [/#if]
-		<br/>
+        <br/>
         [#if mov.nmLotacao??]
             ${mov.nmLotacao}
         [#else]
@@ -2787,49 +2592,49 @@ Pede deferimento.</span><br/><br/><br/>
         [/#if]
 
         [#if textoFinal??]
-			<br/>${textoFinal}
+            <br/>${textoFinal}
         [/#if]
-	</p>
-	<!-- FIM ASSINATURA -->
+    </p>
+    <!-- FIM ASSINATURA -->
 [/#macro]
 
-[#macro estiloBrasaoAEsquerda tipo exibeData=true formatarOrgao=false numeracaoEsquerda=false tamanhoLetra="11pt" obs="" omitirCodigo=false width=65 height=65 exibirOrgao=true texto="" exibeRodapeEnderecamento=false]
+[#macro estiloBrasaoAEsquerda tipo exibeData=true formatarOrgao=false numeracaoEsquerda=false tamanhoLetra="11pt" obs="" omitirCodigo=false width=65 height=65 exibirOrgao=true texto=""]
     [@primeiroCabecalho]
-		<table width="100%" border="0" bgcolor="#FFFFFF">
-			<tr>
-				<td>
+        <table width="100%" border="0" bgcolor="#FFFFFF">
+            <tr>
+                <td>
                     [@cabecalhoEsquerdaPrimeiraPagina width=width height=height exibirOrgao=exibirOrgao/]
-				</td>
-			</tr>
-			<tr bgcolor="#FFFFFF">
-				<td width="100%">
-					<table width="100%">
-						<tr>
+                </td>
+            </tr>
+            <tr bgcolor="#FFFFFF">
+                <td width="100%">
+                    <table width="100%">
+                        <tr>
                             [#if !numeracaoEsquerda]
-								<td align="right">
+                                <td align="right">
                                     [#if !omitirCodigo]
-										<p style="font-family:Arial;font-weight:bold;font-size:11pt;">${tipo} SIGA N&ordm; ${(doc.codigo)!}</p>
+                                        <p style="font-family:Arial;font-weight:bold;font-size:11pt;">${tipo} SIGA N&ordm; ${(doc.codigo)!}</p>
                                     [/#if]
-								</td>
+                                </td>
                             [#else]
-								<td align="left">
+                                <td align="left">
                                     [#if !omitirCodigo]
-										<p style="font-family:Arial;font-weight:bold;font-size:11pt;"><br><br>${tipo}
-											SIGA N&ordm; ${(doc.codigo)!}</p>
+                                        <p style="font-family:Arial;font-weight:bold;font-size:11pt;"><br><br>${tipo}
+                                            SIGA N&ordm; ${(doc.codigo)!}</p>
                                     [/#if]
-								</td>
+                                </td>
                             [/#if]
-						</tr>
+                        </tr>
 
                         [#if exibeData]
-							<tr>
-								<td align="right">[@letra tamanho="11pt"]<p>${(doc.dtExtenso)!}</p>[/@letra]</td>
-							</tr>
+                            <tr>
+                                <td align="right">[@letra tamanho="11pt"]<p>${(doc.dtExtenso)!}</p>[/@letra]</td>
+                            </tr>
                         [/#if]
-					</table>
-				</td>
-			</tr>
-		</table>
+                    </table>
+                </td>
+            </tr>
+        </table>
     [/@primeiroCabecalho]
 
     [@cabecalho]
@@ -2837,13 +2642,13 @@ Pede deferimento.</span><br/><br/><br/>
     [/@cabecalho]
 
     [@letra tamanho=tamanhoLetra]
-		<p>&nbsp;</p>
+        <p>&nbsp;</p>
         [#nested]
-		<p>&nbsp;</p>
+        <p>&nbsp;</p>
         [@assinaturaCentro formatarOrgao=formatarOrgao/]
     [/@letra]
     [#if obs != ""]
-		<p>&nbsp;</p>
+        <p>&nbsp;</p>
         ${obs}
     [/#if]
     [@primeiroRodape]
@@ -2853,31 +2658,28 @@ Pede deferimento.</span><br/><br/><br/>
     [@rodape]
         [@rodapeNumeracaoADireita texto=texto/]
     [/@rodape]
-    [#if exibeRodapeEnderecamento]
-        [@rodapeEnderecamento/]
-    [/#if]
 [/#macro]
 
-[#macro estiloBrasaoADireita tipo exibeData=true formatarOrgao=false numeracaoEsquerda=false tamanhoLetra="11pt" obs="" omitirCodigo=false width=65 height=65 exibirOrgao=false texto=""  exibeRodapeEnderecamento=false]
+[#macro estiloBrasaoADireita tipo exibeData=true formatarOrgao=false numeracaoEsquerda=false tamanhoLetra="11pt" obs="" omitirCodigo=false width=65 height=65 exibirOrgao=false texto=""]
     [@primeiroCabecalho]
-		<table width="100%" border="0" bgcolor="#FFFFFF">
-			<tr>
-				<td>
+        <table width="100%" border="0" bgcolor="#FFFFFF">
+            <tr>
+                <td>
                     [@cabecalhoDireitaGenerico width=65 height=65 exibirOrgao=true/]
-				</td>
-			</tr>
-			<tr bgcolor="#FFFFFF">
-				<td width="100%">
-					<table width="100%">
+                </td>
+            </tr>
+            <tr bgcolor="#FFFFFF">
+                <td width="100%">
+                    <table width="100%">
                         [#if exibeData]
-							<tr>
-								<td align="right">[@letra tamanho="10pt"]<p>${(doc.dtExtenso)!}</p>[/@letra]</td>
-							</tr>
+                            <tr>
+                                <td align="right">[@letra tamanho="10pt"]<p>${(doc.dtExtenso)!}</p>[/@letra]</td>
+                            </tr>
                         [/#if]
-					</table>
-				</td>
-			</tr>
-		</table>
+                    </table>
+                </td>
+            </tr>
+        </table>
     [/@primeiroCabecalho]
 
     [@cabecalho]
@@ -2885,13 +2687,13 @@ Pede deferimento.</span><br/><br/><br/>
     [/@cabecalho]
 
     [@letra tamanho=tamanhoLetra]
-		<p>&nbsp;</p>
+        <p>&nbsp;</p>
         [#nested]
-		<p>&nbsp;</p>
+        <p>&nbsp;</p>
         [@assinaturaCentro formatarOrgao=formatarOrgao/]
     [/@letra]
     [#if obs != ""]
-		<p>&nbsp;</p>
+        <p>&nbsp;</p>
         ${obs}
     [/#if]
 
@@ -2903,13 +2705,10 @@ Pede deferimento.</span><br/><br/><br/>
         [@rodapeClassificacaoDocumental align="right" texto=texto/]
         [@rodapeNumeracaoADireita texto="" /]
     [/@rodape]
-    [#if exibeRodapeEnderecamento]
-        [@rodapeEnderecamento/]
-    [/#if]
 [/#macro]
 
 
-[#macro estiloBrasaoCentralizado tipo tamanhoLetra="11pt"  exibeAssinatura=true formatarOrgao=true orgaoCabecalho=true numeracaoCentralizada=false dataAntesDaAssinatura=false incluirMioloDJE=false omitirCodigo=false omitirData=false topoPrimeiraPagina='' incluirAssinaturaBIE=true exibeClassificacaoDocumental=true exibeRodapeEnderecamento=false]
+[#macro estiloBrasaoCentralizado tipo tamanhoLetra="11pt"  exibeAssinatura=true formatarOrgao=true orgaoCabecalho=true numeracaoCentralizada=false dataAntesDaAssinatura=false incluirMioloDJE=false omitirCodigo=false omitirData=false topoPrimeiraPagina='' incluirAssinaturaBIE=true exibeClassificacaoDocumental=true]
     [@primeiroCabecalho]${topoPrimeiraPagina!}
         [@cabecalhoCentralizadoPrimeiraPagina orgaoCabecalho/]
     [/@primeiroCabecalho]
@@ -2918,45 +2717,45 @@ Pede deferimento.</span><br/><br/><br/>
     [/@cabecalho]
     [@letra tamanhoLetra]
         [#if !numeracaoCentralizada]
-			<table style="float:none; clear:both; margin: 0; padding: 0;border-collapse: collapse;" width="100%"
-				   border="0" bgcolor="#FFFFFF">
-				<tr style="margin: 0; padding: 0;">
-					<td align="left" style="margin: 0; padding: 0;">
+            <table style="float:none; clear:both; margin: 0; padding: 0;border-collapse: collapse;" width="100%"
+                   border="0" bgcolor="#FFFFFF">
+                <tr style="margin: 0; padding: 0;">
+                    <td align="left" style="margin: 0; padding: 0;">
                         [#if !omitirCodigo]
-							<p style="font-family:Arial;font-weight:bold;font-size:11pt;">
-								<br/>[@numeroDJE]${tipo}[#if tipo != ""] SIGA N&ordm; ${(doc.codigo)!} [/#if] [/@numeroDJE]
-							</p>
+                            <p style="font-family:Arial;font-weight:bold;font-size:11pt;">
+                                <br/>[@numeroDJE]${tipo}[#if tipo != ""] SIGA N&ordm; ${(doc.codigo)!} [/#if] [/@numeroDJE]
+                            </p>
                         [/#if]
-					</td>
-				</tr>
+                    </td>
+                </tr>
                 [#if !dataAntesDaAssinatura && !omitirData]
-					<tr>
-						<td align="right">[@letra tamanho="11pt"]
-								<p>[#if mov??]${mov.dtExtenso!}[#else]${doc.dtExtenso!}[/#if]</p>[/@letra]</td>
-					</tr>
+                    <tr>
+                        <td align="right">[@letra tamanho="11pt"]
+                                <p>[#if mov??]${mov.dtExtenso!}[#else]${doc.dtExtenso!}[/#if]</p>[/@letra]</td>
+                    </tr>
                 [/#if]
-			</table>
+            </table>
         [#else]
-			<table style="float:none; clear:both;" width="100%" border="0" bgcolor="#FFFFFF">
-				<tr>
-					<td align="center">
-						<p style="font-family:Arial;font-weight:bold;font-size:11pt;"><br/>
+            <table style="float:none; clear:both;" width="100%" border="0" bgcolor="#FFFFFF">
+                <tr>
+                    <td align="center">
+                        <p style="font-family:Arial;font-weight:bold;font-size:11pt;"><br/>
                             [@numeroDJE] [#if tipo != ""] ${tipo} SIGA N&ordm; ${(doc.codigo)!}[/#if] [/@numeroDJE]
                             [#if !dataAntesDaAssinatura && doc?? && doc.dtD??] de ${doc.dtD} de ${doc.dtMMMM} de ${doc.dtYYYY}[/#if]
-						</p>
-					</td>
-				</tr>
-			</table>
+                        </p>
+                    </td>
+                </tr>
+            </table>
         [/#if]
         [@tituloDJE]
-			<p style="font-family:Arial;font-weight:bold;font-size:11pt;">[#if tipo != ""] ${tipo}[/#if] ${(doc.codigo)!}</p>
+            <p style="font-family:Arial;font-weight:bold;font-size:11pt;">[#if tipo != ""] ${tipo}[/#if] ${(doc.codigo)!}</p>
         [/@tituloDJE]
         [#if incluirMioloDJE]
             [@mioloDJE]
                 [#nested]
                 [#if dataAntesDaAssinatura]<p
-						style="text-align:center">[#if mov??]${mov.dtExtenso!}[#else]${doc.dtExtenso!}[/#if]</p>[/#if]
-				<p>&nbsp;</p>
+                        style="font-family:Arial;text-align:center">[#if mov??]${mov.dtExtenso!}[#else]${doc.dtExtenso!}[/#if]</p>[/#if]
+                <p>&nbsp;</p>
                 [#if exibeAssinatura]
                     [#if mov??]
                         [@assinaturaMovCentro formatarOrgao=formatarOrgao/]
@@ -2969,7 +2768,7 @@ Pede deferimento.</span><br/><br/><br/>
             [#nested]
             [#assign data = func.dataAtual(doc) /]
             [#if dataAntesDaAssinatura]
-				<p style="text-align:center">
+                <p style="font-family:Arial;text-align:center">
                     [#if mov??]
                         ${mov.dtExtenso!}
                     [#else]
@@ -2979,9 +2778,9 @@ Pede deferimento.</span><br/><br/><br/>
                             ${doc.dtExtenso!}
                         [/#if]
                     [/#if]
-				</p>
+                </p>
             [/#if]
-			<p>&nbsp;</p>
+            <p>&nbsp;</p>
             [#if exibeAssinatura]
                 [#if mov??]
                     [@assinaturaMovCentro formatarOrgao=formatarOrgao/]
@@ -2995,7 +2794,6 @@ Pede deferimento.</span><br/><br/><br/>
         [#if exibeClassificacaoDocumental]
             [@rodapeClassificacaoDocumental/]
         [/#if]
-
     [/@primeiroRodape]
     [@rodape]
         [@rodapeNumeracaoADireita/]
@@ -3004,65 +2802,65 @@ Pede deferimento.</span><br/><br/><br/>
 
 [#macro processo]
     [#assign _topoPrimeiraPagina]
-		<table width="100%" border="0" cellpadding="0" cellspacing="0">
-			<tr>
-				<td>
-					<table border="0" align="center" bgcolor="#ffffff" width="100%">
-						<tr>
-							<td width="20%" bgcolor="#787878"></td>
-							<td width="60%" align="center" style=" font: bold; font-size: 14pt"><b>PROCESSO&nbsp;ADMINISTRATIVO</b>
-							</td>
-							<td width="20%" bgcolor="#787878"></td>
-						</tr>
-					</table>
-				</td>
-			<tr>
-			<tr bgcolor="#FFFFFF">
-				<td cellpadding="5">
-					&nbsp;
-				</td>
-			</tr>
-		</table>
+        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <td>
+                    <table border="0" align="center" bgcolor="#ffffff" width="100%">
+                        <tr>
+                            <td width="20%" bgcolor="#787878"></td>
+                            <td width="60%" align="center" style=" font: bold; font-size: 14pt"><b>PROCESSO&nbsp;ADMINISTRATIVO</b>
+                            </td>
+                            <td width="20%" bgcolor="#787878"></td>
+                        </tr>
+                    </table>
+                </td>
+            <tr>
+            <tr bgcolor="#FFFFFF">
+                <td cellpadding="5">
+                    &nbsp;
+                </td>
+            </tr>
+        </table>
     [/#assign]
     [@estiloBrasaoCentralizado tipo='EOF' tamanhoLetra='14pt' formatarOrgao=true omitirCodigo=true omitirData=true topoPrimeiraPagina=_topoPrimeiraPagina]
 
-		<br/>
-		<table align="center" width="60%" border="1" cellspacing="1" bgcolor="#000000">
-			<tr>
-				<td width="30%" bgcolor="#FFFFFF" align="center"><br/>
-					<b>Processo SIGA N&ordm;</b><br/>
-					<br/></td>
-			</tr>
-			<tr>
-				<td bgcolor="#FFFFFF" align="center"><br/>
+        <br/>
+        <table align="center" width="60%" border="1" cellspacing="1" bgcolor="#000000">
+            <tr>
+                <td width="30%" bgcolor="#FFFFFF" align="center"><br/>
+                    <b>Processo SIGA N&ordm;</b><br/>
+                    <br/></td>
+            </tr>
+            <tr>
+                <td bgcolor="#FFFFFF" align="center"><br/>
                     ${(doc.codigo)!}</td>
-			</tr>
-		</table>
+            </tr>
+        </table>
 
-		<br/>
-		<br/>
-		<table align="center" width="50%" border="1" cellspacing="1"
-			   bgcolor="#000000">
-			<tr>
-				<td bgcolor="#FFFFFF" align="center"><br/>
-					<b>Data de abertura</b><br/>
-					<br/></td>
-				<td bgcolor="#FFFFFF" align="center">${(doc.dtDocDDMMYYYY)!}</td>
-			</tr>
-		</table>
-		<br/>
-		<br/>
+        <br/>
+        <br/>
+        <table align="center" width="50%" border="1" cellspacing="1"
+               bgcolor="#000000">
+            <tr>
+                <td bgcolor="#FFFFFF" align="center"><br/>
+                    <b>Data de abertura</b><br/>
+                    <br/></td>
+                <td bgcolor="#FFFFFF" align="center">${(doc.dtDocDDMMYYYY)!}</td>
+            </tr>
+        </table>
+        <br/>
+        <br/>
 
-		<table align="center" width="85%" border="1" cellspacing="1"
-			   bgcolor="#000000">
-			<tr>
-				<td bgcolor="#FFFFFF" align="center"><b>OBJETO</b></td>
-			</tr>
-			<tr>
-				<td bgcolor="#FFFFFF" align="center"><br/>
+        <table align="center" width="85%" border="1" cellspacing="1"
+               bgcolor="#000000">
+            <tr>
+                <td bgcolor="#FFFFFF" align="center"><b>OBJETO</b></td>
+            </tr>
+            <tr>
+                <td bgcolor="#FFFFFF" align="center"><br/>
                     ${(doc.descrDocumento)!}<br/></td>
-			</tr>
-		</table>
+            </tr>
+        </table>
     [/@estiloBrasaoCentralizado]
 [/#macro]
 
@@ -3078,12 +2876,12 @@ Pede deferimento.</span><br/><br/><br/>
     [/#if]
 
     [@estiloBrasaoCentralizado tipo=_tipo tamanhoLetra=tl formatarOrgao=false]
-		<p align="left">
-			De: [#if (doc.nmLotacao)??]${doc.nmLotacao}[#else]${(doc.titular.lotacao.nomeLotacao)!}[/#if]<br/>
-			Para: ${(doc.destinatarioString)!}<br>
-			Assunto: ${(doc.exClassificacao.descrClassificacao)!}</p>
-		<span style="font-size: ${tl}"> ${texto!} </span>
-		<p style="align: justify; TEXT-INDENT: 2cm">${fecho}</p>
+        <p align="left">
+            De: [#if (doc.nmLotacao)??]${doc.nmLotacao}[#else]${(doc.titular.lotacao.nomeLotacao)!}[/#if]<br/>
+            Para: ${(doc.destinatarioString)!}<br>
+            Assunto: ${(doc.exClassificacao.descrClassificacao)!}</p>
+        <span style="font-size: ${tl}"> ${texto!} </span>
+        <p style="align: justify; TEXT-INDENT: 2cm">${fecho}</p>
     [/@estiloBrasaoCentralizado]
 [/#macro]
 
@@ -3106,16 +2904,16 @@ Pede deferimento.</span><br/><br/><br/>
         [@inicioMioloDJE]
         [/@inicioMioloDJE]
         [#if ementa != ""]
-			<table style="float:none;" width="100%" border="0" cellpadding="2" cellspacing="0" bgcolor="#FFFFFF">
-				<tr>
-					<td align="left" width="50%"></td>
-					<td align="left" width="50%" style="font-family: Arial; font-size: ${tl};"><br/>
-						<p align="justify">${ementa!}</p></td>
-				</tr>
-			</table>
+            <table style="float:none;" width="100%" border="0" cellpadding="2" cellspacing="0" bgcolor="#FFFFFF">
+                <tr>
+                    <td align="left" width="50%"></td>
+                    <td align="left" width="50%" style="font-family: Arial; font-size: ${tl};"><br/>
+                        <p align="justify">${ementa!}</p></td>
+                </tr>
+            </table>
             [@br/][@br/]
         [/#if]
-		<div style="font-family: Arial; font-size: ${tl};">
+        <div style="font-family: Arial; font-size: ${tl};">
             [#if abertura != ""]
                 [@br/][@br/]
                 [@aberturaBIE]
@@ -3124,21 +2922,21 @@ Pede deferimento.</span><br/><br/><br/>
             [/#if]
             [@corpoBIE]
                 [#if titulo != ""][@br/]
-					<center><b>${titulo}</b></center>[@br/][/#if]
+                    <center><b>${titulo}</b></center>[@br/][/#if]
                 [#if subtitulo != ""]
-					<center><b>${subtitulo}</b></center>[@br/][/#if]
+                    <center><b>${subtitulo}</b></center>[@br/][/#if]
                 [@br/]${texto}
             [/@corpoBIE]
-			<p style="font-family: Arial; font-size: ${tl}; font-weight: bold;" align="center">
+            <p style="font-family: Arial; font-size: ${tl}; font-weight: bold;" align="center">
                 [@fechoBIE]
                     [@br/]
                     [#if _tipo != "ORDEM DE SERVIÇO"]
-						PUBLIQUE-SE. REGISTRE-SE.
+                        PUBLIQUE-SE. REGISTRE-SE.
                     [/#if]
-					CUMPRA-SE.
+                    CUMPRA-SE.
                 [/@fechoBIE]
-			</p>
-		</div>
+            </p>
+        </div>
     [/@estiloBrasaoCentralizadoTrf]
 [/#macro]
 
@@ -3152,19 +2950,19 @@ Pede deferimento.</span><br/><br/><br/>
     [#else]
         [#assign tl = "11pt"]
     [/#if]
-    [@estiloBrasaoCentralizado tipo=_tipo tamanhoLetra=tl formatarOrgao=false numeracaoCentralizada=true incluirMioloDJE=true exibeRodapeEnderecamento=false]
+    [@estiloBrasaoCentralizado tipo=_tipo tamanhoLetra=tl formatarOrgao=false numeracaoCentralizada=true incluirMioloDJE=true]
         [#if dispoe_sobre != ""]
-			<table style="float:none;" width="100%" border="0" cellpadding="2" cellspacing="0" bgcolor="#FFFFFF">
-				<tr>
-					<td align="left" width="50%"></td>
-					<td align="left" width="50%" style="text-align: justify; font-family: Arial; font-size: ${tl};">
-						<br/>Dispõe sobre ${dispoe_sobre!}</td>
-				</tr>
-			</table>
-			<br/>
+            <table style="float:none;" width="100%" border="0" cellpadding="2" cellspacing="0" bgcolor="#FFFFFF">
+                <tr>
+                    <td align="left" width="50%"></td>
+                    <td align="left" width="50%" style="text-align: justify; font-family: Arial; font-size: ${tl};">
+                        <br/>Dispõe sobre ${dispoe_sobre!}</td>
+                </tr>
+            </table>
+            <br/>
         [/#if]
 
-		<div style="font-family: Arial; font-size: ${tl};">
+        <div style="font-family: Arial; font-size: ${tl};">
             [#if abertura != ""]
                 [@aberturaBIE]
                     ${abertura!}
@@ -3173,20 +2971,17 @@ Pede deferimento.</span><br/><br/><br/>
             [@corpoBIE]
                 ${texto!}
             [/@corpoBIE]
-			<span style="font-family: Arial; font-size: ${tl}"><center>
-            [@fechoBIE]
-                PUBLIQUE-SE. REGISTRE-SE. CUMPRA-SE.</center></span></p>
+            <span style="font-family: Arial; font-size: ${tl}"><center>
+                [@fechoBIE]
+                    PUBLIQUE-SE. REGISTRE-SE. CUMPRA-SE.</center></span></p>
             [/@fechoBIE]
-			</center></span></p>
-		</div>
+            </center></span></p>
+        </div>
     [/@estiloBrasaoCentralizado]
-    [#if exibeRodapeEnderecamento]
-        [@rodapeEnderecamento/]
-    [/#if]
 [/#macro]
 
 [#macro quebraPagina]
-	<div style="PAGE-BREAK-AFTER: always"/>
+    <div style="PAGE-BREAK-AFTER: always"/>
 [/#macro]
 
 [#macro oficio _texto="" _tipo_autoridade="" _genero="" _vocativo="" _enderecamento_dest="" _nome_dest=""
@@ -3226,7 +3021,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
             [/@grupo]
         [/#if]
 
-		<!-- Vocativo -->
+        <!-- Vocativo -->
         [#if _vocativo != ""]
             [@oculto var="vocativo" valor="${_vocativo}" /]
         [#else]
@@ -3244,7 +3039,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
             [/#if]
         [/#if]
 
-		<!-- Conteudo -->
+        <!-- Conteudo -->
         [#if _texto!=""]
             [@oculto var="texto_oficio" valor="${_texto}"/]
         [#else]
@@ -3255,7 +3050,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
             [/@grupo]
         [/#if]
 
-		<!-- Fecho -->
+        <!-- Fecho -->
         [#if _fecho != ""]
             [@oculto var="fecho" valor="${_fecho}"/]
         [#else]
@@ -3264,7 +3059,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
             [/@grupo]
         [/#if]
         [@grupo titulo="Dados do destinatário" esconder=(_enderecamento_dest!="" && _nome_dest!="" && _cargo_dest!="" && _orgao_dest!="" && _endereco_dest!="")]
-			<!-- Tratamento -->
+            <!-- Tratamento -->
             [#if _enderecamento_dest != ""]
                 [@oculto var="enderecamento_dest" valor=_enderecamento_dest /]
             [#else]
@@ -3282,7 +3077,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
                 [/#if]
             [/#if]
 
-			<!-- Nome -->
+            <!-- Nome -->
             [#if _nome_dest != ""]
                 [@oculto var="nome_dest" valor="${_nome_dest}"/]
             [#else]
@@ -3300,7 +3095,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
                 [/#if]
             [/#if]
 
-			<!-- Cargo -->
+            <!-- Cargo -->
             [#if _cargo_dest != ""]
                 [@oculto var="cargo_dest" valor="${_cargo_dest}"/]
             [#else]
@@ -3318,7 +3113,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
                 [/#if]
             [/#if]
 
-			<!-- Órgão -->
+            <!-- Órgão -->
             [#if _orgao_dest != ""]
                 [@oculto var="orgao_dest" valor="${_orgao_dest}"/]
             [#else]
@@ -3371,53 +3166,53 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
             [#assign virgula ="," /]
         [/#if]
         [@estiloBrasaoCentralizado tipo=_tipo tamanhoLetra=tl formatarOrgao=true]
-			<table width="100%" border="0" cellpadding="2" cellspacing="0" bgcolor="#FFFFFF">
-				<tr>
-					<td align="left">
-						<table align="left" width="100%" border="0" cellpadding="2" cellspacing="0">
-							<tr>
-								<td>[@letra tamanho=tl]<p>${enderecamento_dest!}</p>[/@letra]</td>
-							</tr>
-							<tr>
-								<td>[@letra tamanho=tl]<p>${nome_dest!}</p>[/@letra]</td>
-							</tr>
+            <table width="100%" border="0" cellpadding="2" cellspacing="0" bgcolor="#FFFFFF">
+                <tr>
+                    <td align="left">
+                        <table align="left" width="100%" border="0" cellpadding="2" cellspacing="0">
+                            <tr>
+                                <td>[@letra tamanho=tl]<p>${enderecamento_dest!}</p>[/@letra]</td>
+                            </tr>
+                            <tr>
+                                <td>[@letra tamanho=tl]<p>${nome_dest!}</p>[/@letra]</td>
+                            </tr>
                             [#if cargo_dest??]
-								<tr>
-									<td>[@letra tamanho=tl]<p>${cargo_dest!}</p>[/@letra]</td>
-								</tr>
+                                <tr>
+                                    <td>[@letra tamanho=tl]<p>${cargo_dest!}</p>[/@letra]</td>
+                                </tr>
                             [/#if]
                             [#if orgao_dest??]
-								<tr>
-									<td>[@letra tamanho=tl]<p>${orgao_dest!}</p>[/@letra]</td>
-								</tr>
+                                <tr>
+                                    <td>[@letra tamanho=tl]<p>${orgao_dest!}</p>[/@letra]</td>
+                                </tr>
                             [/#if]
                             [#if endereco_dest??]
-								<tr>
-									<td>[@letra tamanho=tl]<p>[@fixcrlf var=endereco_dest! /]</p>[/@letra]</td>
-								</tr>
+                                <tr>
+                                    <td>[@letra tamanho=tl]<p>[@fixcrlf var=endereco_dest! /]</p>[/@letra]</td>
+                                </tr>
                             [/#if]
                             [#if (doc.exClassificacao.descrClassificacao)??]
-								<tr>
-									<td>[@letra tamanho=tl]<p><br/>Assunto: ${(doc.exClassificacao.descrClassificacao)!}
-											</p>[/@letra]</td>
-								</tr>
+                                <tr>
+                                    <td>[@letra tamanho=tl]<p><br/>Assunto: ${(doc.exClassificacao.descrClassificacao)!}
+                                            </p>[/@letra]</td>
+                                </tr>
                             [/#if]
-						</table>
-					</td>
-				</tr>
-			</table>
+                        </table>
+                    </td>
+                </tr>
+            </table>
             [@mioloDJE]
-				<div style="font-family: Arial; font-size: 10pt;">
-					<p>&nbsp;</p>
+                <div style="font-family: Arial; font-size: 10pt;">
+                    <p>&nbsp;</p>
                     [@corpoBIE]
                         [#if vocativo??]
-							<p align="left" style="font-size: ${tl}; TEXT-INDENT: 2cm">${vocativo!},</p>
+                            <p align="left" style="font-size: ${tl}; TEXT-INDENT: 2cm">${vocativo!},</p>
                         [/#if]
                         [@letra tamanho=tl]${texto_oficio!}[/@letra]
                     [/@corpoBIE]
                     [#if fecho??]<p
-							style="font-size: ${tl}; TEXT-INDENT: 2cm">[@fechoBIE]${fecho!}${virgula!}[/@fechoBIE][/#if]</p>
-				</div>
+                            style="font-size: ${tl}; TEXT-INDENT: 2cm">[@fechoBIE]${fecho!}${virgula!}[/@fechoBIE][/#if]</p>
+                </div>
             [/@mioloDJE]
         [/@estiloBrasaoCentralizado]
     [/@documento]
@@ -3426,90 +3221,90 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 [#macro folhaDeRostoExterno]
     [@documento]
         [@estiloBrasaoCentralizado tipo="DOCUMENTO EXTERNO" tamanhoLetra="11pt"]
-			<table width="100%" border="0" cellpadding="6" cellspacing="6" bgcolor="#FFFFFF">
-				<tr>
-					<td width="50%">
-						Órgão Externo:
-					</td>
-					<td width="50%">
+            <table width="100%" border="0" cellpadding="6" cellspacing="6" bgcolor="#FFFFFF">
+                <tr>
+                    <td width="50%">
+                        Órgão Externo:
+                    </td>
+                    <td width="50%">
                         ${(doc.orgaoExterno.descricao)!} ${(doc.obsOrgao)!}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Data Original do Documento:
-					</td>
-					<td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Data Original do Documento:
+                    </td>
+                    <td>
                         ${(doc.dtDocOriginalDDMMYYYY)!}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Número Original:
-					</td>
-					<td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Número Original:
+                    </td>
+                    <td>
                         ${(doc.numExtDoc)!}
-					</td>
-				</tr>
+                    </td>
+                </tr>
                 [#if (doc.numAntigoDoc)! != '']
-					<tr>
-						<td>
-							Número no Sistema Antigo:
-						</td>
-						<td>
+                    <tr>
+                        <td>
+                            Número no Sistema Antigo:
+                        </td>
+                        <td>
                             ${(doc.numAntigoDoc)!}
-						</td>
-					</tr>
+                        </td>
+                    </tr>
                 [/#if]
-				<tr>
-					<td>
-						Data:
-					</td>
-					<td>
+                <tr>
+                    <td>
+                        Data:
+                    </td>
+                    <td>
                         ${(doc.dtDocDDMMYY)!}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Subscritor:
-					</td>
-					<td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Subscritor:
+                    </td>
+                    <td>
                         ${(doc.nmSubscritorExt)!}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Descrição:
-					</td>
-					<td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Descrição:
+                    </td>
+                    <td>
                         ${(doc.descrDocumento)!}
-					</td>
-				</tr>
-				<tr>
-					<td>
-					</td>
-					<td>
-					</td>
-				</tr>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                </tr>
                 [#if doc.cadastrante??]
-					<tr>
-						<td>
-							Cadastrante:
-						</td>
-						<td>
+                    <tr>
+                        <td>
+                            Cadastrante:
+                        </td>
+                        <td>
                             ${(doc.cadastrante.descricao)!}
-						</td>
-					</tr>
+                        </td>
+                    </tr>
                 [/#if]
-				<tr>
-					<td>
-						Data do cadastro:
-					</td>
-					<td>
+                <tr>
+                    <td>
+                        Data do cadastro:
+                    </td>
+                    <td>
                         ${(doc.dtRegDocDDMMYYHHMMSS)!}
-					</td>
-				</tr>
-			</table>
+                    </td>
+                </tr>
+            </table>
         [/@estiloBrasaoCentralizado]
     [/@documento]
 [/#macro]
@@ -3517,80 +3312,80 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 [#macro folhaDeRostoInterno]
     [@documento]
         [@estiloBrasaoCentralizado tipo="DOCUMENTO INTERNO" tamanhoLetra="11pt"]
-			<table width="100%" border="0" cellpadding="6" cellspacing="6" bgcolor="#FFFFFF">
-				<tr>
-					<td width="50%">
-						Número Original:
-					</td>
-					<td width="50%">
+            <table width="100%" border="0" cellpadding="6" cellspacing="6" bgcolor="#FFFFFF">
+                <tr>
+                    <td width="50%">
+                        Número Original:
+                    </td>
+                    <td width="50%">
                         ${doc.numExtDoc!}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Número no Sistema Antigo:
-					</td>
-					<td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Número no Sistema Antigo:
+                    </td>
+                    <td>
                         ${doc.numAntigoDoc!}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Forma:
-					</td>
-					<td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Forma:
+                    </td>
+                    <td>
                         ${doc.exFormaDocumento.descrFormaDoc!}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Modelo:
-					</td>
-					<td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Modelo:
+                    </td>
+                    <td>
                         ${doc.exModelo.nmMod!}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Subscritor:
-					</td>
-					<td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Subscritor:
+                    </td>
+                    <td>
                         ${doc.subscritorString!}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Destinatário:
-					</td>
-					<td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Destinatário:
+                    </td>
+                    <td>
                         ${doc.destinatarioString!}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Descrição:
-					</td>
-					<td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Descrição:
+                    </td>
+                    <td>
                         ${doc.descrDocumento!}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Cadastrante:
-					</td>
-					<td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Cadastrante:
+                    </td>
+                    <td>
                         ${doc.cadastrante.descricao!}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Data do cadastro:
-					</td>
-					<td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Data do cadastro:
+                    </td>
+                    <td>
                         ${doc.dtRegDocDDMMYYHHMMSS!}
-					</td>
-				</tr>
-			</table>
+                    </td>
+                </tr>
+            </table>
         [/@estiloBrasaoCentralizado]
     [/@documento]
 [/#macro]
@@ -3622,8 +3417,8 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
         [#local v = default/]
     [/#if]
 
-	<div class="form-group" style="margin-bottom:0">
-		<input type="hidden" name="vars" value="${var}"/>
+    <div class="form-group" style="margin-bottom:0">
+        <input type="hidden" name="vars" value="${var}"/>
 
         [#if (alerta!"Não") = 'Sim' && v = ""]
             [#list obrigatorios?split(",") as campo]
@@ -3635,49 +3430,49 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 
         [#if obrigatorio == 'Sim']
             [#local negrito = "font-weight:bold"]
-			<input type="hidden" name="obrigatorios" value="${var}"/>
+            <input type="hidden" name="obrigatorios" value="${var}"/>
         [/#if]
 
         [#if titulo != ""]
-			<label for="${var}" style="${negrito!};${vermelho!}">${titulo}</label>
+            <label for="${var}" style="${negrito!};${vermelho!}">${titulo}</label>
         [/#if]
 
         [#if !gerar_formulario!false]
-			<input onkeypress="return formataReais(this, '.' , ',', event)"
-				   type="text" name="${var}" value="${v}" ${jreler!""}${jrelertab!""}${jlargura!""}${jmaxcaracteres!""}
-				   class="form-control"/>
-			<div class="invalid-feedback  invalid-feedback-${var}">Preenchimento obrigatório</div>
+            <input onkeypress="return formataReais(this, '.' , ',', event)"
+                   type="text" name="${var}" value="${v}" ${jreler!""}${jrelertab!""}${jlargura!""}${jmaxcaracteres!""}
+                   class="form-control"/>
+            <div class="invalid-feedback  invalid-feedback-${var}">Preenchimento obrigatório</div>
         [#else]
-			<span class="valor">${v}</span>
+            <span class="valor">${v}</span>
         [/#if]
-	</div>
+    </div>
 [/#macro]
 [#macro identificacao pessoa="" funcao="" nivelHierarquicoMaximoDaLotacao="" obs="" negrito="nao"]
     [#if pessoa?? && pessoa.sigla != ""]
         [#if negrito == "nao"]
             ${pessoa.descricao},
         [#else]
-			<b>${pessoa.descricao}</b>,
+            <b>${pessoa.descricao}</b>,
         [/#if]
         [#if negrito == "total"]
-			matrícula n&ordm; <b>${pessoa.sigla}</b>, <b>${pessoa.cargo.nomeCargo}</b>, classe
-			<b>${pessoa.padraoReferencia}</b>,
+            matrícula n&ordm; <b>${pessoa.sigla}</b>, <b>${pessoa.cargo.nomeCargo}</b>, classe
+            <b>${pessoa.padraoReferencia}</b>,
             [#if obs != ""]
                 ${obs},
             [/#if]
-			lotado(a) no(a)
-			<b>${(nivelHierarquicoMaximoDaLotacao?? && nivelHierarquicoMaximoDaLotacao != "")?string(func.lotacaoPorNivelMaximo(pessoa.lotacao, nivelHierarquicoMaximoDaLotacao?number).descricao,pessoa.lotacao.descricao)}</b>,
+            lotado(a) no(a)
+            <b>${(nivelHierarquicoMaximoDaLotacao?? && nivelHierarquicoMaximoDaLotacao != "")?string(func.lotacaoPorNivelMaximo(pessoa.lotacao, nivelHierarquicoMaximoDaLotacao?number).descricao,pessoa.lotacao.descricao)}</b>,
             [#if funcao?? && funcao == "sim" && pessoa.funcaoConfianca != ""]
-				ocupante do(a) cargo em comissão/função comissionada de <b>${pessoa.funcaoConfianca.descricao}</b>,
+                ocupante do(a) cargo em comissão/função comissionada de <b>${pessoa.funcaoConfianca.descricao}</b>,
             [/#if]
         [#else]
-			matrícula n&ordm; ${pessoa.sigla}, ${pessoa.cargo.nomeCargo}, classe ${pessoa.padraoReferencia},
+            matrícula n&ordm; ${pessoa.sigla}, ${pessoa.cargo.nomeCargo}, classe ${pessoa.padraoReferencia},
             [#if obs != ""]
                 ${obs},
             [/#if]
-			lotado(a) no(a) ${(nivelHierarquicoMaximoDaLotacao?? && nivelHierarquicoMaximoDaLotacao != "")?string(func.lotacaoPorNivelMaximo(pessoa.lotacao, nivelHierarquicoMaximoDaLotacao?number).descricao,pessoa.lotacao.descricao)},
+            lotado(a) no(a) ${(nivelHierarquicoMaximoDaLotacao?? && nivelHierarquicoMaximoDaLotacao != "")?string(func.lotacaoPorNivelMaximo(pessoa.lotacao, nivelHierarquicoMaximoDaLotacao?number).descricao,pessoa.lotacao.descricao)},
             [#if funcao?? && funcao == "sim" && pessoa.funcaoConfianca?? && pessoa.funcaoConfianca != ""]
-				ocupante do(a) cargo em comissão/função comissionada de ${pessoa.funcaoConfianca.descricao},
+                ocupante do(a) cargo em comissão/função comissionada de ${pessoa.funcaoConfianca.descricao},
             [/#if]
         [/#if]
     [/#if]
@@ -3722,7 +3517,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 [/#macro]
 
 [#macro extensaoBuscaTextualbs4]
-	<!--	<div class="form-row">
+    <!--	<div class="form-row">
 		<div class="form-group col-md-6">
 			<label for="conteudo">Conte&uacute;do</label>
 	        <input type="text" id="fullText" value="${valFullText}" size="80" name="fullText" class="form-control" />
@@ -3753,24 +3548,24 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
     [/#if]
 
     [#if botao == 'ambos']
-		<input type="button" name="cmdConfCopia" id="cmdConfCopia" onClick="javascript: incluiApplet(true,false)"
-			   value="Autenticar ${emLote!""}" class="btn btn-primary">
-		<input type="button" name="cmdAssinar" id="cmdAssinar" onClick="javascript: incluiApplet(false,false)"
-			   value="Assinar ${emLote!""}" class="btn btn-primary">
+        <input type="button" name="cmdConfCopia" id="cmdConfCopia" onClick="javascript: incluiApplet(true,false)"
+               value="Autenticar ${emLote!""}" class="btn btn-primary">
+        <input type="button" name="cmdAssinar" id="cmdAssinar" onClick="javascript: incluiApplet(false,false)"
+               value="Assinar ${emLote!""}" class="btn btn-primary">
     [#else]
-		<input type="button" name="cmdAssinar" id="cmdAssinar" onClick="javascript: incluiApplet(false)"
-			   value="Assinar ${emLote!""}" class="btn btn-primary">
+        <input type="button" name="cmdAssinar" id="cmdAssinar" onClick="javascript: incluiApplet(false)"
+               value="Assinar ${emLote!""}" class="btn btn-primary">
     [/#if]
     [#if !ext_assinatura_config_remoto]
-		<input type="button" name="cmdConfigurar" id="cmdConfigurar" onClick="javascript: incluiApplet(false,true)"
-			   value="Configurar Assinador" class="btn btn-primary">
+        <input type="button" name="cmdConfigurar" id="cmdConfigurar" onClick="javascript: incluiApplet(false,true)"
+               value="Configurar Assinador" class="btn btn-primary">
     [/#if]
 
 
 
-	<div id="applet"></div>
+    <div id="applet"></div>
 
-	<script type="text/javascript">
+    <script type="text/javascript">
 
 
         function checkAppletStarted(configurar) {
@@ -3908,7 +3703,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 
             checkAppletStarted(configurar);
         }
-	</script>
+    </script>
 [/#macro]
 
 [#macro extensaoAssinador_apagar_depois_de_01_2014]
@@ -3920,24 +3715,24 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
     [/#if]
 
     [#if botao == 'ambos']
-		<input type="button" name="cmdConfCopia" id="cmdConfCopia" onClick="javascript: incluiApplet(true,false)"
-			   value="Conferir Cópia ${emLote!""}" class="btn btn-primary">
-		<input type="button" name="cmdAssinar" id="cmdAssinar" onClick="javascript: incluiApplet(false,false)"
-			   value="Assinar ${emLote!""}" class="btn btn-primary">
+        <input type="button" name="cmdConfCopia" id="cmdConfCopia" onClick="javascript: incluiApplet(true,false)"
+               value="Conferir Cópia ${emLote!""}" class="btn btn-primary">
+        <input type="button" name="cmdAssinar" id="cmdAssinar" onClick="javascript: incluiApplet(false,false)"
+               value="Assinar ${emLote!""}" class="btn btn-primary">
     [#else]
-		<input type="button" name="cmdAssinar" id="cmdAssinar" onClick="javascript: incluiApplet(false)"
-			   value="Assinar ${emLote!""}" class="btn btn-primary">
+        <input type="button" name="cmdAssinar" id="cmdAssinar" onClick="javascript: incluiApplet(false)"
+               value="Assinar ${emLote!""}" class="btn btn-primary">
     [/#if]
     [#if !ext_assinatura_config_remoto]
-		<input type="button" name="cmdConfigurar" id="cmdConfigurar" onClick="javascript: incluiApplet(false,true)"
-			   value="Configurar Assinador" class="btn btn-primary">
+        <input type="button" name="cmdConfigurar" id="cmdConfigurar" onClick="javascript: incluiApplet(false,true)"
+               value="Configurar Assinador" class="btn btn-primary">
     [/#if]
 
 
 
-	<div id="applet"></div>
+    <div id="applet"></div>
 
-	<script type="text/javascript">
+    <script type="text/javascript">
 
 
         function checkAppletStarted(configurar) {
@@ -4074,7 +3869,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 
             checkAppletStarted(configurar);
         }
-	</script>
+    </script>
 [/#macro]
 
 
@@ -4086,24 +3881,24 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
     [/#if]
 
     [#if botao == 'ambos']
-		<input type="button" name="cmdConfCopia" id="cmdConfCopia" onClick="javascript: incluiApplet(true,false)"
-			   value="Conferir Cópia ${emLote!""}" class="btn btn-primary">
-		<input type="button" name="cmdAssinar" id="cmdAssinar" onClick="javascript: incluiApplet(false,false)"
-			   value="Assinar ${emLote!""}" class="btn btn-primary">
+        <input type="button" name="cmdConfCopia" id="cmdConfCopia" onClick="javascript: incluiApplet(true,false)"
+               value="Conferir Cópia ${emLote!""}" class="btn btn-primary">
+        <input type="button" name="cmdAssinar" id="cmdAssinar" onClick="javascript: incluiApplet(false,false)"
+               value="Assinar ${emLote!""}" class="btn btn-primary">
     [#else]
-		<input type="button" name="cmdAssinar" id="cmdAssinar" onClick="javascript: incluiApplet(false)"
-			   value="Assinar ${emLote!""}" class="btn btn-primary">
+        <input type="button" name="cmdAssinar" id="cmdAssinar" onClick="javascript: incluiApplet(false)"
+               value="Assinar ${emLote!""}" class="btn btn-primary">
     [/#if]
     [#if !ext_assinatura_config_remoto]
-		<input type="button" name="cmdConfigurar" id="cmdConfigurar" onClick="javascript: incluiApplet(false,true)"
-			   value="Configurar Assinador" class="btn btn-primary">
+        <input type="button" name="cmdConfigurar" id="cmdConfigurar" onClick="javascript: incluiApplet(false,true)"
+               value="Configurar Assinador" class="btn btn-primary">
     [/#if]
 
 
 
-	<div id="applet"></div>
+    <div id="applet"></div>
 
-	<script type="text/javascript">
+    <script type="text/javascript">
 
 
         function checkAppletStarted(configurar) {
@@ -4241,12 +4036,12 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 
             checkAppletStarted(configurar);
         }
-	</script>
+    </script>
 [/#macro]
 
 [#macro complementoHEAD]
-	<!-- Google Analytics -->
-	<script type="text/javascript">
+    <!-- Google Analytics -->
+    <script type="text/javascript">
 
         var _gaq = _gaq || [];
         _gaq.push(['_setDomainName', 'none']);
@@ -4261,7 +4056,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
             s.parentNode.insertBefore(ga, s);
         })();
 
-	</script>
+    </script>
 [/#macro]
 
 [#macro requerimentoTrf texto fecho="" tamanhoLetra="Normal" _tipo="" vocat=""]
@@ -4278,58 +4073,58 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 
     [@estiloBrasaoCentralizadoTrf tipo=_tipo tamanhoLetra=tl formatarOrgao=true dataAntesDaAssinatura=true]
         [@br/]
-		<center><b><p>${vocat!}</p></b></center>
-		<span style="font-size: tl"> ${texto!}</span>
-		<p style="align: justify; TEXT-INDENT: 0cm">${fecho}</p>
+        <center><b><p>${vocat!}</p></b></center>
+        <span style="font-size: tl"> ${texto!}</span>
+        <p style="align: justify; TEXT-INDENT: 0cm">${fecho}</p>
     [/@estiloBrasaoCentralizadoTrf]
 
 [/#macro]
 
 [#macro cabecalhoCentralizadoPrimeiraPaginaTrf tipo=""]
-	<table style="float:none; clear:both;" width="100%" align="left" border="0" cellpadding="0"
-		   cellspacing="0" bgcolor="#FFFFFF">
-		<tr bgcolor="#FFFFFF">
-			<td width="100%">
-				<table width="100%" border="0" cellpadding="2">
+    <table style="float:none; clear:both;" width="100%" align="left" border="0" cellpadding="0"
+           cellspacing="0" bgcolor="#FFFFFF">
+        <tr bgcolor="#FFFFFF">
+            <td width="100%">
+                <table width="100%" border="0" cellpadding="2">
                     [#--            [#if tipo == "PORTARIA EMARF"]
             <tr>
                 <td width="100%" align="center" valign="bottom"><img src="contextpath/imagens/brasaoemarf.jpg" width="65" height="65" /></td>
             </tr>
             [#else]
 --]
-					<tr>
-						<td width="100%" align="center" valign="bottom"><img src="${_pathBrasao}" width="65"
-																			 height="65"/></td>
-					</tr>
+                    <tr>
+                        <td width="100%" align="center" valign="bottom"><img src="${_pathBrasao}" width="65"
+                                                                             height="65"/></td>
+                    </tr>
 
-					<tr>
-						<td width="100%" align="center">
-							<p style="font-family: AvantGarde Bk BT, Arial; font-size: 11pt;">${_tituloGeral}</p>
-						</td>
-					</tr>
+                    <tr>
+                        <td width="100%" align="center">
+                            <p style="font-family: AvantGarde Bk BT, Arial; font-size: 11pt;">${_tituloGeral}</p>
+                        </td>
+                    </tr>
                     [#if _subtituloGeral?has_content]
-						<tr>
-							<td width="100%" align="center">
-								<p style="font-family: Arial; font-size: 10pt; font-weight: bold;">${_subtituloGeral}</p>
-							</td>
-						</tr>
+                        <tr>
+                            <td width="100%" align="center">
+                                <p style="font-family: Arial; font-size: 10pt; font-weight: bold;">${_subtituloGeral}</p>
+                            </td>
+                        </tr>
                     [/#if]
 
-					<tr>
-						<td width="100%" align="center">
-							<p style="font-family: AvantGarde Bk BT, Arial; font-size: 8pt;">
+                    <tr>
+                        <td width="100%" align="center">
+                            <p style="font-family: AvantGarde Bk BT, Arial; font-size: 8pt;">
                                 [#if mov??]
                                     ${(mov.lotaTitular.orgaoUsuario.descricaoMaiusculas)!}
                                 [#else]
                                     ${(doc.lotaTitular.orgaoUsuario.descricaoMaiusculas)!}
                                 [/#if]</p>
-						</td>
-					</tr>
+                        </td>
+                    </tr>
                     [#--            [/#if] --]
-				</table>
-			</td>
-		</tr>
-	</table>
+                </table>
+            </td>
+        </tr>
+    </table>
 [/#macro]
 
 [#macro estiloBrasaoCentralizadoTrf tipo tamanhoLetra="11pt" formatarOrgao=true numeracaoCentralizada=false dataAntesDaAssinatura=false omitirCodigo=false omitirData=false topoPrimeiraPagina='']
@@ -4341,43 +4136,43 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
     [/@cabecalho]
     [@letra tamanhoLetra]
         [#if !numeracaoCentralizada]
-			<table style="float:none; clear:both;" width="100%" border="0" bgcolor="#FFFFFF">
-				<tr>
-					<td align="left">
+            <table style="float:none; clear:both;" width="100%" border="0" bgcolor="#FFFFFF">
+                <tr>
+                    <td align="left">
                         [#if !omitirCodigo]
-							<p style="font-family:Arial;align:center;font-weight:bold;font-size:11pt;">
-								<br/>[@numeroDJE][#if tipo != ""] ${tipo} SIGA N&ordm; ${(doc.codigo)!} [/#if] [/@numeroDJE]
-							</p>
+                            <p style="font-family:Arial;align:center;font-weight:bold;font-size:11pt;">
+                                <br/>[@numeroDJE][#if tipo != ""] ${tipo} SIGA N&ordm; ${(doc.codigo)!} [/#if] [/@numeroDJE]
+                            </p>
                         [/#if]
-					</td>
-				</tr>
+                    </td>
+                </tr>
                 [#if !dataAntesDaAssinatura && !omitirData]
-					<tr>
-						<td align="right">[@letra tamanho="11pt"]
-								<p>[#if mov??]${mov.dtExtenso!}[#else]${doc.dtExtenso!}[/#if]</p>[/@letra]</td>
-					</tr>
+                    <tr>
+                        <td align="right">[@letra tamanho="11pt"]
+                                <p>[#if mov??]${mov.dtExtenso!}[#else]${doc.dtExtenso!}[/#if]</p>[/@letra]</td>
+                    </tr>
                 [/#if]
-			</table>
+            </table>
         [#else]
-			<table style="float:none; clear:both;" width="100%" border="0" bgcolor="#FFFFFF">
-				<tr>
-					<td align="center">
-						<p style="font-family:Arial;font-weight:bold;font-size:11pt;"><br/>
+            <table style="float:none; clear:both;" width="100%" border="0" bgcolor="#FFFFFF">
+                <tr>
+                    <td align="center">
+                        <p style="font-family:Arial;font-weight:bold;font-size:11pt;"><br/>
                             [@numeroDJE] [#if tipo != ""] ${tipo} SIGA N&ordm; ${(doc.codigo)!} [/#if] [/@numeroDJE]
                             [#if !dataAntesDaAssinatura && doc?? && doc.dtD??] de ${doc.dtD!} de ${doc.dtMMMM!} de ${doc.dtYYYY!}[/#if]
-						</p>
-					</td>
-				</tr>
-			</table>
+                        </p>
+                    </td>
+                </tr>
+            </table>
         [/#if]
 
         [@tituloDJE]
-			<center>${tipo!} ${(doc.codigo)!} de ${doc.dtD!} de ${doc.dtMMMM!} de ${doc.dtYYYY!}</center>
+            <center>${tipo!} ${(doc.codigo)!} de ${doc.dtD!} de ${doc.dtMMMM!} de ${doc.dtYYYY!}</center>
         [/@tituloDJE]
         [#nested]
         [#if dataAntesDaAssinatura]<p
-				style="text-align:center">[#if mov??]${mov.dtExtenso!}[#else]${doc.dtExtenso!}[/#if]</p>[/#if]
-		<p>&nbsp;</p>
+                style="text-align:center">[#if mov??]${mov.dtExtenso!}[#else]${doc.dtExtenso!}[/#if]</p>[/#if]
+        <p>&nbsp;</p>
         [#if mov??]
             [@assinaturaMovCentro formatarOrgao=formatarOrgao/]
         [#else]
@@ -4422,8 +4217,8 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
         [#local v = default/]
     [/#if]
 
-	<div class="form-group" style="margin-bottom:0">
-		<input type="hidden" name="vars" value="${var}"/>
+    <div class="form-group" style="margin-bottom:0">
+        <input type="hidden" name="vars" value="${var}"/>
 
         [#if (alerta!"Não") = 'Sim' && v = ""]
             [#list obrigatorios?split(",") as campo]
@@ -4435,19 +4230,19 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 
         [#if obrigatorio == 'Sim']
             [#local negrito = "font-weight:bold"]
-			<input type="hidden" name="obrigatorios" value="${var}"/>
+            <input type="hidden" name="obrigatorios" value="${var}"/>
         [/#if]
 
         [#if !gerar_formulario!false]
             [#if titulo?? && titulo != ""]<label for="${var}" style="${negrito!};${vermelho!}">${titulo}</label>[/#if]
-			<input onkeypress="javascript: var tecla=(window.event)?event.keyCode:e.which;if((tecla>47 && tecla<58)) return true;  else{  if (tecla==8 || tecla==0) return true;  else  return false;  }"
-				   id="${var}" type="text" name="${var}"
-				   value="${v}" ${jreler!""}${jrelertab!""}${jlargura!""}${jmaxcaracteres!""} class="form-control"/>
-			<div class="invalid-feedback  invalid-feedback-${var}">Preenchimento obrigatório</div>
+            <input onkeypress="javascript: var tecla=(window.event)?event.keyCode:e.which;if((tecla>47 && tecla<58)) return true;  else{  if (tecla==8 || tecla==0) return true;  else  return false;  }"
+                   id="${var}" type="text" name="${var}"
+                   value="${v}" ${jreler!""}${jrelertab!""}${jlargura!""}${jmaxcaracteres!""} class="form-control"/>
+            <div class="invalid-feedback  invalid-feedback-${var}">Preenchimento obrigatório</div>
         [#else]
-			<span class="valor">${v}</span>
+            <span class="valor">${v}</span>
         [/#if]
-	</div>
+    </div>
 [/#macro]
 
 [#macro horaMinuto titulo var reler=false idAjax="" default="" alerta=false obrigatorio=false]
@@ -4459,35 +4254,35 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 
     [#local v = .vars[var]!default]
 
-	<div class="form-group" style="margin-bottom:0">
+    <div class="form-group" style="margin-bottom:0">
         [#if obrigatorio]
             [#local negrito = "font-weight:bold"]
-			<input type="hidden" name="obrigatorios" value="${var}"/>
+            <input type="hidden" name="obrigatorios" value="${var}"/>
         [/#if]
 
         [#if !gerar_formulario!false]
-			<input type="hidden" name="vars" value="${var}"/>
+            <input type="hidden" name="vars" value="${var}"/>
             [#if titulo?? && titulo != ""]<label for="${var}" style="${negrito!};${vermelho!}">${titulo}</label>[/#if]
-			<input type="text" id="${var}" name="${var}" value="${v}" size="6" maxlength="5"
-				   class="form-control  campoHoraMinuto" style="max-width: 70px" placeholder="00:00"/>
-			<div class="invalid-feedback  invalid-feedback-${var}">Preenchimento obrigatório</div>
+            <input type="text" id="${var}" name="${var}" value="${v}" size="6" maxlength="5"
+                   class="form-control  campoHoraMinuto" style="max-width: 70px" placeholder="00:00"/>
+            <div class="invalid-feedback  invalid-feedback-${var}">Preenchimento obrigatório</div>
         [#else]
-			<span class="valor">${v}</span>
+            <span class="valor">${v}</span>
         [/#if]
-	</div>
+    </div>
 [/#macro]
 
 [#macro webservice var url timeout cache=""]
     [#if cache?has_content]
-		<input type="hidden" name="vars" value="${cache}"/>
+        <input type="hidden" name="vars" value="${cache}"/>
     [/#if]
     [#if cache?has_content && .vars[cache]??]
         [#local str=.vars[cache] /]
-		<input type="hidden" name="${cache}" value="${str}">
+        <input type="hidden" name="${cache}" value="${str}">
     [#else]
         [#local payload][#nested][/#local]
         [#local str=func.webservice(url,payload,timeout) /]
-		<input type="hidden" name="${cache}" value="${str?url('UTF-8')}">
+        <input type="hidden" name="${cache}" value="${str?url('UTF-8')}">
     [/#if]
     [#if str?has_content]
         [#local retornoSource="[#assign " + var + "=func.parseXML(str) /]"/]
@@ -4500,15 +4295,15 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 
 [#macro descricao]
     [#if gerar_descricao!false]
-		<!-- descricao -->
+        <!-- descricao -->
         [#nested]
-		<!-- /descricao -->
+        <!-- /descricao -->
     [/#if]
 [/#macro]
 
 [#macro classificacao codigo]
-	<input type="hidden" name="vars" value="codigoClassificacao"/>
-	<input type="hidden" id="codigoClassificacao" name="codigoClassificacao" value="${codigo}"/>
+    <input type="hidden" name="vars" value="codigoClassificacao"/>
+    <input type="hidden" id="codigoClassificacao" name="codigoClassificacao" value="${codigo}"/>
 [/#macro]
 
 [#macro solicitacao tamanhoLetra="Normal" _tipo="FORMULÁRIO" assunto=""]
@@ -4522,13 +4317,13 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
         [#assign tl = "11pt"]
     [/#if]
     [@estiloBrasaoCentralizado tipo=_tipo tamanhoLetra=tl formatarOrgao=false numeracaoCentralizada=false incluirMioloDJE=false]
-		<table style="float:none;" width="100%" border="0" cellpadding="2" cellspacing="0" bgcolor="#FFFFFF">
-			<tr>
-				<td align="left" style="text-align: justify; font-family: Arial; font-size: ${tl};">
-					<br/>Assunto: ${assunto}</td>
-			</tr>
-		</table>
-		<br/>
+        <table style="float:none;" width="100%" border="0" cellpadding="2" cellspacing="0" bgcolor="#FFFFFF">
+            <tr>
+                <td align="left" style="text-align: justify; font-family: Arial; font-size: ${tl};">
+                    <br/>Assunto: ${assunto}</td>
+            </tr>
+        </table>
+        <br/>
         [#nested]
     [/@estiloBrasaoCentralizado]
 [/#macro]
@@ -4550,7 +4345,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 
 [#macro divX2 id="" depende="" suprimirIndependente=false] [#-- macro utilizada na macro pessoaLotacao --]
     [#if suprimirIndependente || depende != ""]
-		<div style="float: left" [#if id != ""] id="${id}"[/#if][#if depende != ""] depende=";${depende};"[/#if]>
+        <div style="float: left" [#if id != ""] id="${id}"[/#if][#if depende != ""] depende=";${depende};"[/#if]>
             [#if id != ""]<!--ajax:${id}-->[/#if][#nested][#if id != ""]<!--/ajax:${id}-->[/#if]</div>
     [/#if]
 [/#macro]
@@ -4562,27 +4357,27 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
             [#if largura != 0]
                 [#if !grupoLarguraTotal??]
                     [#assign grupoLarguraTotal = 0/]
-					<table width="100%">
-					<tr>
+                    <table width="100%">
+                    <tr>
                 [/#if]
                 [#assign grupoLarguraTotal = grupoLarguraTotal + largura/]
-				<td width="${largura}%" valign="top">
+                <td width="${largura}%" valign="top">
             [/#if]
-			<table class="entrevista" width="100%">
+            <table class="entrevista" width="100%">
                 [#if titulo != ""]
-					<tr class="header">
-						<td>${titulo}</td>
-					</tr>
+                    <tr class="header">
+                        <td>${titulo}</td>
+                    </tr>
                 [/#if]
-				<tr>
-					<td>[#nested]</td>
-				</tr>
-			</table>
+                <tr>
+                    <td>[#nested]</td>
+                </tr>
+            </table>
             [#if largura != 0]
-				</td>
+                </td>
                 [#if (grupoLarguraTotal >= 100)]
-					</td>
-					</table>
+                    </td>
+                    </table>
                     [#assign grupoLarguraTotal = 0/]
                 [/#if]
             [/#if]
@@ -4602,20 +4397,20 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
         [@inlineTemplate/]
     [/#if]
 
-	<div style="float:left">    ${titulo!""}[#if titulo != ""]:[/#if]
+    <div style="float:left">    ${titulo!""}[#if titulo != ""]:[/#if]
 
         [#if !gerar_formulario!false]
-			<input type="hidden" name="vars" value="${var}"/>
-			<select name="${var}" [#if reler] onchange="javascript: sbmt([#if idAjax != ""]'${idAjax}'[/#if]);"[/#if]
-					onclick="${onclick}" class="form-control">
+            <input type="hidden" name="vars" value="${var}"/>
+            <select name="${var}" [#if reler] onchange="javascript: sbmt([#if idAjax != ""]'${idAjax}'[/#if]);"[/#if]
+                    onclick="${onclick}" class="form-control">
                 [#list l as opcao]
-					<option[#if v == opcao] selected[/#if] value="${opcao}">${opcao}</option><br/>
+                    <option[#if v == opcao] selected[/#if] value="${opcao}">${opcao}</option><br/>
                 [/#list]
-			</select>
+            </select>
         [#else]
-			<span class="valor">${v}</span>
+            <span class="valor">${v}</span>
         [/#if]
-	</div>
+    </div>
 [/#macro]
 
 [#function acerto orgao=""]
@@ -4645,19 +4440,19 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
     [#assign ultAbertura="" /]
     [#list materias as d]
         [#if ultFecho?? && ultFecho != d.fecho]
-			<div align="center">${ultFecho!}</div><br/>
+            <div align="center">${ultFecho!}</div><br/>
         [/#if]
-		<span style="font-weight: bold">${d.numero}</span>
+        <span style="font-weight: bold">${d.numero}</span>
         [#if ultAbertura != d.abertura]
-			<div align="center">${d.abertura}</div><br/>
+            <div align="center">${d.abertura}</div><br/>
         [/#if]
         ${d.conteudo}
         [#assign ultFecho=d.fecho /]
         [#assign ultAbertura=d.abertura /]
-		<br/>
+        <br/>
     [/#list]
-	<div align="center">${ultFecho!}</div>
-	<br/>
+    <div align="center">${ultFecho!}</div>
+    <br/>
     [#assign ultFecho="" /]
     [#assign ultAbertura="" /]
 [/#macro]
@@ -4667,53 +4462,53 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
     [@entrevista acaoGravar="gravarBIE" acaoExcluir="excluirBIE" acaoCancelar="refazerBIE" acaoFinalizar="finalizarBIE"]
         ${templateInfosComplementaresEntrevista}
         [@grupo titulo="Documentos a Publicar"]
-			<table>
+            <table>
                 [#assign publicacoes = func.consultarDocsDisponiveisParaInclusaoEmBoletim(doc.lotaCadastrante.orgaoUsuario)!/]
                 [#if publicacoes??]
                     [#list publicacoes as ex ]
-						<tr>
-							<td>[@checkbox var="doc_boletim${ex.idDoc!}" titulo="" default="Sim"/]</td>
-							<td><a href="javascript:void(0)"
-								   onclick="javascript: window.open('/sigaex/expediente/doc/exibir.action?popup=true&sigla=${ex.sigla!}', '_new',    'width=700,height=500,scrollbars=yes,resizable')">${ex.codigo!}</a>
-							</td>
-							<td>&nbsp;&nbsp;&nbsp;&nbsp;${ex.dtFinalizacaoDDMMYY!}</td>
-							<td>&nbsp;&nbsp;&nbsp;&nbsp;${(ex.lotaCadastrante.sigla)!}</td>
-							<td>&nbsp;&nbsp;&nbsp;&nbsp;${ex.descrDocumento!}</td>
-							<td>&nbsp;&nbsp;&nbsp;&nbsp;${ex.sigla!}</td>
-							<td>&nbsp;&nbsp;&nbsp;&nbsp;${ex.idDoc!}</td>
-							<td style="padding-left: 30px">
-								<a href="/sigaex/expediente/mov/cancelar_pedido_publicacao_boletim.action?sigla=${ex.sigla!}">Cancelar
-									Pedido</a>
-							</td>
-						</tr>
+                        <tr>
+                            <td>[@checkbox var="doc_boletim${ex.idDoc!}" titulo="" default="Sim"/]</td>
+                            <td><a href="javascript:void(0)"
+                                   onclick="javascript: window.open('/sigaex/expediente/doc/exibir.action?popup=true&sigla=${ex.sigla!}', '_new',    'width=700,height=500,scrollbars=yes,resizable')">${ex.codigo!}</a>
+                            </td>
+                            <td>&nbsp;&nbsp;&nbsp;&nbsp;${ex.dtFinalizacaoDDMMYY!}</td>
+                            <td>&nbsp;&nbsp;&nbsp;&nbsp;${(ex.lotaCadastrante.sigla)!}</td>
+                            <td>&nbsp;&nbsp;&nbsp;&nbsp;${ex.descrDocumento!}</td>
+                            <td>&nbsp;&nbsp;&nbsp;&nbsp;${ex.sigla!}</td>
+                            <td>&nbsp;&nbsp;&nbsp;&nbsp;${ex.idDoc!}</td>
+                            <td style="padding-left: 30px">
+                                <a href="/sigaex/expediente/mov/cancelar_pedido_publicacao_boletim.action?sigla=${ex.sigla!}">Cancelar
+                                    Pedido</a>
+                            </td>
+                        </tr>
                     [/#list]
                 [/#if]
-			</table>
+            </table>
         [/@grupo]
 
         [@grupo titulo="Documentos Selecionados"]
-			<table>
+            <table>
                 [#assign publicacoesPorDoc = (func.consultarDocsInclusosNoBoletim(doc))! /]
                 [#if publicacoesPorDoc??]
                     [#list publicacoesPorDoc as ex]
-						<tr>
-							<td>[@checkbox var="doc_boletim${ex.idDoc!}" titulo="" default="Sim"/]</td>
-							<td><a href="javascript:void(0)"
-								   onclick="javascript: window.open('/sigaex/expediente/doc/exibir.action?popup=true&sigla=${ex.sigla!}', '_new', 'width=700,height=500,scrollbars=yes,resizable')">${ex.codigo!}</a>
-							</td>
-							<td style="padding-left: 30px">&nbsp;&nbsp;&nbsp;&nbsp${ex.dtFinalizacaoDDMMYY!}</td>
-							<td style="padding-left: 30px">&nbsp;&nbsp;&nbsp;&nbsp${ex.lotaCadastrante.sigla!}</td>
-							<td style="padding-left: 30px">&nbsp;&nbsp;&nbsp;&nbsp${ex.descrDocumento!}</td>
-						</tr>
+                        <tr>
+                            <td>[@checkbox var="doc_boletim${ex.idDoc!}" titulo="" default="Sim"/]</td>
+                            <td><a href="javascript:void(0)"
+                                   onclick="javascript: window.open('/sigaex/expediente/doc/exibir.action?popup=true&sigla=${ex.sigla!}', '_new', 'width=700,height=500,scrollbars=yes,resizable')">${ex.codigo!}</a>
+                            </td>
+                            <td style="padding-left: 30px">&nbsp;&nbsp;&nbsp;&nbsp${ex.dtFinalizacaoDDMMYY!}</td>
+                            <td style="padding-left: 30px">&nbsp;&nbsp;&nbsp;&nbsp${ex.lotaCadastrante.sigla!}</td>
+                            <td style="padding-left: 30px">&nbsp;&nbsp;&nbsp;&nbsp${ex.descrDocumento!}</td>
+                        </tr>
                     [/#list]
                 [/#if]
-			</table>
+            </table>
         [/@grupo]
     [/@entrevista]
 
     [@documento]
 
-		<!-- INICIO PRIMEIRO CABECALHO
+        <!-- INICIO PRIMEIRO CABECALHO
 			<table width="100%" border="0" bgcolor="#FFFFFF"><tr><td>
 				<table width="100%" align="left" border="0" bgcolor="#FFFFFF">
 					<tr bgcolor="#FFFFFF">
@@ -4744,7 +4539,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
         [@br/]
         [@br/]
 
-		<!-- INICIO CABECALHO
+        <!-- INICIO CABECALHO
 				<table width="100%" bgcolor="#FFFFFF">
 					<tr>
 						<td valign="bottom" align="center" style="border-width: 0px 0px 1px 0px; border-style: solid; padding-top: 3px">
@@ -4761,43 +4556,43 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
         [#if hBIE??]
             [#list hBIE.topicos as topico]
                 [#if !topico.vazio]
-					<table align="left" border="0" width="100%" bgcolor="#FFFFFF">
-						<tr>
+                    <table align="left" border="0" width="100%" bgcolor="#FFFFFF">
+                        <tr>
                             [#if topico.descr??]
-								<td valign="bottom"
-									style="border-width: 0px 0px 0px 0px; border-style: solid; padding-top: 3px">
-									<h2>${(topico.descr)!}</h2>
-								</td>
+                                <td valign="bottom"
+                                    style="border-width: 0px 0px 0px 0px; border-style: solid; padding-top: 3px">
+                                    <h2>${(topico.descr)!}</h2>
+                                </td>
                             [/#if]
-						</tr>
-					</table>
+                        </tr>
+                    </table>
                     [#if topico.materias??]
                         [@materiasBoletimInterno topico.materias /]
                     [/#if]
                     [#if topico.topicos??]
                         [#list topico.topicos as subTopico]
                             [#if !subTopico.vazio]
-								<span style="page-break-inside: avoid">
+                                <span style="page-break-inside: avoid">
 										[#if subTopico.descr??]<h3 align="right">${(subTopico.descr)!}</h3>[/#if]
                                     [@materiasBoletimInterno subTopico.materias /]
 									</span>
-								<br/>
+                                <br/>
                             [/#if]
                         [/#list]
                     [/#if]
-					<br/><br/>
+                    <br/><br/>
                 [/#if]
             [/#list]
         [/#if]
 
-		<span>&nbsp;</span>
+        <span>&nbsp;</span>
         [@br/]
-		<center><span
-					style="font-size: 15px;">********************************* FIM *********************************</span>
-		</center>
+        <center><span
+                    style="font-size: 15px;">********************************* FIM *********************************</span>
+        </center>
 
 
-		<!-- INICIO PRIMEIRO RODAPE
+        <!-- INICIO PRIMEIRO RODAPE
 			[#assign idOrgaoUsu=""/]
 			[#assign acronimoOrgaoUsu=""/]
 			[#assign descricaoOrgaoUsu=""/]
@@ -4866,7 +4661,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 	        </span>
 		FIM PRIMEIRO RODAPE -->
 
-		<!-- INICIO RODAPE
+        <!-- INICIO RODAPE
 			<table width="100%" border="0" cellpadding="0" bgcolor="#000000">
 				<col></col>
 				<tr>
@@ -4878,7 +4673,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 [/#macro]
 
 [#macro diminuirEspacamento texto=""]
-	<style>
+    <style>
         p {
             margin-bottom: 0px;
             margin-top: 0px;
@@ -4903,7 +4698,7 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
             margin-bottom: 0px;
             margin-top: 0px;
         }
-	</style>
+    </style>
     ${texto}
 [/#macro]
 

@@ -44,7 +44,7 @@
         <div class="container-fluid">
             <div class="card bg-light mb-3">
                 <div class="card-header">
-                    <h5>Dados da Lotação</h5>
+                    <h5>Dados do Cargo</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
