@@ -2656,24 +2656,24 @@ public class ExDocumentoController extends ExController {
 		ExMobil mobPai = null;
 		if (exDocumentoDTO.getMobilPaiSel().buscarPorSigla())
 			mobPai = exDocumentoDTO.getMobilPaiSel().buscarObjeto();
-		
+
 		boolean isEditandoAnexo = exDocumentoDTO.isCriandoAnexo();
 		boolean isCriandoSubprocesso = exDocumentoDTO.getCriandoSubprocesso();
-		
-		if (exDocumentoDTO.getDoc().getExMobilPai() != null) {
-				if (exDocumentoDTO.getDoc().getExMobilPai().isGeral()) {
-					isCriandoSubprocesso = true;
-					exDocumentoDTO.setCriandoSubprocesso(true);
-				} else {
-					isEditandoAnexo = true;
-					exDocumentoDTO.setCriandoAnexo(true);
-				}	
-		}	
-		if(mobPai == null) {
-	            mobPai = exDocumentoDTO.getDoc().getExMobilPai();   
 
-	    }
-        
+		if (exDocumentoDTO.getDoc().getExMobilPai() != null) {
+			if (exDocumentoDTO.getDoc().getExMobilPai().isGeral() && exDocumentoDTO.getDoc().getExMobilPai().doc().isProcesso() && exDocumentoDTO.getDoc().isProcesso()) {
+				isCriandoSubprocesso = true;
+				exDocumentoDTO.setCriandoSubprocesso(true);
+			} else {
+				isEditandoAnexo = true;
+				exDocumentoDTO.setCriandoAnexo(true);
+			}
+		}
+		if(mobPai == null) {
+			mobPai = exDocumentoDTO.getDoc().getExMobilPai();
+
+		}
+
 		exDocumentoDTO.setModelos(Ex
 				.getInstance()
 				.getBL()

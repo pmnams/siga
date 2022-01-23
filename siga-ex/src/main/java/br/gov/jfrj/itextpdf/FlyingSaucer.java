@@ -190,9 +190,10 @@ public class FlyingSaucer implements ConversorHtml {
 				: "<div class=\"doc-footer\">" + corrigirRodape(rodape.strExtraida) + "</div>";
 
 		if (cabecalho != null) {
-			strCabecalho += strPrimeiroRodape + strRodape;
+			//strCabecalho += strPrimeiroRodape + strRodape;
+			strCabecalho += strRodape;
 		} else if (primeiroCabecalho != null) {
-			strPrimeiroCabecalho += strPrimeiroRodape + strRodape;
+			strPrimeiroCabecalho += strRodape;
 		} else if (primeiroRodape != null || rodape != null) {
 			throw new RuntimeException("Não é possível injetar rodapé quando não existe cabeçalho");
 		}
@@ -211,7 +212,7 @@ public class FlyingSaucer implements ConversorHtml {
 		}
 
 		if (primeiroRodape != null) {
-			primeiroRodape = extrair(html, "<!-- INICIO PRIMEIRO RODAPE", "FIM PRIMEIRO RODAPE -->", "");
+			primeiroRodape = extrair(html, "<!-- INICIO PRIMEIRO RODAPE", "FIM PRIMEIRO RODAPE -->", strPrimeiroRodape);
 			html = primeiroRodape.strRestante;
 		}
 

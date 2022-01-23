@@ -2700,7 +2700,7 @@ Pede deferimento.</span><br/><br/><br/>
         [#if incluirMioloDJE]
             [@mioloDJE]
             [#nested]
-            [#if dataAntesDaAssinatura]<p style="text-align:center">[#if mov??]${mov.dtExtenso!}[#else]${doc.dtExtenso!}[/#if]</p>[/#if]
+            [#if dataAntesDaAssinatura]<p style="font-family:Arial;text-align:center">[#if mov??]${mov.dtExtenso!}[#else]${doc.dtExtenso!}[/#if]</p>[/#if]
             <p>&nbsp;</p>
             [#if exibeAssinatura]
             [#if mov??]
@@ -2714,7 +2714,7 @@ Pede deferimento.</span><br/><br/><br/>
             [#nested]
       		[#assign data = func.dataAtual(doc) /]
             [#if dataAntesDaAssinatura]
-            	<p style="text-align:center">
+            	<p style="font-family:Arial;text-align:center">
             	[#if mov??] 
             		${mov.dtExtenso!}
             	[#else] 
