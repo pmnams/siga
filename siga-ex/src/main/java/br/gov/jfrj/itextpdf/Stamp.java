@@ -12,6 +12,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -38,7 +44,6 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfWriter;
-import com.swetake.util.Qrcode;
 
 import br.gov.jfrj.itextpdf.LocalizaAnotacao.LocalizaAnotacaoResultado;
 import br.gov.jfrj.siga.base.Prop;
@@ -426,6 +431,10 @@ public class Stamp {
 			stamp.close();
 			byte[] pdf = bo2.toByteArray();
 			return pdf;
+		} catch (WriterException e) {
+			e.printStackTrace();
+			/// TODO: 23/01/2022 qrcode exception
+			return null;
 		}
 	}
 
@@ -477,41 +486,13 @@ public class Stamp {
 
 	}
 
-	public static java.awt.Image createQRCodeImage(String url) {
-		Qrcode x = new Qrcode();
+	public static java.awt.Image createQRCodeImage(String url) throws WriterException {
+		QRCodeWriter barcodeWriter = new QRCodeWriter();
+		BitMatrix bitMatrix =
+				barcodeWriter.encode(url, BarcodeFormat.QR_CODE, 500, 500,
+						ImmutableMap.of(com.google.zxing.EncodeHintType.MARGIN,0));
 
-		x.setQrcodeErrorCorrect('M'); // 15%
-		x.setQrcodeEncodeMode('B'); // Bynary
-		boolean[][] matrix = x.calQrcode(url.getBytes());
-
-		// Canvas canvas = new Canvas();
-		// java.awt.Image img = canvas.createImage(matrix.length,
-		// matrix.length);
-		// Graphics g = img.getGraphics();
-		// g.setColor(Color.BLACK);
-		// img.getGraphics().clearRect(0, 0, matrix.length, matrix.length);
-		byte ab[] = new byte[matrix.length * matrix.length];
-		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix.length; j++) {
-				if (matrix[j][i]) {
-					// img.getGraphics().drawLine(j, i, j, i);
-					ab[i * matrix.length + j] = 0;
-				} else {
-					ab[i * matrix.length + j] = -1;
-				}
-			}
-		}
-		BufferedImage img = new BufferedImage(matrix.length, matrix.length, BufferedImage.TYPE_BYTE_GRAY);
-		WritableRaster wr = img.getRaster();
-		wr.setDataElements(0, 0, matrix.length, matrix.length, ab);
-
-		// buffered_image.setRGB (0, 0, matrix.length, matrix.length, ab, 0,
-		// matrix.length);
-
-		// java.awt.Image img = Toolkit.getDefaultToolkit().createImage(ab,
-		// matrix.length, matrix.length);
-
-		return img;
+		return MatrixToImageWriter.toBufferedImage(bitMatrix);
 	}
 
 	private static void tarjar(String tarja, PdfContentByte over, final BaseFont helv, Rectangle r) {
