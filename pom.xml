@@ -352,9 +352,14 @@
                 <version>2.0.23</version>
             </dependency>
             <dependency>
-                <groupId>swetake</groupId>
-                <artifactId>qrcode</artifactId>
-                <version>0.1</version>
+                <groupId>com.google.zxing</groupId>
+                <artifactId>core</artifactId>
+                <version>3.3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.zxing</groupId>
+                <artifactId>javase</artifactId>
+                <version>3.3.0</version>
             </dependency>
             <dependency>
                 <groupId>org.ccil.cowan.tagsoup</groupId>
@@ -518,10 +523,6 @@
             <id>jaspersoft-third-party</id>
             <url>https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
         </repository>
-<!--        <repository>-->
-<!--            <id>swetake</id>-->
-<!--            <url>https://itrc.jju.edu.cn/nexus-2.0.6/content/repositories/thirdparty/</url>-->
-<!--        </repository>-->
     </repositories>
     <build>
         <finalName>${project.artifactId}</finalName>

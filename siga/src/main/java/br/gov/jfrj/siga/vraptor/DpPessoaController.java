@@ -395,7 +395,7 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
 
                 result.include("identidade", pessoa.getIdentidade());
                 result.include("orgaoIdentidade", pessoa.getOrgaoIdentidade());
-
+                result.include("nmMatricula", pessoa.getMatricula());
 
                 if (pessoa.getDataNascimento() != null) {
                     result.include("dtNascimento", pessoa.getDtNascimentoDDMMYYYY());
