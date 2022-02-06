@@ -95,15 +95,12 @@ public class LoginController extends SigaController {
 	@Post("public/app/login")
 	@Transacional
 	public void auth(String username, String password, String cont) throws Exception {
-//		try {
+		try {
 			GiService giService = Service.getGiService();
 			String usuarioLogado = giService.login(username, password);
 
 			if (Pattern.matches("\\d+", username) && username.length() == 11) {
 				List<CpIdentidade> lista = new CpDao().consultaIdentidadesCadastrante(username, Boolean.TRUE);
-				/* if (lista.size() > 1) {
-					throw new RuntimeException("Pessoa com mais de um usuário, favor efetuar login com a matrícula!");
-				}*/
 			}
 			if (usuarioLogado == null || usuarioLogado.trim().length() == 0) {
 				StringBuffer mensagem = new StringBuffer();
@@ -126,10 +123,10 @@ public class LoginController extends SigaController {
 			}
 					
 			
-//		} catch (Exception e) {
-//			result.include("loginMensagem", e.getMessage()); // aqui adicionar tente com a senha de rede windows 
-//			result.forwardTo(this).login(cont);
-//		}
+		} catch (Exception e) {
+			result.include("loginMensagem", e.getMessage());
+			result.forwardTo(this).login(cont);
+		}
 	}
 
 	@Get("public/app/logout")
@@ -356,7 +353,7 @@ public class LoginController extends SigaController {
 	
 	private boolean isSenhaUsuarioExpirada(String jsonUsuarioLogado) {		
 		try {
-			return Boolean.valueOf(new JSONObject(jsonUsuarioLogado).getJSONObject("identidade").getBoolean("isSenhaUsuarioExpirada"));
+			return new JSONObject(jsonUsuarioLogado).getJSONObject("identidade").getBoolean("isSenhaUsuarioExpirada");
 		} catch (JSONException e) {
 			Logger.getLogger(LoginController.class).warn("Não foi possível identificar se a senha do usuário estava expirada ao efetuar login!");
 			return false;

@@ -192,5 +192,5 @@
 			<groupId>com.crivano</groupId>
 			<artifactId>swaggerservlet</artifactId>
 		</dependency>
-	</dependencies>
+    </dependencies>
 </project>

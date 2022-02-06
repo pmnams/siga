@@ -46,6 +46,17 @@ public interface WfService extends Remote {
 			ArrayList<String> keys, ArrayList<String> values) throws Exception;
 
 	/**
+	 * Método que obtem informações sobre um procedimento.
+	 *
+	 * @param siglaProcedimento
+	 *            Sigla do procedimento a ser consultado
+	 * @return Retorna um objeto complexo se tudo ocorrer corretamente.
+	 * @throws Exception
+	 */
+	@WebMethod
+	WfProcedimentoWSTO consultarProcedimento(String siglaProcedimento) throws Exception;
+
+	/**
 	 * Varre todas as instancias de todos os Workflows, procurando um tarefa que
 	 * contenha uma action e possua uma variavel de controle mapiada para uma
 	 * variavel de contexto iniciada por "doc_" e seja somente leitura. Se essa

@@ -21,8 +21,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.*;
-
 import br.gov.jfrj.siga.base.AplicacaoException;
 import br.gov.jfrj.siga.base.SigaCalendar;
 import br.gov.jfrj.siga.base.util.Utils;
@@ -40,7 +38,8 @@ import br.gov.jfrj.siga.gc.vraptor.GcInterceptor;
 import br.gov.jfrj.siga.gc.vraptor.SigaLogicResult;
 import br.gov.jfrj.siga.model.ActiveRecord;
 import br.gov.jfrj.siga.model.Objeto;
-import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.SortNatural;
 
 @Entity
 @Table(name = "sigagc.gc_informacao")
@@ -110,7 +109,7 @@ public class GcInformacao extends Objeto {
 
 	@SortNatural
 	@ManyToMany
-	@Cascade({CascadeType.PERSIST})
+	@Cascade({org.hibernate.annotations.CascadeType.PERSIST})
 	@JoinTable(name = "sigagc.gc_informacao_x_tag", joinColumns = @JoinColumn(name = "ID_INFORMACAO"), inverseJoinColumns = @JoinColumn(name = "ID_TAG"))
 	private SortedSet<GcTag> tags;
 
@@ -123,7 +122,7 @@ public class GcInformacao extends Objeto {
 	@Column(name = "NUMERO")
 	private Integer numero;
 
-	@ManyToOne(optional = false)
+	@ManyToOne(cascade=CascadeType.PERSIST, optional = false)
 	@JoinColumn(name = "ID_ARQUIVO")
 	private GcArquivo arq;
 

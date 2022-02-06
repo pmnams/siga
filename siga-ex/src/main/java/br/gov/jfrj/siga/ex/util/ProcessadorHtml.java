@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  * 
  *     This file is part of SIGA.
@@ -249,28 +249,28 @@ public class ProcessadorHtml {
 		// System.out.println(System.currentTimeMillis()
 		// + " - INI canonicalizarHtml");
 
-		final Tidy tidy = new Tidy();
-		tidy.setXmlOut(true);
-		tidy.setXmlPi(true);
-		tidy.setXmlPIs(true);
-		tidy.setXHTML(true);
-		tidy.setFixComments(true);
-		tidy.setFixBackslash(true);
-		tidy.setTidyMark(false);
-		tidy.setCharEncoding(fIso8859 ? Configuration.LATIN1
-				: Configuration.ASCII);
-		tidy.setRawOut(false);
-		tidy.setIndentAttributes(false);
-		tidy.setEncloseBlockText(true);
-		tidy.setEncloseText(true);
-		tidy.setMakeClean(true);
-		tidy.setShowWarnings(false);
-		tidy.setSmartIndent(false);
-		tidy.setSpaces(0);
-		tidy.setTidyMark(false);
-		tidy.setIndentContent(!fRemoverEspacos);
-		
-		tidy.setQuiet(true);
+//		final Tidy tidy = new Tidy();
+//		tidy.setXmlOut(true);
+//		tidy.setXmlPi(true);
+//		tidy.setXmlPIs(true);
+//		tidy.setXHTML(true);
+//		tidy.setFixComments(true);
+//		tidy.setFixBackslash(true);
+//		tidy.setTidyMark(false);
+//		tidy.setCharEncoding(fIso8859 ? Configuration.LATIN1
+//				: Configuration.ASCII);
+//		tidy.setRawOut(false);
+//		tidy.setIndentAttributes(false);
+//		tidy.setEncloseBlockText(true);
+//		tidy.setEncloseText(true);
+//		tidy.setMakeClean(true);
+//		tidy.setShowWarnings(false);
+//		tidy.setSmartIndent(false);
+//		tidy.setSpaces(0);
+//		tidy.setTidyMark(false);
+//		tidy.setIndentContent(!fRemoverEspacos);
+//
+//		tidy.setQuiet(true);
 		//tidy.setErrout(null); // Nato: isso precisou ser removido pois estava fazendo o tidy retornar "" na canonicalização
 
 		s = s.replace("\r\n", "*newline*");
@@ -337,21 +337,23 @@ public class ProcessadorHtml {
 		// else
 		// s = htmlc.getPrettyXmlAsString();
 
-		try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-			tidy.parse(new ByteArrayInputStream(s.getBytes("iso-8859-1")), os);
-			os.flush();
-			s = new String(os.toByteArray(), "iso-8859-1");
-		}
+		s = Jsoup.parse(s).toString();
+
+//		try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+//			tidy.parse(new ByteArrayInputStream(s.getBytes("iso-8859-1")), os);
+//			os.flush();
+//			s = new String(os.toByteArray(), "iso-8859-1");
+//		}
 
 		if (fRemoverTagsDesconhecidos) {
 			s = removerTagsDesconhecidosHtml(s);
 			// Depois precisamos rodar o tidy novamente para recuperar a
 			// formatacao
-			try (ByteArrayOutputStream os2 = new ByteArrayOutputStream()) {
-				tidy.parse(new ByteArrayInputStream(s.getBytes("iso-8859-1")), os2);
-				os2.flush();
-				s = new String(os2.toByteArray(), "iso-8859-1");
-			}
+//			try (ByteArrayOutputStream os2 = new ByteArrayOutputStream()) {
+//				tidy.parse(new ByteArrayInputStream(s.getBytes("iso-8859-1")), os2);
+//				os2.flush();
+//				s = new String(os2.toByteArray(), "iso-8859-1");
+//			}
 		}
 
 		if (fRemoverEspacos)
@@ -390,7 +392,7 @@ public class ProcessadorHtml {
 				"");
 		s = s.replace("<title></title>", "");
 
-		s = s.replace("\r\n", " \r\n");
+		//s = s.replace("\r\n", " \r\n");
 		s = s.replace("  ", " ");
 
 		if (fBodyOnly) {

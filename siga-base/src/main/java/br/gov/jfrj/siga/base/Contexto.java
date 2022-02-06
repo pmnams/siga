@@ -44,7 +44,18 @@ public class Contexto {
 	}
 	
 	public static String urlBase(HttpServletRequest request) {
+		String urlBase = Prop.get("/siga.external.base.url");
+
+		if (urlBase == null || urlBase.trim().length() == 0)
+			urlBase = request.getScheme() + "://"
+					+ request.getServerName() + ":"
+					+ request.getServerPort();
+		return urlBase;
+	}
+
+	public static String internallUrlBase(HttpServletRequest request) {
 		String urlBase = Prop.get("/siga.internal.base.url");
+
 		if (urlBase == null || urlBase.trim().length() == 0)
 			urlBase = request.getScheme() + "://"
 					+ request.getServerName() + ":"

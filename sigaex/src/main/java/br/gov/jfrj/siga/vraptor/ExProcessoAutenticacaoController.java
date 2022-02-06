@@ -19,6 +19,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import br.gov.jfrj.siga.base.client.Hcaptcha;
 import com.auth0.jwt.JWTSigner;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.JWTVerifyException;
@@ -50,7 +51,6 @@ import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.vo.ExDocumentoVO;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.persistencia.ExMobilDaoFiltro;
-import br.gov.jfrj.siga.unirest.proxy.Hcaptcha;
 import org.json.JSONObject;
 
 @Controller
@@ -97,12 +97,12 @@ public class ExProcessoAutenticacaoController extends ExController {
 			return;
 		}
 
-		String gHcaptchaResponse = request.getParameter("h-captcha-response");
+		String gHcaptchaResponse = request.getParameter("captcha-response");
 		boolean success = false;
 		if (gHcaptchaResponse != null) {
 			String hostname = request.getServerName();
 
-			JSONObject body = Hcaptcha.validarRecaptcha(hCaptchaSitePassword, gHcaptchaResponse,
+			JSONObject body = Hcaptcha.validar(hCaptchaSitePassword, gHcaptchaResponse,
 						request.getRemoteAddr());
 
 			if (body.getBoolean("success")) {

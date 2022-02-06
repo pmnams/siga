@@ -162,7 +162,7 @@ public class PrincipalController extends SigaController {
 		if (incluirMatricula == null)
 			incluirMatricula = "";
 
-		String urlBase = Contexto.urlBase(request);
+		String urlBase = Contexto.internallUrlBase(request);
 
 		List<String> lurls = new ArrayList<>();
 

@@ -31,9 +31,9 @@ import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.parser.PessoaLotacaoParser;
 
 public class ExMarcadorBL {
-	private ExMobil mob;
-	private SortedSet<ExMarca> set;
-	private SortedSet<ExMovimentacao> movs;
+	private final ExMobil mob;
+	private final SortedSet<ExMarca> set;
+	private final SortedSet<ExMovimentacao> movs;
 
 	public ExMarcadorBL(SortedSet<ExMarca> set, ExMobil mob) {
 		this.mob = mob;
@@ -70,8 +70,6 @@ public class ExMarcadorBL {
 	/**
 	 * Calcula quais as marcas cada mobil terá com base nas movimentações que foram
 	 * feitas no documento.
-	 * 
-	 * @param mob
 	 */
 	private void acrescentarMarcadores() {
 		acrescentarMarcadoresTemporalidade();
@@ -166,7 +164,7 @@ public class ExMarcadorBL {
 		}
 
 		if (!apensadoAVolumeDoMesmoProcesso && !mob.doc().isPendenteDeAssinatura() && !mob.isJuntado()
-				&& !mob.isEliminado() && !mob.isEmTransitoExterno() && !mob.isArquivado())
+				&& !mob.isEliminado() && !mob.isEmTransitoExterno() && !mob.isArquivado() && !mob.isSobrestado())
 			calcularMarcadoresDeTramite();
 
 		if (!mob.isArquivado())
@@ -199,8 +197,6 @@ public class ExMarcadorBL {
 				}
 			}
 		}
-
-		return;
 	}
 
 	private void acrescentarMarcadoresManuais() {
@@ -248,7 +244,7 @@ public class ExMarcadorBL {
 			// Calcular datas de início e fim
 			Date dtIni = null;
 			Date dtFim = null;
-			if (dtIni == null && mov.getDtParam1() != null && mov.getDtParam2() != null
+			if (mov.getDtParam1() != null && mov.getDtParam2() != null
 					&& marcador.getIdFinalidade().getIdTpExibicao() == CpMarcadorTipoExibicaoEnum.MENOR_DATA)
 				dtIni = mov.getDtParam1().before(mov.getDtParam2()) ? mov.getDtParam1() : mov.getDtParam2();
 			if (dtIni == null && mov.getDtParam1() != null
@@ -403,10 +399,9 @@ public class ExMarcadorBL {
 			}
 			if (m != null && !mob.doc().isEliminado() && !mob.doc().isArquivadoPermanente()) {
 				// Se o perfil foi cadastrado para uma pessoa
-				if (mov.getSubscritor() != null)
-					lotaPerfil = null;
-				else
+				if (mov.getSubscritor() == null)
 					lotaPerfil = mov.getLotaSubscritor();
+
 				acrescentarMarca(m, mov.getDtIniMov(), mov.getSubscritor(), lotaPerfil);
 			}
 		}

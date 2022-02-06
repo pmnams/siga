@@ -542,6 +542,11 @@
 		var ifr = document.getElementById('painel');
 		var ifrp = document.getElementById('paipainel');
 
+		if('${excedeuTamanhoMax}' === 'true' && !($('#radioHTML').hasClass('active') || document.getElementById('radioHTML').checked)) {
+			sigaModal.alerta("Agregação de documentos excedeu o tamanho máximo permitido.");
+			return;
+		}
+
 		if (ifr.addEventListener)
 			ifr.removeEventListener("load", resize, false);
 		else if (ifr.attachEvent)

@@ -18,11 +18,7 @@
  ******************************************************************************/
 package br.gov.jfrj.siga.ex;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
+import javax.persistence.*;
 
 import br.gov.jfrj.siga.dp.CpMarca;
 
@@ -69,11 +65,11 @@ import br.gov.jfrj.siga.dp.CpMarca;
 })
 public class AbstractExMarca extends CpMarca {
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_REF")
 	private ExMobil exMobil;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_MOV")
 	private ExMovimentacao exMovimentacao;
 

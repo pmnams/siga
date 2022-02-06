@@ -11,7 +11,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import br.gov.jfrj.siga.unirest.proxy.Hcaptcha;
+import br.gov.jfrj.siga.base.client.Hcaptcha;
 import org.json.JSONException;
 
 import com.auth0.jwt.JWTSigner;
@@ -223,12 +223,12 @@ public class ExProcessoConsultaPublicaController extends ExController {
 	private boolean isCaptchaValido() throws JSONException {
 		String hCaptchaSitePassword = getHcaptchaSitePassword();
 
-		String gHcaptchaResponse = request.getParameter("h-captcha-response");
+		String gHcaptchaResponse = request.getParameter("captcha-response");
 		boolean success = false;
 		if (gHcaptchaResponse != null) {
 			String hostname = request.getServerName();
 
-			JSONObject body = Hcaptcha.validarRecaptcha(hCaptchaSitePassword, gHcaptchaResponse,
+			JSONObject body = Hcaptcha.validar(hCaptchaSitePassword, gHcaptchaResponse,
 					request.getRemoteAddr());
 
 			if (body.getBoolean("success")) {
