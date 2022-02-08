@@ -86,13 +86,14 @@
                                             class="fas fa-sign-in-alt"></i> Entrar
                                     </button>
                                     <div class="mt-4">
+                                            <%-- Todo--%>
                                             <%--										<a href="/siga/public/app/usuario/incluir_usuario"--%>
                                             <%--											class="btn btn-secondary btn-block mb-2">--%>
                                             <%--											<fmt:message key = "usuario.sounovo"/>--%>
                                             <%--										</a>--%>
-                                        <a href="/siga/public/app/usuario/senha/reset"
-                                           class="btn btn-link btn-block"><strong>Esqueci minha senha</strong>
-                                        </a>
+                                            <%--										<a href="/siga/public/app/usuario/senha/reset" class="btn btn-link btn-block">--%>
+                                            <%--											<strong>Esqueci minha senha</strong>--%>
+                                            <%--										</a>--%>
                                     </div>
 
                                     <c:choose>

@@ -1699,6 +1699,7 @@ Descrição: Esta macro é utilizada pelo Integrador
         }
 
 
+
     </script>
 
     <div id="xstandard_temp" style="display:none">

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -1045,7 +1045,7 @@ public class ExDocumentoController extends ExController {
                                             .getBL()
                                             .excluirAnexosNaoAssinados(getTitular(), getLotaTitular(), mobUlt);
                                 }
-                                if (Ex.getInstance().getComp().pode(ExPodeArquivarCorrente.class, getTitular(),	getLotaTitular(), mobArq)) {
+                                if (Ex.getInstance().getComp().pode(ExPodeArquivarCorrente.class, getTitular(), getLotaTitular(), mobArq)) {
                                     Ex.getInstance()
                                             .getBL()
                                             .arquivarCorrenteAutomatico(dest, getLotaTitular(), mobArq);
@@ -1569,7 +1569,7 @@ public class ExDocumentoController extends ExController {
                 && exDocumentoDTO.getMobilPaiSel().getObjeto() != null && exDocumentoDTO.getMobilPaiSel().getObjeto().getDoc() != null)
             Ex.getInstance().getComp().afirmar("Documento não pode ser incluído no documento " + exDocumentoDTO.getMobilPaiSel().getObjeto().getDoc().getSigla()
                             + " pelo usuário " + getTitular().getSigla() + ". Usuário " + getTitular().getSigla()
-                            + " não possui acesso ao documento " + exDocumentoDTO.getMobilPaiSel().getObjeto().getDoc().getSigla()+".",
+                            + " não possui acesso ao documento " + exDocumentoDTO.getMobilPaiSel().getObjeto().getDoc().getSigla() + ".",
                     ExPodeIncluirDocumento.class, getTitular(), getLotaTitular(), exDocumentoDTO.getMobilPaiSel().getObjeto());
 
         try {
@@ -1711,9 +1711,9 @@ public class ExDocumentoController extends ExController {
                                 "Arquivo vazio não pode ser anexado.");
                     }
                     numBytes = baArquivo.length;
-                    if (numBytes > 10 * 1024 * 1024) {
+                    if (numBytes > 15 * 1024 * 1024) {
                         throw new AplicacaoException(
-                                "Não é permitida a anexação de arquivos com mais de 10MB.");
+                                "Não é permitida a anexação de arquivos com mais de 15MB.");
                     }
                     d.setConteudoBlobPdf(baArquivo);
                     d.setConteudoBlobHtml(null);

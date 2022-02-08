@@ -7,8 +7,8 @@ function testpdf(x) {
     inputFile.parent().find('label[for=arquivo]').html('<i class="far fa-file-pdf"></i>&nbsp;&nbsp;'.concat(inputFile[0].files[0].name));
     inputFile.attr('title', 'arquivo selecionado: '.concat(inputFile[0].files[0].name));
 
-    if (tamanhoArquivo > 10485760) {
-        var mensagem = 'Tamanho do arquivo excede o permitido (10MB)';
+    if (tamanhoArquivo > 15728640) {
+        var mensagem = 'Tamanho do arquivo excede o permitido (15MB)';
         aplicarErro(inputFile, mensagem);
         sigaModal.alerta(mensagem).focus(document.getElementById("arquivo"));
         return false;

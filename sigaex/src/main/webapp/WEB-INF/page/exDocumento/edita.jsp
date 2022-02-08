@@ -466,7 +466,7 @@
 							  <div class="form-group" style="margin-bottom:0">
 							    <div class="custom-file">								    
 								    <input type="file" class="custom-file-input" id="arquivo" name="arquivo" accept="application/pdf" onchange="testpdf(this.form)" title="arquivo">
-								    <label class="custom-file-label" for="arquivo"><i class="far fa-file-pdf"></i>&nbsp;&nbsp;<fmt:message key = "usuario.novodocumento.arquivo"/> (limite de 10MB)</label>								    								   
+								    <label class="custom-file-label" for="arquivo"><i class="far fa-file-pdf"></i>&nbsp;&nbsp;<fmt:message key = "usuario.novodocumento.arquivo"/> (limite de 15MB)</label>
 								    <div class="invalid-feedback  invalid-feedback-arquivo">Selecione o arquivo</div>
 								</div>									    							  
 							  </div>

@@ -4,3 +4,5 @@
 # Allow files and directories
 !/target/**
 !/docker
+
+/docker/swarm
