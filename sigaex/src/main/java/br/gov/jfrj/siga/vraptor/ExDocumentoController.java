@@ -53,6 +53,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import br.com.caelum.vraptor.observer.upload.UploadSizeLimit;
 import br.gov.jfrj.siga.ex.*;
 import org.apache.commons.beanutils.BeanUtils;
 import org.jboss.logging.Logger;
@@ -1761,9 +1762,9 @@ public class ExDocumentoController extends ExController {
                                 "Arquivo vazio não pode ser anexado.");
                     }
                     numBytes = baArquivo.length;
-                    if (numBytes > 10 * 1024 * 1024) {
+                    if (numBytes > 15 * 1024 * 1024) {
                         throw new AplicacaoException(
-                                "Não é permitida a anexação de arquivos com mais de 10MB.");
+                                "Não é permitida a anexação de arquivos com mais de 15MB.");
                     }
                     d.setConteudoBlobPdf(baArquivo);
                     d.setConteudoBlobHtml(null);
@@ -2888,8 +2889,7 @@ public class ExDocumentoController extends ExController {
 
     /**
      * Prepara os dados das Movimentações de um {@link ExDocumento Documento}
-     * {@link MarcadorEnum.SEM_EFEITO.getId() Cancelado} associado a cancelado
-     * associado a uma {@link ExMobil Via} que foi
+     *  associado a uma {@link ExMobil Via} que foi
      * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TORNAR_SEM_EFEITO Cancelada}.
      * Primeiro
      * {@link ExDao#consultarTramitacoesPorMovimentacaoDocumentoCancelado(Long)

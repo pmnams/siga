@@ -46,6 +46,7 @@ import javax.persistence.Transient;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -2565,7 +2566,7 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
         final String sHtml = (new ProcessadorHtml()).canonicalizarHtml(s,
                 false, true, false, false, false);
         if (sHtml != null)
-            setConteudoBlob("doc.htm", sHtml.getBytes("ISO-8859-1"));
+            setConteudoBlob("doc.htm", sHtml.getBytes(StandardCharsets.ISO_8859_1));
         else
             setConteudoBlob("doc.htm", null);
     }
