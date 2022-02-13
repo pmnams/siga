@@ -31,8 +31,7 @@ import br.gov.jfrj.siga.ex.BIE.ExBoletimDoc;
 import br.gov.jfrj.siga.ex.converter.ExTipoDePrincipalConverter;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDePrincipal;
 import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Sort;
-import org.hibernate.annotations.SortType;
+import org.hibernate.annotations.SortNatural;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -44,7 +43,6 @@ import java.util.TreeSet;
  * A class that represents a row in the EX_DOCUMENTO table. You can customize
  * the behavior of this class by editing the class, {@link ExDocumento()}.
  */
-@SuppressWarnings("serial")
 @MappedSuperclass
 @NamedQueries({
         @NamedQuery(name = "obterProximoNumeroSub", query = "select max(doc.numExpediente)+1"
@@ -393,7 +391,7 @@ public abstract class AbstractExDocumento extends ExArquivo implements
 
     @BatchSize(size = 1)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "exDocumento")
-    @Sort(type = SortType.NATURAL)
+    @SortNatural
     private java.util.SortedSet<ExMobil> exMobilSet = new TreeSet<ExMobil>();
 
     @BatchSize(size = 1)
@@ -1164,5 +1162,4 @@ public abstract class AbstractExDocumento extends ExArquivo implements
     public void setTipoDePrincipal(ExTipoDePrincipal tipoDePrincipal) {
         this.tipoDePrincipal = tipoDePrincipal;
     }
-
 }

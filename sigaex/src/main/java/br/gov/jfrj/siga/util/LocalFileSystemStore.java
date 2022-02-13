@@ -14,12 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 
-import javax.servlet.http.HttpServletRequest;
-
-import net.sf.webdav.DavExtensionConfig;
 import net.sf.webdav.ITransaction;
 import net.sf.webdav.IWebdavStore;
 import net.sf.webdav.StoredObject;
@@ -212,46 +207,4 @@ public class LocalFileSystemStore implements IWebdavStore {
 
        return so;
    }
-
-@Override
-public void addNamespace(HashMap<String, String> arg0) {
-	// TODO Auto-generated method stub
-	
-}
-
-@Override
-public Principal createPrincipal(HttpServletRequest arg0) {
-	// TODO Auto-generated method stub
-	return null;
-}
-
-@Override
-public Map<String, String> getAdditionalProperties(String arg0, Vector<String> arg1) {
-	// TODO Auto-generated method stub
-	return null;
-}
-
-@Override
-public DavExtensionConfig getConfig() {
-	// TODO Auto-generated method stub
-	return null;
-}
-
-@Override
-public List<String> getReportSubEntries(String arg0, String arg1) {
-	// TODO Auto-generated method stub
-	return null;
-}
-
-@Override
-public void moveResource(ITransaction arg0, String arg1, String arg2) {
-	// TODO Auto-generated method stub
-	
-}
-
-@Override
-public boolean supportsMoveOperation() {
-	// TODO Auto-generated method stub
-	return false;
-}
 }

@@ -16,7 +16,6 @@
         <module>siga-ldap</module>
         <module>siga-vraptor-module-old</module>
         <module>siga-vraptor-module</module>
-        <module>siga-dump</module>
         <module>siga</module>
         <module>sigawf</module>
         <module>siga-wf</module>
@@ -32,12 +31,9 @@
         <module>siga-oidc</module>
     </modules>
     <properties>
-        <hibernate.version>5.3.7.Final</hibernate.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <siga.versao>develop</siga.versao>
         <siga.version>${project.version}</siga.version>
-        <spring.version>4.0.6.RELEASE</spring.version>
-        <version.jboss.bom.eap>6.2.0-redhat-1</version.jboss.bom.eap>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
     </properties>
@@ -372,11 +368,6 @@
                 <version>0.9.14</version>
             </dependency>
             <dependency>
-                <groupId>nl.captcha</groupId>
-                <artifactId>simplecaptcha</artifactId>
-                <version>1.2.1</version>
-            </dependency>
-            <dependency>
                 <groupId>javax.ws.rs</groupId>
                 <artifactId>jsr311-api</artifactId>
                 <version>1.1</version>
@@ -485,11 +476,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>jsp-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
         </dependency>
@@ -504,22 +490,6 @@
     </dependencies>
     <repositories>
         <repository>
-            <id>github</id>
-            <url>https://raw.githubusercontent.com/projeto-siga/siga-repo/master/repo</url>
-        </repository>
-        <repository>
-            <id>JBoss Thirdparty Releases</id>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-        </repository>
-        <repository>
-            <id>jboss-releases</id>
-            <url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <id>JBoss deprecated</id>
-            <url>https://repository.jboss.org/nexus/content/repositories/deprecated</url>
-        </repository>
-        <repository>
             <id>jaspersoft-third-party</id>
             <url>https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
         </repository>
@@ -533,27 +503,23 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+<!--                    <compilerArgument>-Xlint:unchecked</compilerArgument>-->
+<!--                    <compilerArgument>-Xlint:deprecation</compilerArgument>-->
                 </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.16</version>
+                <version>3.0.0-M5</version>
                 <configuration>
                     <skipTests>true</skipTests>
                 </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.5.3</version>
                 <configuration>
                     <finalName>${project.artifactId}</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.1</version>
-                <configuration></configuration>
             </plugin>
             <plugin>
                 <groupId>org.wildfly.plugins</groupId>
@@ -565,54 +531,4 @@
             </plugin>
         </plugins>
     </build>
-    <reporting>
-        <plugins>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
-                <configuration></configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.3</version>
-            </plugin>
-        </plugins>
-    </reporting>
-    <profiles>
-        <profile>
-            <id>findbugs</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>findbugs-maven-plugin</artifactId>
-                        <version>3.0.3</version>
-                        <executions>
-                            <execution>
-                                <id>analyze-compile</id>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <effort>Max</effort>
-                            <threshold>Low</threshold>
-                            <xmlOutput>true</xmlOutput>
-                            <failOnError>true</failOnError>
-                            <plugins>
-                                <plugin>
-                                    <groupId>com.h3xstream.findsecbugs</groupId>
-                                    <artifactId>findsecbugs-plugin</artifactId>
-                                    <version>LATEST</version>
-                                </plugin>
-                            </plugins>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
