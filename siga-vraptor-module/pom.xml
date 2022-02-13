@@ -49,11 +49,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>jstl</groupId>
-			<artifactId>jstl</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>jsp-api</artifactId>
 			<scope>provided</scope>

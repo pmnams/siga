@@ -27,7 +27,6 @@ import br.gov.jfrj.siga.ex.ExTipoMovimentacao;
 import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.vo.ExMovimentacaoVO;
 import br.gov.jfrj.siga.hibernate.ExDao;
-import net.sf.webdav.DavExtensionConfig;
 import net.sf.webdav.ITransaction;
 import net.sf.webdav.IWebdavStore;
 import net.sf.webdav.StoredObject;
@@ -161,8 +160,6 @@ public class ExWebdavStore implements IWebdavStore {
 		dt = ret.mov.getDtIniMov();
 		o.setCreationDate(dt);
 		o.setLastModified(dt);
-		o.setMimeType(getContentType(ret.mov.getNmArqMov()));
-		o.setEtag("teste");
 		// o.setNullResource(false);
 		// o.setResourceTypes(new ArrayList<String>());
 
@@ -349,59 +346,4 @@ public class ExWebdavStore implements IWebdavStore {
 		log.error(s, t);
 		throw new RuntimeException(s, t);
 	}
-
-	@Override
-	public void addNamespace(HashMap<String, String> arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public Principal createPrincipal(HttpServletRequest req) {
-		Principal p = new Principal() {
-
-			@Override
-			public String getName() {
-				return "TESTE";
-			}
-			
-		};
-		return req.getUserPrincipal();
-	}
-
-	@Override
-	public void destroy() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public Map<String, String> getAdditionalProperties(String arg0, Vector<String> arg1) {
-		return new HashMap<String, String>();
-	}
-
-	@Override
-	public DavExtensionConfig getConfig() {
-		// TODO Auto-generated method stub
-		return new DavExtensionConfig();
-	}
-
-	@Override
-	public List<String> getReportSubEntries(String arg0, String arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void moveResource(ITransaction arg0, String arg1, String arg2) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean supportsMoveOperation() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 }
