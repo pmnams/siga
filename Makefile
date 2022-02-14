@@ -22,8 +22,8 @@ IMAGEFULLNAME=${REPO}/${IMAGENAME}:${verssion}
 
 start-dev: export BASE_PATH = $(shell pwd)
 start-dev:
-	@bash infra/bin/siga-infra.sh deploy siga --dev --add docker/swarm/siga-compose-dev.yaml
-	@bash infra/bin/siga-infra.sh deploy traefik
+	@bash infra/bin/siga-infra.sh deploy siga --dev --add docker/swarm/siga-dev.yaml
+	@bash infra/bin/siga-infra.sh deploy traefik --add docker/swarm/traefik-dev.yaml
 
 stop-dev:
 	@docker stack rm siga

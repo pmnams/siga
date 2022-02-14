@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  traefik:
+    command:
+      - "--entrypoints.dev.address=:9990"
+      - "--entrypoints.debug.address=:8787"
+    ports:
+      - target: 9990
+        published: 9990
+        mode: host
+      - target: 8787
+        published: 8787
+        mode: host

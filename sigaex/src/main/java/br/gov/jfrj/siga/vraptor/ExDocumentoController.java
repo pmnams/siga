@@ -1607,6 +1607,7 @@ public class ExDocumentoController extends ExController {
 
     @Transacional
     @Post("/app/expediente/doc/gravar")
+    @UploadSizeLimit(sizeLimit = 16 * 1024 * 1024, fileSizeLimit = 16 * 1024 * 1024)
     public void gravar(final ExDocumentoDTO exDocumentoDTO,
                        final String[] vars, final String[] campos,
                        final UploadedFile arquivo) {
