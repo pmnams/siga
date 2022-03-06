@@ -93,3 +93,4 @@ sigasr/.tern-project
 docs/_build/
 resultado.txt
 *.eml
+.run

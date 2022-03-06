@@ -3,10 +3,10 @@ version: '3.4'
 services:
   app:
     volumes:
-      - ../siga/:${BASE_PATH:?Defina o path}/siga
-      - ../sigaex/:${BASE_PATH}/sigaex
-      - ../sigawf/:${BASE_PATH}/sigawf
-      - ../sigagc/:${BASE_PATH}/sigagc
+      - ${BASE_PATH:?Defina o path}/siga/:${BASE_PATH}/siga
+      - ${BASE_PATH}/sigaex/:${BASE_PATH}/sigaex
+      - ${BASE_PATH}/sigawf/:${BASE_PATH}/sigawf
+      - ${BASE_PATH}/sigagc/:${BASE_PATH}/sigagc
     deploy:
       labels:
         - "traefik.tcp.routers.manager.entrypoints=dev"

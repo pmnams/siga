@@ -20,14 +20,19 @@ help:
 
 IMAGEFULLNAME=${REPO}/${IMAGENAME}:${verssion}
 
+start-dev-tls: export BASE_PATH = $(shell pwd)
+start-dev-tls:
+	@bash infra/siga-infra.sh deploy siga --dev --tls --add docker/swarm/siga-dev.yaml
+	@bash infra/siga-infra.sh deploy infra --panel --tls --add docker/swarm/traefik-dev.yaml
+
 start-dev: export BASE_PATH = $(shell pwd)
 start-dev:
-	@bash infra/bin/siga-infra.sh deploy siga --dev --add docker/swarm/siga-dev.yaml
-	@bash infra/bin/siga-infra.sh deploy traefik --add docker/swarm/traefik-dev.yaml
+	@bash infra/siga-infra.sh deploy siga --dev --add docker/swarm/siga-dev.yaml
+	@bash infra/siga-infra.sh deploy infra --panel --add docker/swarm/traefik-dev.yaml
 
 stop-dev:
-	@docker stack rm siga
-	@docker stack rm traefik
+	@docker stack rm siga-default
+	@docker stack rm infra
 
 restart-dev:
 	@docker service update siga_app --force
