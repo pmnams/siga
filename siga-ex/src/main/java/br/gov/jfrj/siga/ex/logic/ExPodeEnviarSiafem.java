@@ -9,9 +9,9 @@ import com.crivano.jlogic.*;
 
 public class ExPodeEnviarSiafem extends CompositeExpressionSupport {
 
-    private ExDocumento doc;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final ExDocumento doc;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public ExPodeEnviarSiafem(ExDocumento doc, DpPessoa titular, DpLotacao lotaTitular) {
         this.doc = doc;

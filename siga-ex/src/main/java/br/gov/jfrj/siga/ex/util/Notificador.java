@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -32,9 +32,7 @@ import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.parser.PessoaLotacaoParser;
 import org.jboss.logging.Logger;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class Notificador {
 
@@ -43,14 +41,6 @@ public class Notificador {
     public static int TIPO_NOTIFICACAO_EXCLUSAO = 3;
 
     private static final Logger log = Logger.getLogger(Notificador.class);
-
-    // private static String servidor = "localhost:8080"; // teste
-
-    // private static String servidor = "siga"; // produção
-
-    // private static String servidor = "http://"
-    // + SigaBaseProperties.getString(SigaBaseProperties
-    // .getString("ambiente") + ".servidor.principal");
 
     private static ExDao exDao() {
         return ExDao.getInstance();
@@ -64,11 +54,10 @@ public class Notificador {
      * @param assunto       - Assunto do email
      * @param html          - HTML do email
      * @param txt           - Texto do email
-     * @throws AplicacaoException
      */
     public static void notificar(String destinatarios, String assunto, String html, String txt) throws AplicacaoException {
-        HashSet<String> emails = new HashSet<String>();
-        List<Notificacao> notificacoes = new ArrayList<Notificacao>();
+        HashSet<String> emails = new HashSet<>();
+        List<Notificacao> notificacoes = new ArrayList<>();
 
         if (destinatarios == null)
             return;
@@ -104,9 +93,7 @@ public class Notificador {
     /**
      * Método que notifica as pessoas com perfis vinculados ao documento.
      *
-     * @param mov
      * @param tipoNotificacao - Se é uma gravação, cancelamento ou exclusão de movimentação.
-     * @throws AplicacaoException
      */
     public static void notificarDestinariosEmail(ExMovimentacao mov,
                                                  int tipoNotificacao) throws AplicacaoException {
@@ -121,9 +108,9 @@ public class Notificador {
 
         // lista de destinatários com informações adicionais de perfil e código
         // da movimentação que adicionou o perfil para permitir o cancelamento.
-        HashSet<Destinatario> destinatariosEmail = new HashSet<Destinatario>();
+        HashSet<Destinatario> destinatariosEmail = new HashSet<>();
 
-        List<Notificacao> notificacoes = new ArrayList<Notificacao>();
+        List<Notificacao> notificacoes = new ArrayList<>();
 
         for (PessoaLotacaoParser atendente : mov.mob().getAtendente()) {
             DpLotacao lotaAtendente = atendente.getLotacaoOuLotacaoPrincipalDaPessoa();
@@ -217,7 +204,7 @@ public class Notificador {
             String txt = conteudo.toString();
             String assunto;
 
-            if (dest.tipo == "P")
+            if (Objects.equals(dest.tipo, "P"))
                 assunto = "Notificação Automática -" + mov.getExMobil().getSigla() + "- Movimentação de Documento";
             else /* transferencia */
                 assunto = "Documento transferido para " + dest.sigla;
@@ -237,24 +224,19 @@ public class Notificador {
      * Inclui destinatários na lista baseando-se nas configurações existentes na
      * tabela EX_CONFIGURACAO
      *
-     * @param mov
-     * @param destinatariosEmail
-     * @param m
-     * @throws AplicacaoException
      */
 
     private static void adicionarDestinatariosEmail(ExMovimentacao mov,
                                                     HashSet<Destinatario> destinatariosEmail, ExMovimentacao m, DpPessoa pess, DpLotacao lot)
-            throws AplicacaoException, Exception {
+            throws Exception {
 
         //	Destinatario dest = new Destinatario();
-        HashSet<String> emailsTemp = new HashSet<String>();
+        HashSet<String> emailsTemp = new HashSet<>();
         String sigla;
-        ExPapel papel = new ExPapel();
+        ExPapel papel = null;
         Long idMovPapel = null;
 
         List<ExEmailNotificacao> listaDeEmails = exDao().consultarEmailNotificacao(pess, lot);
-        papel = null;
 
         if (m != null) {
             papel = m.getExPapel();
@@ -372,7 +354,7 @@ public class Notificador {
     }
 
     private static boolean temPermissao(ExTipoFormaDoc tipoFormaDoc,
-                                        ExPapel papel, DpPessoa pessoa, ITipoDeMovimentacao tipoMovimentacao) throws AplicacaoException, Exception {
+                                        ExPapel papel, DpPessoa pessoa, ITipoDeMovimentacao tipoMovimentacao) throws Exception {
 
         return (Ex.getInstance()
                 .getConf()
@@ -385,7 +367,7 @@ public class Notificador {
 
     }
 
-    private static boolean temPermissao(DpPessoa pessoa, DpLotacao lotacao, ExModelo modelo, ITipoDeMovimentacao idTpMov) throws AplicacaoException, Exception {
+    private static boolean temPermissao(DpPessoa pessoa, DpLotacao lotacao, ExModelo modelo, ITipoDeMovimentacao idTpMov) {
 
         return (Ex.getInstance().getConf().podePorConfiguracao(pessoa,
                 lotacao, modelo, idTpMov,
@@ -416,17 +398,13 @@ public class Notificador {
      * Monta o corpo do e-mail que será recebido pelas pessoas com perfis
      * vinculados.
      *
-     * @param dest
-     * @param conteudo
-     * @param conteudoHTML
-     * @param mov
      * @param tipoNotificacao - Se é uma gravação, cancelamento ou exclusão de movimentação.
      */
     private static void prepararTexto(Destinatario dest,
                                       StringBuilder conteudo, StringBuilder conteudoHTML,
                                       ExMovimentacao mov, int tipoNotificacao) {
 
-        if (dest.tipo == "P") {
+        if (Objects.equals(dest.tipo, "P")) {
             // conteúdo texto
             conteudo.append("Documento: ");
             conteudo.append(mov.getExMobil().getSigla());
@@ -438,171 +416,166 @@ public class Notificador {
                 conteudo.append(mov.getExTipoMovimentacao().getDescr());
             }
             if (tipoNotificacao == TIPO_NOTIFICACAO_CANCELAMENTO) {
-                conteudo.append(mov.getExMovimentacaoRef().getDescrTipoMovimentacao() + "(Cancelamento)");
+                conteudo.append(mov.getExMovimentacaoRef().getDescrTipoMovimentacao())
+                        .append("(Cancelamento)");
             }
             if (mov.getCadastrante() != null) {
-                conteudo.append("\nRealizada por '"
-                        + mov.getCadastrante().getNomePessoa() + " (Matrícula: "
-                        + mov.getCadastrante().getMatricula() + ")'.\n\n");
+                conteudo.append("\nRealizada por '")
+                        .append(mov.getCadastrante().getNomePessoa())
+                        .append(" (Matrícula: ")
+                        .append(mov.getCadastrante().getMatricula())
+                        .append(")'.\n\n");
 
             }
 
             if (mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.TRANSFERENCIA
                     || mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.DESPACHO_TRANSFERENCIA) {
                 if (mov.getResp() != null) {
-                    conteudo.append("Destinatário:  <b>"
-                            + mov.getResp().getNomePessoa()
-                            + " (Matrícula: "
-                            + mov.getResp().getMatricula() + ") do (a) "
-                            + mov.getLotaResp().getNomeLotacao()
-                            + " (sigla: " + mov.getLotaResp().getSigla()
-                            + ")" + "</b>");
+                    conteudo.append("Destinatário:  <b>")
+                            .append(mov.getResp().getNomePessoa())
+                            .append(" (Matrícula: ")
+                            .append(mov.getResp().getMatricula())
+                            .append(") do (a) ")
+                            .append(mov.getLotaResp().getNomeLotacao())
+                            .append(" (sigla: ")
+                            .append(mov.getLotaResp().getSigla())
+                            .append(")</b>");
                 } else {
-                    conteudo.append("Lotação Destinatária: <b>"
-                            + mov.getLotaResp().getNomeLotacao()
-                            + " (sigla: "
-                            + mov.getLotaResp().getSigla()
-                            + ")" + "</b>");
+                    conteudo.append("Lotação Destinatária: <b>")
+                            .append(mov.getLotaResp().getNomeLotacao())
+                            .append(" (sigla: ")
+                            .append(mov.getLotaResp().getSigla())
+                            .append(")</b>");
                 }
             }
-            conteudo.append("<p>Para visualizar o documento, ");
-            conteudo.append("clique <a href=\"");
-            conteudo.append(Prop.get("/sigaex.url")
-                    + "/app/expediente/doc/exibir?sigla=");
-            conteudo.append(mov.getExDocumento().getSigla());
-            conteudo.append("\">aqui</a>.</p>");
+            conteudo.append("<p>Para visualizar o documento, clique <a href=\"")
+                    .append(Prop.get("/sigaex.url"))
+                    .append("/app/expediente/doc/exibir?sigla=")
+                    .append(mov.getExDocumento().getSigla())
+                    .append("\">aqui</a>.</p>");
 
             if (dest.papel != null) {
-                conteudo.append("\n\nEste email foi enviado porque ");
-                conteudo.append(dest.sigla);
-                conteudo.append(" tem o perfil de '");
-                conteudo.append(dest.papel);
-                conteudo.append("' no documento ");
-                conteudo.append(mov.getExDocumento().getSigla());
-                conteudo.append(". Caso não deseje mais receber notificações desse documento, clique no link abaixo para se descadastrar:\n\n");
-                conteudo.append(Prop.get("/sigaex.url") + "/app/expediente/mov/cancelar?id=");
-                conteudo.append(dest.idMovPapel);
+                conteudo.append("\n\nEste email foi enviado porque ")
+                        .append(dest.sigla)
+                        .append(" tem o perfil de '")
+                        .append(dest.papel)
+                        .append("' no documento ")
+                        .append(mov.getExDocumento().getSigla())
+                        .append(". Caso não deseje mais receber notificações desse documento, clique no link abaixo para se descadastrar:\n\n")
+                        .append(Prop.get("/sigaex.url"))
+                        .append("/app/expediente/mov/cancelar?id=")
+                        .append(dest.idMovPapel);
             }
 
 
             // conteúdo html
-            conteudoHTML.append("<html><body>");
-
-            conteudoHTML.append("<p>Documento: <b>");
-            conteudoHTML.append(mov.getExMobil().getSigla() + "</b></p>");
-            conteudoHTML.append("<p>Descrição: <b>");
-            conteudoHTML.append(mov.getExDocumento().getDescrDocumento() + "</b></p>");
-            conteudoHTML.append("<p>Movimentação: <b>");
+            conteudoHTML.append("<html><body>")
+                        .append("<p>Documento: <b>")
+                        .append(mov.getExMobil().getSigla())
+                        .append("</b></p>")
+                        .append("<p>Descrição: <b>")
+                        .append(mov.getExDocumento().getDescrDocumento()).append("</b></p>")
+                        .append("<p>Movimentação: <b>");
 
             if (tipoNotificacao == TIPO_NOTIFICACAO_GRAVACAO) {
-                conteudoHTML.append(mov.getExTipoMovimentacao().getDescr() + "</b></p>");
+                conteudoHTML.append(mov.getExTipoMovimentacao().getDescr())
+                        .append("</b></p>");
             }
             if (tipoNotificacao == TIPO_NOTIFICACAO_EXCLUSAO) {
-                conteudoHTML.append(mov.getExTipoMovimentacao().getDescr() + " (Excluída)</b></p>");
+                conteudoHTML.append(mov.getExTipoMovimentacao().getDescr())
+                        .append(" (Excluída)</b></p>");
             }
             if (tipoNotificacao == TIPO_NOTIFICACAO_CANCELAMENTO) {
-                conteudoHTML.append(mov.getExMovimentacaoRef().getDescrTipoMovimentacao()
-                        + "</b></p>.");
+                conteudoHTML.append(mov.getExMovimentacaoRef().getDescrTipoMovimentacao())
+                        .append("</b></p>.");
             }
             if (mov.getCadastrante() != null) {
-                conteudoHTML.append("Realizada por <b>"
-                        + mov.getCadastrante().getNomePessoa() + " (Matrícula: "
-                        + mov.getCadastrante().getMatricula() + ")</b></p>");
+                conteudoHTML.append("Realizada por <b>")
+                        .append(mov.getCadastrante().getNomePessoa())
+                        .append(" (Matrícula: ")
+                        .append(mov.getCadastrante().getMatricula())
+                        .append(")</b></p>");
             }
 
             if (mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.TRANSFERENCIA
                     || mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.DESPACHO_TRANSFERENCIA) {
                 if (mov.getResp() != null) {
-                    conteudoHTML.append("<p>Destinatário:  <b>"
-                            + mov.getResp().getNomePessoa() + " (Matrícula: "
-                            + mov.getResp().getMatricula() + ") do (a) "
-                            + mov.getLotaResp().getNomeLotacao() + " (sigla: "
-                            + mov.getLotaResp().getSigla() + ")" + "</b></p>");
+                    conteudoHTML.append("<p>Destinatário:  <b>")
+                            .append(mov.getResp().getNomePessoa())
+                            .append(" (Matrícula: ")
+                            .append(mov.getResp().getMatricula())
+                            .append(") do (a) ")
+                            .append(mov.getLotaResp().getNomeLotacao())
+                            .append(" (sigla: ")
+                            .append(mov.getLotaResp().getSigla())
+                            .append(")</b></p>");
                 } else {
-                    conteudoHTML.append("<p>Lotação Destinatária: <b>"
-                            + mov.getLotaResp().getNomeLotacao() + " (sigla: "
-                            + mov.getLotaResp().getSigla() + ")" + "</b></p>");
+                    conteudoHTML.append("<p>Lotação Destinatária: <b>")
+                            .append(mov.getLotaResp().getNomeLotacao())
+                            .append(" (sigla: ")
+                            .append(mov.getLotaResp().getSigla())
+                            .append(")</b></p>");
                 }
             }
 
-            conteudoHTML.append("<p>Para visualizar o documento, ");
-            conteudoHTML.append("clique <a href=\"");
-            conteudoHTML.append(Prop.get("/sigaex.url")
-                    + "/app/expediente/doc/exibir?sigla=");
-            conteudoHTML.append(mov.getExDocumento().getSigla());
-            conteudoHTML.append("\">aqui</a>.</p>");
+            conteudoHTML.append("<p>Para visualizar o documento, ")
+                    .append("clique <a href=\"")
+                    .append(Prop.get("/sigaex.url")).append("/app/expediente/doc/exibir?sigla=")
+                    .append(mov.getExDocumento().getSigla())
+                    .append("\">aqui</a>.</p>");
 
             if (dest.papel != null) {
-                conteudoHTML.append("<p>Este email foi enviado porque <b>");
-                conteudoHTML.append(dest.sigla);
-                conteudoHTML.append(" </b> tem o perfil de '");
-                conteudoHTML.append(dest.papel);
-                conteudoHTML.append("' no documento ");
-                conteudoHTML.append(mov.getExDocumento().getSigla());
-                conteudoHTML
-                        .append(". <br> Caso não deseje mais receber notificações desse documento, clique <a href=\"");
-                conteudoHTML.append(Prop.get("/sigaex.url") + "/app/expediente/mov/cancelar?id=");
-                conteudoHTML.append(dest.idMovPapel);
-                conteudoHTML.append("\">aqui</a> para descadastrar.</p>");
+                conteudoHTML.append("<p>Este email foi enviado porque <b>")
+                        .append(dest.sigla)
+                        .append(" </b> tem o perfil de '")
+                        .append(dest.papel)
+                        .append("' no documento ")
+                        .append(mov.getExDocumento().getSigla())
+                        .append(". <br> Caso não deseje mais receber notificações desse documento, clique <a href=\"")
+                        .append(Prop.get("/sigaex.url")).append("/app/expediente/mov/cancelar?id=")
+                        .append(dest.idMovPapel)
+                        .append("\">aqui</a> para descadastrar.</p>");
             }
             conteudoHTML.append("</body></html>");
         } else {
             String mensagemTeste = Ex.getInstance().getBL().mensagemDeTeste();
 
-            conteudo.append("O documento ");
-
-            conteudo.append(dest.siglaMobil);
-
-            conteudo.append(", com descrição '");
-
-            conteudo.append(dest.descrDocumento);
-
-            conteudo.append("', foi transferido para ");
-
-            conteudo.append(dest.sigla);
-
-            conteudo.append(" e aguarda recebimento.\n\n");
-
-            conteudo.append("Para visualizar o documento, ");
-
-            conteudo.append("clique no link abaixo:\n\n");
-
-            conteudo.append(Prop.get("/sigaex.url") + "/app/expediente/doc/exibir?sigla=");
-
-            conteudo.append(dest.siglaMobil);
+            conteudo.append("O documento ")
+                    .append(dest.siglaMobil)
+                    .append(", com descrição '")
+                    .append(dest.descrDocumento)
+                    .append("', foi transferido para ")
+                    .append(dest.sigla)
+                    .append(" e aguarda recebimento.\n\n")
+                    .append("Para visualizar o documento, ")
+                    .append("clique no link abaixo:\n\n")
+                    .append(Prop.get("/sigaex.url"))
+                    .append("/app/expediente/doc/exibir?sigla=")
+                    .append(dest.siglaMobil);
 
             if (mensagemTeste != null)
-                conteudo.append("\n " + mensagemTeste + "\n");
+                conteudo.append("\n ")
+                        .append(mensagemTeste)
+                        .append("\n");
 
-            conteudoHTML.append("<html><body>");
-
-            conteudoHTML.append("<p>O documento <b>");
-
-            conteudoHTML.append(dest.siglaMobil);
-
-            conteudoHTML.append("</b>, com descrição '<b>");
-
-            conteudoHTML.append(dest.descrDocumento);
-
-            conteudoHTML.append("</b>', foi transferido para <b>");
-
-            conteudoHTML.append(dest.sigla);
-
-            conteudoHTML.append("</b> e aguarda recebimento.</p>");
-
-            conteudoHTML.append("<p>Para visualizar o documento, ");
-
-            conteudoHTML.append("clique <a href=\"");
-
-            conteudoHTML
-                    .append(Prop.get("/sigaex.url") + "/app/expediente/doc/exibir?sigla=");
-
-            conteudoHTML.append(dest.siglaMobil);
-
-            conteudoHTML.append("\">aqui</a>.</p>");
+            conteudoHTML.append("<html><body>")
+                    .append("<p>O documento <b>")
+                    .append(dest.siglaMobil)
+                    .append("</b>, com descrição '<b>")
+                    .append(dest.descrDocumento)
+                    .append("</b>', foi transferido para <b>")
+                    .append(dest.sigla)
+                    .append("</b> e aguarda recebimento.</p>")
+                    .append("<p>Para visualizar o documento, ")
+                    .append("clique <a href=\"")
+                    .append(Prop.get("/sigaex.url")).append("/app/expediente/doc/exibir?sigla=")
+                    .append(dest.siglaMobil)
+                    .append("\">aqui</a>.</p>");
 
             if (mensagemTeste != null)
-                conteudoHTML.append("<p><b>" + mensagemTeste + "</b></p>");
+                conteudoHTML.append("<p><b>")
+                        .append(mensagemTeste)
+                        .append("</b></p>");
 
             conteudoHTML.append("</body></html>");
         }
@@ -618,7 +591,7 @@ public class Notificador {
      */
     static class CorreioThread extends Thread {
 
-        private List<Notificacao> notificacoes;
+        private final List<Notificacao> notificacoes;
 
         public CorreioThread(List<Notificacao> notificacoes) {
             super();
@@ -629,12 +602,13 @@ public class Notificador {
         public void run() {
             String txt;
             String html;
+
             try {
                 for (Notificacao not : notificacoes) {
                     txt = not.txt;
                     html = not.html;
                     Correio.enviar(null,
-                            not.dest.emails.toArray(new String[not.dest.emails.size()]),
+                            not.dest.emails.toArray(new String[0]),
                             not.assunto, txt, html);
                 }
 
@@ -668,7 +642,7 @@ public class Notificador {
         public Long idMovPapel;
         public String siglaMobil;
         public String descrDocumento;
-        public HashSet<String> emails = new HashSet<String>();
+        public HashSet<String> emails;
 
         public Destinatario(String tipo, String sigla, String papel,
                             Long idMovPapel, String siglaMobil, String descrDocumento,

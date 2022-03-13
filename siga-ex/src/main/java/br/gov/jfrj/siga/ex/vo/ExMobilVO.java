@@ -43,30 +43,28 @@ public class ExMobilVO extends ExVO {
     transient Logger log = Logger.getLogger(ExMobilVO.class.getCanonicalName());
 
     transient ExMobil mob;
-    transient List<ExMarca> marcasAtivas = new ArrayList<ExMarca>();
+    transient List<ExMarca> marcasAtivas = new ArrayList<>();
 
     String sigla;
     boolean isGeral;
-    List<ExMobilVO> apensos = new ArrayList<ExMobilVO>();
-    // List<ExDocumentoVO> filhos = new ArrayList<ExDocumentoVO>();
-    List<ExDocumentoVO> expedientesFilhosNaoCancelados = new ArrayList<ExDocumentoVO>();
-    List<ExDocumentoVO> processosFilhosNaoCancelados = new ArrayList<ExDocumentoVO>();
+    List<ExMobilVO> apensos = new ArrayList<>();
+    List<ExDocumentoVO> expedientesFilhosNaoCancelados = new ArrayList<>();
+    List<ExDocumentoVO> processosFilhosNaoCancelados = new ArrayList<>();
 
-    List<ExMovimentacaoVO> anexosNaoAssinados = new ArrayList<ExMovimentacaoVO>();
-    List<ExMovimentacaoVO> despachosNaoAssinados = new ArrayList<ExMovimentacaoVO>();
-    List<ExDocumentoVO> expedientesFilhosNaoJuntados = new ArrayList<ExDocumentoVO>();
-    List<ExMobilVO> expedientesJuntadosNaoAssinados = new ArrayList<ExMobilVO>();
-    List<ExMovimentacaoVO> pendenciasDeAnexacao = new ArrayList<ExMovimentacaoVO>();
-    List<ExMovimentacaoVO> pendenciasDeColaboracao = new ArrayList<ExMovimentacaoVO>();
+    List<ExMovimentacaoVO> anexosNaoAssinados = new ArrayList<>();
+    List<ExMovimentacaoVO> despachosNaoAssinados = new ArrayList<>();
+    List<ExDocumentoVO> expedientesFilhosNaoJuntados = new ArrayList<>();
+    List<ExMobilVO> expedientesJuntadosNaoAssinados = new ArrayList<>();
+    List<ExMovimentacaoVO> pendenciasDeAnexacao = new ArrayList<>();
+    List<ExMovimentacaoVO> pendenciasDeColaboracao = new ArrayList<>();
     Long pendenciaProximoModelo = null;
 
-    List<ExMovimentacaoVO> movs = new ArrayList<ExMovimentacaoVO>();
-    List<DuracaoVO> duracoes = new ArrayList<DuracaoVO>();
+    List<ExMovimentacaoVO> movs = new ArrayList<>();
+    List<DuracaoVO> duracoes = new ArrayList<>();
     Long byteCount;
     Integer pagInicial;
     Integer pagFinal;
     String tamanhoDeArquivo;
-    boolean ocultar;
     Long id;
     boolean podeTramitar;
     boolean podeAnotar;
@@ -270,7 +268,7 @@ public class ExMobilVO extends ExVO {
                     if (d.getDuracao().endsWith("m"))
                         d.setDuracao(d.getDuracao() + "in");
                 } else {
-                    d.setDuracao(Long.toString(l) + " dia"
+                    d.setDuracao(l + " dia"
                             + (l == 1L ? "" : "s"));
                 }
                 // movVOUlt.duracaoSpan = duracaoSpan;
@@ -337,12 +335,6 @@ public class ExMobilVO extends ExVO {
         }
     }
 
-    /**
-     * @param mob
-     * @param titular
-     * @param lotaTitular
-     * @throws Exception
-     */
     private void addAcoes(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
 
         if (!mob.isGeral()) {
@@ -470,9 +462,7 @@ public class ExMobilVO extends ExVO {
                                 + mob.getDescricaoUltimaMovimentacaoNaoCancelada()
                                 + ")?").classe("once").build());
             }
-            listaMovimentacoesNaoCancelavel = null;
         }
-        ultimaMovNaoCancelada = null;
 
         // exibir+completo,
         // confirmacao
@@ -607,7 +597,7 @@ public class ExMobilVO extends ExVO {
         return sigla;
     }
 
-    public List getApensos() {
+    public List<ExMobilVO> getApensos() {
         return apensos;
     }
 
@@ -615,23 +605,23 @@ public class ExMobilVO extends ExVO {
      * public List getFilhos() { return filhos; }
      */
 
-    public List getExpedientesFilhosNaoCancelados() {
+    public List<ExDocumentoVO> getExpedientesFilhosNaoCancelados() {
         return expedientesFilhosNaoCancelados;
     }
 
-    public List getAnexosNaoAssinados() {
+    public List<ExMovimentacaoVO> getAnexosNaoAssinados() {
         return anexosNaoAssinados;
     }
 
-    public List getDespachosNaoAssinados() {
+    public List<ExMovimentacaoVO> getDespachosNaoAssinados() {
         return despachosNaoAssinados;
     }
 
-    public List getExpedientesFilhosNaoJuntados() {
+    public List<ExDocumentoVO> getExpedientesFilhosNaoJuntados() {
         return expedientesFilhosNaoJuntados;
     }
 
-    public List getProcessosFilhosNaoCancelados() {
+    public List<ExDocumentoVO> getProcessosFilhosNaoCancelados() {
         return processosFilhosNaoCancelados;
     }
 

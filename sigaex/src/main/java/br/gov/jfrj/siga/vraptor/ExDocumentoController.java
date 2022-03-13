@@ -28,6 +28,7 @@ import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.observer.download.Download;
 import br.com.caelum.vraptor.observer.download.InputStreamDownload;
+import br.com.caelum.vraptor.observer.upload.UploadSizeLimit;
 import br.com.caelum.vraptor.observer.upload.UploadedFile;
 import br.com.caelum.vraptor.view.Results;
 import br.gov.jfrj.siga.base.*;
@@ -1330,10 +1331,15 @@ public class ExDocumentoController extends ExController {
                 Ex.getInstance().getBL().receber(getCadastrante(), getTitular(), getLotaTitular(), exDocumentoDto.getMob(), new Date());
                 ExDao.getInstance().em().refresh(exDocumentoDto.getMob());
             }
-        } else if (Ex.getInstance().getComp().pode(ExPodeReceber.class, getTitular(), getLotaTitular(), exDocumentoDto.getMob())
-                && !exDocumentoDto.getMob().getUltimaMovimentacao(ExTipoDeMovimentacao.TRANSFERENCIA).getCadastrante().equivale(getTitular())
-                && !exDocumentoDto.getMob().isJuntado()) {
-            recebimentoPendente = true;
+        } else {
+            ExMovimentacao mov = exDocumentoDto.getMob().getUltimaMovimentacaoNaoCancelada(ExTipoDeMovimentacao.TRANSFERENCIA);
+
+            if (Ex.getInstance().getComp().pode(ExPodeReceber.class, getTitular(), getLotaTitular(),exDocumentoDto.getMob())
+                    && !exDocumentoDto.getMob().isEmTransitoExterno()
+                    && (mov.getCadastrante() == null || !mov.getCadastrante().equivale(getTitular()))
+                    && !exDocumentoDto.getMob().isJuntado()) {
+                recebimentoPendente = true;
+            }
         }
 
         final ExDocumentoVO docVO = new ExDocumentoVO(exDocumentoDto.getDoc(),
@@ -2799,9 +2805,9 @@ public class ExDocumentoController extends ExController {
      * {@link ExDocumento Documento} ativo. Primeiro
      * {@link ExDao#consultarTramitacoesPorMovimentacao(Long) pesquisa pelas
      * Movimentações da Via} e depois separa os
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_RECEBIMENTO Recebimentos} e os
-     * associa com as {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TRANSFERENCIA
-     * Tramitações} de origem.
+     * {@link} e os
+     * associa com as {@link
+     * } de origem.
      *
      * @param idMobil {@link ExMobil#getIdMobil() ID} da {@link ExMobil Via}
      */
@@ -2877,28 +2883,28 @@ public class ExDocumentoController extends ExController {
      * {@link ExMovimentacao#getDtTimestamp()}) . As movimentações retornadas devm
      * ser dos seguintes {@link ExMovimentacao#getExTipoMovimentacao() Tipos}:
      * <ul>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TRANSFERENCIA }
+     * <li>{@link}
      * (Tramitação)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_RECEBIMENTO }</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_JUNTADA } (Juntada)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_ARQUIVAMENTO_CORRENTE }
+     * <li>{@link}</li>
+     * <li>{@link} (Juntada)</li>
+     * <li>{@link}
      * (Arquivamento Corrente)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_ARQUIVAMENTO_INTERMEDIARIO }
+     * <li>{@link}
      * (Arquivamento Intermediário)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_DESARQUIVAMENTO_CORRENTE }
+     * <li>{@link}
      * (Desarquivamento)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_DESARQUIVAMENTO_INTERMEDIARIO }
+     * <li>{@link}
      * (Desarquivamento Intermediário)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_CANCELAMENTO_JUNTADA }</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_CANCELAMENTO_DE_MOVIMENTACAO }
+     * <li>{@link}</li>
+     * <li>{@link}
      * (Cancelamento de Movimentação)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TORNAR_SEM_EFEITO }
+     * <li>{@link}
      * (Cancelamento)</li>
      * </ul>
      * As movimentações do tipo
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_RECEBIMENTO } não serão exibidas.
+     * {@link } não serão exibidas.
      * Elas são apenas usadas para indicar a hora de recebimento da Movimentação de
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TRANSFERENCIA } imediatamente
+     * {@link  } imediatamente
      * anterior. <br>
      * Se a flag <code>docCancelado</code> for <code>true</code> serão retornadas
      * todas as movimentações das vias de documento.

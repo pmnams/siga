@@ -9,7 +9,7 @@ public enum CpTipoDeMovimentacao implements ITipoDeMovimentacao {
 
     NENHUMA(0, "NENHUMA");
 
-    private static Map<Integer, ITipoDeMovimentacao> map = new HashMap<>();
+    private static final Map<Integer, ITipoDeMovimentacao> map = new HashMap<>();
 
     private final int id;
     private final String descr;

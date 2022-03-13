@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -48,6 +48,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.EncodedKeySpec;
@@ -62,7 +63,6 @@ import static java.util.Objects.nonNull;
  * be customized as it is never re-generated after being created.
  */
 
-@SuppressWarnings("serial")
 @Entity
 @BatchSize(size = 500)
 @Table(name = "siga.ex_movimentacao")
@@ -78,7 +78,6 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
     /**
      * Constructor of ExMovimentacao instances given a simple primary key.
      *
-     * @param idMov
      */
     public ExMovimentacao(final java.lang.Long idMov) {
         super(idMov);
@@ -89,8 +88,8 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
         return super.getIdMov();
     }
 
-    public String getConteudoBlobString() throws UnsupportedEncodingException {
-        return new String(getConteudoBlobMov2(), "ISO-8859-1");
+    public String getConteudoBlobString() {
+        return new String(getConteudoBlobMov2(), StandardCharsets.ISO_8859_1);
     }
 
     public String getConteudoBlobPdfB64() {
@@ -117,7 +116,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
     }
 
     public String getLotaPublicacao() {
-        Map<String, String> atributosXML = new HashMap<String, String>();
+        Map<String, String> atributosXML;
         try {
             String xmlString = this.getConteudoXmlString("boletimadm");
             if (xmlString != null) {
@@ -133,7 +132,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
     }
 
     public String getDescrPublicacao() {
-        Map<String, String> atributosXML = new HashMap<String, String>();
+        Map<String, String> atributosXML;
         try {
             String xmlString = this.getConteudoXmlString("boletimadm");
             if (xmlString != null) {
@@ -368,8 +367,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
      * contrário.
      */
     public int getNumVia2() {
-        return getExMobil().isVia() ? getExMobil().getNumSequencia().intValue()
-                : 0;
+        return getExMobil().isVia() ? getExMobil().getNumSequencia() : 0;
     }
 
     /**
@@ -398,9 +396,9 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
         // Trata o caso de alguma parâmetro ser null
         if (idTpMov == null && idTpMov2 == null)
             return 0;
-        if (idTpMov == null && idTpMov2 != null)
+        if (idTpMov == null)
             return Integer.MAX_VALUE;
-        if (idTpMov != null && idTpMov2 == null)
+        if (idTpMov2 == null)
             return Integer.MIN_VALUE;
 
         int i = tpMovDesempate.indexOf(idTpMov);
@@ -502,7 +500,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
     public void setConteudoBlob(final String nome, final byte[] conteudo) {
         final Compactador zip = new Compactador();
         final byte[] arqZip = getConteudoBlobMov2();
-        byte[] conteudoZip = null;
+        byte[] conteudoZip;
         if (arqZip == null || (zip.listarStream(arqZip) == null)) {
             if (conteudo != null) {
                 conteudoZip = zip.compactarStream(nome, conteudo);
@@ -527,11 +525,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
         if (getConteudoBlobHtml() == null) {
             return null;
         }
-        try {
-            return new String(getConteudoBlobHtml(), "ISO-8859-1");
-        } catch (UnsupportedEncodingException e) {
-            return new String(getConteudoBlobHtml());
-        }
+        return new String(getConteudoBlobHtml(), StandardCharsets.ISO_8859_1);
     }
 
     public byte[] getConteudoBlobPdfNecessario() {
@@ -575,12 +569,11 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
         return getConteudoBlob(nome);
     }
 
-    public String getConteudoXmlString(String nome)
-            throws UnsupportedEncodingException {
+    public String getConteudoXmlString(String nome) {
 
         byte[] xmlByte = this.getConteudoBlobXML(nome);
         if (xmlByte != null)
-            return new String(xmlByte, "ISO-8859-1");
+            return new String(xmlByte, StandardCharsets.ISO_8859_1);
 
         return null;
     }
@@ -602,7 +595,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
     public void setConteudoBlobHtmlString(final String s) throws Exception {
         final String sHtml = (new ProcessadorHtml()).canonicalizarHtml(s,
                 false, true, false, false, false);
-        setConteudoBlob("doc.htm", sHtml.getBytes("ISO-8859-1"));
+        setConteudoBlob("doc.htm", sHtml.getBytes(StandardCharsets.ISO_8859_1));
     }
 
     /**
@@ -613,7 +606,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
     public java.lang.String getNmFuncao() {
         if (getNmFuncaoSubscritor() == null)
             return null;
-        String a[] = getNmFuncaoSubscritor().split(";");
+        String[] a = getNmFuncaoSubscritor().split(";");
         if (a.length < 1)
             return null;
         if (a[0].length() == 0)
@@ -669,7 +662,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
     public java.lang.String getNmLotacao() {
         if (getNmFuncaoSubscritor() == null)
             return null;
-        String a[] = getNmFuncaoSubscritor().split(";");
+        String[] a = getNmFuncaoSubscritor().split(";");
         if (a.length < 2)
             return null;
         if (a[1].length() == 0)
@@ -685,7 +678,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
     public java.lang.String getNmLocalidade() {
         if (getNmFuncaoSubscritor() == null)
             return null;
-        String a[] = getNmFuncaoSubscritor().split(";");
+        String[] a = getNmFuncaoSubscritor().split(";");
         if (a.length < 3)
             return null;
         if (a[2].length() == 0)
@@ -701,7 +694,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
     public java.lang.String getNmSubscritor() {
         if (getNmFuncaoSubscritor() == null)
             return null;
-        String a[] = getNmFuncaoSubscritor().split(";");
+        String[] a = getNmFuncaoSubscritor().split(";");
         if (a.length < 4)
             return null;
         if (a[3].length() == 0)
@@ -752,11 +745,11 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
     }
 
     @Override
-    public String getHtmlComReferencias() throws Exception {
+    public String getHtmlComReferencias() {
         return getConteudoBlobHtmlStringComReferencias();
     }
 
-    private String getConteudoBlobHtmlStringComReferencias() throws Exception {
+    private String getConteudoBlobHtmlStringComReferencias() {
         String sHtml = getConteudoBlobHtmlString();
         ProcessadorReferencias pr = new ProcessadorReferencias();
         pr.ignorar(this.getExMobil().getExDocumento().getSigla());
@@ -878,11 +871,8 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
      * Retorna se uma movimentação possui assinaturas com senha.
      */
     public boolean temAssinaturasComSenha() {
-        if (getApenasAssinaturasComSenha() != null
-                && getApenasAssinaturasComSenha().size() > 0)
-            return true;
-
-        return false;
+        return getApenasAssinaturasComSenha() != null
+                && getApenasAssinaturasComSenha().size() > 0;
     }
 
     public String getSiglaAssinatura() {
@@ -904,7 +894,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
     }
 
     public Set<ExMovimentacao> getAssinaturasDigitais() {
-        TreeSet<ExMovimentacao> movs = new TreeSet<ExMovimentacao>();
+        TreeSet<ExMovimentacao> movs = new TreeSet<>();
         movs.addAll(getApenasAssinaturas());
         movs.addAll(getApenasConferenciasCopia());
         return movs;
@@ -917,7 +907,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
      * @return Coleção de movimentações de assinaturas digitais.
      */
     public Set<ExMovimentacao> getApenasAssinaturas() {
-        Set<ExMovimentacao> set = new TreeSet<ExMovimentacao>();
+        Set<ExMovimentacao> set = new TreeSet<>();
 
         for (ExMovimentacao m : getExMovimentacaoReferenciadoraSet()) {
             if ((m.getExTipoMovimentacao() == ExTipoDeMovimentacao.ASSINATURA_DIGITAL_MOVIMENTACAO || m
@@ -936,7 +926,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
      * @return Coleção de movimentações de assinaturas com Token.
      */
     public Set<ExMovimentacao> getApenasAssinaturasComToken() {
-        Set<ExMovimentacao> set = new TreeSet<ExMovimentacao>();
+        Set<ExMovimentacao> set = new TreeSet<>();
 
         for (ExMovimentacao m : getExMovimentacaoReferenciadoraSet()) {
             if ((m.getExTipoMovimentacao() == ExTipoDeMovimentacao.ASSINATURA_DIGITAL_MOVIMENTACAO)
@@ -954,7 +944,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
      * @return Coleção de movimentações de assinaturas com Senha.
      */
     public Set<ExMovimentacao> getApenasAssinaturasComSenha() {
-        Set<ExMovimentacao> set = new TreeSet<ExMovimentacao>();
+        Set<ExMovimentacao> set = new TreeSet<>();
 
         for (ExMovimentacao m : getExMovimentacaoReferenciadoraSet()) {
             if ((m.getExTipoMovimentacao() == ExTipoDeMovimentacao.ASSINATURA_MOVIMENTACAO_COM_SENHA)
@@ -972,7 +962,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
      * @return Coleção de movimentações de conferências de cópia.
      */
     public Set<ExMovimentacao> getApenasConferenciasCopia() {
-        Set<ExMovimentacao> set = new TreeSet<ExMovimentacao>();
+        Set<ExMovimentacao> set = new TreeSet<>();
 
         for (ExMovimentacao m : getExMovimentacaoReferenciadoraSet()) {
             if ((m.getExTipoMovimentacao() == ExTipoDeMovimentacao.CONFERENCIA_COPIA_DOCUMENTO || m
@@ -991,7 +981,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
      * @return Coleção de movimentações de conferências de cópia com token.
      */
     public Set<ExMovimentacao> getApenasConferenciasCopiaComToken() {
-        Set<ExMovimentacao> set = new TreeSet<ExMovimentacao>();
+        Set<ExMovimentacao> set = new TreeSet<>();
 
         for (ExMovimentacao m : getExMovimentacaoReferenciadoraSet()) {
             if ((m.getExTipoMovimentacao() == ExTipoDeMovimentacao.CONFERENCIA_COPIA_DOCUMENTO)
@@ -1009,7 +999,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
      * @return Coleção de movimentações de conferências de cópia com senha.
      */
     public Set<ExMovimentacao> getApenasConferenciasCopiaComSenha() {
-        Set<ExMovimentacao> set = new TreeSet<ExMovimentacao>();
+        Set<ExMovimentacao> set = new TreeSet<>();
 
         for (ExMovimentacao m : getExMovimentacaoReferenciadoraSet()) {
             if ((m.getExTipoMovimentacao() == ExTipoDeMovimentacao.CONFERENCIA_COPIA_COM_SENHA)
@@ -1063,22 +1053,15 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
 
     @Override
     public boolean isRascunho() {
-        // TODO Auto-generated method stub
-        if (getExTipoMovimentacao() == ExTipoDeMovimentacao.ANEXACAO
-                && mob().doc().isEletronico() && !isAssinada())
-            return true;
-
-        return false;
+        return getExTipoMovimentacao() == ExTipoDeMovimentacao.ANEXACAO
+                && mob().doc().isEletronico() && !isAssinada();
     }
 
     @Override
     public boolean isSemEfeito() {
         if (getExDocumento().isSemEfeito()) {
             // Não gera marca de "Sem Efeito em Folha de Desentranhamento"
-            if (getExTipoMovimentacao() == ExTipoDeMovimentacao.CANCELAMENTO_JUNTADA)
-                return false;
-            else
-                return true;
+            return getExTipoMovimentacao() != ExTipoDeMovimentacao.CANCELAMENTO_JUNTADA;
         }
 
         return false;
@@ -1263,11 +1246,9 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
                         this.getDtIniMov(), retornaNome);
 
             case CONFERENCIA_COPIA_DOCUMENTO:
+            case ASSINATURA_DIGITAL_MOVIMENTACAO:
                 return assertAssinaturaDigitalValida(this.getExMovimentacaoRef().getConteudoBlobpdf(), this.getConteudoBlobMov(),
                         this.getDtIniMov(), retornaNome);
-            case ASSINATURA_DIGITAL_MOVIMENTACAO:
-                return assertAssinaturaDigitalValida(this.getExMovimentacaoRef().getConteudoBlobpdf(),
-                        this.getConteudoBlobMov(), this.getDtIniMov(), retornaNome);
             default:
                 throw new AplicacaoException("Não é Assinatura");
         }
@@ -1286,7 +1267,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
         if (pwd == null)
             throw new AplicacaoException("Inválido (falta propriedade sigaex.carimbo.public.key)");
 
-        PublicKey publicKey = null;
+        PublicKey publicKey;
 
         byte[] publicKeyBytes = SwaggerUtils.base64Decode(pwd);
 
@@ -1323,9 +1304,9 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
         //
         BlucService bluc = Service.getBlucService();
         ValidateRequest validatereq = new ValidateRequest();
-        validatereq.setEnvelope(bluc.bytearray2b64(cms));
-        validatereq.setSha1(bluc.bytearray2b64(bluc.calcSha1(pdf)));
-        validatereq.setSha256(bluc.bytearray2b64(bluc.calcSha256(pdf)));
+        validatereq.setEnvelope(BlucService.bytearray2b64(cms));
+        validatereq.setSha1(BlucService.bytearray2b64(BlucService.calcSha1(pdf)));
+        validatereq.setSha256(BlucService.bytearray2b64(BlucService.calcSha256(pdf)));
         validatereq.setTime(dtMov);
         validatereq.setCrl("true");
         ValidateResponse validateresp = Ex.getInstance().getBL().assertValid(bluc, validatereq);

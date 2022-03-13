@@ -101,42 +101,42 @@ public class ExConfiguracaoDTO {
     public List<Long> getIdModelos() {
         List<Long> idModelos = new ArrayList<>();
         Stream<Long> streamModelos = Arrays.stream(modelos);
-        streamModelos.forEach(m -> idModelos.add(m));
+        streamModelos.forEach(idModelos::add);
         return idModelos;
     }
 
     public List<Long> getIdOrgaos() {
         List<Long> idOrgaos = new ArrayList<>();
         Stream<Long> streamOrgaos = Arrays.stream(orgaos);
-        streamOrgaos.forEach(o -> idOrgaos.add(o));
+        streamOrgaos.forEach(idOrgaos::add);
         return idOrgaos;
     }
 
     public List<Long> getIdUnidades() {
         List<Long> idUnidades = new ArrayList<>();
         Stream<Long> streamUnidades = Arrays.stream(unidades);
-        streamUnidades.forEach(u -> idUnidades.add(u));
+        streamUnidades.forEach(idUnidades::add);
         return idUnidades;
     }
 
     public List<Long> getIdCargos() {
         List<Long> idCargos = new ArrayList<>();
         Stream<Long> streamCargos = Arrays.stream(cargos);
-        streamCargos.forEach(c -> idCargos.add(c));
+        streamCargos.forEach(idCargos::add);
         return idCargos;
     }
 
     public List<Long> getIdFuncoes() {
         List<Long> idFuncoes = new ArrayList<>();
         Stream<Long> streamFuncoes = Arrays.stream(funcoes);
-        streamFuncoes.forEach(f -> idFuncoes.add(f));
+        streamFuncoes.forEach(idFuncoes::add);
         return idFuncoes;
     }
 
     public List<Long> getIdPessoas() {
         List<Long> idPessoas = new ArrayList<>();
         Stream<Long> streamPessoas = Arrays.stream(pessoas);
-        streamPessoas.forEach(p -> idPessoas.add(p));
+        streamPessoas.forEach(idPessoas::add);
         return idPessoas;
     }
 

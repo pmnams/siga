@@ -3049,6 +3049,8 @@ public class ExBL extends CpBL {
 
             if (!Utils.empty(tipoSequencia) && !doc.isFinalizado()) {
                 doc.setNumeroSequenciaGenerica(obterSequenciaAno(doc.getAnoEmissao(), tipoSequencia));
+                doc.setCodigoUnico(formatarCodigoUnico(doc.getNumeroSequenciaGenerica()));
+                doc.setDigitoVerificadorCodigoUnico(calcularDigitoVerificador(doc.getCodigoUnico()));
             }
         }
     }
@@ -4332,8 +4334,10 @@ public class ExBL extends CpBL {
             throws AplicacaoException {
         ExMovimentacao novaMov = new ExMovimentacao();
         novaMov.setCadastrante(cadastrante);
-        novaMov.setConteudoBlobMov(mov.getConteudoBlobMov());
-        novaMov.setConteudoTpMov(mov.getConteudoTpMov());
+        if (mov.getConteudoTpMov() != null && mov.getConteudoBlobMov() != null) {
+            novaMov.setConteudoBlobMov(mov.getConteudoBlobMov());
+            novaMov.setConteudoTpMov(mov.getConteudoTpMov());
+        }
         novaMov.setDescrMov(mov.getDescrMov());
         novaMov.setDtIniMov(dao().dt());
         novaMov.setDtMov(mov.getDtMov());
@@ -4416,14 +4420,14 @@ public class ExBL extends CpBL {
                             else
                                 gravarMovimentacao(mov);
                         }
-                        p = mob.calcularTramitesPendentes();
+                        p = m.calcularTramitesPendentes();
                     }
                 }
 
                 // Se houver outros recebimentos pendentes para o destinatário, em vez de
                 // receber deve concluir direto
-                boolean fConcluirDireto = !mob.isEmTransitoExterno() && p.fIncluirCadastrante && (Utils.equivale(mob.doc().getCadastrante(), titular)
-                        || Utils.equivale(mob.doc().getLotaCadastrante(), lotaTitular));
+                boolean fConcluirDireto = !mob.isEmTransitoExterno() && p.fIncluirCadastrante && (Utils.equivale(mob.getTitular(), titular)
+                        || Utils.equivale(mob.getLotaTitular(), lotaTitular));
                 if (!fConcluirDireto)
                     for (ExMovimentacao r : p.recebimentosPendentes)
                         // Existe um recebimento pendente e não é apenas de notificação
@@ -4521,7 +4525,7 @@ public class ExBL extends CpBL {
 
             ExMovimentacao recebimento = null;
             if (p.fIncluirCadastrante && (Utils.equivale(mob.doc().getLotaCadastrante(), lotaTitular)
-                    || Utils.equivale(mob.doc().getCadastrante(), titular))) {
+                    || Utils.equivale(mob.getTitular(), titular))) {
                 recebimento = null;
             } else {
                 // Localiza o recebimento que será concluído
@@ -4780,6 +4784,8 @@ public class ExBL extends CpBL {
 
         boolean fTranferencia = lotaResponsavel != null || responsavel != null;
 
+        final DpPessoa titularFinal = titular != null? titular : cadastrante;
+
         SortedSet<ExMobil> set = mob.getMobilEApensosExcetoVolumeApensadoAoProximo();
 
         Date dtUltReceb = null;
@@ -4963,11 +4969,11 @@ public class ExBL extends CpBL {
                     if (automatico)
                         mov.setDescrMov("Transferência automática.");
 
-                    Pendencias p = mob.calcularTramitesPendentes();
+                    Pendencias p = m.calcularTramitesPendentes();
 
                     // Localiza o tramite que será recebido
                     for (ExMovimentacao t : p.recebimentosPendentes) {
-                        if (forcarTransferencia || (titular == null && lotaCadastrante == null) || t.isResp(titular, lotaCadastrante)) {
+                        if (forcarTransferencia || (titularFinal == null && lotaCadastrante == null) || t.isResp(titularFinal, lotaCadastrante)) {
                             mov.setExMovimentacaoRef(t);
                             break;
                         }
@@ -4975,8 +4981,8 @@ public class ExBL extends CpBL {
 
                     // Titular é a origem e deve sempre ser preenchido
                     if (mov.getExMovimentacaoRef() == null && p.fIncluirCadastrante) {
-                        mov.setTitular(mov.mob().doc().getCadastrante());
-                        mov.setLotaTitular(mov.mob().doc().getLotaCadastrante());
+                        mov.setTitular(mov.mob().getTitular());
+                        mov.setLotaTitular(mov.mob().getLotaTitular());
                     }
 
                     // Cancelar trâmite pendente quando é para forçar para outro destino
@@ -5374,6 +5380,8 @@ public class ExBL extends CpBL {
                         Utils.mapFromUrlEncodedForm(form, doc.getConteudoBlobForm());
                         //gera e adiciona a entrevista o número da sequencia generica
                         form.put("numeroSequenciaGenerica", doc.getNumeroSequenciaGenerica());
+                        form.put("codigoUnico", doc.getCodigoUnico());
+                        form.put("digitoVerificadorCodigoUnico", doc.getDigitoVerificadorCodigoUnico());
                         //Atualiza Form
                         doc.setConteudoBlobForm(urlEncodedFormFromMap(form));
                         //Reprocessa Descrição para adição de sequencia se implementado no modelo
@@ -7910,15 +7918,16 @@ public class ExBL extends CpBL {
     private void enviarSiafem(String usuarioSiafem, String senhaSiafem, ExDocumento exDoc) {
         ExDocumento formulario = obterFormularioSiafem(exDoc);
 
-        if (formulario == null)
-            throw new AplicacaoException("Favor preencher o \"" + Prop.get("ws.siafem.nome.modelo") + "\" antes de tramitar.");
+        if(formulario == null)
+            throw new AplicacaoException("Favor preencher o \"" + Prop.get("ws.siafem.nome.modelo") + ".");
 
-        String descricao = formulario.getDescrDocumento();
-        SiafDoc doc = new SiafDoc(descricao.split(";"));
+        Map<String, String> form = new TreeMap<String, String>();
+        Utils.mapFromUrlEncodedForm(form, formulario.getConteudoBlobForm());
+        SiafDoc siafDoc = new SiafDoc(form);
 
-        doc.setProcesso(obterCodigoUnico(formulario, false));
+        siafDoc.setCodSemPapel(exDoc.getExMobilPai().doc().getSigla().replaceAll("[-/]", ""));
 
-        ServicoSiafemWs.enviarDocumento(usuarioSiafem, senhaSiafem, doc);
+        ServicoSiafemWs.enviarDocumento(usuarioSiafem, senhaSiafem, siafDoc);
     }
 
     private void gravarMovimentacaoSiafem(ExDocumento exDoc, DpPessoa cadastrante, DpLotacao lotacaoTitular) throws AplicacaoException, SQLException {
@@ -7930,7 +7939,7 @@ public class ExBL extends CpBL {
         mov.setDtIniMov(dt);
         mov.setDtFimMov(dt);
         mov.setDtMov(dt);
-        mov.setExMobil(exDoc.getMobilGeral());
+        mov.setExMobil(exDoc.getPrimeiraVia());
         mov.setExTipoMovimentacao(ExTipoDeMovimentacao.ENVIO_SIAFEM);
         mov.setLotaCadastrante(lotacaoTitular);
         mov.setLotaResp(lotacaoTitular);
@@ -7948,21 +7957,21 @@ public class ExBL extends CpBL {
     public ExDocumento obterFormularioSiafem(ExDocumento doc) {
         String modeloSiafem = Prop.get("ws.siafem.nome.modelo");//"Formulario Integracao Siafem";
 
-        if (modeloSiafem == null)
+        if(modeloSiafem == null)
             return null;
 
-        if (doc.getNmMod().equals(modeloSiafem))
+        if(doc.getNmMod().equals(modeloSiafem))
             return doc;
 
         ExMobil mDefault = doc.getMobilDefaultParaReceberJuntada();
 
-        if (mDefault == null)
+        if(mDefault == null)
             return null;
 
         Set<ExMobil> mobilsJuntados = mDefault.getJuntados();
 
         for (ExMobil exMobil : mobilsJuntados) {
-            if (!exMobil.isCancelada() && modeloSiafem.contains(exMobil.getDoc().getNmMod())) {
+            if(!exMobil.isCancelada() && modeloSiafem.contains(exMobil.getDoc().getNmMod())) {
                 return exMobil.getDoc();
             }
         }

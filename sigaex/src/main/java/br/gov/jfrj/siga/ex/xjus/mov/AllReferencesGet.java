@@ -32,7 +32,7 @@ public class AllReferencesGet implements IXjusRecordAPI.IAllReferencesGet {
                     ExTipoDeMovimentacao.DESPACHO_INTERNO,
                     ExTipoDeMovimentacao.DESPACHO_INTERNO_TRANSFERENCIA,
                     ExTipoDeMovimentacao.DESPACHO_TRANSFERENCIA_EXTERNA));
-            q.setMaxResults(Integer.valueOf(req.max));
+            q.setMaxResults(Integer.parseInt(req.max));
             Long first = Long.valueOf(req.lastid);
             // System.out.println("req.last: " + SwaggerUtils.format(first));
             q.setParameter("id", first);

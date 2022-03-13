@@ -8,20 +8,20 @@
 <%@ taglib uri="http://localhost/functiontag" prefix="f" %>
 
 <siga:pagina titulo="Relatório">
-    <script type="text/javascript" language="Javascript1.1">
+    <script type="text/javascript">
         var newwindow = '';
 
         function visualizarRelatorio(rel, idFormaDoc, descrFormaDoc) {
             frmRelatorios.tipoRel.value = "pdf";
-            if (!newwindow.closed && newwindow.location) {
+            if (!newwindow.closed &amp;&amp; newwindow.location) {
             } else {
                 var popW = 1000;
                 var popH = 600;
                 var winleft = (screen.width - popW) / 2;
                 var winUp = (screen.height - popH) / 2;
                 winProp = 'width=' + popW + ',height=' + popH + ',left='
-                        + winleft + ',top=' + winUp
-                        + ',scrollbars=yes,resizable'
+                    + winleft + ',top=' + winUp
+                    + ',scrollbars=yes,resizable'
                 newwindow = window.open('', '', winProp);
                 newwindow.name = 'doc';
             }
@@ -41,6 +41,15 @@
                 newwindow.focus()
             }
             return false;
+        }
+
+        function visualizarCVS(rel) {
+            frmRelatorios.tipoRel.value = "cvs";
+            t = frmRelatorios.target;
+            a = frmRelatorios.action;
+            frmRelatorios.action = rel;
+            frmRelatorios.submit();
+            frmRelatorios.action = a;
         }
 
         function visualizarCVS(rel) {

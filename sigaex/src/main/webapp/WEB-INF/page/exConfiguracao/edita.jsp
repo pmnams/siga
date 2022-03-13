@@ -63,8 +63,8 @@
                         <c:choose>
                             <c:when
                                     test="${campoFixo && not empty config.exTipoMovimentacao}">
-                                <input type="hidden" name="id"
-                                       value="${config.exTipoMovimentacao.idTpMov}"/>
+                                <input type="hidden" name="idTpMov"
+                                       value="${config.exTipoMovimentacao.id}"/>
                                 ${config.exTipoMovimentacao.descr}
                             </c:when>
                             <c:otherwise>

@@ -1,6 +1,3 @@
-/**
- *
- */
 package br.gov.jfrj.siga.vraptor.builder;
 
 import br.gov.jfrj.siga.dp.DpLotacao;

@@ -8,10 +8,10 @@ import com.crivano.jlogic.*;
 
 public class ExPodeCriarVolume extends CompositeExpressionSupport {
 
-    private ExMobil mob;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
-    private ExMobil ultVolume;
+    private final ExMobil mob;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
+    private final ExMobil ultVolume;
 
     public ExPodeCriarVolume(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;

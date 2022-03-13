@@ -24,27 +24,6 @@
  */
 package br.gov.jfrj.siga.hibernate;
 
-import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.persistence.LockModeType;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
-import javax.persistence.TemporalType;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-
-import br.gov.jfrj.siga.ex.*;
-import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
-import org.jboss.logging.Logger;
-
 import br.gov.jfrj.siga.base.AplicacaoException;
 import br.gov.jfrj.siga.base.Prop;
 import br.gov.jfrj.siga.base.util.Texto;
@@ -57,21 +36,28 @@ import br.gov.jfrj.siga.dp.CpOrgaoUsuario;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.dp.dao.CpDao;
+import br.gov.jfrj.siga.ex.*;
 import br.gov.jfrj.siga.ex.BIE.ExBoletimDoc;
-import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.bl.ExBL;
-import br.gov.jfrj.siga.ex.bl.ExCompetenciaBL;
 import br.gov.jfrj.siga.ex.bl.Mesa2.GrupoItem;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import br.gov.jfrj.siga.ex.util.MascaraUtil;
 import br.gov.jfrj.siga.hibernate.ext.IExMobilDaoFiltro;
 import br.gov.jfrj.siga.hibernate.ext.IMontadorQuery;
 import br.gov.jfrj.siga.model.Selecionavel;
 import br.gov.jfrj.siga.model.dao.ModeloDao;
-import br.gov.jfrj.siga.persistencia.ExClassificacaoDaoFiltro;
-import br.gov.jfrj.siga.persistencia.ExDocumentoDaoFiltro;
-import br.gov.jfrj.siga.persistencia.ExMobilApiBuilder;
-import br.gov.jfrj.siga.persistencia.ExMobilDaoFiltro;
-import br.gov.jfrj.siga.persistencia.ExModeloDaoFiltro;
+import br.gov.jfrj.siga.persistencia.*;
+import org.jboss.logging.Logger;
+
+import javax.persistence.LockModeType;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import javax.persistence.TemporalType;
+import javax.persistence.criteria.*;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class ExDao extends CpDao {
@@ -386,7 +372,7 @@ public class ExDao extends CpDao {
         return em().createQuery(criteriaQuery).getResultList();
     }
 
-    public List<ExMovimentacao> consultarMovimentoIncluindoJuntadaPorMobils(List<ExMobil> mobils){
+    public List<ExMovimentacao> consultarMovimentoIncluindoJuntadaPorMobils(List<ExMobil> mobils) {
         CriteriaBuilder builder = em().getCriteriaBuilder();
         CriteriaQuery<ExMovimentacao> query = builder.createQuery(ExMovimentacao.class);
         Root<ExMovimentacao> root = query.from(ExMovimentacao.class);
@@ -1216,7 +1202,7 @@ public class ExDao extends CpDao {
         try {
             final Query query = em()
                     .createNamedQuery("consultarAtualPorId");
-            query.setParameter("idRegIni", o.getHisIdIni());
+            query.setParameter("hisIdIni", o.getHisIdIni());
             return (ExClassificacao) query.getSingleResult();
         } catch (final NullPointerException e) {
             return null;
@@ -1566,6 +1552,7 @@ public class ExDao extends CpDao {
         final Query query = em().createNamedQuery(
                 "listarAnexoPendenteAssinatura");
         query.setParameter("idPessoaIni", pessoa.getIdPessoaIni());
+        query.setParameter("enumList", EnumSet.of(ExTipoDeMovimentacao.ANEXACAO));
         return query.getResultList();
     }
 
@@ -2074,42 +2061,6 @@ public class ExDao extends CpDao {
         return l;
     }
 
-    /**
-     * Realiza a consulta das {@link ExMovimentacao Movimentações} para o histórico
-     * de tramitações de uma {@link ExMobil} relacionada a um determinado
-     * {@link ExDocumento Documento} em ordem cronológica decrescente (
-     * {@link ExMovimentacao#getDtTimestamp()}) a partir da primeira
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TRANSFERENCIA tramitação} das
-     * {@link ExMobil}s do Documento. As movimentações retornadas devm ser dos
-     * seguintes {@link ExMovimentacao#getExTipoMovimentacao() Tipos}:
-     * <ul>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TRANSFERENCIA }
-     * (Tramitação)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_RECEBIMENTO }</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_JUNTADA } (Juntada)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_ARQUIVAMENTO_CORRENTE }
-     * (Arquivamento Corrente)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_ARQUIVAMENTO_INTERMEDIARIO }
-     * (Arquivamento Intermediário)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_DESARQUIVAMENTO_CORRENTE }
-     * (Desarquivamento)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_DESARQUIVAMENTO_INTERMEDIARIO }
-     * (Desarquivamento Intermediário)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_CANCELAMENTO_JUNTADA }</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_CANCELAMENTO_DE_MOVIMENTACAO }
-     * (Cancelamento de Movimentação)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TORNAR_SEM_EFEITO }
-     * (Cancelamento)</li>
-     * </ul>
-     * As movimentações do tipo
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_RECEBIMENTO } não serão exibidas.
-     * Elas são apenas usadas para indicar a hora de recebimento da Movimentação de
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TRANSFERENCIA } imediatamente
-     * anterior.
-     *
-     * @param idMobil ID da Mobilização
-     * @return As Movimentações dos tipos relacionados acima.
-     */
     public List<ExMovimentacao> consultarTramitacoesPorMovimentacao(Long idMobil) {
         return em() //
                 .createNamedQuery(AbstractExMovimentacao.CONSULTAR_TRAMITACOES_POR_MOVIMENTACAO_NAMED_QUERY,
@@ -2124,42 +2075,6 @@ public class ExDao extends CpDao {
                 .getResultList();
     }
 
-    /**
-     * Realiza a consulta das {@link ExMovimentacao Movimentações} para o histórico
-     * de tramitações do {@link ExDocumento Documento} Cancelado de uma
-     * {@link ExMobil} relacionada a um determinado em ordem cronológica decrescente
-     * ( {@link ExMovimentacao#getDtTimestamp()}) a partir da primeira
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TRANSFERENCIA tramitação} das
-     * {@link ExMobil}s do Documento. As movimentações retornadas devm ser dos
-     * seguintes {@link ExMovimentacao#getExTipoMovimentacao() Tipos}:
-     * <ul>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TRANSFERENCIA }
-     * (Tramitação)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_RECEBIMENTO }</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_JUNTADA } (Juntada)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_ARQUIVAMENTO_CORRENTE }
-     * (Arquivamento Corrente)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_ARQUIVAMENTO_INTERMEDIARIO }
-     * (Arquivamento Intermediário)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_DESARQUIVAMENTO_CORRENTE }
-     * (Desarquivamento)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_DESARQUIVAMENTO_INTERMEDIARIO }
-     * (Desarquivamento Intermediário)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_CANCELAMENTO_JUNTADA }</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_CANCELAMENTO_DE_MOVIMENTACAO }
-     * (Cancelamento de Movimentação)</li>
-     * <li>{@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TORNAR_SEM_EFEITO }
-     * (Cancelamento)</li>
-     * </ul>
-     * As movimentações do tipo
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_RECEBIMENTO } não serão exibidas.
-     * Elas são apenas usadas para indicar a hora de recebimento da Movimentação de
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TRANSFERENCIA } imediatamente
-     * anterior.
-     *
-     * @param idMobil ID da Mobilização
-     * @return As Movimentações dos tipos relacionados acima.
-     */
     public List<ExMovimentacao> consultarTramitacoesPorMovimentacaoDocumentoCancelado(Long idMobil) {
         return em() //
                 .createNamedQuery(
@@ -2178,8 +2093,6 @@ public class ExDao extends CpDao {
     /**
      * Conta o total de movimentações assinadas
      *
-     * @param idDoc
-     * @return
      */
     public Long contarMovimentacaoAssinada(Long idDoc) {
         return em().createQuery(
@@ -2197,9 +2110,6 @@ public class ExDao extends CpDao {
     /**
      * Pesquisa documentos por lista de marcadores, pessoas e lotações
      *
-     * @param List<Long> idMarcadores
-     * @param List<Long> idPessoasIni,
-     * @param List<Long> idLotacoesIni>
      * @return List<Object [ ]>
      */
     public List consultarPorFiltro(ExMobilApiBuilder flt) {

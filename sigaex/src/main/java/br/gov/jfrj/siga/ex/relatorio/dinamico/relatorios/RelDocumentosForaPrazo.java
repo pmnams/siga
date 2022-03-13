@@ -148,7 +148,7 @@ public class RelDocumentosForaPrazo extends RelatorioTemplate {
                     linkModeloDoc.append(modeloDoc);
                 }
 
-                listDados = new ArrayList();
+                listDados = new ArrayList<>();
                 if (!lotaDoc.equals(lotaAnt)) {
                     listDados.add(lotaDoc + " / " + lotaNomeDoc);
                     lotaAnt = lotaDoc;

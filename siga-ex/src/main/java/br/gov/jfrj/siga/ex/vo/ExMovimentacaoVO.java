@@ -53,7 +53,7 @@ public class ExMovimentacaoVO extends ExVO {
     String descricao;
     ITipoDeMovimentacao exTipoMovimentacao;
     String complemento;
-    Map<String, ExParteVO> parte = new TreeMap<String, ExParteVO>();
+    Map<String, ExParteVO> parte = new TreeMap<>();
     Date dtIniMov;
     String dtRegMovDDMMYYHHMMSS;
     String dtFimMovDDMMYYHHMMSS;
@@ -66,7 +66,6 @@ public class ExMovimentacaoVO extends ExVO {
     String lotaCadastranteSigla;
     String exTipoMovimentacaoSigla;
     String tempoRelativo;
-    boolean podeExibirNoSigale;
     private String subscritor;
 
     public ExMobilVO getMobVO() {
@@ -135,12 +134,6 @@ public class ExMovimentacaoVO extends ExVO {
 
     }
 
-    /**
-     * @param mov
-     * @param titular
-     * @param lotaTitular
-     * @throws Exception
-     */
     private void addAcoes(ExMovimentacao mov, DpPessoa cadastrante, DpPessoa titular, DpLotacao lotaTitular) {
         if (complemento == null)
             complemento = "";
@@ -151,8 +144,7 @@ public class ExMovimentacaoVO extends ExVO {
                     .params("sigla", mov.mob().getCodigoCompacto()).params("id", mov.getIdMov().toString()).params("ajax", "true").exp(new CpPodeSempre()).classe("once").build());
         }
 
-        if (exTipoMovimentacao == ExTipoDeMovimentacao.ASSINATURA_DIGITAL_MOVIMENTACAO
-                || exTipoMovimentacao == ExTipoDeMovimentacao.ASSINATURA_DIGITAL_MOVIMENTACAO) {
+        if (exTipoMovimentacao == ExTipoDeMovimentacao.ASSINATURA_DIGITAL_MOVIMENTACAO) {
             descricao = Texto.maiusculasEMinusculas(mov.getObs());
         }
 
@@ -179,7 +171,7 @@ public class ExMovimentacaoVO extends ExVO {
                 descricao += ", prazo final: " + Data.formatDataETempoRelativo(mov.getDtParam2());
             if (mov.getObs() != null && mov.getObs().trim().length() > 0)
                 descricao += ", obs: " + mov.getObs();
-            String descrUrl = "";
+            String descrUrl;
             try {
                 descrUrl = URLEncoder.encode("Exclusão de marcação: " + mov.getMarcador().getDescrMarcador(), "iso-8859-1");
             } catch (UnsupportedEncodingException e) {
@@ -214,10 +206,7 @@ public class ExMovimentacaoVO extends ExVO {
                     sApp = "powerpoint";
                     sNome = "PowerPoint";
                 }
-                String token = mov.mob().getReferencia() + "_" + cadastrante.getSiglaCompleta() + "_"
-                        + titular.getSiglaCompleta() + "_" + lotaTitular.getSiglaCompleta();
-
-                token = getWebdavJwtToken(mov, cadastrante, titular, lotaTitular, pwd);
+                String token = getWebdavJwtToken(mov, cadastrante, titular, lotaTitular, pwd);
 
                 addAcao(AcaoVO.builder().nome("Editar no " + sNome).nameSpace(sApp
                         + ":ofe|u|__scheme__://__serverName__:__serverPort____contextPath__/webdav/" + token).acao(mov.getNmArqMov()).exp(new CpPodeSempre()).build());
@@ -301,24 +290,24 @@ public class ExMovimentacaoVO extends ExVO {
             if (mov.getExMovimentacaoReferenciadoraSet() != null) {
                 boolean fAssinaturas = false;
                 boolean fConferencias = false;
-                String complementoConferencias = "";
-
+                StringBuilder complementoConferencias = new StringBuilder();
+                StringBuilder complementoAssinaturas = new StringBuilder();
                 for (ExMovimentacao movRef : mov.getExMovimentacaoReferenciadoraSet()) {
                     if (movRef.getExTipoMovimentacao() == ExTipoDeMovimentacao.ASSINATURA_DIGITAL_MOVIMENTACAO
                             || movRef.getExTipoMovimentacao() == ExTipoDeMovimentacao.ASSINATURA_MOVIMENTACAO_COM_SENHA) {
-                        complemento += (complemento.length() > 0 ? ", " : "")
-                                + Texto.maiusculasEMinusculas(movRef.getObs());
+                        complementoAssinaturas.append(complementoAssinaturas.length() > 0 ? ", " : "")
+                                .append(Texto.maiusculasEMinusculas(movRef.getObs()));
                         fAssinaturas = true;
                     } else if (movRef.getExTipoMovimentacao() == ExTipoDeMovimentacao.CONFERENCIA_COPIA_DOCUMENTO
                             || movRef.getExTipoMovimentacao() == ExTipoDeMovimentacao.CONFERENCIA_COPIA_COM_SENHA) {
-                        complementoConferencias += (complementoConferencias.length() > 0 ? ", " : "")
-                                + Texto.maiusculasEMinusculas(movRef.getObs());
+                        complementoConferencias.append(complementoConferencias.length() > 0 ? ", " : "")
+                                .append(Texto.maiusculasEMinusculas(movRef.getObs()));
                         fConferencias = true;
                     }
 
                 }
                 if (fAssinaturas)
-                    complemento = " | Assinado por: " + complemento;
+                    complemento = " | Assinado por: " + complementoAssinaturas;
 
                 if (fConferencias)
                     complemento += " | Autenticado por: " + complementoConferencias;
@@ -470,9 +459,7 @@ public class ExMovimentacaoVO extends ExVO {
 
         if (exTipoMovimentacao == ExTipoDeMovimentacao.ELIMINACAO) {
             descricao = null;
-            if (originadaAqui) {
-                // Não faz nada, pois o documento eliminado nunca é exibido
-            } else {
+            if (!originadaAqui) {
                 descricao = mov.getExMobil().getSigla();
             }
         }
@@ -498,7 +485,7 @@ public class ExMovimentacaoVO extends ExVO {
                 || exTipoMovimentacao == ExTipoDeMovimentacao.TRANSFERENCIA || exTipoMovimentacao == ExTipoDeMovimentacao.TRANSFERENCIA_EXTERNA
                 || exTipoMovimentacao == ExTipoDeMovimentacao.RECEBIMENTO_TRANSITORIO) {
             String pre = null;
-            if (mov.getDtFimMovDDMMYY() != "") {
+            if (!Objects.equals(mov.getDtFimMovDDMMYY(), "")) {
                 pre = "Devolver até " + mov.getDtFimMovDDMMYY() + " | ";
             }
             if (!mov.isCancelada())
@@ -530,9 +517,6 @@ public class ExMovimentacaoVO extends ExVO {
         }
     }
 
-    /**
-     * @param mov
-     */
     private void calcularClasse(ExMovimentacao mov) {
         ExTipoDeMovimentacao tpMov = (ExTipoDeMovimentacao) mov.getExTipoMovimentacao();
         if (mov.getExMovimentacaoCanceladora() == null) {
@@ -768,7 +752,7 @@ public class ExMovimentacaoVO extends ExVO {
     }
 
     public static String getWebdavPassword() {
-        String pwd = null;
+        String pwd;
         try {
             pwd = Prop.get("webdav.senha");
         } catch (Exception e) {
@@ -792,7 +776,7 @@ public class ExMovimentacaoVO extends ExVO {
         String token;
 
         final JWTSigner signer = new JWTSigner(getWebdavPassword());
-        final HashMap<String, Object> claims = new HashMap<String, Object>();
+        final HashMap<String, Object> claims = new HashMap<>();
 
         // final long iat = System.currentTimeMillis() / 1000L; // issued at
         // claim
@@ -830,7 +814,7 @@ public class ExMovimentacaoVO extends ExVO {
         try {
             Map<String, Object> map = verifier
                     .verify(token.replace("~", ".").replace(JWT_FIXED_HEADER_REPLACEMENT, JWT_FIXED_HEADER));
-            String a[] = map.get("d").toString().split("\\|");
+            String[] a = map.get("d").toString().split("\\|");
             map.put("mob", a[0]);
             map.put("cad", a[1]);
             map.put("tit", a[2]);

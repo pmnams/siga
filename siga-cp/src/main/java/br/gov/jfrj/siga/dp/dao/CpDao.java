@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -689,7 +689,7 @@ public class CpDao extends ModeloDao {
         query.setHint("org.hibernate.cacheable", true);
         query.setHint("org.hibernate.cacheRegion", CACHE_QUERY_CONFIGURACAO);
         final List<DpLotacao> l = query.getResultList();
-        if (l.size() == 0)
+        if (l.size() != 1)
             return null;
         return l.get(0);
     }

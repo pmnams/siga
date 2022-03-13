@@ -101,12 +101,9 @@ import net.sf.jasperreports.engine.JRException;
 							+ "right join mov.exMobil mob "
 							+ "inner join mob.exDocumento doc "
 							+ "where mov.dtIniMov between :dtini and :dtfim "
-//							+ "where (:dtIni is null or doc.dtDoc >= :dtini) "
-//							+ "	and (:dtFim is null or doc.dtDoc <= :dtfim) "
 							+ queryOrgao
 							+ queryLotacao
 							+ " and mov.exTipoMovimentacao = :tpmov "
-//							+ "		or mov.exTipoMovimentacao.idTpMov = '64') "
 							+ "order by doc.lotaCadastrante.siglaLotacao, "
 							+ "doc.exModelo.nmMod, "
 							+ "mob.idMobil "

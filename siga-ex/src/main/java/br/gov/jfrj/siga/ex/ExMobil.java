@@ -779,7 +779,6 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
     /**
      * Retorna a última movimentação não cancelada que o móbil mob recebeu antes
      * de determinada data dt passada por parâmetro
-     *
      */
     public ExMovimentacao getUltimaMovimentacaoAntesDaData(Date dt) {
 
