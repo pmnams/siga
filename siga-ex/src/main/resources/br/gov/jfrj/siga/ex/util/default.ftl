@@ -1329,7 +1329,10 @@ Descrição: Esta macro é utilizada pelo Integrador
                                             items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyBlock', 'JustifyRight']
                                         },
                                         {name: 'insert', items: ['Table', '-', 'SpecialChar', '-', 'PageBreak']},
-                                        {name: 'document', items: ['Source']}
+                                        {
+                                            name: 'document',
+                                            items: ['Source']
+                                        }
                                     ];
 
                                 window.onload = function () {
@@ -1462,17 +1465,136 @@ Descrição: Esta macro é utilizada pelo Integrador
                                     {
                                         name: 'document',
                                         items: ['Source']
+                                    },
+                                    {
+                                        name: 'extra',
+                                        items: ['strinsert']
                                     }
                                 ];
-                                CKEDITOR.config.extraPlugins = 'footnotes';
-                                window.onload = function () {
+
+                                // @license Copyright © 2013 Stuart Sillitoe <stuart@vericode.co.uk>
+                                // This is open source, can modify it as you wish.
+                                // Stuart Sillitoe - stuartsillitoe.co.uk
+                                CKEDITOR.config.strinsert_strings =	 [
+                                    {'name': 'Documento em Elaboração'},
+                                    {'name': 'Número', 'value': '$' + '{doc.sigla}'},
+                                    {'name': 'Data', 'value': '$' + '{doc.dtDocDDMMYYYY}'},
+                                    {'name': 'Nome do Subscritor', 'value': '$' + '{doc.subscritor.descricao}'},
+                                    {'name': 'Nome da Lotação do Subscritor', 'value': '$' + '{doc.subscritor.lotacao.descricao}'},
+                                    {'name': 'Sigla da Lotação do Subscritor', 'value': '$' + '{doc.lotaSubscritor.sigla}'},
+                                    {'name': 'Sigla da Lotação do Cadastrante', 'value': '$' + '{doc.lotaCadastrante.sigla}'},
+                                    {'name': 'Destinatário', 'value': '$' + '{doc.destinatarioString}'},
+                                    {'name': 'Campo de cadastro do doc', 'value': '$' + '{doc.form.NOMECAMPO}'},
+                                    {'name': 'Descrição', 'value': '$' + '{doc.descrDocumento}'},
+                                    {'name': 'Documento Pai'},
+                                    {'name': 'Número', 'value': '$' + '{doc.pai.sigla}'},
+                                    {'name': 'Data', 'value': '$' + '{doc.pai.dtDocDDMMYYYY}'},
+                                    {'name': 'Nome do Subscritor', 'value': '$' + '{doc.pai.subscritor.descricao}'},
+                                    {'name': 'Nome da Lotação do Subscritor', 'value': '$' + '{doc.pai.subscritor.lotacao.descricao}'},
+                                    {'name': 'Sigla da Lotação do Subscritor', 'value': '$' + '{doc.pai.lotaSubscritor.sigla}'},
+                                    {'name': 'Sigla da Lotação do Cadastrante', 'value': '$' + '{doc.pai.lotaCadastrante.lotacao.sigla}'},
+                                    {'name': 'Destinatário', 'value': '$' + '{doc.pai.destinatarioString}'},
+                                    {'name': 'Campo de cadastro do doc', 'value': '$' + '{doc.pai.form.NOMECAMPO}'},
+                                    {'name': 'Descrição', 'value': '$' + '{doc.pai.descrDocumento}'},
+                                    {'name': 'Documento Autuado'},
+                                    {'name': 'Número', 'value': '$' + '{ref.pai.autuado.mob.sigla}'},
+                                    {'name': 'Data', 'value': '$' + '{ref.pai.autuado.doc.dtDocDDMMYYYY}'},
+                                    {'name': 'Nome do Subscritor', 'value': '$' + '{ref.pai.autuado.doc.subscritor.descricao}'},
+                                    {'name': 'Nome da Lotação do Subscritor', 'value': '$' + '{ref.pai.autuado.doc.subscritor.lotacao.descricao}'},
+                                    {'name': 'Sigla da Lotação do Subscritor', 'value': '$' + '{ref.pai.autuado.doc.lotaSubscritor.sigla}'},
+                                    {'name': 'Sigla da Lotação do Cadastrante', 'value': '$' + '{ref.pai.autuado.doc.lotaCadastrante.sigla}'},
+                                    {'name': 'Destinatário', 'value': '$' + '{ref.pai.autuado.doc.destinatarioString}'},
+                                    {'name': 'Campo de cadastro do doc Autuado', 'value': '$' + '{ref.pai.autuado.form.NOMECAMPO}'},
+                                    {'name': 'Descrição', 'value': '$' + '{ref.pai.autuado.doc.descrDocumento}'},
+                                    {'name': 'Outros Documentos'},
+                                    {'name': 'Relação de docs juntados do modelo', 'value': '$' + "{ref.modelo('MODELO DESEJADO 1','MODELO DESEJADO 2')}"},
+                                    {'name': 'Último doc juntado do modelo', 'value': '$' + "{ref.modelo('MODELO DESEJADO').ultimo.mob.sigla}"},
+                                    {'name': 'Campo do último doc juntado do modelo', 'value': '$' + "{ref.modelo('memorando').form.NOMECAMPO}"},
+                                    {'name': 'Workflow'},
+                                    {'name': 'Número do Procedimento', 'value': '$' + '{wf.sigla}'},
+                                    {'name': 'Número do Principal vinculado ao procedimento', 'value': '$' + '{wf.principal}'},
+                                    {'name': 'Nome de quem iniciou o Procedimento', 'value': '$' + '{wf.titular}'},
+                                    {'name': 'Lotação de quem iniciou o Procedimento', 'value': '$' + '{wf.lotaTitular}'},
+                                    {'name': 'Variável (sem formatação)', 'value': '$' + '{wf.var.NOMEVARIAVEL}'},
+                                    {'name': 'Variável (Data)', 'value': '$' + '{fmt.data(wf.var.NOMEVARIAVEL)}'},
+                                    {'name': 'Variável (Reais)', 'value': '$' + '{fmt.reais(wf.var.NOMEVARIAVEL)}'},
+                                    {'name': 'Variável (Reais por Extenso)', 'value': '$' + '{fmt.reaisPorExtenso(wf.var.NOMEVARIAVEL)}'},
+                                    {'name': 'Documento Criado por uma tarefa', 'value': '$' + '{wf.var.doc_NOMETAREFA}'},
+                                ];
+                                CKEDITOR.config.strinsert_button_label = 'Parâmetro';
+                                CKEDITOR.config.strinsert_button_title = 'Inserir Parâmetro';
+                                CKEDITOR.config.strinsert_button_voice = 'Inserir Parâmetro';
+
+                                CKEDITOR.plugins.add('strinsert',
+                                    {
+                                        requires : ['richcombo'],
+                                        init : function( editor )
+                                        {
+                                            var config = editor.config;
+
+                                            // Gets the list of insertable strings from the settings.
+                                            var strings = config.strinsert_strings;
+
+                                            // add the menu to the editor
+                                            editor.ui.addRichCombo('strinsert',
+                                                {
+                                                    label: 		config.strinsert_button_label,
+                                                    title: 		config.strinsert_button_title,
+                                                    voiceLabel: config.strinsert_button_voice,
+                                                    toolbar: 'insert',
+                                                    className: 	'cke_format',
+                                                    multiSelect:false,
+                                                    panel:
+                                                        {
+                                                            css: [ editor.config.contentsCss, CKEDITOR.skin.getPath('editor') ],
+                                                            voiceLabel: editor.lang.panelVoiceLabel
+                                                        },
+
+                                                    init: function()
+                                                    {
+                                                        var lastgroup = '';
+                                                        for(var i=0, len=strings.length; i < len; i++)
+                                                        {
+                                                            string = strings[i];
+                                                            // If there is no value, make a group header using the name.
+                                                            if (!string.value) {
+                                                                this.startGroup( string.name );
+                                                            }
+                                                            // If we have a value, we have a string insert row.
+                                                            else {
+                                                                // If no name provided, use the value for the name.
+                                                                if (!string.name) {
+                                                                    string.name = string.value;
+                                                                }
+                                                                // If no label provided, use the name for the label.
+                                                                if (!string.label) {
+                                                                    string.label = string.name;
+                                                                }
+                                                                this.add(string.value, string.name, string.label);
+                                                            }
+                                                        }
+                                                    },
+
+                                                    onClick: function( value )
+                                                    {
+                                                        editor.focus();
+                                                        editor.fire( 'saveSnapshot' );
+                                                        editor.insertHtml(value);
+                                                        editor.fire( 'saveSnapshot' );
+                                                    },
+
+                                                });
+                                        }
+                                    });
+                                CKEDITOR.config.extraPlugins = ['footnotes','strinsert'];
+
+                                window.onload = function() {
                                     $("textarea.editor").each(function (index) {
                                         CKEDITOR.replace(this, {
                                             toolbar: 'SigaToolbar'
                                         });
                                     });
                                 }
-
                             </script>
 
                         [/#if]

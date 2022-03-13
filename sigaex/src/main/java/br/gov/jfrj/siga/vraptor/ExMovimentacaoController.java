@@ -1283,6 +1283,16 @@ public class ExMovimentacaoController extends ExController {
 
         final ExDocumento doc = buscarDocumento(documentoBuilder);
 
+        if (!new ExPodeRestringirCossignatarioSubscritor(getTitular(), getLotaTitular(), cosignatarioSel.getObjeto(), cosignatarioSel.getObjeto().getLotacao(),
+                cosignatarioSel.getObjeto() != null ? cosignatarioSel.getObjeto().getCargo() : null,
+                cosignatarioSel.getObjeto() != null ? cosignatarioSel.getObjeto().getFuncaoConfianca() : null,
+                cosignatarioSel.getObjeto().getOrgaoUsuario()).eval()) {
+            result.include(SigaModal.ALERTA, SigaModal.mensagem("Esse usuário não está disponível para inclusão de Cossignatário / " + SigaMessages.getMessage("documento.subscritor") + "."));
+            result.forwardTo(this).incluirCosignatario(sigla);
+
+            return;
+        }
+
         String funcaoUnidadeCosignatario = funcaoCosignatario;
         // Efetuar validação e concatenar o conteudo se for implantação GOVSP
         if (SigaMessages.isSigaSP() && (funcaoCosignatario != null && !funcaoCosignatario.isEmpty()) && (unidadeCosignatario != null && !unidadeCosignatario.isEmpty())) {

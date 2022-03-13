@@ -26,6 +26,7 @@ import javax.jws.WebService;
 import javax.persistence.EntityManager;
 import javax.xml.ws.WebServiceContext;
 
+import br.gov.jfrj.siga.wf.model.enm.WfTipoDePrincipal;
 import br.gov.jfrj.siga.wf.service.WfProcedimentoWSTO;
 import org.jboss.logging.Logger;
 
@@ -115,8 +116,9 @@ public class WfServiceImpl implements WfService {
     /**
      * Inicia um novo procedimento.
      */
+    @Override
     public Boolean criarInstanciaDeProcesso(String nomeProcedimento, String siglaCadastrante, String siglaTitular,
-                                            ArrayList<String> keys, ArrayList<String> values) throws Exception {
+                                            ArrayList<String> keys, ArrayList<String> values, String tipoDePrincipal, String principal) throws Exception {
         try (SoapContext ctx = new WfSoapContext(true)) {
             try {
 
@@ -143,7 +145,7 @@ public class WfServiceImpl implements WfService {
                 if (l.size() > 0)
                     identidade = l.get(0);
                 WfProcedimento pi = Wf.getInstance().getBL().createProcessInstance(pd.getId(), null,
-                        titularParser.getPessoa(), titularParser.getLotacao(), identidade, null, null, keys, values,
+                        titularParser.getPessoa(), titularParser.getLotacao(), identidade, WfTipoDePrincipal.valueOf(tipoDePrincipal), principal, keys, values,
                         false);
 
                 WfBL.transferirDocumentosVinculados(pi, siglaTitular);

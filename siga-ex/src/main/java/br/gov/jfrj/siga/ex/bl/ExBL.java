@@ -3143,7 +3143,7 @@ public class ExBL extends CpBL {
                 ContextoPersistencia.flushTransaction();
                 client.criarInstanciaDeProcesso(nomeProcesso,
                         SiglaParser.makeSigla(cadastrante, cadastrante.getLotacao()),
-                        SiglaParser.makeSigla(titular, lotaTitular), keys, values);
+                        SiglaParser.makeSigla(titular, lotaTitular), keys, values, "DOCUMENTO", doc.getCodigo());
             }
         }
         // atualizarWorkFlow(doc);
@@ -4784,7 +4784,7 @@ public class ExBL extends CpBL {
 
         boolean fTranferencia = lotaResponsavel != null || responsavel != null;
 
-        final DpPessoa titularFinal = titular != null? titular : cadastrante;
+        final DpPessoa titularFinal = titular != null ? titular : cadastrante;
 
         SortedSet<ExMobil> set = mob.getMobilEApensosExcetoVolumeApensadoAoProximo();
 
@@ -7918,7 +7918,7 @@ public class ExBL extends CpBL {
     private void enviarSiafem(String usuarioSiafem, String senhaSiafem, ExDocumento exDoc) {
         ExDocumento formulario = obterFormularioSiafem(exDoc);
 
-        if(formulario == null)
+        if (formulario == null)
             throw new AplicacaoException("Favor preencher o \"" + Prop.get("ws.siafem.nome.modelo") + ".");
 
         Map<String, String> form = new TreeMap<String, String>();
@@ -7957,21 +7957,21 @@ public class ExBL extends CpBL {
     public ExDocumento obterFormularioSiafem(ExDocumento doc) {
         String modeloSiafem = Prop.get("ws.siafem.nome.modelo");//"Formulario Integracao Siafem";
 
-        if(modeloSiafem == null)
+        if (modeloSiafem == null)
             return null;
 
-        if(doc.getNmMod().equals(modeloSiafem))
+        if (doc.getNmMod().equals(modeloSiafem))
             return doc;
 
         ExMobil mDefault = doc.getMobilDefaultParaReceberJuntada();
 
-        if(mDefault == null)
+        if (mDefault == null)
             return null;
 
         Set<ExMobil> mobilsJuntados = mDefault.getJuntados();
 
         for (ExMobil exMobil : mobilsJuntados) {
-            if(!exMobil.isCancelada() && modeloSiafem.contains(exMobil.getDoc().getNmMod())) {
+            if (!exMobil.isCancelada() && modeloSiafem.contains(exMobil.getDoc().getNmMod())) {
                 return exMobil.getDoc();
             }
         }

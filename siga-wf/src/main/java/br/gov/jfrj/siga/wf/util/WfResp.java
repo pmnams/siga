@@ -1,8 +1,11 @@
 package br.gov.jfrj.siga.wf.util;
 
+import br.gov.jfrj.siga.base.util.Utils;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import com.crivano.jflow.model.Responsible;
+
+import java.util.Objects;
 
 public class WfResp implements Responsible {
 
@@ -55,5 +58,22 @@ public class WfResp implements Responsible {
 
     public void setLotacao(DpLotacao lotacao) {
         this.lotacao = lotacao;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lotacao, pessoa);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        WfResp other = (WfResp) obj;
+        return Utils.equivale(lotacao, other.lotacao) && Utils.equivale(pessoa, other.pessoa);
     }
 }

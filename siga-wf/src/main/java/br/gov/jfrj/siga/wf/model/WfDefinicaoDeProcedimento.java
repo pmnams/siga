@@ -2,6 +2,7 @@ package br.gov.jfrj.siga.wf.model;
 
 import br.gov.jfrj.siga.base.AcaoVO;
 import br.gov.jfrj.siga.base.AplicacaoException;
+import br.gov.jfrj.siga.base.util.Texto;
 import br.gov.jfrj.siga.base.util.Utils;
 import br.gov.jfrj.siga.cp.CpPerfil;
 import br.gov.jfrj.siga.cp.model.HistoricoAuditavelSuporte;
@@ -15,7 +16,7 @@ import br.gov.jfrj.siga.sinc.lib.Desconsiderar;
 import br.gov.jfrj.siga.sinc.lib.Sincronizavel;
 import br.gov.jfrj.siga.sinc.lib.SincronizavelSuporte;
 import br.gov.jfrj.siga.wf.dao.WfDao;
-import br.gov.jfrj.siga.wf.logic.PodeSim;
+import br.gov.jfrj.siga.wf.logic.WfPodeDuplicarDiagrama;
 import br.gov.jfrj.siga.wf.logic.WfPodeEditarDiagrama;
 import br.gov.jfrj.siga.wf.logic.WfPodeIniciarDiagrama;
 import br.gov.jfrj.siga.wf.model.enm.*;
@@ -347,10 +348,21 @@ public class WfDefinicaoDeProcedimento extends HistoricoAuditavelSuporte impleme
     }
 
     public void assertAcessoDeEditar(DpPessoa titular, DpLotacao lotaTitular) {
-        if (!new WfPodeEditarDiagrama(this, titular, lotaTitular).eval())
+        WfPodeEditarDiagrama pode = new WfPodeEditarDiagrama(this, titular, lotaTitular);
+        if (!pode.eval())
             throw new RuntimeException("Edição do diagrama '" + nome + "' não é permitida para "
                     + (titular != null ? titular.getSigla() : null) + "/"
-                    + (lotaTitular != null ? lotaTitular.getSigla() : null));
+                    + (lotaTitular != null ? lotaTitular.getSigla() : null) + " - "
+                    + AcaoVO.Helper.formatarExplicacao(pode, false));
+    }
+
+    public void assertAcessoDeDuplicar(DpPessoa titular, DpLotacao lotaTitular) {
+        WfPodeDuplicarDiagrama pode = new WfPodeDuplicarDiagrama(this, titular, lotaTitular);
+        if (!pode.eval())
+            throw new RuntimeException("Edição do diagrama '" + nome + "' não é permitida para "
+                    + (titular != null ? titular.getSigla() : null) + "/"
+                    + (lotaTitular != null ? lotaTitular.getSigla() : null) + " - "
+                    + AcaoVO.Helper.formatarExplicacao(pode, false));
     }
 
     public List<AcaoVO> getAcoes(DpPessoa titular, DpLotacao lotaTitular) {
@@ -363,7 +375,9 @@ public class WfDefinicaoDeProcedimento extends HistoricoAuditavelSuporte impleme
                 .exp(new WfPodeIniciarDiagrama(this, titular, lotaTitular)).build());
 
         set.add(AcaoVO.builder().nome("_Duplicar").icone("arrow_divide")
-                .acao("/app/diagrama/editar?duplicar=true&id=" + id).exp(new PodeSim()).build());
+                .acao("/app/diagrama/editar?duplicar=true&id=" + id)
+                .exp(new WfPodeDuplicarDiagrama(this, titular, lotaTitular))
+                .build());
 
         return set;
     }
@@ -455,6 +469,12 @@ public class WfDefinicaoDeProcedimento extends HistoricoAuditavelSuporte impleme
                 set.add(WfTarefaDocCriar.getIdentificadorDaVariavel(td));
         }
         return String.join(", ", set);
+    }
+
+    public String getAncora() {
+        if (getNome() != null)
+            return "^wf:" + Texto.slugify(getSiglaCompacta(), true, false);
+        return null;
     }
 
 }

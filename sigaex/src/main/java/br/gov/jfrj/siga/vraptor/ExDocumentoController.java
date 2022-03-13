@@ -523,15 +523,6 @@ public class ExDocumentoController extends ExController {
                     exDocumentoDTO.setIdTpDoc(tp.getId());
                     break;
                 }
-
-                // Preencher automaticamente o subscritor quando se tratar de
-                // novo documento
-                if (exDocumentoDTO.getIdTpDoc() == ExTipoDocumento.TIPO_DOCUMENTO_INTERNO
-                        && !postback) {
-                    DpPessoaSelecao subscritorSel = new DpPessoaSelecao();
-                    subscritorSel.buscarPorObjeto(getCadastrante());
-                    exDocumentoDTO.setSubscritorSel(subscritorSel);
-                }
             }
 
             if (exDocumentoDTO.getNivelAcesso() == null) {
@@ -549,12 +540,10 @@ public class ExDocumentoController extends ExController {
             }
         }
 
-        if (exDocumentoDTO.isCriandoAnexo() && exDocumentoDTO.getId() == null
-                && isDocNovo && !postback && modelo == null) {
+        if (exDocumentoDTO.isCriandoAnexo() && exDocumentoDTO.getId() == null && isDocNovo && !postback && modelo == null) {
             ExModelo despacho = dao().consultarExModelo(null, "Despacho");
             if (despacho == null)
-                throw new RuntimeException(
-                        "Não foi possível carregar um modelo chamado 'Despacho'");
+                throw new RuntimeException("Não foi possível carregar um modelo chamado 'Despacho'");
             exDocumentoDTO.setIdMod(despacho.getId());
             for (ExTipoDocumento tp : despacho.getExFormaDocumento()
                     .getExTipoDocumentoSet()) {
@@ -1334,7 +1323,7 @@ public class ExDocumentoController extends ExController {
         } else {
             ExMovimentacao mov = exDocumentoDto.getMob().getUltimaMovimentacaoNaoCancelada(ExTipoDeMovimentacao.TRANSFERENCIA);
 
-            if (Ex.getInstance().getComp().pode(ExPodeReceber.class, getTitular(), getLotaTitular(),exDocumentoDto.getMob())
+            if (Ex.getInstance().getComp().pode(ExPodeReceber.class, getTitular(), getLotaTitular(), exDocumentoDto.getMob())
                     && !exDocumentoDto.getMob().isEmTransitoExterno()
                     && (mov.getCadastrante() == null || !mov.getCadastrante().equivale(getTitular()))
                     && !exDocumentoDto.getMob().isJuntado()) {
@@ -1583,6 +1572,22 @@ public class ExDocumentoController extends ExController {
             buscarDocumentoOuNovo(true, exDocumentoDTO);
             if (exDocumentoDTO.getDoc() == null) {
                 exDocumentoDTO.setDoc(new ExDocumento());
+            }
+
+            if (!new ExPodeRestringirCossignatarioSubscritor(getTitular(), getLotaTitular(), exDocumentoDTO.getSubscritorSel().getObjeto(), exDocumentoDTO.getSubscritorSel().getObjeto().getLotacao(),
+                    exDocumentoDTO.getSubscritorSel().getObjeto() != null ? exDocumentoDTO.getSubscritorSel().getObjeto().getCargo() : null,
+                    exDocumentoDTO.getSubscritorSel().getObjeto() != null ? exDocumentoDTO.getSubscritorSel().getObjeto().getFuncaoConfianca() : null,
+                    exDocumentoDTO.getSubscritorSel().getObjeto() != null ? exDocumentoDTO.getSubscritorSel().getObjeto().getOrgaoUsuario() : exDocumentoDTO.getSubscritorSel().getObjeto().getOrgaoUsuario()).eval()) {
+                result.include(SigaModal.ALERTA, SigaModal.mensagem("Esse usuário não está disponível para inclusão de Cossignatário / " + SigaMessages.getMessage("documento.subscritor") + "."));
+                result.forwardTo(this).edita(exDocumentoDTO, null, vars,
+                        exDocumentoDTO.getMobilPaiSel(),
+                        exDocumentoDTO.isCriandoAnexo(),
+                        exDocumentoDTO.getAutuando(),
+                        exDocumentoDTO.getIdMobilAutuado(),
+                        exDocumentoDTO.getCriandoSubprocesso(),
+                        null, null, null, null);
+
+                return;
             }
 
             long tempoIni = System.currentTimeMillis();
@@ -2838,17 +2843,17 @@ public class ExDocumentoController extends ExController {
     /**
      * Prepara os dados das Movimentações de um {@link ExDocumento Documento}
      * associado a uma {@link ExMobil Via} que foi
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TORNAR_SEM_EFEITO Cancelada}.
+     * {@link }.
      * Primeiro
      * {@link ExDao#consultarTramitacoesPorMovimentacaoDocumentoCancelado(Long)
      * pesquisa pelas Movimentações das Vias} do Documento Cancelado e depois separa
-     * os {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_RECEBIMENTO Recebimentos} e os
-     * associa com as {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TRANSFERENCIA
-     * Tramitações} de origem.
+     * os {@link } e os
+     * associa com as {@link
+     * } de origem.
      *
      * @param idMobil {@link ExMobil#getIdMobil() ID} da {@link ExMobil Via}
-     *                {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TORNAR_SEM_EFEITO
-     *                Cancelada}.
+     *                {@link
+     *                }.
      */
     private void tratarMovimentacoesDocumentoCancelado(Long idMobil) {
         List<ExMovimentacao> movimentacoesDocumento = dao()

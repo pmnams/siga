@@ -1,5 +1,6 @@
 package br.gov.jfrj.siga.wf.model;
 
+import br.gov.jfrj.siga.base.util.Texto;
 import br.gov.jfrj.siga.cp.model.HistoricoAuditavelSuporte;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
@@ -535,6 +536,32 @@ public class WfDefinicaoDeTarefa extends HistoricoAuditavelSuporte
 
     public void setParam2(java.lang.String param2) {
         this.param2 = param2;
+    }
+
+    public String getAncora() {
+        if (getDefinicaoDeProcedimento().getNome() != null && getNome() != null)
+            return "^wf:"
+                    + Texto.slugify(getDefinicaoDeProcedimento().getSiglaCompacta() + "-" + getNome(), true, false);
+        return null;
+    }
+
+    public String getAncoraDescr() {
+        if (getDefinicaoDeProcedimento().getNome() != null && getNome() != null)
+            return "^wf:-descr-"
+                    + Texto.slugify(getDefinicaoDeProcedimento().getSiglaCompacta() + "-" + getNome(), true, false);
+        return null;
+    }
+
+    public List<String> getTags() {
+        ArrayList<String> tags = new ArrayList<String>();
+        if (getDefinicaoDeProcedimento() != null) {
+            tags.add("@" + Texto.slugify(getDefinicaoDeProcedimento().getSiglaCompacta(), true, false));
+            tags.add("@" + Texto.slugify(getDefinicaoDeProcedimento().getNome(), true, false));
+        }
+        if (getNome() != null)
+            tags.add("@" + Texto.slugify(getNome(), true, false));
+
+        return tags;
     }
 
 }

@@ -2,13 +2,13 @@ package br.gov.jfrj.siga.wf.logic;
 
 import com.crivano.jlogic.Expression;
 import com.crivano.jlogic.Or;
-import com.crivano.jlogic.utils.CompositeExpressionSuport;
+import com.crivano.jlogic.CompositeExpressionSupport;
 
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.wf.model.WfDefinicaoDeProcedimento;
 
-public class WfPodeEditarDiagrama extends CompositeExpressionSuport {
+public class WfPodeEditarDiagrama extends CompositeExpressionSupport {
 
 	private WfDefinicaoDeProcedimento pd;
 	private DpPessoa titular;

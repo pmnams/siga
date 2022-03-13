@@ -40,8 +40,6 @@ public class ServiceTest extends TestCase {
 			keys.add("doc_" + (char) ('a' + n));
 			values.add("RJ-MEM-2007/00595" + "-" + (char) ('A' + n));
 		}
-		Service.getWfService().criarInstanciaDeProcesso("testeNovo",
-				"RJ13635@RJSESIE", "RJ13635@RJSESIE", keys, values);
 	}
 
 	public void testTransferir() throws Exception {
