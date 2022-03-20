@@ -10,10 +10,10 @@ import com.crivano.jlogic.*;
 
 public class ExPodeCancelar extends CompositeExpressionSupport {
 
-    private ExMobil mob;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
-    private ExMovimentacao mov;
+    private final ExMobil mob;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
+    private final ExMovimentacao mov;
 
     public ExPodeCancelar(ExMobil mob, ExMovimentacao mov, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;
@@ -45,7 +45,6 @@ public class ExPodeCancelar extends CompositeExpressionSupport {
 
                         new ExMovimentacaoELotaCadastrante(mov, lotaTitular)),
 
-                new ExPodePorConfiguracao(titular, lotaTitular)
-                        .withIdTpConf(ExTipoDeConfiguracao.CANCELAR_MOVIMENTACAO));
+                new ExPodePorConfiguracao(titular, lotaTitular).withIdTpConf(ExTipoDeConfiguracao.CANCELAR_MOVIMENTACAO).withExTpMov(mov.getExTipoMovimentacao()));
     }
 }

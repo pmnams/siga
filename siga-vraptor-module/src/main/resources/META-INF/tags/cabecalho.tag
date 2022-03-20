@@ -77,8 +77,6 @@
 
     <c:set var="siga_version" scope="request" value="10.0.21.3"/>
 
-    <c:set var="exibirExplicacao" value="${f:podeExibirRegraDeNegocioEmBotoes(titular, lotaTitular)}"/>
-
     <meta name="theme-color" content="bg-primary">
     <c:set var="thead_color" value="thead-light" scope="request"/>
 

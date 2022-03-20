@@ -135,7 +135,7 @@
                                                        var="item">
                                                 <option value="${item.idPreenchimento}"
                                                     ${item.idPreenchimento == exDocumentoDTO.preenchimento ? 'selected' : ''}>
-                                                        ${item.descricaoNaLista(lotaTitular)}</option>
+                                                        ${item.nomePreenchimento}</option>
                                             </c:forEach>
                                         </select>
                                         <div class="input-group-append">

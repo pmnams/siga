@@ -9,14 +9,11 @@ import com.crivano.jlogic.*;
 
 public class ExPodeArquivarCorrente extends CompositeExpressionSupport {
 
-    private ExMobil mob;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final ExMobil mob;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public ExPodeArquivarCorrente(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
-        if (mob.isGeralDeProcesso() && mob.doc().isFinalizado())
-            mob = mob.doc().getUltimoVolume();
-
         this.mob = mob;
         this.titular = titular;
         this.lotaTitular = lotaTitular;
@@ -60,11 +57,14 @@ public class ExPodeArquivarCorrente extends CompositeExpressionSupport {
 
                                         new ExTemAnexosNaoAssinados(mob.doc().getMobilGeral()),
 
-                                        new ExTemDespachosNaoAssinados(mob.doc().getMobilGeral()))),
+                                        new ExTemDespachosNaoAssinados(mob.doc().getMobilGeral()))
+                        )
 
-                        Not.of(new ExEstaPendenteDeAssinatura(mob.doc())),
+                ),
 
-                        new ExPodeMovimentar(mob, titular, lotaTitular)),
+                Not.of(new ExEstaPendenteDeAssinatura(mob.doc())),
+
+                new ExPodeMovimentar(mob, titular, lotaTitular),
 
                 Not.of(new ExEstaEmTramiteParalelo(mob)), Not.of(new ExEstaArquivado(mob)),
 
@@ -75,8 +75,6 @@ public class ExPodeArquivarCorrente extends CompositeExpressionSupport {
                 new ExPodePorConfiguracao(titular, lotaTitular).withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
                         .withExTpMov(ExTipoDeMovimentacao.ARQUIVAMENTO_CORRENTE)
                         .withCargo(titular.getCargo()).withDpFuncaoConfianca(titular.getFuncaoConfianca())
-                        .withExFormaDoc(mob.doc().getExFormaDocumento()).withExMod(mob.doc().getExModelo()),
-
-                new ExPodeMovimentarPorConfiguracao(ExTipoDeMovimentacao.COPIA, titular, lotaTitular));
+                        .withExFormaDoc(mob.doc().getExFormaDocumento()).withExMod(mob.doc().getExModelo()));
     }
 }

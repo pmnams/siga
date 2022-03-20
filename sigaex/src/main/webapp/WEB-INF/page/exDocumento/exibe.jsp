@@ -11,6 +11,9 @@
 <%@ taglib uri="http://localhost/libstag" prefix="libs" %>
 
 <jsp:useBean id="docVO" scope="request" type="br.gov.jfrj.siga.ex.vo.ExDocumentoVO"/>
+
+<c:set var="exibirExplicacao" scope="request" value="${libs:podeExibirRegraDeNegocioEmBotoes(titular, lotaTitular)}"/>
+
 <siga:pagina titulo=" ${docVO.sigla}" popup="${param.popup}">
 
     <style type="text/css">

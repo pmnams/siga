@@ -9,10 +9,10 @@ import com.crivano.jlogic.*;
 
 public class ExPodeExcluirAnotacao extends CompositeExpressionSupport {
 
-    private ExMobil mob;
-    private ExMovimentacao mov;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final ExMobil mob;
+    private final ExMovimentacao mov;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public ExPodeExcluirAnotacao(ExMobil mob, ExMovimentacao mov, DpPessoa titular, DpLotacao lotaTitular) {
         if (mob.isGeralDeProcesso() && mob.doc().isFinalizado())
@@ -34,13 +34,6 @@ public class ExPodeExcluirAnotacao extends CompositeExpressionSupport {
      * <li>Não pode haver configuração impeditiva. Tipo de configuração: Excluir
      * Anotação</li>
      * </ul>
-     *
-     * @param titular
-     * @param lotaTitular
-     * @param mob
-     * @param mov
-     * @return
-     * @throws Exception
      */
     @Override
     protected Expression create() {
@@ -52,7 +45,11 @@ public class ExPodeExcluirAnotacao extends CompositeExpressionSupport {
 
                         new ExMovimentacaoECadastrante(mov, titular),
 
-                        new ExMovimentacaoESubscritor(mov, titular)),
+                        new ExMovimentacaoESubscritor(mov, titular),
+
+                        new ExMovimentacaoELotaCadastrante(mov, titular.getLotacao()),
+
+                        new ExMovimentacaoELotaSubscritor(mov, titular.getLotacao())),
 
                 new ExPodePorConfiguracao(titular, lotaTitular).withIdTpConf(ExTipoDeConfiguracao.EXCLUIR_ANOTACAO));
     }

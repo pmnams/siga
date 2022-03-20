@@ -56,7 +56,6 @@ import javax.persistence.TemporalType;
 import javax.persistence.criteria.*;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
@@ -1411,18 +1410,14 @@ public class ExDao extends CpDao {
     public List<ExMovimentacao> consultarMovimentacoes(DpPessoa pes, Date dt) {
 
         if (pes == null || dt == null) {
-            log.error("[consultarMovimentacoes] - Os dados recebidos para realizar a consulta de movimentaï¿½ï¿½es nï¿½o podem ser nulos.");
             throw new IllegalStateException(
-                    "A pessoa e/ou a data informada para a realizaï¿½ï¿½o da consulta ï¿½ nula.");
+                    "A pessoa e/ou a data informada para a realização da consulta é nula.");
         }
 
-        final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         final Query query = em().createNamedQuery("consultarMovimentacoes");
-        ExMovimentacao mov = consultar(1122650L, ExMovimentacao.class, false);
 
         query.setParameter("pessoaIni", pes.getIdPessoaIni());
-        // query.setParameter("data", dt);
-        query.setParameter("data", df.format(dt));
+
         return query.getResultList();
     }
 
@@ -2092,7 +2087,6 @@ public class ExDao extends CpDao {
 
     /**
      * Conta o total de movimentações assinadas
-     *
      */
     public Long contarMovimentacaoAssinada(Long idDoc) {
         return em().createQuery(

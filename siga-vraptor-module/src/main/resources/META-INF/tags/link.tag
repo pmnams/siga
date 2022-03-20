@@ -21,20 +21,14 @@
 <%@ attribute name="explicacao" %>
 <%@ attribute name="post" %>
 
+<c:set var="exibirExplicacao" scope="request" value="${libs:podeExibirRegraDeNegocioEmBotoes(titular, lotaTitular)}"/>
 
 <c:choose>
-    <c:when test="${siga_cliente == 'GOVSP'}">
-        <c:set var="btnClass" value="btn btn-sm btn-light"/>
+    <c:when test="${empty test or test}">
+        <c:set var="btnClass" value="btn btn-sm btn-info text-white"/>
     </c:when>
     <c:otherwise>
-        <c:choose>
-            <c:when test="${empty test or test}">
-                <c:set var="btnClass" value="btn btn-sm btn-info text-white"/>
-            </c:when>
-            <c:otherwise>
-                <c:set var="btnClass" value="btn btn-sm btn-light text-secondary"/>
-            </c:otherwise>
-        </c:choose>
+        <c:set var="btnClass" value="btn btn-sm btn-light text-secondary"/>
     </c:otherwise>
 </c:choose>
 
