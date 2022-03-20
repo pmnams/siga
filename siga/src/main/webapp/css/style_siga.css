@@ -1,5 +1,8 @@
 /*Identidade Visual do SIGA.doc para todos locais */
 
+#siga-top-menu {
+	z-index: 1040;
+}
 .text-size-5 {
 	font-size: 16px;
 	font-weight: 400;
@@ -38,7 +41,7 @@
 .card-header a {
     text-decoration: none;
 }
-/* Bot�o circular */
+/* Botao circular */
 .btn-circle {
     width: 30px;
     height: 30px;
@@ -96,6 +99,8 @@ p.gt-table-action-list a.link-tag {
 .disabled {
 	opacity: 0.6;
 	filter: alpha(opacity=60); /* For IE8 and earlier */
+	pointer-events: none;
+	cursor: default;
 }
 .grey-light {
 	background-color: #adb5bd  !important;

@@ -222,7 +222,8 @@
                                             </option>
                                             <option value="AUTUAR_DOCUMENTO"
                                                     ng-if="data.workflow.tipoDePrincipal == 'DOCUMENTO'">
-                                                Autuar Documento</option>
+                                                Autuar Documento
+                                            </option>
                                             <option value="TRAMITAR_PRINCIPAL"
                                                     ng-if="data.workflow.tipoDePrincipal == 'DOCUMENTO'">
                                                 Tramitar
@@ -230,6 +231,10 @@
                                             <option value="ARQUIVAR_PRINCIPAL"
                                                     ng-if="data.workflow.tipoDePrincipal == 'DOCUMENTO'">
                                                 Arquivar
+                                            </option>
+                                            <option value="INCLUIR_AUXILIAR"
+                                                    ng-if="data.workflow.tipoDePrincipal == 'DOCUMENTO'">
+                                                Incluir Auxiliar
                                             </option>
                                         </optgroup>
                                     </select></label> <i></i></section>
@@ -253,7 +258,7 @@
                                 </select>
                                     <i></i></section>
                                 <section
-                                        ng-show="tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL'"
+                                        ng-show="tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL' || tarefaItem.tipo == 'INCLUIR_AUXILIAR'"
                                         class="col col-12 col-md-2 col-lg-2 form-group">
                                     <label
                                             for="tipoResponsavel" title="" class="label">Tipo Resp.<i
@@ -326,7 +331,7 @@
                                     </select>
                                 </section>
                                 <section
-                                        ng-show="(tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL') && tarefaItem.tipoResponsavel == 'LOTACAO'"
+                                        ng-show="(tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL' || tarefaItem.tipo == 'INCLUIR_AUXILIAR') && tarefaItem.tipoResponsavel == 'LOTACAO'"
                                         class="col col-12 col-md-3 col-lg-3 form-group">
                                     <label
                                             for="refUnidadeResponsavel" title="" class="label">Lotação
@@ -347,7 +352,7 @@
                                          template-url="/siga/javascript/angucomplete-alt/custom-template.html"></div>
                                 </section>
                                 <section
-                                        ng-show="(tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL') && tarefaItem.tipoResponsavel == 'PESSOA'"
+                                        ng-show="(tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL' || tarefaItem.tipo == 'INCLUIR_AUXILIAR') && tarefaItem.tipoResponsavel == 'PESSOA'"
                                         class="col col-12 col-md-3 col-lg-3 form-group">
                                     <label for="refPessoaResponsavel" title="" class="label">Pessoa</label>
                                     Resp.
@@ -366,7 +371,7 @@
                                          template-url="/siga/javascript/angucomplete-alt/custom-template.html"></div>
                                 </section>
                                 <section
-                                        ng-show="(tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL') && tarefaItem.tipoResponsavel == 'RESPONSAVEL'"
+                                        ng-show="(tarefaItem.tipo == 'FORMULARIO' || tarefaItem.tipo == 'INCLUIR_DOCUMENTO' || tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO' || tarefaItem.tipo == 'EMAIL' || tarefaItem.tipo == 'TRAMITAR_PRINCIPAL' || tarefaItem.tipo == 'INCLUIR_AUXILIAR') && tarefaItem.tipoResponsavel == 'RESPONSAVEL'"
                                         class="col col-12 col-md-3 col-lg-3 form-group">
                                     <label for="refResponsavel" title="" class="label">Responsável</label>
                                     <select ng-model="tarefaItem.refResponsavel"
@@ -420,14 +425,16 @@
                                     <select ng-model="tarefaItem.ref2"
                                             ng-options="item.idPreenchimento as item.nome for item in tarefaItem.preenchimentos"
                                             class="form-control"></select></section>
-                                <section ng-if="tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO'"
-                                         class="col col-12 col-md-3 col-lg-3 form-group"><label
+                                <section
+                                        ng-if="tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO'"
+                                        class="col col-12 col-md-3 col-lg-3 form-group"><label
                                         for="param" title="" class="label mb-0">Finalizar</label> <select
                                         ng-model="tarefaItem.param"
                                         ng-options="item.id as item.nome for item in [{id: 'NAO_FINALIZAR', nome: 'Não Finalizar'},{id: 'FINALIZAR', nome: 'Finalizar'}]"
                                         class="form-control"></select></section>
-                                <section ng-if="(tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO') && tarefaItem.param == 'FINALIZAR'"
-                                         class="col col-12 col-md-3 col-lg-3 form-group"><label
+                                <section
+                                        ng-if="(tarefaItem.tipo == 'CRIAR_DOCUMENTO' || tarefaItem.tipo == 'AUTUAR_DOCUMENTO') && tarefaItem.param == 'FINALIZAR'"
+                                        class="col col-12 col-md-3 col-lg-3 form-group"><label
                                         for="param2" title="" class="label mb-0">Aguardar</label>
                                     <select ng-model="tarefaItem.param2"
                                             ng-options="item.id as item.nome for item in [{id: 'NAO_AGUARDAR', nome: 'Não Aguardar'},{id: 'AGUARDAR_ASSINATURA', nome: 'Aguardar Assinatura'},{id: 'AGUARDAR_JUNTADA', nome: 'Aguardar Juntada ao Principal'}]"
@@ -606,7 +613,7 @@
                                                 <section class="col col-12 col-md-4 form-group"><label
                                                         for="condicao" title="" class="label">Condição</label>
                                                     <input ng-model="desvioItem.condicao" name="condicao"
-                                                        id="condicao" type="text" class="form-control">
+                                                           id="condicao" type="text" class="form-control">
                                                 </section>
                                             </div>
                                         </div>

@@ -77,6 +77,8 @@
 
     <c:set var="siga_version" scope="request" value="10.0.21.3"/>
 
+    <c:set var="exibirExplicacao" value="${f:podeExibirRegraDeNegocioEmBotoes(titular, lotaTitular)}"/>
+
     <meta name="theme-color" content="bg-primary">
     <c:set var="thead_color" value="thead-light" scope="request"/>
 
@@ -117,7 +119,7 @@
 
 <body onload="${onLoad}" class="${body_color}">
 <c:if test="${popup!='true'}">
-<nav class="navbar navbar-expand-lg ${navbar_class} ${menu_class}">
+<nav id="siga-top-menu" class="navbar navbar-expand-lg ${navbar_class} ${menu_class}">
     <a class="navbar-brand pt-0 pb-0" href="/siga"> <img
             src="${navbar_logo}" height="${navbar_logo_size}">
     </a>

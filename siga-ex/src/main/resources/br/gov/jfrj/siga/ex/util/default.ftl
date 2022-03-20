@@ -588,7 +588,7 @@ Autor:    Ruben
 Data:     13/05/2012
 Descrição: Recebe o id e o texto da mensagem para que se possa alterar o style.diplay para "none" ou "inline"
 --]
-    <span id="idspan" style="[#if vermelho]color=#ff0000[/#if]"> ${texto!""}</span>
+    <span id="idspan" style="[#if vermelho]color: #ff0000[/#if]"> ${texto!""}</span>
 [/#macro]
 
 [#macro memooculto var titulo colunas linhas reler=false obrigatorio=false default=""]

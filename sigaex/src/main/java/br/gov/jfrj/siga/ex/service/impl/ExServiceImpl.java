@@ -1,5 +1,5 @@
 
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -811,6 +811,19 @@ public class ExServiceImpl implements ExService {
                 if (mob.isGeral())
                     mob = mob.getDoc().getPrimeiroMobil();
                 return mob.isModeloIncluso(idModelo, depoisDaData);
+            } catch (Exception ex) {
+                ctx.rollback(ex);
+                throw ex;
+            }
+        }
+    }
+
+    public Boolean isAuxiliarIncluso(String codigoDocumento, Date depoisDaData) throws Exception {
+        try (ExSoapContext ctx = new ExSoapContext(true)) {
+            try {
+                ExMobil mob = buscarMobil(codigoDocumento).getDoc().getMobilGeral();
+
+                return mob.isAuxiliarIncluso(depoisDaData);
             } catch (Exception ex) {
                 ctx.rollback(ex);
                 throw ex;

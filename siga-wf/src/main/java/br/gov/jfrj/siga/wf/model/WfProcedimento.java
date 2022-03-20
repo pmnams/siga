@@ -3,7 +3,6 @@ package br.gov.jfrj.siga.wf.model;
 import br.gov.jfrj.siga.Service;
 import br.gov.jfrj.siga.base.AcaoVO;
 import br.gov.jfrj.siga.base.AplicacaoException;
-import br.gov.jfrj.siga.base.util.Texto;
 import br.gov.jfrj.siga.base.util.Utils;
 import br.gov.jfrj.siga.cp.CpIdentidade;
 import br.gov.jfrj.siga.cp.util.CpProcessadorReferencias;
@@ -672,6 +671,12 @@ public class WfProcedimento extends Objeto
                     + getDefinicaoDeTarefaCorrente().getRefSigla() + "' ao documento " + getPrincipal()
                     + ". Clique <a href=\"/sigaex/app/expediente/doc/editar?mobilPaiSel.sigla=" + getPrincipal()
                     + "&criandoAnexo=true&modelo=" + getDefinicaoDeTarefaCorrente().getRefId()
+                    + "\">aqui</a> para incluir.";
+        }
+        if (getDefinicaoDeTarefaCorrente() != null
+                && getDefinicaoDeTarefaCorrente().getTipoDeTarefa() == WfTipoDeTarefa.INCLUIR_AUXILIAR) {
+            return "Este workflow prosseguirá automaticamente quando for anexado um arquivo auxilar ao documento " + getPrincipal()
+                    + ". Clique <a href=\"/sigaex/app/expediente/mov/anexar_arquivo_auxiliar?sigla=" + getPrincipal()
                     + "\">aqui</a> para incluir.";
         }
         if (getDefinicaoDeTarefaCorrente() != null

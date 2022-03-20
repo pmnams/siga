@@ -75,7 +75,7 @@ public class SigaHTTP {
 	 * @param URL
 	 *            deve ser a url completa.
 	 * @param cookieStore
-	 *            Necessaria se desejar incluir cookies alem da session do idp
+	 *            Necessaria se desejar incluir cookies alem da sgession do idp
 	 * @param idpDomain
 	 *            dominio do idp, ex.: siga.jfrj.jus.br
 	 * @param idpSession

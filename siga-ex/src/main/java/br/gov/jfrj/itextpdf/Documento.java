@@ -659,15 +659,12 @@ public class Documento {
     }
 
     public static String realPath() {
-
         RequestInfo ri = CurrentRequest.get();
-        String realPath = Contexto.urlBase(ri.getRequest()) + ri.getRequest().getContextPath();
+        String realPath = Contexto.internallUrlBase(ri.getRequest()) + ri.getRequest().getContextPath();
 
         if (realPath.endsWith("/siga-le"))
             realPath = realPath.replace("/siga-le", "/sigaex");
 
         return realPath;
     }
-
-
 }

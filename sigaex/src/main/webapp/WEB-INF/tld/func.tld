@@ -364,7 +364,7 @@
  <function>
   <name>listaPublicacao</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
-  <function-signature>List&lt;ExTpDocPublicacao&gt; listaPublicacao(java.lang.Long)</function-signature>
+  <function-signature>java.util.List&lt;br.gov.jfrj.siga.ex.ExTpDocPublicacao&gt; listaPublicacao(java.lang.Long)</function-signature>
  </function>
  <function>
   <name>calculoPCD</name>
@@ -375,12 +375,12 @@
  <function>
   <name>listaDocsAPublicarBoletim</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
-  <function-signature>List&lt;ExDocumento&gt; listaDocsAPublicarBoletim(br.gov.jfrj.siga.dp.CpOrgaoUsuario)</function-signature>
+  <function-signature>java.util.List&lt;br.gov.jfrj.siga.ex.ExDocumento&gt; listaDocsAPublicarBoletim(br.gov.jfrj.siga.dp.CpOrgaoUsuario)</function-signature>
  </function>
  <function>
   <name>listaDocsAPublicarBoletimPorDocumento</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
-  <function-signature>List&lt;ExDocumento&gt; listaDocsAPublicarBoletimPorDocumento(br.gov.jfrj.siga.ex.ExDocumento)</function-signature>
+  <function-signature>java.util.List&lt;br.gov.jfrj.siga.ex.ExDocumento&gt; listaDocsAPublicarBoletimPorDocumento(br.gov.jfrj.siga.ex.ExDocumento)</function-signature>
  </function>
  <function>
   <name>webservice</name>
@@ -390,7 +390,7 @@
  <function>
   <name>parseXML</name>
   <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
-  <function-signature>freemarker.ext.dom.NodeModel webservice(java.lang.String)</function-signature>
+  <function-signature>java.lang.String webservice(java.lang.String)</function-signature>
  </function>
  <function>
   <name>podeAssinarComSenha</name>
@@ -455,7 +455,7 @@
  <function>
   <name>calculaDiasAPartirDeHoje</name>
   <function-class>br.gov.jfrj.siga.jee.SigaLibsEL</function-class>
-  <function-signature>java.lang.String calculaDiasAPartirDeHoje( java.lang.Long )</function-signature>
+  <function-signature>java.lang.String calculaDiasAPartirDeHoje(java.lang.Long)</function-signature>
  </function>
  <function>
   <name>podeUtilizarSegundoFatorPin</name>

@@ -29,7 +29,10 @@ import br.com.caelum.vraptor.observer.download.Download;
 import br.com.caelum.vraptor.observer.download.InputStreamDownload;
 import br.com.caelum.vraptor.observer.upload.UploadedFile;
 import br.com.caelum.vraptor.view.Results;
-import br.gov.jfrj.siga.base.*;
+import br.gov.jfrj.siga.base.AplicacaoException;
+import br.gov.jfrj.siga.base.GeraMessageDigest;
+import br.gov.jfrj.siga.base.Prop;
+import br.gov.jfrj.siga.base.SigaModal;
 import br.gov.jfrj.siga.base.client.Hcaptcha;
 import br.gov.jfrj.siga.base.util.Texto;
 import br.gov.jfrj.siga.cp.bl.Cp;
@@ -284,8 +287,8 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
                     dao().gravar(pessoaAnt);
                     dao().commitTransacao();
                 } catch (final Exception e) {
-                    if (e.getCause() instanceof ConstraintViolationException &&
-                            ("CORPORATIVO.DP_PESSOA_UNIQUE_PESSOA_ATIVA".equalsIgnoreCase(((ConstraintViolationException) e.getCause()).getConstraintName()))) {
+                    if (e.getCause() instanceof ConstraintViolationException
+                            && ((ConstraintViolationException) e.getCause()).getConstraintName().toUpperCase().contains("DP_PESSOA_UNIQUE_PESSOA_ATIVA")) {
                         result.include(SigaModal.ALERTA, SigaModal.mensagem("Ocorreu um problema no cadastro da pessoa"));
                     } else {
                         throw new AplicacaoException("Erro na gravação", 0, e);
@@ -346,8 +349,8 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
                 try {
                     dao().gravarComHistorico(pessoa, pessoaAnt, dao().consultarDataEHoraDoServidor(), getIdentidadeCadastrante());
                 } catch (Exception e) {
-                    if (e.getCause() instanceof ConstraintViolationException &&
-                            ("CORPORATIVO.DP_PESSOA_UNIQUE_PESSOA_ATIVA".equalsIgnoreCase(((ConstraintViolationException) e.getCause()).getConstraintName()))) {
+                    if (e.getCause() instanceof ConstraintViolationException
+                            && ((ConstraintViolationException) e.getCause()).getConstraintName().toUpperCase().contains("DP_PESSOA_UNIQUE_PESSOA_ATIVA")) {
                         result.include(SigaModal.ALERTA, SigaModal.mensagem("Ocorreu um problema no cadastro da pessoa"));
                     } else {
                         LOG.error("Erro ao ativar pessoa " + pessoa + ": " + e.getMessage(), e);
@@ -594,12 +597,8 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
 
         assertAcesso("GI:Módulo de Gestão de Identidade;CAD_PESSOA:Cadastrar Pessoa");
 
-        try {
-            DpPessoa pes = new CpBL().criarUsuario(id, getIdentidadeCadastrante(), idOrgaoUsu, nmMatricula, idCargo, idFuncao, idLotacao, nmPessoa, dtNascimento, cpf, email, identidade,
-                    orgaoIdentidade, ufIdentidade, dataExpedicaoIdentidade, nomeExibicao, enviarEmail);
-        } catch (RegraNegocioException e) {
-            result.include(SigaModal.ALERTA, e.getMessage());
-        }
+        DpPessoa pes = new CpBL().criarUsuario(id, getIdentidadeCadastrante(), idOrgaoUsu, nmMatricula, idCargo, idFuncao, idLotacao, nmPessoa, dtNascimento, cpf, email, identidade,
+                orgaoIdentidade, ufIdentidade, dataExpedicaoIdentidade, nomeExibicao, enviarEmail);
 
         lista(0, null, null, "", "", null, null, null, "", null);
     }

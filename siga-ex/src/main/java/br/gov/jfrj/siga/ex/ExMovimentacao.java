@@ -47,7 +47,6 @@ import org.hibernate.annotations.BatchSize;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -77,7 +76,6 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
 
     /**
      * Constructor of ExMovimentacao instances given a simple primary key.
-     *
      */
     public ExMovimentacao(final java.lang.Long idMov) {
         super(idMov);
@@ -1233,21 +1231,23 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
         if (!(getExTipoMovimentacao() instanceof ExTipoDeMovimentacao))
             throw new AplicacaoException("Não é Assinatura");
         ExTipoDeMovimentacao l = (ExTipoDeMovimentacao) getExTipoMovimentacao();
+        byte[] pdf = this.getExMovimentacaoRef() != null ? this.getExMovimentacaoRef().getConteudoBlobpdf() : this.getExDocumento().getPdf();
+
         switch (l) {
             case ASSINATURA_COM_SENHA:
             case CONFERENCIA_COPIA_COM_SENHA:
-                return assertAssinaturaComSenhaValida(this.getExDocumento().getPdf(), this.getAuditHash(),
-                        this.getDtIniMov(), retornaNome);
             case ASSINATURA_MOVIMENTACAO_COM_SENHA:
-                return assertAssinaturaComSenhaValida(this.getExMovimentacaoRef().getConteudoBlobpdf(), this.getAuditHash(),
-                        this.getDtIniMov(), retornaNome);
-            case ASSINATURA_DIGITAL_DOCUMENTO:
-                return assertAssinaturaDigitalValida(this.getExDocumento().getPdf(), this.getConteudoBlobMov(),
+                return assertAssinaturaComSenhaValida(
+                        pdf,
+                        this.getAuditHash(),
                         this.getDtIniMov(), retornaNome);
 
+            case ASSINATURA_DIGITAL_DOCUMENTO:
             case CONFERENCIA_COPIA_DOCUMENTO:
             case ASSINATURA_DIGITAL_MOVIMENTACAO:
-                return assertAssinaturaDigitalValida(this.getExMovimentacaoRef().getConteudoBlobpdf(), this.getConteudoBlobMov(),
+                return assertAssinaturaDigitalValida(
+                        pdf,
+                        this.getConteudoBlobMov(),
                         this.getDtIniMov(), retornaNome);
             default:
                 throw new AplicacaoException("Não é Assinatura");
