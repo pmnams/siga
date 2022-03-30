@@ -2,6 +2,7 @@ package br.gov.jfrj.siga.vraptor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -107,7 +108,7 @@ public class ExModeloController extends ExSelecionavelController {
 			throws UnsupportedEncodingException {
 		assertAcesso(VERIFICADOR_ACESSO);
 		if (postback == null) {
-			ExModelo modelo = buscarModelo(id);
+			ExModelo modelo = copiarModeloAtual(id);
 
 			String tipoModelo = modelo.getConteudoTpBlob();
 			if (tipoModelo == null || tipoModelo.trim().length() == 0) {
@@ -122,7 +123,7 @@ public class ExModeloController extends ExSelecionavelController {
 					.getExClassCriacaoVia());
 
 			final String conteudo = modelo.getConteudoBlobMod() != null ? new String(
-					modelo.getConteudoBlobMod2(), UTF8) : null;
+					modelo.getConteudoBlobMod2(), StandardCharsets.UTF_8) : null;
 			final Long forma = modelo.getExFormaDocumento() != null ? modelo
 					.getExFormaDocumento().getIdFormaDoc() : null;
 			final Long nivel = modelo.getExNivelAcesso() != null ? modelo

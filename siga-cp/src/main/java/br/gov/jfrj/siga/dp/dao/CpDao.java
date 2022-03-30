@@ -48,7 +48,6 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -89,6 +88,8 @@ public class CpDao extends ModeloDao {
             String s = o.getNome();
             if (s != null)
                 s = s.replace(' ', '%');
+            else
+                s = "";
             query.setParameter("nome", s);
 
             final List<CpOrgao> l = query.getResultList();
@@ -257,6 +258,8 @@ public class CpDao extends ModeloDao {
             String s = o.getNome();
             if (s != null)
                 s = s.replace(' ', '%');
+            else
+                s = "";
             query.setParameter("nome", s);
 
             final int l = ((Long) query.getSingleResult()).intValue();
@@ -294,6 +297,8 @@ public class CpDao extends ModeloDao {
             String s = o.getNome();
             if (s != null)
                 s = s.replace(' ', '%');
+            else
+                s = "";
             query.setParameter("nome", s);
 
             query.setHint("org.hibernate.cacheable", true);
@@ -324,6 +329,8 @@ public class CpDao extends ModeloDao {
             String s = o.getNome();
             if (s != null)
                 s = s.replace(' ', '%');
+            else
+                s = "";
             query.setParameter("nome", s);
 
             query.setHint("org.hibernate.cacheable", true);
@@ -390,6 +397,8 @@ public class CpDao extends ModeloDao {
             String s = o.getNome();
             if (s != null)
                 s = s.replace(' ', '%');
+            else
+                s = "";
             query.setParameter("nome", s);
 
             query.setHint("org.hibernate.cacheable", true);
@@ -424,6 +433,8 @@ public class CpDao extends ModeloDao {
             String s = o.getNome();
             if (s != null)
                 s = s.replace(' ', '%');
+            else
+                s = "";
             query.setParameter("nome", s);
 
             if (o.getIdOrgaoUsu() != null)
@@ -487,6 +498,8 @@ public class CpDao extends ModeloDao {
             String s = o.getNome();
             if (s != null)
                 s = s.replace(' ', '%');
+            else
+                s = "";
             query.setParameter("nome", s);
 
             if (o.getIdOrgaoUsu() != null)
@@ -524,6 +537,8 @@ public class CpDao extends ModeloDao {
             String s = o.getNome();
             if (s != null)
                 s = s.replace(' ', '%');
+            else
+                s = "";
             query.setParameter("nome", s);
 
             if (o.getIdOrgaoUsu() != null)
@@ -605,6 +620,8 @@ public class CpDao extends ModeloDao {
             String s = o.getNome();
             if (s != null)
                 s = s.replace(' ', '%');
+            else
+                s = "";
             query.setParameter("nome", s);
             if (o.getIdOrgaoUsu() != null)
                 query.setParameter("idOrgaoUsu", o.getIdOrgaoUsu());
@@ -2688,8 +2705,7 @@ public class CpDao extends ModeloDao {
             Query sql = em().createNamedQuery("consultarQtdeDocCriadosPossePorDpLotacao");
 
             sql.setParameter("idLotacao", idLotacao);
-            List result = sql.getResultList();
-            final int l = ((BigDecimal) sql.getSingleResult()).intValue();
+            final Integer l = ((Number) sql.getSingleResult()).intValue(); //Number pq no MySQL NativeQuery retorna BigInteger e no Oracle BigDecimal
             return l;
         } catch (final NullPointerException e) {
             return null;

@@ -311,15 +311,21 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
                 dpPessoa.setId(id);
 
                 dpPessoa.setBuscarFechadas(Boolean.FALSE);
-                Integer tamanho = dao().consultarQuantidade(dpPessoa);
+                int tamanho = dao().consultarQuantidade(dpPessoa);
 
                 if (tamanho > 0) {
                     throw new AplicacaoException(
                             "Já existe outro usuário ativo com estes dados: Órgão, Cargo, Função, Unidade e CPF");
                 }
 
-                DpCargo cargoAtual = new DpCargo();
-                cargoAtual = CpDao.getInstance().consultarPorIdInicialDpCargoAtual(pessoaAnt.getCargo().getIdCargoIni());
+                DpLotacao lotacaoAtual = dpPessoa.getLotacao().getLotacaoAtual();
+                if ((lotacaoAtual == null) || (lotacaoAtual != null && lotacaoAtual.getDataFim() != null)) {
+                    throw new AplicacaoException(
+                            "Não é possível ativar pessoa. Lotação inexistente ou inativada.");
+                }
+                pessoa.setLotacao(lotacaoAtual);
+
+                DpCargo cargoAtual = CpDao.getInstance().consultarPorIdInicialDpCargoAtual(pessoaAnt.getCargo().getIdCargoIni());
                 if ((cargoAtual == null) || (cargoAtual != null && cargoAtual.getDataFim() != null)) {
                     throw new AplicacaoException(
                             "Não é possível ativar pessoa. Cargo inexistente ou inativado.");
@@ -339,7 +345,6 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
 
                 pessoa.setNomePessoa(pessoaAnt.getNomePessoa());
                 pessoa.setCpfPessoa(pessoaAnt.getCpfPessoa());
-                pessoa.setLotacao(pessoaAnt.getLotacao());
                 pessoa.setOrgaoUsuario(pessoaAnt.getOrgaoUsuario());
                 pessoa.setDataNascimento(pessoaAnt.getDataNascimento());
                 pessoa.setMatricula(pessoaAnt.getMatricula());
@@ -404,17 +409,21 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
                 if (pessoa.getDataNascimento() != null) {
                     result.include("dtNascimento", pessoa.getDtNascimentoDDMMYYYY());
                 }
-                if (pessoa.getCargo() != null) {
-                    result.include("idCargo", pessoa.getCargo().getId());
-                }
+
                 if (pessoa.getNomeExibicao() != null) {
                     result.include("nomeExibicao", pessoa.getNomeExibicao());
                 }
-                if (pessoa.getFuncaoConfianca() != null) {
-                    result.include("idFuncao", pessoa.getFuncaoConfianca().getId());
+
+                if (pessoa.getCargo() != null) {
+                    result.include("idCargo", pessoa.getCargo().getCargoAtual().getId());
                 }
+
+                if (pessoa.getFuncaoConfianca() != null) {
+                    result.include("idFuncao", pessoa.getFuncaoConfianca().getFuncaoConfiancaAtual().getId());
+                }
+
                 if (pessoa.getLotacao() != null) {
-                    result.include("idLotacao", pessoa.getLotacao().getId());
+                    result.include("idLotacao", pessoa.getLotacao().getLotacaoAtual().getId());
                 }
 
                 if (pessoa.getUfIdentidade() != null) {
@@ -945,7 +954,7 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
                 throw new RuntimeException("Usuário não localizado. Verifique os dados informados.");
             }
 
-            String jwt = SigaUtil.buildJwtToken("RESET-SENHA",cpf);
+            String jwt = SigaUtil.buildJwtToken("RESET-SENHA", cpf);
             HashMap<String, Object> json = new HashMap<>();
 
             json.put("emails", emailsOculto);

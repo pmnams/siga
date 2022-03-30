@@ -1,18 +1,18 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
- * 
+ *
  *     This file is part of SIGA.
- * 
+ *
  *     SIGA is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     SIGA is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with SIGA.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -24,16 +24,6 @@
  */
 package br.gov.jfrj.siga.dp;
 
-import java.io.Serializable;
-import java.util.Date;
-
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Formula;
-
 import br.gov.jfrj.siga.base.util.Texto;
 import br.gov.jfrj.siga.dp.dao.CpDao;
 import br.gov.jfrj.siga.model.Assemelhavel;
@@ -42,191 +32,210 @@ import br.gov.jfrj.siga.model.Selecionavel;
 import br.gov.jfrj.siga.sinc.lib.Desconsiderar;
 import br.gov.jfrj.siga.sinc.lib.Sincronizavel;
 import br.gov.jfrj.siga.sinc.lib.SincronizavelSuporte;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Formula;
 
-@SuppressWarnings("serial")
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.io.Serializable;
+import java.util.Date;
+
 @Entity
 @Table(name = "corporativo.dp_funcao_confianca")
 @Cache(region = CpDao.CACHE_CORPORATIVO, usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class DpFuncaoConfianca extends AbstractDpFuncaoConfianca implements
-		Serializable, Historico, Selecionavel, Sincronizavel, DpConvertableEntity {
+        Serializable, Historico, Selecionavel, Sincronizavel, DpConvertableEntity {
 
-	@Formula(value = "REMOVE_ACENTO(NOME_FUNCAO_CONFIANCA)")
-	@Desconsiderar
-	private String nmFuncaoConfiancaAI;
+    @Formula(value = "REMOVE_ACENTO(NOME_FUNCAO_CONFIANCA)")
+    @Desconsiderar
+    private String nmFuncaoConfiancaAI;
 
-	public DpFuncaoConfianca() {
-		super();
-	}
+    public DpFuncaoConfianca() {
+        super();
+    }
 
-	// @Override
-	// public String getNomeFuncao() {
-	// String nome = super.getNomeFuncao();
-	// if (super.getNomeFuncao().indexOf("(") > 0)
-	// nome = super.getNomeFuncao().substring(0,
-	// super.getNomeFuncao().indexOf("(")).trim();
-	// return nome;
-	// }
+    // @Override
+    // public String getNomeFuncao() {
+    // String nome = super.getNomeFuncao();
+    // if (super.getNomeFuncao().indexOf("(") > 0)
+    // nome = super.getNomeFuncao().substring(0,
+    // super.getNomeFuncao().indexOf("(")).trim();
+    // return nome;
+    // }
 
-	public String iniciais(String s) {
-		final StringBuilder sb = new StringBuilder(10);
-		boolean f = true;
+    public String iniciais(String s) {
+        final StringBuilder sb = new StringBuilder(10);
+        boolean f = true;
 
-		s = s.replace(" E ", " ");
-		s = s.replace(" DA ", " ");
-		s = s.replace(" DE ", " ");
-		s = s.replace(" DO ", " ");
+        s = s.replace(" E ", " ");
+        s = s.replace(" DA ", " ");
+        s = s.replace(" DE ", " ");
+        s = s.replace(" DO ", " ");
 
-		for (int i = 0; i < s.length(); i++) {
-			final char c = s.charAt(i);
-			if (f) {
-				sb.append(c);
-				f = false;
-			}
-			if (c == ' ') {
-				f = true;
-			}
-		}
-		return sb.toString();
-	}
+        for (int i = 0; i < s.length(); i++) {
+            final char c = s.charAt(i);
+            if (f) {
+                sb.append(c);
+                f = false;
+            }
+            if (c == ' ') {
+                f = true;
+            }
+        }
+        return sb.toString();
+    }
 
-	public String getIniciais() {
-		return iniciais(getNomeFuncao());
-	}
-	
-	public String getDescricaoIniciaisMaiusculas() {
-		return Texto.maiusculasEMinusculas(getDescricao());
-	}
+    public String getIniciais() {
+        return iniciais(getNomeFuncao());
+    }
 
-	public Long getId() {
-		return Long.valueOf(getIdFuncao());
-	}
+    public String getDescricaoIniciaisMaiusculas() {
+        return Texto.maiusculasEMinusculas(getDescricao());
+    }
 
-	public String getSigla() {
-		return getSiglaFuncaoConfianca();
-	}
+    public Long getId() {
+        return getIdFuncao();
+    }
 
-	public void setSigla(final String sigla) {
-		setSiglaFuncaoConfianca(sigla);
-	}
+    public String getSigla() {
+        return getSiglaFuncaoConfianca();
+    }
 
-	public String getDescricao() {
-		return getNomeFuncao();
-	}
+    public void setSigla(final String sigla) {
+        setSiglaFuncaoConfianca(sigla);
+    }
 
-	public String getNmFuncaoConfiancaAI() {
-		return nmFuncaoConfiancaAI;
-	}
+    public String getDescricao() {
+        return getNomeFuncao();
+    }
 
-	public void setNmFuncaoConfiancaAI(String nmFuncaoConfiancaAI) {
-		this.nmFuncaoConfiancaAI = nmFuncaoConfiancaAI;
-	}
+    public String getNmFuncaoConfiancaAI() {
+        return nmFuncaoConfiancaAI;
+    }
 
-	// Metodos necessarios para ser "Sincronizavel"
-	//
-	public Date getDataFim() {
-		return getDataFimFuncao();
-	}
+    public void setNmFuncaoConfiancaAI(String nmFuncaoConfiancaAI) {
+        this.nmFuncaoConfiancaAI = nmFuncaoConfiancaAI;
+    }
 
-	public Date getDataInicio() {
-		return getDataInicioFuncao();
-	}
+    // Metodos necessarios para ser "Sincronizavel"
+    //
+    public Date getDataFim() {
+        return getDataFimFuncao();
+    }
 
-	public String getDescricaoExterna() {
-		return getDescricao();
-	}
+    public Date getDataInicio() {
+        return getDataInicioFuncao();
+    }
 
-	public String getIdExterna() {
-		return getIdeFuncao();
-	}
+    public String getDescricaoExterna() {
+        return getDescricao();
+    }
 
-	public Long getIdInicial() {
-		return getIdFuncaoIni();
-	}
+    public String getIdExterna() {
+        return getIdeFuncao();
+    }
 
-	public String getLoteDeImportacao() {
-		return getOrgaoUsuario().getId().toString();
-	}
+    public Long getIdInicial() {
+        return getIdFuncaoIni();
+    }
 
-	public int getNivelDeDependencia() {
-		return SincronizavelSuporte.getNivelDeDependencia(this);
-	}
+    public String getLoteDeImportacao() {
+        return getOrgaoUsuario().getId().toString();
+    }
 
-	public void setDataFim(Date dataFim) {
-		setDataFimFuncao(dataFim);
-	}
+    public int getNivelDeDependencia() {
+        return SincronizavelSuporte.getNivelDeDependencia(this);
+    }
 
-	public void setDataInicio(Date dataInicio) {
-		setDataInicioFuncao(dataInicio);
-	}
+    public void setDataFim(Date dataFim) {
+        setDataFimFuncao(dataFim);
+    }
 
-	public void setIdExterna(String idExterna) {
-		setIdeFuncao(idExterna);
-	}
+    public void setDataInicio(Date dataInicio) {
+        setDataInicioFuncao(dataInicio);
+    }
 
-	public void setIdInicial(Long idInicial) {
-		setIdFuncaoIni(idInicial);
-	}
+    public void setIdExterna(String idExterna) {
+        setIdeFuncao(idExterna);
+    }
 
-	public void setLoteDeImportacao(String loteDeImportacao) {
-	}
+    public void setIdInicial(Long idInicial) {
+        setIdFuncaoIni(idInicial);
+    }
 
-	public boolean semelhante(Assemelhavel obj, int profundidade) {
-		return SincronizavelSuporte.semelhante(this, obj, profundidade);
-	}
+    public void setLoteDeImportacao(String loteDeImportacao) {
+    }
 
-	public boolean equivale(Object other) {
-		if (other == null)
-			return false;
-		return this.getIdInicial().longValue() == ((DpFuncaoConfianca) other)
-				.getIdInicial().longValue();
-	}
+    public boolean semelhante(Assemelhavel obj, int profundidade) {
+        return SincronizavelSuporte.semelhante(this, obj, profundidade);
+    }
 
-	@Override
-	public void setId(Long id) {
-		setIdFuncao(id);
-	}
+    public boolean equivale(Object other) {
+        if (other == null)
+            return false;
+        return this.getIdInicial().longValue() == ((DpFuncaoConfianca) other)
+                .getIdInicial().longValue();
+    }
 
-	@Override
-	public Long getHisIdIni() {
-		return getIdFuncaoIni();
-	}
+    @Override
+    public void setId(Long id) {
+        setIdFuncao(id);
+    }
 
-	@Override
-	public void setHisIdIni(Long hisIdIni) {
-		setIdFuncaoIni(hisIdIni);
-		
-	}
+    @Override
+    public Long getHisIdIni() {
+        return getIdFuncaoIni();
+    }
 
-	@Override
-	public Date getHisDtIni() {
-		return getDataInicioFuncao();
-	}
+    @Override
+    public void setHisIdIni(Long hisIdIni) {
+        setIdFuncaoIni(hisIdIni);
 
-	@Override
-	public void setHisDtIni(Date hisDtIni) {
-		setDataInicioFuncao(hisDtIni);
-		
-	}
+    }
 
-	@Override
-	public Date getHisDtFim() {
-		return getDataFimFuncao();
-	}
+    @Override
+    public Date getHisDtIni() {
+        return getDataInicioFuncao();
+    }
 
-	@Override
-	public void setHisDtFim(Date hisDtFim) {
-		setDataFimFuncao(hisDtFim);
-		
-	}
+    @Override
+    public void setHisDtIni(Date hisDtIni) {
+        setDataInicioFuncao(hisDtIni);
 
-	@Override
-	public Integer getHisAtivo() {
-		return getDataFimFuncao() != null ? 1 : 0;
-	}
+    }
 
-	@Override
-	public void setHisAtivo(Integer hisAtivo) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public Date getHisDtFim() {
+        return getDataFimFuncao();
+    }
+
+    @Override
+    public void setHisDtFim(Date hisDtFim) {
+        setDataFimFuncao(hisDtFim);
+
+    }
+
+    @Override
+    public Integer getHisAtivo() {
+        return getDataFimFuncao() != null ? 1 : 0;
+    }
+
+    @Override
+    public void setHisAtivo(Integer hisAtivo) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * Retorna a Função de Confiança atual (última) no historico desta Função de Confiança
+     */
+    public DpFuncaoConfianca getFuncaoConfiancaAtual() {
+
+        if (this.getDataFim() != null)
+            return CpDao.getInstance().consultarPorIdInicialDpFuncaoConfiancaAtual(this.getIdFuncaoIni());
+
+        return this;
+    }
+
 }

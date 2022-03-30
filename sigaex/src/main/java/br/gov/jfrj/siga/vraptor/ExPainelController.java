@@ -26,6 +26,7 @@ import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Result;
 import br.gov.jfrj.siga.base.AplicacaoException;
+import br.gov.jfrj.siga.cp.model.enm.ITipoDeMovimentacao;
 import br.gov.jfrj.siga.ex.ExDocumento;
 import br.gov.jfrj.siga.ex.ExMobil;
 import br.gov.jfrj.siga.ex.ExMovimentacao;
@@ -45,7 +46,7 @@ import java.util.Set;
 @Controller
 public class ExPainelController extends ExController {
     private static final String CORRIGEMOBIL = "CORRIGEMOBIL:Corrige Documento sem Mobil de Via ou Volume";
-    private static final int TEMPO_MAX_MILISEG = 60000;
+    private static final int TEMPO_MAX_MILISEG = 5000;
 
     /**
      * @deprecated CDI eyes only
@@ -107,9 +108,11 @@ public class ExPainelController extends ExController {
                 result.include("erroDocMsg", "Aten&ccedil;&atilde;o: O documento " + documentoRefSel.getSigla() + " está sem a descri&ccedil;&atilde;o.");
             }
             // Verifica se ha movs duplicadas no documento
-            Set<ExMovimentacao> setDuplicadas = new java.util.TreeSet<ExMovimentacao>();
+            Set<ExMovimentacao> setDuplicadas = new java.util.TreeSet<>();
+            ITipoDeMovimentacao[] tpMovs = {ExTipoDeMovimentacao.RECEBIMENTO, ExTipoDeMovimentacao.TRANSFERENCIA, ExTipoDeMovimentacao.JUNTADA};
+
             for (ExMobil mob : exDocumentoDTO.getDoc().getExMobilSet()) {
-                setDuplicadas.addAll(mob.getMovsDuplicadas(TEMPO_MAX_MILISEG));
+                setDuplicadas.addAll(mob.getMovsDuplicadas(TEMPO_MAX_MILISEG, tpMovs));
             }
 
             if (!setDuplicadas.isEmpty()) {
@@ -118,7 +121,7 @@ public class ExPainelController extends ExController {
                         + "&idMovDuplicada=" + idMovDup);
                 result.include("erroDocBtn", "Cancela Movimenta&ccedil;&atilde;o Duplicada");
                 result.include("erroDocMsg", "Aten&ccedil;&atilde;o: O documento " + documentoRefSel.getSigla()
-                        + " provavelmente tem a movimenta&ccedil;&atilde;o " + idMovDup + " duplicada, confira.");
+                        + " provavelmente tem a movimenta&ccedil;&atilde;o " + idMovDup + " duplicada, CONFIRA COM ATENÇÃO.");
             }
         } catch (AplicacaoException e) {
             result.include("mensagemCabec", "Documento não encontrado.");
@@ -207,7 +210,8 @@ public class ExPainelController extends ExController {
 
         ExMovimentacao mov = dao().consultar(idMovDuplicada, ExMovimentacao.class, false);
 
-        java.util.Set<ExMovimentacao> setDuplicadas = mov.getExMobil().getMovsDuplicadas(TEMPO_MAX_MILISEG);
+        ITipoDeMovimentacao[] tpMovs = {ExTipoDeMovimentacao.RECEBIMENTO, ExTipoDeMovimentacao.TRANSFERENCIA, ExTipoDeMovimentacao.JUNTADA};
+        java.util.Set<ExMovimentacao> setDuplicadas = mov.getExMobil().getMovsDuplicadas(TEMPO_MAX_MILISEG, tpMovs);
 
         if (!setDuplicadas.contains(mov)) {
             result.include("mensagemCabec", "A movimentação informada não está duplicada.");

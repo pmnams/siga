@@ -175,6 +175,7 @@ public class CpArquivo implements Serializable, PersistentAttributeInterceptable
         if (cacheArquivo != null)
             return cacheArquivo;
         switch (getTipoArmazenamento()) {
+            case TABELA:
             case BLOB:
                 cacheArquivo = getArquivoBlob() != null ? getArquivoBlob().getConteudoBlobArq() : null;
                 break;
@@ -283,7 +284,7 @@ public class CpArquivo implements Serializable, PersistentAttributeInterceptable
         return tipoArmazenamento;
     }
 
-    private void setTipoArmazenamento(CpArquivoTipoArmazenamentoEnum tipoArmazenamento) {
+    public void setTipoArmazenamento(CpArquivoTipoArmazenamentoEnum tipoArmazenamento) {
         this.tipoArmazenamento = tipoArmazenamento;
     }
 

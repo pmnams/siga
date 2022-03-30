@@ -174,14 +174,6 @@ public class ExCompetenciaBL extends CpCompetenciaBL {
      * Retorna um configuração existente para a combinação dos dados passados como
      * parâmetros, caso exista.
      *
-     * @param titularIniciador
-     * @param lotaTitularIniciador
-     * @param tipoConfig
-     * @param procedimento
-     * @param raia
-     * @param tarefa
-     * @return
-     * @throws Exception
      */
     private ExConfiguracaoCache preencherFiltroEBuscarConfiguracao(DpPessoa titularIniciador,
                                                                    DpLotacao lotaTitularIniciador, ITipoDeConfiguracao tipoConfig, ITipoDeMovimentacao tipoMov,
@@ -257,11 +249,6 @@ public class ExCompetenciaBL extends CpCompetenciaBL {
      * checagem de permissão correspondente. Por exemplo, para a função juntar, é
      * invocado <i>podeJuntar()</i>
      *
-     * @param funcao
-     * @param titular
-     * @param lotaTitular
-     * @param mob
-     * @return
      */
     public static boolean testaCompetencia(final String funcao, final DpPessoa titular, final DpLotacao lotaTitular,
                                            final ExMobil mob) {
