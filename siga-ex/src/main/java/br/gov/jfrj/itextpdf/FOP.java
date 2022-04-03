@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -25,6 +25,8 @@ import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
+import org.jsoup.Jsoup;
+import org.jsoup.parser.Parser;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.Result;
@@ -126,6 +128,9 @@ public class FOP implements ConversorHtml {
             html = substituiComentarios(html);
             html = html.replace("\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"", "\"xhtml.dtd\"");
             html = html.replace("\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\"", "\"xhtml.dtd\"");
+            html = Jsoup.parse(html, "", Parser.xmlParser()).toString();
+            html = html.replace("</br>", "");
+            html = html.replace("<br>", "<br/>");
             Source src = new StreamSource(new ByteArrayInputStream(html
                     .getBytes(StandardCharsets.UTF_8)));
 

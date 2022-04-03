@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -1398,6 +1398,9 @@ public class ExRelatorioController extends ExController {
             final Map<String, String> parametros = new HashMap<String, String>();
             Long orgaoUsu = getLotaTitular().getOrgaoUsuario().getIdOrgaoUsu();
             Long orgaoSelId = getIdOrgaoSel(lotacaoSel, usuarioSel, orgaoUsu);
+
+            parametros.put("lotacaoTitular", getLotaTitular().getSiglaLotacao());
+            parametros.put("idTit", getTitular().getId().toString());
 
             if (!primeiraVez) {
                 if (orgaoUsu != orgaoSelId) {

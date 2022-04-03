@@ -60,19 +60,11 @@
 		}
 
 		function submitBusca() {
-			if(${siga_cliente == 'GOVSP'}) {
-				sigaSpinner.mostrar();
-				var descricao = document.getElementById('descrDocumento').value.trim();
-				if(descricao.length != 0 && descricao.length < 5) {
-					sigaSpinner.ocultar();
-					sigaModal.alerta("Preencha no mínimo 5 caracteres no campo descrição");
-					return;
-				}
-			}
 			$('#buscandoSpinner').removeClass('d-none');
 			document.getElementById("btnBuscar").disabled = true;
 			listar.submit();
 		}
+
 
     </script>
 
@@ -81,20 +73,11 @@
           media="screen, projection"/>
 
     <div id="inicio" class="container-fluid content mb-3">
-        <c:if test="${pesquisaLimitadaPorData}">
-            <h5 id="pesqTitle">Pesquisar Documentos</h5>
-        </c:if>
+        <h5 id="pesqTitle">Pesquisar Documentos</h5>
         <c:set var="formOrigem" value="lista" scope="request"/>
         <c:if
                 test="${((empty primeiraVez) or (primeiraVez != 'sim')) and ((empty apenasRefresh) or (apenasRefresh != 1)) and !pesquisaLimitadaPorData}">
-            <c:choose>
-                <c:when test="${siga_cliente != 'GOVSP'}">
-                    <jsp:include page="./lista.jsp"/>
-                </c:when>
-                <c:otherwise>
-                    <jsp:include page="./listaSP.jsp"/>
-                </c:otherwise>
-            </c:choose>
+            <jsp:include page="./lista.jsp"/>
         </c:if>
         <div class="card bg-light ${pesquisaLimitadaPorData? 'sticky-top':''}">
             <jsp:include page="./headerMeses.jsp"/>
@@ -114,26 +97,6 @@
                                                                                                          id="limiteDias"
                                                                                                          name="limiteDias"
                                                                                                          value="${f:resource('/siga.pesquisa.limite.dias')}"/>
-
-                            <c:if test="${siga_cliente == 'GOVSP'}">
-                                <div class="form-row">
-                                    <div class="form-group col-12">
-                                        <label for="descrDocumento"><fmt:message key="documento.descricao"/></label>
-                                        <input
-                                                class="form-control" type="text" name="descrDocumento"
-                                                id="descrDocumento"
-                                                value="${descrDocumento}" size="80"
-                                                <c:if test="${!podePesquisarDescricao}">
-                                                    readonly placeholder="Não é possível realizar a pesquisa pela descrição"
-                                                </c:if>
-                                        />
-                                        <c:if test="${podePesquisarDescricao && podePesquisarDescricaoLimitada}">
-                                            <small>Campo "Descrição" habilitado para pesquisa após o preenchimento dos
-                                                campos "Órgão", "Espécie" e "Ano de Emissão"</small>
-                                        </c:if>
-                                    </div>
-                                </div>
-                            </c:if>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="ultMovIdEstadoDoc">Situação</label> <select
@@ -204,9 +167,7 @@
                                     <label for="orgaoUsu">Órgão</label>
                                     <select class="form-control  siga-select2" id="orgaoUsu" name="orgaoUsu"
                                             onchange="podeDescricao(true)">
-                                        <c:if test="${siga_cliente != 'GOVSP' || orgaoUsu == '0'}">
-                                            <option value="0">[Todos]</option>
-                                        </c:if>
+                                        <option value="0">[Todos]</option>
                                         <c:forEach items="${orgaosUsu}" var="item">
                                             <option value="${item.idOrgaoUsu}"
                                                 ${item.idOrgaoUsu == orgaoUsu ? 'selected' : ''}>
@@ -214,20 +175,18 @@
                                         </c:forEach>
                                     </select>
                                 </div>
-                                <c:if test="${siga_cliente != 'GOVSP'}">
-                                    <div class="form-group col-md-3">
-                                        <label for="idTpDoc">Origem</label> <select class="form-control"
-                                                                                    id="idTpDoc" name="idTpDoc"
-                                                                                    onchange="javascript:alteraOrigem();">
-                                        <option value="0">[Todos]</option>
-                                        <c:forEach items="${tiposDocumento}" var="item">
-                                            <option value="${item.idTpDoc}"
-                                                ${item.idTpDoc == idTpDoc ? 'selected' : ''}>
-                                                    ${item.descrTipoDocumento}</option>
-                                        </c:forEach>
-                                    </select>
-                                    </div>
-                                </c:if>
+                                <div class="form-group col-md-3">
+                                    <label for="idTpDoc">Origem</label> <select class="form-control"
+                                                                                id="idTpDoc" name="idTpDoc"
+                                                                                onchange="javascript:alteraOrigem();">
+                                    <option value="0">[Todos]</option>
+                                    <c:forEach items="${tiposDocumento}" var="item">
+                                        <option value="${item.idTpDoc}"
+                                            ${item.idTpDoc == idTpDoc ? 'selected' : ''}>
+                                                ${item.descrTipoDocumento}</option>
+                                    </c:forEach>
+                                </select>
+                                </div>
                                 <div class="form-group col-md-3 ${pesquisaLimitadaPorData? 'd-none':''}">
                                     <label for="dtDocString">Data Inicial</label> <input
                                         class="form-control campoData" placeholder="dd/mm/aaaa" autocomplete="off"
@@ -430,17 +389,14 @@
                                 </div>
                             </div>
 
-                            <c:if test="${siga_cliente != 'GOVSP'}">
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label for="classificacao"><fmt:message key="documento.descricao"/></label>
-                                        <input
-                                                class="form-control" type="text" name="descrDocumento"
-                                                value="${descrDocumento}" size="80"/>
-                                    </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="descrDocumento"><fmt:message key="documento.descricao"/></label>
+                                    <input
+                                            class="form-control" type="text" name="descrDocumento" id="descrDocumento"
+                                            value="${descrDocumento}" size="80"/>
                                 </div>
-                            </c:if>
-
+                            </div>
                                 ${f:obterExtensaoBuscaTextualbs4(lotaTitular.orgaoUsuario, fullText)}
 
                             <div class="form-row ${hide_only_GOVSP}">

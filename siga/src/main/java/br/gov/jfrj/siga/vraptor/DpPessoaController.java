@@ -36,6 +36,7 @@ import br.gov.jfrj.siga.base.SigaModal;
 import br.gov.jfrj.siga.base.client.Hcaptcha;
 import br.gov.jfrj.siga.base.util.CPFUtils;
 import br.gov.jfrj.siga.base.util.Texto;
+import br.gov.jfrj.siga.cp.CpIdentidade;
 import br.gov.jfrj.siga.cp.bl.Cp;
 import br.gov.jfrj.siga.cp.bl.CpBL;
 import br.gov.jfrj.siga.cp.model.DpLotacaoSelecao;
@@ -938,20 +939,28 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
             List<DpPessoa> usuarios = dao().consultarPorFiltro(dpPessoa);
             Set<String> emailsOculto = new HashSet<>();
 
+            final String mensagemUsuarioOuIdentidadeInexistente = "Usuário não localizado ou não possui um acesso ativo. "
+                    + "Verifique os dados informados e caso necessite, entre em contato com o Administrador Local";
+
             if (!usuarios.isEmpty()) {
-                Set<String> emailsDistintos = new HashSet<>();
+                List<CpIdentidade> listaIdentidadesCpf = CpDao.getInstance().consultaIdentidadesPorCpf(cpf);
 
-                //Adiciona email normal de forma distinta
-                for (DpPessoa usuario : usuarios) {
-                    emailsDistintos.add(usuario.getEmailPessoaAtual());
-                }
-
-                //Troca emails distintos por Email estenografado
-                for (String email : emailsDistintos) {
-                    emailsOculto.add(SigaUtil.ocultaParcialmenteEmail(email));
+                if (!listaIdentidadesCpf.isEmpty()) {
+                    Set<String> emailsDistintos = new HashSet<String>();
+                    //Adiciona email normal de forma distinta
+                    for (DpPessoa usuario : usuarios) {
+                        emailsDistintos.add(usuario.getEmailPessoaAtual());
+                    }
+                    //Troca emails distintos por Email estenografado
+                    for (String email : emailsDistintos) {
+                        emailsOculto.add(SigaUtil.ocultaParcialmenteEmail(email));
+                    }
+                    emailsDistintos = null;
+                } else {
+                    throw new RuntimeException(mensagemUsuarioOuIdentidadeInexistente);
                 }
             } else {
-                throw new RuntimeException("Usuário não localizado. Verifique os dados informados.");
+                throw new RuntimeException(mensagemUsuarioOuIdentidadeInexistente);
             }
 
             String jwt = SigaUtil.buildJwtToken("RESET-SENHA", cpf);

@@ -851,6 +851,10 @@ public class CpBL {
 
         boolean podeTrocar = Boolean.FALSE;
 
+        if (listaIdentidades.isEmpty()) {
+            throw new RuntimeException("Usuário não possui um acesso ativo para que seja redefinida a Senha.");
+        }
+
         for (CpIdentidade cpIdentidade : listaIdentidades) {
             podeTrocar = Boolean.TRUE;
             break;
@@ -2239,8 +2243,8 @@ public class CpBL {
 
             //Aplica cargo alterado nas pessoas ativas do cargo anterior.
             if (pessoasAtivasCargo != null && !pessoasAtivasCargo.isEmpty()) {
-                DpPessoa pessoaNovo = new DpPessoa();
                 for (DpPessoa pessoaAtual : pessoasAtivasCargo) {
+                    DpPessoa pessoaNovo = new DpPessoa();
                     copiarPessoa(pessoaAtual, pessoaNovo); //copyProperty não funciona, pois DpPessoa é um Bean despadronizado
 
                     if (pessoaNovo != null) {
@@ -2360,8 +2364,8 @@ public class CpBL {
 
             //Aplica cargo alterado nas pessoas ativas do cargo anterior.
             if (pessoasAtivasFuncaoConfianca != null && !pessoasAtivasFuncaoConfianca.isEmpty()) {
-                DpPessoa pessoaNovo = new DpPessoa();
                 for (DpPessoa pessoaAtual : pessoasAtivasFuncaoConfianca) {
+                    DpPessoa pessoaNovo = new DpPessoa();
                     copiarPessoa(pessoaAtual, pessoaNovo); //copyProperty não funciona, pois DpPessoa é um Bean despadronizado
 
                     if (pessoaNovo != null) {

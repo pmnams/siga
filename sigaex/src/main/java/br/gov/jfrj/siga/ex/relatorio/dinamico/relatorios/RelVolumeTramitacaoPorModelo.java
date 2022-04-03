@@ -40,9 +40,9 @@ public class RelVolumeTramitacaoPorModelo extends RelatorioTemplate {
         if (parametros.get("dataFinal") == null) {
             throw new DJBuilderException("Parâmetro dataFinal não informado!");
         }
-        listColunas = new ArrayList<String>();
-        listLinhas = new ArrayList<List<String>>();
-        listModelos = new ArrayList<List<String>>();
+        listColunas = new ArrayList<>();
+        listLinhas = new ArrayList<>();
+        listModelos = new ArrayList<>();
     }
 
     @Override
@@ -71,15 +71,11 @@ public class RelVolumeTramitacaoPorModelo extends RelatorioTemplate {
 
         Query qryLotacaoTitular = ContextoPersistencia.em().createQuery(
                 "from DpLotacao lot " + "where lot.dataFimLotacao is null "
-                        + "and lot.orgaoUsuario = "
-                        + parametros.get("orgaoUsuario")
-                        + " and lot.siglaLotacao = '"
-                        + parametros.get("lotacaoTitular") + "'");
+                        + " and lot.orgaoUsuario = " + parametros.get("orgao")
+                        + " and lot.siglaLotacao = '" + parametros.get("lotacaoTitular") + "'");
         DpLotacao lotaTitular = (DpLotacao) qryLotacaoTitular.getSingleResult();
 
-        DpPessoa titular = ExDao.getInstance().consultar(
-                new Long((String) parametros.get("idTit")), DpPessoa.class,
-                false);
+        DpPessoa titular = ExDao.getInstance().consultar(new Long((String) parametros.get("idTit")), DpPessoa.class, false);
 
         String queryOrgao = "";
         if (parametros.get("orgao") != null && !"".equals(parametros.get("orgao")))
@@ -166,12 +162,6 @@ public class RelVolumeTramitacaoPorModelo extends RelatorioTemplate {
         if (listModelos.size() == 0) {
             throw new AplicacaoException("Não foram encontrados documentos para os dados informados.");
         }
-//			for (List<String> lin : listModelos) {
-//				for (String dado : lin) {
-//					d.add(dado);
-//				}
-//			}
-//			return d;
     }
 
     private void setQueryParms(Query query)
