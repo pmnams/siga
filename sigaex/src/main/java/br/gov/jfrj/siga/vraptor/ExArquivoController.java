@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -88,7 +88,7 @@ public class ExArquivoController extends ExController {
     @Get("/app/arquivo/exibir")
     public Download aExibir(final String sigla, final boolean popup, final String arquivo, byte[] certificado,
                             String hash, final String HASH_ALGORITHM, final String certificadoB64, boolean completo,
-                            final boolean semmarcas, final boolean volumes, final Long idVisualizacao, boolean exibirReordenacao) {
+                            final boolean semmarcas, final boolean volumes, final Long idVisualizacao, boolean exibirReordenacao, boolean iframe) throws Exception {
         try {
             final String servernameport = getRequest().getServerName() + ":" + getRequest().getServerPort();
             final String contextpath = getRequest().getContextPath();
@@ -202,7 +202,7 @@ public class ExArquivoController extends ExController {
                     hashreq.setTime(dt);
                     HashResponse hashresp = bluc.hash(hashreq);
                     if (hashresp.getErrormsg() != null)
-                        throw new Exception(
+                        throw new AplicacaoException(
                                 "BluC não conseguiu produzir o pacote assinável. " + hashresp.getErrormsg());
                     byte[] sa = Base64.decode(hashresp.getHash());
 
@@ -219,7 +219,7 @@ public class ExArquivoController extends ExController {
                 Documento.getDocumentoHTML(baos, null, mob, mov, completo, volumes, contextpath, servernameport);
                 ab = baos.toByteArray();
                 if (ab == null) {
-                    throw new Exception("HTML inválido!");
+                    throw new AplicacaoException("HTML inválido!");
                 }
             }
             if (imutavel) {
@@ -253,7 +253,8 @@ public class ExArquivoController extends ExController {
                 return new InputStreamDownload(makeByteArrayInputStream((new byte[0]), false), TEXT_PLAIN,
                         "arquivo inválido");
             }
-            throw new RuntimeException("erro na geração do documento.", e);
+            result.include("iframe", iframe ? "sim" : "");
+            throw e;
         }
     }
 
