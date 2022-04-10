@@ -6,31 +6,27 @@ import br.gov.jfrj.siga.ex.ExDocumento;
 import br.gov.jfrj.siga.ex.ExMobil;
 import br.gov.jfrj.siga.ex.ExMovimentacao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
-import com.crivano.jlogic.And;
-import com.crivano.jlogic.CompositeExpressionSupport;
-import com.crivano.jlogic.Expression;
-import com.crivano.jlogic.Not;
+import com.crivano.jlogic.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ExPodeSerJuntado extends CompositeExpressionSupport {
 
-    private ExMobil mob;
-    private ExDocumento doc;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
-    private List<ExMovimentacao> listMovJuntada;
+    private final ExDocumento docFilho;
+    private final ExMobil mobPai;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
-    public ExPodeSerJuntado(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
-        this.mob = mob;
-        this.doc = mob.doc();
+    public ExPodeSerJuntado(ExDocumento docFilho, ExMobil mobPai, DpPessoa titular, DpLotacao lotaTitular) {
+        this.docFilho = docFilho;
+        this.mobPai = mobPai;
         this.titular = titular;
         this.lotaTitular = lotaTitular;
 
-        listMovJuntada = new ArrayList<ExMovimentacao>();
-        if (mob.getDoc().getMobilDefaultParaReceberJuntada() != null) {
-            listMovJuntada.addAll(mob.getDoc().getMobilDefaultParaReceberJuntada()
+        List<ExMovimentacao> listMovJuntada = new ArrayList<>();
+        if (mobPai.getDoc().getMobilDefaultParaReceberJuntada() != null) {
+            listMovJuntada.addAll(mobPai.getDoc().getMobilDefaultParaReceberJuntada()
                     .getMovsNaoCanceladas(ExTipoDeMovimentacao.JUNTADA));
         }
     }
@@ -46,24 +42,25 @@ public class ExPodeSerJuntado extends CompositeExpressionSupport {
      * <li>Não pode estar em trânsito</li>
      * <li><i>podeMovimentar()</i> precisa retornar verdadeiro para ele</li>
      * </ul>
-     *
-     * @return
-     * @throws Exception
      */
     @Override
     protected Expression create() {
         return And.of(
 
-                Not.of(new ExEMobilCancelado(mob)),
+                Not.of(new ExEMobilCancelado(mobPai)),
 
-                Not.of(new ExEMobilVolumeEncerrado(mob)),
+                Not.of(new ExEMobilVolumeEncerrado(mobPai)),
 
-                Not.of(new ExEstaJuntado(mob)),
+                Not.of(new ExEstaJuntado(mobPai)),
 
-                Not.of(new ExEstaEmTransito(mob, titular, lotaTitular)),
+                Not.of(new ExEstaEmTransito(mobPai, titular, lotaTitular)),
 
-                Not.of(new ExEstaArquivado(mob)),
+                Not.of(new ExEstaArquivado(mobPai)),
 
-                new ExPodeMovimentar(mob, titular, lotaTitular));
+                Or.of(
+
+                        new ExPodeMovimentar(mobPai, titular, lotaTitular),
+
+                        new ExEDocFilho(docFilho, mobPai)));
     }
 }

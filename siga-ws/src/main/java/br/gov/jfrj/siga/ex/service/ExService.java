@@ -146,4 +146,7 @@ public interface ExService extends Remote {
     @WebMethod
     public Boolean isAuxiliarIncluso(String codigoDocumentoVia, Date depoisDaData) throws Exception;
 
+    @WebMethod
+    String obterSiglaAtual(String codigoDocumentoVia) throws Exception;
+
 }

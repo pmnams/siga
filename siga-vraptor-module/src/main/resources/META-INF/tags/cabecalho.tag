@@ -189,6 +189,7 @@
                                     var src = 'https://vimeopro.com/fcav/spsempapel';
                                     $('#tutorialModal').modal('show');
                                     $('#tutorialModal iframe').attr('src', src);
+                                    $(".modal-backdrop").css("z-index", "0");
                                 });
 
                                 $('#tutorialModal button').click(function () {
@@ -370,7 +371,8 @@
 					 						</strong>
                                         <c:if test="${cadastrante.lotacoes[1] != null}">
                                             </button>
-                                            <div class="dropdown-menu" style="z-index: 1040" aria-labelledby="dropdownLotaMenuButton">
+                                            <div class="dropdown-menu" style="z-index: 1040"
+                                                 aria-labelledby="dropdownLotaMenuButton">
 												<c:forEach var="lota" items="${cadastrante.lotacoes}">
                                                     <c:if test="${!(lota[0]==cadastrante.sigla || lota[1]==cadastrante.lotacao)}">
 														<a class="dropdown-item"

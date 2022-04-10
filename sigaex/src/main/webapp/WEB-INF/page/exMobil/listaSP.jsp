@@ -304,15 +304,13 @@
                                     </c:if>
                                     <td class="tramitacoes fa-fw" style="min-width: 120px;">
                                         <c:choose>
-                                            <c:when test="${not empty documento[1].getMovimentacoesPorNome('TRANSFERENCIA', false)}">
-                                                <%-- Tem Tramitação? --%>
-                                                <a class="fa fa-search btn btn-default btn-sm xrp-label ${classDisabled}"
-                                                   title="${title}" href="${link}">
-                                                </a>
-                                                <c:set var="link"
+                                            <c:when test="${docTemTramitacoes}"><c:set var="link"
                                                        value="${pageContext.request.contextPath}/app/expediente/doc/exibirMovimentacoesTramitacao?idMobil=${documento[1].idMobil}&docCancelado=false"/>
                                                 <c:set var="title" value="Ver Histórico de Tramitação"/>
                                                 <c:set var="classDisabled" value=""/>
+                                                <a class="fa fa-search btn btn-default btn-sm xrp-label ${classDisabled}"
+                                                   title="${title}" href="${link}">
+                                                </a>
                                             </c:when>
                                             <c:when test="${(documento[1].exTipoMobil.idTipoMobil == 1) and (documento[2].cpMarcador.idMarcador == 32)}">
                                                 <%-- É a via principal? Ela foi cancelada (sem efeito)? --%>

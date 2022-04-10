@@ -1103,6 +1103,9 @@ public class ExServiceImpl implements ExService {
             else if (mobFilho.isGeralDeProcesso())
                 mobFilho = mobFilho.doc().getUltimoVolume();
 
+            if (mobFilho == null)
+                return false;
+
             if (!mobFilho.isJuntado())
                 return false;
 
@@ -1136,6 +1139,15 @@ public class ExServiceImpl implements ExService {
                 ctx.rollback(ex);
                 throw ex;
             }
+        }
+    }
+
+    @Override
+    public String obterSiglaAtual(String codigoDocumentoVia)
+            throws Exception {
+        try (ExSoapContext ctx = new ExSoapContext(false)) {
+            ExMobil mob = buscarMobil(codigoDocumentoVia);
+            return mob.getSigla();
         }
     }
 

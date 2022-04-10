@@ -477,4 +477,34 @@ public class WfDefinicaoDeProcedimento extends HistoricoAuditavelSuporte impleme
         return null;
     }
 
+    public WfDefinicaoDeTarefa gerarDefinicaoDeTarefaComTodasAsVariaveis() {
+        WfDefinicaoDeTarefa tdSuper = new WfDefinicaoDeTarefa();
+        Set<String> identificadores = new HashSet<>();
+        for (WfDefinicaoDeTarefa td : getDefinicaoDeTarefa()) {
+            switch (td.getKind()) {
+                case FORMULARIO:
+                    for (WfDefinicaoDeVariavel vd : td.getDefinicaoDeVariavel())
+                        if (!identificadores.contains(vd.getIdentificador())) {
+                            WfDefinicaoDeVariavel vdSuper = new WfDefinicaoDeVariavel(vd);
+                            tdSuper.getDefinicaoDeVariavel().add(vdSuper);
+                            identificadores.add(vd.getIdentificador());
+                        }
+                    break;
+                case CRIAR_DOCUMENTO:
+                    String identificador = WfTarefaDocCriar.getIdentificadorDaVariavel(td);
+                    if (!identificadores.contains(identificador)) {
+                        WfDefinicaoDeVariavel vdSuper = new WfDefinicaoDeVariavel();
+                        vdSuper.setIdentificador(identificador);
+                        vdSuper.setNome(td.getNome());
+                        vdSuper.setTipo(WfTipoDeVariavel.DOC_MOBIL);
+                        vdSuper.setAcesso(WfTipoDeAcessoDeVariavel.READ_WRITE);
+                        tdSuper.getDefinicaoDeVariavel().add(vdSuper);
+                        identificadores.add(vdSuper.getIdentificador());
+                    }
+                default:
+            }
+        }
+        return tdSuper;
+    }
+
 }

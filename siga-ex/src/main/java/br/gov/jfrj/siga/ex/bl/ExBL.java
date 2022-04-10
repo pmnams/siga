@@ -2924,6 +2924,9 @@ public class ExBL extends CpBL {
                 throw new AplicacaoException("não é permitido criar documento com data futura");
         }
 
+        // Acrescenta o TMP na lista de notificações do WF, para que seja atualizado o evento com o código que será recebido depois da finalização
+        atualizarWorkFlowAdicionarCodigoDeDocumento(doc.getCodigo());
+
         try {
             // atualizando a classificacao do documento
             doc.setExClassificacao(doc.getExClassificacao().getAtual() != null ? doc.getExClassificacao().getAtual()
@@ -2993,9 +2996,7 @@ public class ExBL extends CpBL {
             String s = processarComandosEmTag(doc, "finalizacao");
 
             ExMobil mob = doc.getMobilDefaultParaReceberJuntada();
-            if (doc.getExMobilAutuado() != null
-                    && Ex.getInstance().getComp().pode(ExPodeSerJuntado.class, cadastrante, lotaCadastrante, mob)
-                    && Ex.getInstance().getComp().pode(ExPodeJuntar.class, cadastrante, lotaCadastrante, doc.getExMobilAutuado()))
+            if (doc.getExMobilAutuado() != null)
                 juntarAoDocumentoAutuado(cadastrante, lotaCadastrante, doc, null, cadastrante);
 
             return s;
@@ -4064,7 +4065,8 @@ public class ExBL extends CpBL {
             if (mobPai.isArquivado())
                 throw new RegraNegocioException("A via não pode ser juntada ao documento porque ele está arquivado");
 
-            Ex.getInstance().getComp().afirmar("A via não pode ser juntada ao documento porque ele não pode ser movimentado.", ExPodeMovimentar.class, docTitular, lotaCadastrante, mobPai);
+            if (!getComp().pode(ExPodeSerJuntado.class, docTitular, lotaCadastrante, mob.doc(), mobPai) && !getComp().pode(ExPodeMovimentar.class, docTitular, lotaCadastrante, mobPai))
+                throw new RegraNegocioException("A via não pode ser juntada ao documento porque ele não pode ser movimentado.");
 
             if (mob.getDoc().isComposto() && !mobPai.getDoc().isComposto())
                 throw new RegraNegocioException("Não é permitido realizar a juntada de documento composto em documento avulso.");
@@ -4457,7 +4459,7 @@ public class ExBL extends CpBL {
                 // receber deve concluir direto
                 boolean fConcluirDireto = !mob.isEmTransitoExterno() && p.fIncluirCadastrante && (Utils.equivale(mob.getTitular(), titular)
                         || Utils.equivale(mob.getLotaTitular(), lotaTitular));
-                if (!fConcluirDireto)
+                if (!mob.isEmTransitoExterno() && !fConcluirDireto)
                     for (ExMovimentacao r : p.recebimentosPendentes)
                         // Existe um recebimento pendente e não é apenas de notificação
                         if (r.isResp(titular, lotaTitular) && !p.recebimentosDeNotificacoesPendentes.contains(r))
@@ -5536,8 +5538,16 @@ public class ExBL extends CpBL {
             attrs.put("ref", doc.getRef());
 
         // Incluir um atributo chamado "wf" que contém os dados do procedimento vinculado
-        if (doc.getTipoDePrincipal() != null && doc.getTipoDePrincipal() == ExTipoDePrincipal.PROCEDIMENTO && doc.getPrincipal() != null) {
-            WfProcedimentoWSTO wf = Service.getWfService().consultarProcedimento(doc.getPrincipal());
+        String principal = null;
+        if (doc.getTipoDePrincipal() != null && doc.getTipoDePrincipal() == ExTipoDePrincipal.PROCEDIMENTO && doc.getPrincipal() != null)
+            principal = doc.getPrincipal();
+        else if (doc.getExMobilPai() != null && doc.getExMobilPai().doc().getTipoDePrincipal() != null && doc.getExMobilPai().doc().getTipoDePrincipal() == ExTipoDePrincipal.PROCEDIMENTO && doc.getExMobilPai().doc().getPrincipal() != null)
+            principal = doc.getExMobilPai().doc().getPrincipal();
+        else if (doc.getExMobilAutuado() != null && doc.getExMobilAutuado().doc().getTipoDePrincipal() != null && doc.getExMobilAutuado().doc().getTipoDePrincipal() == ExTipoDePrincipal.PROCEDIMENTO && doc.getExMobilAutuado().doc().getPrincipal() != null)
+            principal = doc.getExMobilAutuado().doc().getPrincipal();
+
+        if (principal != null) {
+            WfProcedimentoWSTO wf = Service.getWfService().consultarProcedimento(principal);
             Map<String, Object> vars = wf.getVar();
 
             // Converter boolean em Sim/Não
@@ -5643,7 +5653,7 @@ public class ExBL extends CpBL {
         for (final ExMobil mob : doc.getExMobilSet()) {
 
             if (getComp().pode(ExPodeJuntar.class, titular, lotaCadastrante, mob) && getComp()
-                    .pode(ExPodeSerJuntado.class, titular, lotaCadastrante, doc.getExMobilPai())) {
+                    .pode(ExPodeSerJuntado.class, titular, lotaCadastrante, mob.doc(), doc.getExMobilPai())) {
                 juntarDocumento(cadastrante, titular, lotaCadastrante, null, mob,
                         doc.getExMobilPai(), dtMov, null, titular, "1");
                 break;
@@ -5657,8 +5667,8 @@ public class ExBL extends CpBL {
         // for (int numVia = 1; numVia <= doc.getNumUltimaViaNaoCancelada();
         // numVia++)
         for (final ExMobil mob : doc.getExMobilSet()) {
-            if (getComp().pode(ExPodeJuntar.class, titular, lotaCadastrante, doc.getExMobilAutuado())
-                    & getComp().pode(ExPodeSerJuntado.class, titular, lotaCadastrante, mob)) {
+            if (getComp().pode(ExPodeJuntar.class, titular, lotaCadastrante, mob.doc(), doc.getExMobilAutuado())
+                    & getComp().pode(ExPodeSerJuntado.class, titular, lotaCadastrante, doc.getExMobilAutuado().doc(), mob)) {
                 juntarDocumento(cadastrante, titular, lotaCadastrante, null,
                         doc.getExMobilAutuado(), mob, dtMov, null, titular, "1");
                 break;
@@ -6017,20 +6027,15 @@ public class ExBL extends CpBL {
     }
 
     private void atualizarWorkflow(ExDocumento doc, ExMobil mob, ExMovimentacao mov) {
-        Set<String> set = docsParaAtualizacaoDeWorkflow.get();
-        if (set == null) {
-            docsParaAtualizacaoDeWorkflow.set(new HashSet<>());
-            set = docsParaAtualizacaoDeWorkflow.get();
-        }
-
+        Set<String> set = null;
         if (mov != null) {
-            set.add(mov.mob().doc().getCodigo());
+            set = atualizarWorkFlowAdicionarCodigoDeDocumento(mov.mob().doc().getCodigo());
             if (mov.getExMobilRef() != null)
-                set.add(mov.getExMobilRef().doc().getCodigo());
+                set = atualizarWorkFlowAdicionarCodigoDeDocumento(mov.getExMobilRef().doc().getCodigo());
         } else if (mob != null)
-            set.add(mob.doc().getCodigo());
+            set = atualizarWorkFlowAdicionarCodigoDeDocumento(mob.doc().getCodigo());
         else if (doc != null)
-            set.add(doc.getCodigo());
+            set = atualizarWorkFlowAdicionarCodigoDeDocumento(doc.getCodigo());
 
         // Nato: criei uma threadLocal para suprimir a atualização do WF. Isso é especialmente
         // necessário para métodos que realizam várias operações, como por exemplo a assinatura,
@@ -6066,19 +6071,14 @@ public class ExBL extends CpBL {
         }
     }
 
-    public void atualizarWorkFlow(ExDocumento doc) throws AplicacaoException {
-        try {
-            if (doc.getIdDoc() != null) {
-                if (ContextoPersistencia.getUsuarioDeSistema() == null || ContextoPersistencia.getUsuarioDeSistema() != UsuarioDeSistemaEnum.SIGA_WF)
-                    Service.getWfService().atualizarWorkflowsDeDocumento(doc.getCodigo());
-            }
-        } catch (Exception ex) {
-            throw new RuntimeException("Erro ao tentar atualizar estado do workflow", ex);
+    public Set<String> atualizarWorkFlowAdicionarCodigoDeDocumento(String codigoDoDocumento) throws AplicacaoException {
+        Set<String> set = docsParaAtualizacaoDeWorkflow.get();
+        if (set == null) {
+            docsParaAtualizacaoDeWorkflow.set(new HashSet<>());
+            set = docsParaAtualizacaoDeWorkflow.get();
         }
-    }
-
-    public void atualizarWorkFlow(ExMovimentacao mov) throws AplicacaoException {
-
+        set.add(codigoDoDocumento);
+        return set;
     }
 
     /**
