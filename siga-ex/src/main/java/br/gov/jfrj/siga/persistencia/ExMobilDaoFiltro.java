@@ -22,10 +22,11 @@ import br.gov.jfrj.siga.dp.CpOrgaoUsuario;
 import br.gov.jfrj.siga.ex.ExDocumento;
 import br.gov.jfrj.siga.ex.ExMobil;
 import br.gov.jfrj.siga.hibernate.ExDao;
-import br.gov.jfrj.siga.hibernate.ext.IExMobilDaoFiltro;
+import br.gov.jfrj.siga.hibernate.query.ext.IExMobilDaoFiltro;
 import br.gov.jfrj.siga.model.dao.DaoFiltroSelecionavel;
 
 import java.util.Date;
+import java.util.List;
 
 public class ExMobilDaoFiltro extends DaoFiltroSelecionavel implements
         IExMobilDaoFiltro {
@@ -71,11 +72,15 @@ public class ExMobilDaoFiltro extends DaoFiltroSelecionavel implements
 
     private Long idDoc;
 
+    private List<Long> listaIdDoc;
+
     private Long anoEmissao;
 
     private Long classificacaoSelId;
 
     private String descrDocumento;
+
+    private String descrPesquisaXjus;
 
     private String fullText;
 
@@ -147,6 +152,14 @@ public class ExMobilDaoFiltro extends DaoFiltroSelecionavel implements
 
     public String getDescrDocumento() {
         return descrDocumento;
+    }
+
+    public String getDescrPesquisaXjus() {
+        return descrPesquisaXjus;
+    }
+
+    public void setDescrPesquisaXjus(String descrPesquisaXjus) {
+        this.descrPesquisaXjus = descrPesquisaXjus;
     }
 
     public Long getDestinatarioSelId() {
@@ -384,6 +397,14 @@ public class ExMobilDaoFiltro extends DaoFiltroSelecionavel implements
         this.idMod = idMod;
     }
 
+    public List<Long> getListaIdDoc() {
+        return listaIdDoc;
+    }
+
+    public void setListaIdDoc(final List<Long> listaIdDoc) {
+        this.listaIdDoc = listaIdDoc;
+    }
+
     public boolean buscarPorCamposMarca() {
         return (getUltMovIdEstadoDoc() != null && getUltMovIdEstadoDoc() != 0)
                 || (getUltMovLotaRespSelId() != null && getUltMovLotaRespSelId() != 0)
@@ -418,4 +439,5 @@ public class ExMobilDaoFiltro extends DaoFiltroSelecionavel implements
                 || (getAnoEmissao() != null && getAnoEmissao() != 0)
                 || (getNumExpediente() != null && getNumExpediente() != 0);
     }
+
 }

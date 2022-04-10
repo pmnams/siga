@@ -19,11 +19,15 @@ public class ExGraphTramitacao extends ExGraph {
         listMov.addAll(mob.getExMovimentacaoSet());
         Collections.sort(listMov);
 
-        PessoaLotacaoParser cadastrante = new PessoaLotacaoParser(mob.doc().getCadastrante(),
-                mob.doc().getLotaCadastrante());
-
         // Incluí o cadastrante
         {
+            PessoaLotacaoParser cadastrante = new PessoaLotacaoParser(mob.doc().getCadastrante(),
+                    mob.doc().getLotaCadastrante());
+
+            ExMovimentacao criacao = mob.getUltimaMovimentacao(ExTipoDeMovimentacao.CRIACAO);
+            if (criacao != null)
+                cadastrante = new PessoaLotacaoParser(criacao.getCadastrante(), criacao.getLotaCadastrante());
+
             boolean atendente = mob.isAtendente(cadastrante.getPessoa(), cadastrante.getLotacao());
             boolean notificado = mob.isNotificado(cadastrante.getPessoa(), cadastrante.getLotacao());
 
@@ -44,8 +48,8 @@ public class ExGraphTramitacao extends ExGraph {
                     || t == ExTipoDeMovimentacao.NOTIFICACAO) {
 
                 PessoaLotacaoParser remetente = new PessoaLotacaoParser(mov.getTitular(), mov.getLotaTitular());
-                if (remetente.getPessoa() == null && remetente.getLotacao() == null && mov.getExMovimentacaoRef() != null)
-                    remetente = new PessoaLotacaoParser(mov.getExMovimentacaoRef().getTitular(), mov.getExMovimentacaoRef().getLotaTitular());
+
+                // Quando o trâmite é feito pelo WF, não haverá titular ou lotaTitular na movimentação, então tentaremos obter o remetente pelo recebimento anterior
                 if (remetente.getPessoa() == null && remetente.getLotacao() == null && mov.getExMovimentacaoRef() != null)
                     remetente = new PessoaLotacaoParser(mov.getExMovimentacaoRef().getResp(), mov.getExMovimentacaoRef().getLotaResp());
                 PessoaLotacaoParser destinatario = new PessoaLotacaoParser(mov.getResp(), mov.getLotaResp());

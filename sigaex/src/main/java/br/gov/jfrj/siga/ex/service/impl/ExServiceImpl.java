@@ -116,8 +116,9 @@ public class ExServiceImpl implements ExService {
                 }
                 return true;
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
@@ -147,8 +148,9 @@ public class ExServiceImpl implements ExService {
                         mob, null, null, destinoParser.getPessoa(), false);
                 return true;
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
@@ -168,8 +170,9 @@ public class ExServiceImpl implements ExService {
                         destinoParser.getPessoa(), "1");
                 return true;
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
@@ -180,8 +183,9 @@ public class ExServiceImpl implements ExService {
                 ExMobil mob = buscarMobil(codigoDocumento);
                 return !mob.getExDocumento().isPendenteDeAssinatura();
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
@@ -194,8 +198,9 @@ public class ExServiceImpl implements ExService {
                     return null;
                 return mob.getExDocumento().isSemEfeito();
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
@@ -210,8 +215,9 @@ public class ExServiceImpl implements ExService {
                                 : cadastranteParser.getLotacao(),
                         mob);
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
@@ -237,9 +243,6 @@ public class ExServiceImpl implements ExService {
     /**
      * Verifica se o móbil contém 1 e apenas 1 via. Se houver mais de uma via não há
      * como determinar qual via deve ser transferida.
-     *
-     * @param mob
-     * @return
      */
     private boolean contemApenasUmaVia(ExMobil mob) {
         return mob.doc().getPrimeiraVia() != null && mob.doc().getSetVias().size() == 1;
@@ -267,8 +270,9 @@ public class ExServiceImpl implements ExService {
                 ExMobil mob = buscarMobil(codigoDocumento);
                 return isAtendente(cadastranteParser.getPessoa(), cadastranteParser.getLotacao(), mob);
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
@@ -292,8 +296,9 @@ public class ExServiceImpl implements ExService {
                 }
                 return null;
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
@@ -303,8 +308,9 @@ public class ExServiceImpl implements ExService {
             try {
                 return Ex.getInstance().getBL().obterPdfPorNumeroAssinatura(num);
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
@@ -320,8 +326,9 @@ public class ExServiceImpl implements ExService {
                     return s;
                 return null;
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
@@ -339,8 +346,9 @@ public class ExServiceImpl implements ExService {
                         cadastranteParser.getLotacaoOuLotacaoPrincipalDaPessoa(), mob.doc());
                 return mob.doc().getUltimaVia().getSigla();
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
@@ -353,12 +361,14 @@ public class ExServiceImpl implements ExService {
                 ExMobil mob = buscarMobil(codigoDocumento);
                 return mob.doc().getForm().get(variavel);
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
 
+    @Override
     public Boolean exigirAnexo(String codigoDocumentoVia, String siglaCadastrante, String descricaoDoAnexo)
             throws Exception {
         try (ExSoapContext ctx = new ExSoapContext(true)) {
@@ -370,8 +380,9 @@ public class ExServiceImpl implements ExService {
                         descricaoDoAnexo);
                 return true;
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
@@ -388,8 +399,9 @@ public class ExServiceImpl implements ExService {
                     return "";
                 }
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
@@ -604,7 +616,6 @@ public class ExServiceImpl implements ExService {
                 }
 
                 if (nomeNivelDeAcesso == null) {
-
                     Date dt = ExDao.getInstance().consultarDataEHoraDoServidor();
 
                     ExConfiguracao config = new ExConfiguracao();
@@ -629,7 +640,6 @@ public class ExServiceImpl implements ExService {
                 if (nivelDeAcesso == null)
                     nivelDeAcesso = dao().consultar(6L, ExNivelAcesso.class, false);
 
-
                 List<ExNivelAcesso> niveisFinal = NivelDeAcessoUtil.getListaNivelAcesso(tipoDocumento, forma, modelo,
                         classificacao, cadastrante, lotaCadastrante);
 
@@ -638,7 +648,6 @@ public class ExServiceImpl implements ExService {
 
                 doc.setCadastrante(cadastrante);
                 doc.setLotaCadastrante(lotaCadastrante);
-
                 if (subscritor != null && doc.getTitular() == null) {
                     doc.setTitular(subscritor);
                     doc.setLotaTitular(subscritor.getLotacao());
@@ -682,8 +691,10 @@ public class ExServiceImpl implements ExService {
                 }
 
                 doc.setSubscritor(subscritor);
-                doc.setLotaSubscritor(subscritor.getLotacao());
-                doc.setOrgaoUsuario(subscritor.getOrgaoUsuario());
+                if (subscritor != null) {
+                    doc.setLotaSubscritor(subscritor.getLotacao());
+                    doc.setOrgaoUsuario(subscritor.getOrgaoUsuario());
+                }
                 doc.setExTipoDocumento(tipoDocumento);
                 doc.setExFormaDocumento(forma);
                 doc.setExModelo(modelo);
@@ -730,8 +741,9 @@ public class ExServiceImpl implements ExService {
 
                 return doc.getSigla();
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
@@ -812,8 +824,9 @@ public class ExServiceImpl implements ExService {
                     mob = mob.getDoc().getPrimeiroMobil();
                 return mob.isModeloIncluso(idModelo, depoisDaData);
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }
@@ -855,7 +868,7 @@ public class ExServiceImpl implements ExService {
                     if ((idDocNumeracao != null) && !new ExPodeReiniciarNumeracao(orgaoUsuario, formaDocumento).eval()) { //Existe Range Anterior e Não pode Resetar numeracao
                         dao().updateMantemRangeNumeroDocumento(idDocNumeracao);
 
-                    } else { //Não existe ou deve resetar numeração
+                    } else { // Não existe ou deve resetar numeração
                         ExDocumentoNumeracao documentoNumeracao = new ExDocumentoNumeracao();
 
                         documentoNumeracao.setIdOrgaoUsu(idOrgaoUsu);
@@ -875,19 +888,18 @@ public class ExServiceImpl implements ExService {
                     orgaoUsuario = null;
                     formaDocumento = null;
 
-                } else { //Range vigente. Só incrementa
+                } else { // Range vigente. Só incrementa
                     idDocNumeracao = docNumeracao.getIdDocumentoNumeracao();
                     dao().incrementNumeroDocumento(idDocNumeracao);
                 }
 
-
-                if (nrDocumento != 1L) { //Obtém Número Gerado antes de liberar registro
+                if (nrDocumento != 1L) { // Obtém Número Gerado antes de liberar registro
                     nrDocumento = dao().obterNumeroGerado(idOrgaoUsu, idFormaDoc, anoEmissao);
                 }
 
                 ContextoPersistencia.flushTransaction();
 
-                //Retorno em String para WS
+                // Retorno em String para WS
                 return nrDocumento.toString();
             } catch (Exception ex) {
                 ctx.rollback(ex);
@@ -904,17 +916,17 @@ public class ExServiceImpl implements ExService {
                 Long numero = 0L;
                 ContextoPersistencia.flushTransaction();
 
-                //Verifica se Range atual existe
+                // Verifica se Range atual existe
                 ExSequencia sequencia = dao().obterSequencia(tipoSequencia, anoEmissao, true);
 
                 if (sequencia == null) {
 
                     sequencia = dao().existeRangeSequencia(tipoSequencia);
 
-                    if (sequencia != null && "0".equals(sequencia.getZerarInicioAno())) { //Existe Range Anterior e Não pode Resetar numeracao
+                    if (sequencia != null && "0".equals(sequencia.getZerarInicioAno())) { // Existe Range Anterior e Não pode Resetar numeracao
                         dao().updateMantemRangeSequencia(sequencia.getIdSequencia());
 
-                    } else { //Não existe ou deve resetar numeração
+                    } else { // Não existe ou deve resetar numeração
                         ExSequencia exSequencia = new ExSequencia();
 
                         exSequencia.setTipoSequencia(tipoSequencia);
@@ -935,24 +947,22 @@ public class ExServiceImpl implements ExService {
                         exSequencia = null;
                     }
 
-                } else { //Range vigente. Só incrementa
+                } else { // Range vigente. Só incrementa
                     idSeq = sequencia.getIdSequencia();
                     dao().incrementNumero(idSeq);
                 }
 
-
-                if (numero != 1L) { //Obtém Número Gerado antes de liberar registro
+                if (numero != 1L) { // Obtém Número Gerado antes de liberar registro
                     numero = dao().obterNumeroGerado(tipoSequencia, anoEmissao);
                 }
 
                 ContextoPersistencia.flushTransaction();
 
-                //Retorno em String para WS
+                // Retorno em String para WS
                 return numero.toString();
             } catch (Exception ex) {
                 ctx.rollback(ex);
-                throw new Exception("Ocorreu um problema na obtenção do número: "
-                        + ex.getMessage(), ex);
+                throw new Exception("Ocorreu um problema na obtenção do número: " + ex.getMessage(), ex);
             }
         }
     }
@@ -967,12 +977,10 @@ public class ExServiceImpl implements ExService {
         }
     }
 
-
     public String obterMetadadosDocumento(String siglaDocumento, String token) throws Exception {
         try (ExSoapContext ctx = new ExSoapContext(false)) {
             if (Prop.getBool("/siga.ws.seguranca.token.jwt"))
                 SigaUtil.getInstance().validarToken(token);
-
 
             final ExMobilDaoFiltro filter = new ExMobilDaoFiltro();
             filter.setSigla(siglaDocumento);
@@ -982,8 +990,7 @@ public class ExServiceImpl implements ExService {
                 return Ex.getInstance().getBL().documentoToJSON(mob.getDoc());
             }
         } catch (Exception e) {
-            throw new Exception("Ocorreu um problema na obtenção dos Metadados do Documento: "
-                    + e.getMessage(), e);
+            throw new Exception("Ocorreu um problema na obtenção dos Metadados do Documento: " + e.getMessage(), e);
         }
         return "Ocorreu um problema na obtenção dos Metadados do Documento";
     }
@@ -1029,6 +1036,7 @@ public class ExServiceImpl implements ExService {
                     cadastranteWS = dao().getPessoaFromSigla(SigaUtil.getInstance().parseTokenJwt(token).get("sub").toString());
                     Ex.getInstance().getComp().afirmar("Não é possível " + SigaMessages.getMessage("documento.publicar.portaltransparencia"),
                             ExPodePublicarPortalDaTransparencia.class, cadastranteWS, cadastranteWS.getLotacao(), mob);
+
                     /* Fim da Validação */
                     String[] listaMarcadores = null;
                     if (!"".equals(marcadoresStr)) {
@@ -1058,9 +1066,15 @@ public class ExServiceImpl implements ExService {
                 if (siglaMobilPai == null)
                     throw new Exception("Informe a sigla do móbil pai");
                 ExMobil mobPai = buscarMobil(siglaMobilPai);
+                if (mobPai == null)
+                    throw new Exception("Móbil pai inexistente");
+                if (mobPai.isGeral())
+                    mobPai = mobPai.doc().getMobilDefaultParaReceberJuntada();
                 if (siglaMobilFilho == null)
                     throw new Exception("Informe a sigla do móbil filho");
                 ExMobil mobFilho = buscarMobil(siglaMobilFilho);
+                if (mobFilho == null)
+                    throw new Exception("Móbil filho inexistente");
 
                 PessoaLotacaoParser cadastranteParser = new PessoaLotacaoParser(siglaCadastrante);
 //				if (cadastranteParser.getLotacao() == null && cadastranteParser.getPessoa() == null)
@@ -1070,8 +1084,9 @@ public class ExServiceImpl implements ExService {
                         cadastranteParser.getLotacaoOuLotacaoPrincipalDaPessoa(), mobPai, mobFilho, null, null, null);
                 return;
             } catch (Exception ex) {
-                ctx.rollback(ex);
-                throw ex;
+                Exception e = ctx.exceptionWithMessageFileAndLine(ex);
+                ctx.rollback(e);
+                throw e;
             }
         }
     }

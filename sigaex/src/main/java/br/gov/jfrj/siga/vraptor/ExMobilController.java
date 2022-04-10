@@ -32,10 +32,12 @@ import br.gov.jfrj.siga.cp.bl.Cp;
 import br.gov.jfrj.siga.cp.model.CpOrgaoSelecao;
 import br.gov.jfrj.siga.cp.model.DpLotacaoSelecao;
 import br.gov.jfrj.siga.cp.model.DpPessoaSelecao;
+import br.gov.jfrj.siga.cp.model.enm.CpTipoDeConfiguracao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.*;
 import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.bl.ExBL;
+import br.gov.jfrj.siga.ex.logic.ExPodePorConfiguracao;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.model.GenericoSelecao;
 import br.gov.jfrj.siga.model.Selecionavel;
@@ -450,7 +452,7 @@ public class ExMobilController extends
         if (primeiraVez == null || !primeiraVez.equals("sim")) {
             try {
                 validarFiltrosPesquisa(flt);
-
+                pesquisarXjus(flt);
                 listarItensPesquisa(flt, builder);
             } catch (RegraNegocioException | AplicacaoException e) {
                 result.include("msgPesqErro", e.getMessage());
@@ -532,7 +534,52 @@ public class ExMobilController extends
 
     }
 
+    private void pesquisarXjus(ExMobilDaoFiltro flt) {
+        if (!(new ExPodePorConfiguracao(getTitular(), getLotaTitular()).withIdTpConf(CpTipoDeConfiguracao.UTILIZAR_PESQUISA_XJUS).eval())) {
+            flt.setDescrPesquisaXjus(null);
+            return;
+        }
+
+        if(flt.getDescrPesquisaXjus() == null || flt.getDescrPesquisaXjus().isEmpty() )
+            return;
+
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+        String filter = flt.getDescrPesquisaXjus();
+        String acronimoOrgaoUsu = dao().consultarOrgaoUsuarioPorId(flt.getIdOrgaoUsu()).getAcronimoOrgaoUsu();
+        String descEspecie = flt.getIdFormaDoc() == null || flt.getIdFormaDoc() == 0 ? null : dao().consultarExFormaPorId(flt.getIdFormaDoc()).getDescrFormaDoc();
+        String descModelo = flt.getIdMod() == null  || flt.getIdMod() == 0 ? null : dao().consultar(flt.getIdMod(), ExModelo.class, false).getDescMod();
+        String dataInicial = flt.getDtDoc() == null ? null : df.format(flt.getDtDoc());
+        String dataFinal = flt.getDtDocFinal() == null ? null : df.format(flt.getDtDocFinal());
+        String acl = "PUBLIC;O" + getTitular().getOrgaoUsuario().getId() + ";L"
+                + getTitular().getLotacao().getIdInicial() + ";P"
+                + getTitular().getIdInicial();
+
+        try {
+            List<Long> listaIdDoc = Ex.getInstance().getBL().pesquisarXjus(
+                    filter,
+                    acronimoOrgaoUsu,
+                    descEspecie,
+                    descModelo,
+                    dataInicial,
+                    dataFinal,
+                    acl,
+                    1,
+                    1000);
+
+            flt.setListaIdDoc(listaIdDoc);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.include("msgCabecClass", "alert-warning");
+            result.include("mensagemCabec", "Não foi possível utilizar a pesquisa via XJUS. A consulta foi realizada via Banco de Dados: " + e.getMessage());
+        }
+    }
+
     private void listarItensPesquisa(final ExMobilDaoFiltro flt, final ExMobilBuilder builder) {
+        //caso não tenha encontrado resultado do xjus não precisa realizar busca no BD
+        if(flt.getListaIdDoc() != null && flt.getListaIdDoc().isEmpty())
+            return;
+
         setItens(dao().consultarPorFiltroOtimizado(flt,
                 builder.getOffset(), getItemPagina() + (Prop.isGovSP() ? 1 : 0), getTitular(),
                 getLotaTitular()));
@@ -678,6 +725,9 @@ public class ExMobilController extends
                     .getIdInicial());
         flt.setDescrDocumento(Texto
                 .removeAcentoMaiusculas(param("descrDocumento")));
+
+        flt.setDescrPesquisaXjus(param("descrDocumento"));
+
         String paramFullText = param("fullText");
         if (paramFullText != null) {
             paramFullText = paramFullText.trim();

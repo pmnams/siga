@@ -42,8 +42,8 @@ import br.gov.jfrj.siga.ex.bl.ExBL;
 import br.gov.jfrj.siga.ex.bl.Mesa2.GrupoItem;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import br.gov.jfrj.siga.ex.util.MascaraUtil;
-import br.gov.jfrj.siga.hibernate.ext.IExMobilDaoFiltro;
-import br.gov.jfrj.siga.hibernate.ext.IMontadorQuery;
+import br.gov.jfrj.siga.hibernate.query.ext.IExMobilDaoFiltro;
+import br.gov.jfrj.siga.hibernate.query.ext.IMontadorQuery;
 import br.gov.jfrj.siga.model.Selecionavel;
 import br.gov.jfrj.siga.model.dao.ModeloDao;
 import br.gov.jfrj.siga.persistencia.*;
@@ -55,6 +55,7 @@ import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.criteria.*;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -552,11 +553,8 @@ public class ExDao extends CpDao {
             query.setParameter("classificacaoSelId", flt.getClassificacaoSelId());
         }
 
-        if (flt.getDescrDocumento() != null
-
-                && !flt.getDescrDocumento().trim().equals("")) {
-            query.setParameter("descrDocumento", "%"
-                    + flt.getDescrDocumento().toUpperCase() + "%");
+        if (flt.getDescrDocumento() != null && !flt.getDescrDocumento().trim().equals("") && flt.getListaIdDoc() == null) {
+            query.setParameter("descrDocumento", "%" + flt.getDescrDocumento().toUpperCase() + "%");
         }
 
         if (flt.getDtDoc() != null) {
@@ -631,6 +629,10 @@ public class ExDao extends CpDao {
             ExModelo mod = ExDao.getInstance().consultar(flt.getIdMod(),
                     ExModelo.class, false);
             query.setParameter("hisIdIni", mod.getHisIdIni());
+        }
+
+        if (flt.getListaIdDoc() != null && !flt.getListaIdDoc().isEmpty()) {
+            query.setParameter("listaIdDoc", flt.getListaIdDoc());
         }
     }
 
@@ -2199,6 +2201,21 @@ public class ExDao extends CpDao {
         } catch (Exception ne) {
             return null;
         }
+    }
+
+    public List<BigDecimal> consultarDocumentosPorSiglas(List<String> siglas) {
+        String sql = "SELECT X.ID_DOC \n" +
+                "FROM SIGA.EX_DOCUMENTO X, \n" +
+                "	SIGA.EX_FORMA_DOCUMENTO Y,\n" +
+                "	CORPORATIVO.CP_ORGAO_USUARIO Z\n" +
+                "WHERE X.ID_FORMA_DOC  = Y.ID_FORMA_DOC \n" +
+                "	AND X.ID_ORGAO_USU = Z.ID_ORGAO_USU\n" +
+                "	AND Z.SIGLA_ORGAO_USU || Y.SIGLA_FORMA_DOC || X.ANO_EMISSAO || LPAD(X.NUM_EXPEDIENTE, 5, '0')\n" +
+                "	 IN ( :siglas )";
+        final Query query = em().createNativeQuery(sql);
+        query.setParameter("siglas", siglas);
+
+        return query.getResultList();
     }
 
 }

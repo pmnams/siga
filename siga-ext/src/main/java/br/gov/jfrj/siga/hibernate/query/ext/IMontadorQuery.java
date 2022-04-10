@@ -16,14 +16,13 @@
  *     You should have received a copy of the GNU General Public License
  *     along with SIGA.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package br.gov.jfrj.siga.hibernate.ext;
-
+package br.gov.jfrj.siga.hibernate.query.ext;
 
 
 public interface IMontadorQuery {
 
 	public abstract String montaQueryConsultaporFiltro(
-			final IExMobilDaoFiltro flt, boolean apenasCount);
+            final IExMobilDaoFiltro flt, boolean apenasCount);
 
 	public abstract void setMontadorPrincipal(IMontadorQuery montadorQueryPrincipal);
 }
