@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -29,6 +29,7 @@ import br.gov.jfrj.siga.base.AplicacaoException;
 import br.gov.jfrj.siga.dp.dao.CpDao;
 import br.gov.jfrj.siga.model.Selecionavel;
 import br.gov.jfrj.siga.model.dao.DaoFiltroSelecionavel;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
@@ -125,11 +126,12 @@ public abstract class SigaSelecionavelControllerSupport<T extends Selecionavel, 
 
         final DaoFiltroT flt = createDaoFiltro();
 
-        if (fCalcularTamanho)
-            tamanho = dao().consultarQuantidade(flt);
+        if (StringUtils.isNotBlank(sigla)) {
+            if (fCalcularTamanho)
+                tamanho = dao().consultarQuantidade(flt);
 
-        tamanho = dao().consultarQuantidade(flt);
-        itens = dao().consultarPorFiltro(flt, offset, itemPagina);
+            itens = dao().consultarPorFiltro(flt, offset, itemPagina);
+        }
 
         result.include("currentPageNumber", calculaPaginaAtual(offset));
         return "busca";

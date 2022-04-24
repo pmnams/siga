@@ -75,7 +75,7 @@
 
     <c:set var="collapse_Expanded" scope="request" value="collapsible expanded"/>
 
-    <c:set var="siga_version" scope="request" value="1.0.0"/>
+    <c:set var="siga_version" scope="request" value="1.0.1"/>
 
     <meta name="theme-color" content="bg-primary">
     <c:set var="thead_color" value="thead-light" scope="request"/>
@@ -187,9 +187,8 @@
                             <script>
                                 $('#btnTutorial').click(function () {
                                     var src = 'https://vimeopro.com/fcav/spsempapel';
-                                    $('#tutorialModal').modal('show');
+                                    $('#tutorialModal').appendTo("body").modal('show');
                                     $('#tutorialModal iframe').attr('src', src);
-                                    $(".modal-backdrop").css("z-index", "0");
                                 });
 
                                 $('#tutorialModal button').click(function () {
@@ -418,6 +417,10 @@
             </div>
         </c:if>
     </div>
+    <script>
+        if('${mensagemConsole}' != '')
+            console.log('${mensagemConsole}');
+    </script>
     <div class="row ${mensagemCabec==null?'d-none':''}" id="mensagemCabecId">
         <div class="col">
             <div class="alert ${msgCabecClass} fade show" id="mensagemCabec" role="alert">

@@ -261,7 +261,7 @@ public class Excel {
                 Cell cell;
 
                 //NOME DA LOTACAO
-                celula = retornaConteudo(row.getCell(0, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 problemas += validarNomeLotacao(nomes, celula.trim(), orgaoUsuario, linha, lotacao, 100);
 
                 if (problemas == null || "".equals(problemas.toString())) {
@@ -269,7 +269,7 @@ public class Excel {
                 }
 
                 //SIGLA DA LOTACAO
-                celula = retornaConteudo(row.getCell(1, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 problemas += validarSiglaLotacao(siglas, celula.trim(), orgaoUsuario, linha, lotacao, 20);
 
                 if (problemas == null || "".equals(problemas.toString())) {
@@ -277,7 +277,7 @@ public class Excel {
                 }
 
                 //ESTADO
-                celula = retornaConteudo(row.getCell(2, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
 
                 if (uf == null || !uf.getSigla().equalsIgnoreCase(celula)) {
                     uf = CpDao.getInstance().consultaSiglaUF(celula.toUpperCase());
@@ -287,7 +287,7 @@ public class Excel {
                     problemas += "Linha " + linha + ": UF não encontrada" + System.getProperty("line.separator");
                 } else {
                     //LOCALIDADE DA LOTACAO
-                    celula = retornaConteudo(row.getCell(3, Row.CREATE_NULL_AS_BLANK));
+                    celula = retornaConteudo(row.getCell(3, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                     loc.setUF(uf);
                     loc.setNmLocalidade(celula);
                     problemas += validarLocalidadeLotacao(localidades, linha, loc);
@@ -298,9 +298,9 @@ public class Excel {
                  * Alteracao 24/04/2020
                  */
                 //Lotacao Pai
-                //celula = retornaConteudo(row.getCell(3, Row.CREATE_NULL_AS_BLANK));
+                //celula = retornaConteudo(row.getCell(3, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 //String lotacaopaidescricao = celula;
-                celula = retornaConteudo(row.getCell(4, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 String lotacaopaisigla = celula;
                 if (!celula.equals("")) {
                     DpLotacao lo = CpDao.getInstance().consultarLotacaoPorOrgaoEId(orgaoUsuario, lotacaopaisigla);
@@ -313,7 +313,7 @@ public class Excel {
                 }
 
                 //LOTACAO EXTERNA
-                celula = retornaConteudo(row.getCell(5, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 problemas += validarIsExternaLotacao(celula.trim(), linha);
 
                 if (problemas == null || "".equals(problemas.toString())) {
@@ -434,7 +434,7 @@ public class Excel {
                 Cell cell;
 
                 //NOME DA FUNCAO
-                celula = retornaConteudo(row.getCell(0, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 problemas.append(validarNomeFuncao(nomes, celula.trim(), orgaoUsuario, linha, funcao, 100));
 
                 if (problemas == null || "".equals(problemas.toString())) {
@@ -536,7 +536,7 @@ public class Excel {
                 Cell cell;
 
                 //NOME DA CARGO
-                celula = retornaConteudo(row.getCell(0, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 problemas.append(validarNomeCargo(nomes, celula.trim(), orgaoUsuario, linha, cargo, 100));
 
                 if (problemas == null || "".equals(problemas.toString())) {
@@ -652,7 +652,7 @@ public class Excel {
                 Cell cell;
 
                 /* 6 --------  CPF -----------*/
-                celula = retornaConteudo(row.getCell(6, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(6, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 cpf = celula.replaceAll("[^0-9]", "");
                 cpf = StringUtils.leftPad(cpf, 11, "0");
                 if (!"".equals(cpf.trim())) {
@@ -666,7 +666,7 @@ public class Excel {
 
 
                 /* 0 --------  SIGLA DO ORGAO -----------*/
-                celula = retornaConteudo(row.getCell(0, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 if ("".equals(celula.trim())) {
                     problemas.append("Linha " + linha + ": ÓRGÃO em branco" + System.lineSeparator());
                 } else {
@@ -677,7 +677,7 @@ public class Excel {
                 /* ----------  END ---------- */
 
                 /* 1 --------  NOME DO CARGO -----------*/
-                celula = retornaConteudo(row.getCell(1, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 if (!"".equals(celula.trim())) {
                     cargo.setOrgaoUsuario(orgaoUsuario);
                     cargo.setNomeCargo(Texto.removeAcento(Texto.removerEspacosExtra(celula).trim()));
@@ -706,7 +706,7 @@ public class Excel {
                 /* ----------  END ---------- */
 
                 /* 2 --------  NOME FUNCAO DE CONFIANCA -----------*/
-                celula = retornaConteudo(row.getCell(2, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 if (!"".equals(celula.trim())) {
                     funcao.setOrgaoUsuario(orgaoUsuario);
                     funcao.setNomeFuncao(Texto.removeAcento(Texto.removerEspacosExtra(celula).trim()));
@@ -737,7 +737,7 @@ public class Excel {
                 /* ----------  END ---------- */
 
                 /* 3 --------  NOME DA LOTACAO -----------*/
-                celula = retornaConteudo(row.getCell(3, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(3, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 if (!"".equals(celula.trim())) {
                     lotacao.setOrgaoUsuario(orgaoUsuario);
                     lotacao.setSiglaLotacao(Texto.removeAcento(Texto.removerEspacosExtra(celula).trim()));
@@ -768,7 +768,7 @@ public class Excel {
                 /* ----------  END ---------- */
 
                 /* 4 --------  NOME DA PESSOA -----------*/
-                celula = retornaConteudo(row.getCell(4, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 problemas.append(validarNomePessoa(celula.trim(), linha, 60));
 
 
@@ -789,15 +789,15 @@ public class Excel {
 
 
                 /* 5 --------  DATA DE NASCIMENTO -----------*/
-                if (retornaConteudo(row.getCell(5, Row.CREATE_NULL_AS_BLANK)) != "") {
-                    if (row.getCell(5).getCellType() == HSSFCell.CELL_TYPE_NUMERIC && HSSFDateUtil.isCellDateFormatted(row.getCell(5, Row.CREATE_NULL_AS_BLANK))) {
+                if (retornaConteudo(row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)) != "") {
+                    if (row.getCell(5).getCellType() == HSSFCell.CELL_TYPE_NUMERIC && HSSFDateUtil.isCellDateFormatted(row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK))) {
                         date = row.getCell(5).getDateCellValue();
 
                         if (date.compareTo(new Date()) > 0) {
                             problemas.append("Linha " + linha + ": DATA DE NASCIMENTO inválida" + System.lineSeparator());
                         }
                     } else if (row.getCell(5).getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
-                        problemas.append(validarData(String.valueOf(((Double) row.getCell(5, Row.CREATE_NULL_AS_BLANK).getNumericCellValue()).longValue()), linha));
+                        problemas.append(validarData(String.valueOf(((Double) row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getNumericCellValue()).longValue()), linha));
                         if (problemas != null && problemas.toString().equals("")) {
                             dataString = String.valueOf(((Double) row.getCell(5).getNumericCellValue()).longValue()).replaceAll("[^0-9]", "");
                             date = formato.parse(dataString);
@@ -808,9 +808,9 @@ public class Excel {
                         }
 
                     } else if (row.getCell(5).getCellType() == HSSFCell.CELL_TYPE_STRING) {
-                        problemas.append(validarData(row.getCell(5, Row.CREATE_NULL_AS_BLANK).getStringCellValue(), linha));
+                        problemas.append(validarData(row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue(), linha));
                         if (problemas != null && problemas.toString().equals("")) {
-                            dataString = row.getCell(5, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
+                            dataString = row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
                             date = formato.parse(dataString.replaceAll("[^0-9]", ""));
 
                             if (date.compareTo(new Date()) > 0) {
@@ -825,7 +825,7 @@ public class Excel {
                 /* ----------  END ---------- */
 
                 /* 7 --------  EMAIL -----------*/
-                celula = retornaConteudo(row.getCell(7, Row.CREATE_NULL_AS_BLANK)).trim().toLowerCase();
+                celula = retornaConteudo(row.getCell(7, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)).trim().toLowerCase();
                 email = celula;
 
                 if (!"".equals(celula.trim())) {
@@ -851,18 +851,18 @@ public class Excel {
                 /* ----------  END ---------- */
 
                 /* 8 --------  RG -----------*/
-                celula = retornaConteudo(row.getCell(8, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(8, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 rg = celula;
                 /* ----------  END ---------- */
 
 
                 /* 9 --------  RG Orgao Expeditor -----------*/
-                celula = retornaConteudo(row.getCell(9, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(9, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 orgexp = celula;
                 /* ----------  END ---------- */
 
                 /* 10 --------  UF RG -----------*/
-                celula = retornaConteudo(row.getCell(10, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(10, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 ufexp = celula;
                 if (!"".equals(ufexp.trim())) {
                     if (CpDao.getInstance().consultaSiglaUF(ufexp) == null)
@@ -871,15 +871,15 @@ public class Excel {
                 /* ----------  END ---------- */
 
                 /* 11 --------  RG Data Expedicao -----------*/
-                if (retornaConteudo(row.getCell(11, Row.CREATE_NULL_AS_BLANK)) != "") {
-                    if (row.getCell(11).getCellType() == HSSFCell.CELL_TYPE_NUMERIC && HSSFDateUtil.isCellDateFormatted(row.getCell(11, Row.CREATE_NULL_AS_BLANK))) {
+                if (retornaConteudo(row.getCell(11, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)) != "") {
+                    if (row.getCell(11).getCellType() == HSSFCell.CELL_TYPE_NUMERIC && HSSFDateUtil.isCellDateFormatted(row.getCell(11, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK))) {
                         dateExp = row.getCell(11).getDateCellValue();
 
                         if (dateExp.compareTo(new Date()) > 0) {
                             problemas.append("Linha " + linha + ": DATA DE EXPEDIÇÃO DO RG inválida" + System.lineSeparator());
                         }
                     } else if (row.getCell(11).getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
-                        problemas.append(validarData(String.valueOf(((Double) row.getCell(11, Row.CREATE_NULL_AS_BLANK).getNumericCellValue()).longValue()), linha, "expedição"));
+                        problemas.append(validarData(String.valueOf(((Double) row.getCell(11, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getNumericCellValue()).longValue()), linha, "expedição"));
                         if (problemas != null && problemas.toString().equals("")) {
                             dataString = String.valueOf(((Double) row.getCell(11).getNumericCellValue()).longValue()).replaceAll("[^0-11]", "");
                             dateExp = formato.parse(dataString);
@@ -890,9 +890,9 @@ public class Excel {
                         }
 
                     } else if (row.getCell(11).getCellType() == HSSFCell.CELL_TYPE_STRING) {
-                        problemas.append(validarData(row.getCell(11, Row.CREATE_NULL_AS_BLANK).getStringCellValue(), linha, "expedição"));
+                        problemas.append(validarData(row.getCell(11, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue(), linha, "expedição"));
                         if (problemas != null && problemas.toString().equals("")) {
-                            dataString = row.getCell(11, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
+                            dataString = row.getCell(11, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
                             dateExp = formato.parse(dataString.replace("-", "").replace("/", "").trim());
 
                             if (dateExp.compareTo(new Date()) > 0) {
@@ -907,7 +907,7 @@ public class Excel {
                 /* ----------  END ---------- */
 
                 /* 12 --------  Nome Abreviado -----------*/
-                celula = retornaConteudo(row.getCell(12, Row.CREATE_NULL_AS_BLANK));
+                celula = retornaConteudo(row.getCell(12, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 problemas.append(validarNomeAbreviado(celula.trim(), linha, 40));
                 nomeExibicao = celula;
                 /* ----------  END ---------- */

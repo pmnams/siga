@@ -30,6 +30,7 @@ import br.gov.jfrj.siga.cp.*;
 import br.gov.jfrj.siga.cp.bl.Cp;
 import br.gov.jfrj.siga.cp.bl.CpBL;
 import br.gov.jfrj.siga.cp.bl.CpConfiguracaoBL;
+import br.gov.jfrj.siga.cp.grupo.ConfiguracaoGrupo;
 import br.gov.jfrj.siga.cp.model.enm.*;
 import br.gov.jfrj.siga.dp.*;
 import br.gov.jfrj.siga.dp.dao.CpDao;
@@ -1640,7 +1641,7 @@ public class ExBL extends CpBL {
                 && !doc.getPrimeiroMobil().getMobilPrincipal().doc().isPendenteDeAssinatura()) {
             transferir(doc.getOrgaoExternoDestinatario(), doc.getObsOrgao(), cadastrante, lotaCadastrante,
                     doc.getPrimeiroMobil().getMobilPrincipal(), null, null, null, doc.getLotaDestinatario(),
-                    doc.getDestinatario(), null, null, assinante, assinante, null, false, null, null, null, false,
+                    doc.getDestinatario(), null, null, null, assinante, assinante, null, false, null, null, null, false,
                     false, ExTipoDeMovimentacao.TRANSFERENCIA);
         }
     }
@@ -3977,11 +3978,22 @@ public class ExBL extends CpBL {
     public void incluirCosignatario(final DpPessoa cadastrante, final DpLotacao lotaCadastrante, final ExDocumento doc,
                                     final Date dtMov, final DpPessoa subscritor, final String funcaoCosignatario) throws AplicacaoException {
 
-        try {
-            if (subscritor == null) {
-                throw new AplicacaoException("Cossignatário não foi informado");
-            }
+        if (subscritor == null) {
+            throw new RegraNegocioException("Cossignatário não foi informado");
+        }
 
+        if (Ex.getInstance().getComp().exp(ExECossignatario.class, subscritor, doc).eval()) {
+            throw new RegraNegocioException("Não é possivel incluir o cossignatário, pois ele já foi incluído!");
+        }
+
+        if (!new ExPodeRestringirCossignatarioSubscritor(cadastrante, lotaCadastrante, subscritor, subscritor.getLotacao(),
+                subscritor.getCargo(),
+                subscritor.getFuncaoConfianca(),
+                subscritor.getOrgaoUsuario()).eval()) {
+            throw new RegraNegocioException("Esse usuário não está disponível para inclusão de Cossignatário / " + SigaMessages.getMessage("documento.subscritor"));
+        }
+
+        try {
             iniciarAlteracao();
 
             final ExMovimentacao mov = criarNovaMovimentacao(
@@ -4774,7 +4786,7 @@ public class ExBL extends CpBL {
                                      DpLotacao lotaResp, ExMobil mob) throws Exception {
 
         transferir(null, null, cadastrante, lotaCadastrante, mob, null, null, null, lotaResp, resp, null, null, null,
-                null, null, false, null, null, null, false, true, ExTipoDeMovimentacao.TRANSFERENCIA);
+                null, null, null, false, null, null, null, false, true, ExTipoDeMovimentacao.TRANSFERENCIA);
     }
 
     /**
@@ -4806,7 +4818,7 @@ public class ExBL extends CpBL {
     // Nato: retirei: final HttpServletRequest request,
     public void transferir(final CpOrgao orgaoExterno, final String obsOrgao, final DpPessoa cadastrante,
                            final DpLotacao lotaCadastrante, final ExMobil mob, final Date dtMov, final Date dtMovIni,
-                           final Date dtFimMov, DpLotacao lotaResponsavel, final DpPessoa responsavel,
+                           final Date dtFimMov, DpLotacao lotaResponsavel, final DpPessoa responsavel, final CpGrupoDeEmail grupo,
                            final DpLotacao lotaDestinoFinal, final DpPessoa destinoFinal, final DpPessoa subscritor,
                            final DpPessoa titular, final ExTipoDespacho tpDespacho, final boolean fInterno, final String descrMov,
                            final String conteudo, String nmFuncaoSubscritor, boolean forcarTransferencia, boolean automatico, final ITipoDeMovimentacao tipoTramite) {
@@ -4888,7 +4900,7 @@ public class ExBL extends CpBL {
                 }
 
                 if (!fDespacho) {
-                    if (responsavel == null && lotaResponsavel == null)
+                    if (responsavel == null && lotaResponsavel == null && grupo == null)
                         if (orgaoExterno == null && obsOrgao == null)
                             throw new AplicacaoException("não foram informados dados para o trâmite");
                 }
@@ -4904,7 +4916,7 @@ public class ExBL extends CpBL {
 
                 ITipoDeMovimentacao idTpMov;
                 if (!fDespacho) {
-                    if (responsavel == null && lotaResponsavel == null)
+                    if (responsavel == null && lotaResponsavel == null && grupo == null)
                         idTpMov = ExTipoDeMovimentacao.TRANSFERENCIA_EXTERNA;
                     else
                         idTpMov = ExTipoDeMovimentacao.TRANSFERENCIA;
@@ -4937,108 +4949,123 @@ public class ExBL extends CpBL {
                         || idTpMov == ExTipoDeMovimentacao.TRANSFERENCIA
                         || idTpMov == ExTipoDeMovimentacao.TRAMITE_PARALELO
                         || idTpMov == ExTipoDeMovimentacao.NOTIFICACAO) {
+                    Set<PessoaLotacaoParser> destinatarios = new HashSet<>();
+                    if (grupo != null) {
+                        ArrayList<ConfiguracaoGrupo> configuracoesGrupo = Cp.getInstance().getConf()
+                                .obterCfgGrupo(dao().consultar(grupo.getHisIdIni(), CpGrupo.class, false));
+                        for (ConfiguracaoGrupo cfgGrp : configuracoesGrupo) {
+                            CpConfiguracao cfg = cfgGrp.getCpConfiguracao();
+                            switch (cfgGrp.getTipo()) {
+                                case PESSOA:
+                                    destinatarios.add(new PessoaLotacaoParser(cfg.getDpPessoa(), cfg.getDpPessoa().getLotacao()));
+                                    break;
+                                case LOTACAO:
+                                    destinatarios.add(new PessoaLotacaoParser(null, cfg.getLotacao()));
+                                    break;
+                            }
 
-                    ExMovimentacao mov = criarNovaMovimentacaoTransferencia(idTpMov, cadastrante,
-                            lotaCadastrante, m, dtMov, dtFimMov,
-                            (subscritor == null && fDespacho) ? cadastrante : subscritor, null, titular, null, dt);
-
-                    if (dt != null)
-                        mov.setDtIniMov(dt);
-
-                    if (dtFimMov != null)//
-                        mov.setDtFimMov(dtFimMov);//
-
-                    if (orgaoExterno != null || obsOrgao != null) {
-                        mov.setOrgaoExterno(orgaoExterno);
-                        mov.setObsOrgao(obsOrgao);
-                    }
-
-                    if (lotaResponsavel != null) {
-                        mov.setLotaResp(lotaResponsavel);
-                        mov.setResp(responsavel);
+                        }
                     } else {
-                        if (responsavel != null)
-                            lotaResponsavel = responsavel.getLotacao();
+                        destinatarios.add(new PessoaLotacaoParser(responsavel, lotaResponsavel));
                     }
 
-                    mov.setLotaTitular(mov.getLotaSubscritor());
-                    mov.setDestinoFinal(destinoFinal);
-                    mov.setLotaDestinoFinal(lotaDestinoFinal);
+                    for (PessoaLotacaoParser destinatario : destinatarios) {
+                        ExMovimentacao mov = criarNovaMovimentacaoTransferencia(idTpMov, cadastrante,
+                                lotaCadastrante, m, dtMov, dtFimMov,
+                                (subscritor == null && fDespacho) ? cadastrante : subscritor, null, titular, null, dt);
 
-                    mov.setNmFuncaoSubscritor(nmFuncaoSubscritor);
+                        if (dt != null)
+                            mov.setDtIniMov(dt);
 
-                    mov.setExTipoDespacho(tpDespacho);
-                    mov.setDescrMov(descrMov);
+                        if (dtFimMov != null)//
+                            mov.setDtFimMov(dtFimMov);//
 
-                    if (tpDespacho != null || descrMov != null || conteudo != null) {
-                        // Gravar o form
-                        String cont = null;
-                        if (conteudo != null) {
-                            cont = conteudo;
-                        } else if (descrMov != null) {
-                            cont = descrMov;
+                        if (orgaoExterno != null || obsOrgao != null) {
+                            mov.setOrgaoExterno(orgaoExterno);
+                            mov.setObsOrgao(obsOrgao);
+                        }
+
+                        mov.setLotaResp(destinatario.getLotacao());
+                        mov.setResp(destinatario.getPessoa());
+
+                        mov.setLotaTitular(mov.getLotaSubscritor());
+                        mov.setDestinoFinal(destinoFinal);
+                        mov.setLotaDestinoFinal(lotaDestinoFinal);
+
+                        mov.setNmFuncaoSubscritor(nmFuncaoSubscritor);
+
+                        mov.setExTipoDespacho(tpDespacho);
+                        mov.setDescrMov(descrMov);
+
+                        if (tpDespacho != null || descrMov != null || conteudo != null) {
+                            // Gravar o form
+                            String cont = null;
+                            if (conteudo != null) {
+                                cont = conteudo;
+                            } else if (descrMov != null) {
+                                cont = descrMov;
+                            } else {
+                                cont = tpDespacho.getDescTpDespacho();
+                            }
+                            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                                baos.write("conteudo".getBytes("iso-8859-1"));
+                                baos.write('=');
+                                baos.write(URLEncoder.encode(cont, "iso-8859-1").getBytes());
+                                mov.setConteudoBlobForm(baos.toByteArray());
+                            }
+
+                            // Gravar o Html //Nato
+                            final String strHtml = processarModelo(mov, "processar_modelo", null,
+                                    mov.getTitular().getOrgaoUsuario());
+                            mov.setConteudoBlobHtmlString(strHtml);
+
+                            // Gravar o Pdf
+                            final byte pdf[] = Documento.generatePdf(strHtml);
+                            mov.setConteudoBlobPdf(pdf);
+                            mov.setConteudoTpMov("application/zip");
+                        }
+                        if (automatico)
+                            mov.setDescrMov("Transferência automática.");
+
+                        Pendencias p = m.calcularTramitesPendentes();
+
+                        // Localiza o tramite que será recebido
+                        for (ExMovimentacao t : p.recebimentosPendentes) {
+                            if (forcarTransferencia || (titularFinal == null && lotaCadastrante == null) || t.isResp(titularFinal, lotaCadastrante)) {
+                                mov.setExMovimentacaoRef(t);
+                                break;
+                            }
+                        }
+
+                        // Titular é a origem e deve sempre ser preenchido
+                        if (mov.getExMovimentacaoRef() == null && p.fIncluirCadastrante) {
+                            mov.setTitular(mov.mob().getTitular());
+                            mov.setLotaTitular(mov.mob().getLotaTitular());
+                        }
+
+                        // Cancelar trâmite pendente quando é para forçar para outro destino
+                        Set<ExMovimentacao> movsTramitePendente = m.calcularTramitesPendentes().tramitesPendentes;
+                        if (forcarTransferencia && movsTramitePendente.size() > 0) {
+                            for (ExMovimentacao tp : movsTramitePendente)
+                                gravarMovimentacaoCancelamento(mov, tp);
                         } else {
-                            cont = tpDespacho.getDescTpDespacho();
-                        }
-                        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                            baos.write("conteudo".getBytes("iso-8859-1"));
-                            baos.write('=');
-                            baos.write(URLEncoder.encode(cont, "iso-8859-1").getBytes());
-                            mov.setConteudoBlobForm(baos.toByteArray());
+                            gravarMovimentacao(mov);
                         }
 
-                        // Gravar o Html //Nato
-                        final String strHtml = processarModelo(mov, "processar_modelo", null,
-                                mov.getTitular().getOrgaoUsuario());
-                        mov.setConteudoBlobHtmlString(strHtml);
+                        concluirAlteracaoParcialComRecalculoAcesso(m);
 
-                        // Gravar o Pdf
-                        final byte pdf[] = Documento.generatePdf(strHtml);
-                        mov.setConteudoBlobPdf(pdf);
-                        mov.setConteudoTpMov("application/zip");
-                    }
-                    if (automatico)
-                        mov.setDescrMov("Transferência automática.");
+                        List<ExMovimentacao> listaMovimentacao = new ArrayList<ExMovimentacao>();
+                        listaMovimentacao.addAll(m.doc().getMobilGeral()
+                                .getMovsNaoCanceladas(ExTipoDeMovimentacao.RESTRINGIR_ACESSO));
+                        if (!listaMovimentacao.isEmpty()) {
+                            List<ExDocumento> listaDocumentos = new ArrayList<ExDocumento>();
+                            listaDocumentos.addAll(mob.getDoc().getExDocumentoFilhoSet());
 
-                    Pendencias p = m.calcularTramitesPendentes();
-
-                    // Localiza o tramite que será recebido
-                    for (ExMovimentacao t : p.recebimentosPendentes) {
-                        if (forcarTransferencia || (titularFinal == null && lotaCadastrante == null) || t.isResp(titularFinal, lotaCadastrante)) {
-                            mov.setExMovimentacaoRef(t);
-                            break;
+                            for (ExDocumento exDocumento : listaDocumentos) {
+                                concluirAlteracaoParcialComRecalculoAcesso(exDocumento.getMobilGeral());
+                            }
                         }
                     }
-
-                    // Titular é a origem e deve sempre ser preenchido
-                    if (mov.getExMovimentacaoRef() == null && p.fIncluirCadastrante) {
-                        mov.setTitular(mov.mob().getTitular());
-                        mov.setLotaTitular(mov.mob().getLotaTitular());
-                    }
-
-                    // Cancelar trâmite pendente quando é para forçar para outro destino
-                    Set<ExMovimentacao> movsTramitePendente = m.calcularTramitesPendentes().tramitesPendentes;
-                    if (forcarTransferencia && movsTramitePendente.size() > 0) {
-                        for (ExMovimentacao tp : movsTramitePendente)
-                            gravarMovimentacaoCancelamento(mov, tp);
-                    } else {
-                        gravarMovimentacao(mov);
-                    }
-
-                    concluirAlteracaoParcialComRecalculoAcesso(m);
-
-                    List<ExMovimentacao> listaMovimentacao = new ArrayList<ExMovimentacao>();
-                    listaMovimentacao.addAll(m.doc().getMobilGeral()
-                            .getMovsNaoCanceladas(ExTipoDeMovimentacao.RESTRINGIR_ACESSO));
-                    if (!listaMovimentacao.isEmpty()) {
-                        List<ExDocumento> listaDocumentos = new ArrayList<ExDocumento>();
-                        listaDocumentos.addAll(mob.getDoc().getExDocumentoFilhoSet());
-
-                        for (ExDocumento exDocumento : listaDocumentos) {
-                            concluirAlteracaoParcialComRecalculoAcesso(exDocumento.getMobilGeral());
-                        }
-                    }
-
                 }
             }
 
@@ -6047,7 +6074,7 @@ public class ExBL extends CpBL {
         // Nato: meio confuso esse código de commitar a transação e depois atualizar o workflow, mas
         // quis manter assim mesmo para não correr o risco de mudar alguma lógica e provocar algum erro
         // inesperado.
-        if (Prop.getBool("/sigawf.ativo") && (ContextoPersistencia.getUsuarioDeSistema() == null || ContextoPersistencia.getUsuarioDeSistema() != UsuarioDeSistemaEnum.SIGA_WF)) {
+        if (set != null && Prop.getBool("/sigawf.ativo") && (ContextoPersistencia.getUsuarioDeSistema() == null || ContextoPersistencia.getUsuarioDeSistema() != UsuarioDeSistemaEnum.SIGA_WF)) {
             ContextoPersistencia.flushTransaction();
             for (String d : set) {
                 try {
@@ -6058,7 +6085,8 @@ public class ExBL extends CpBL {
             }
         }
 
-        set.clear();
+        if (set != null)
+            set.clear();
         docsParaAtualizacaoDeWorkflow.remove();
     }
 
@@ -8019,22 +8047,24 @@ public class ExBL extends CpBL {
     }
 
     public String obterCodigoUnico(ExDocumento doc, boolean comDigitoVerificador) {
-        ExDocumento formulario = obterFormularioSiafem(doc);
+        ExDocumento doctSiafem = obterFormularioSiafem(doc);
 
-        if (formulario == null)
+        if (doctSiafem == null)
             return null;
 
-        String[] tokens = formulario.getDescrDocumento().split(";");
+        Map<String, String> form = new TreeMap<String, String>();
+        Utils.mapFromUrlEncodedForm(form, doctSiafem.getConteudoBlobForm());
 
-        if (tokens.length <= 0 || tokens[0].trim().length() == 0)
+        String codigoUnico = form.get("codigoUnico") == null ? "" : form.get("codigoUnico").trim();
+        String digitoCodigoUnico = form.get("digitoVerificadorCodigoUnico") == null ? "" : form.get("digitoVerificadorCodigoUnico").trim();
+
+        if (codigoUnico.isEmpty() || digitoCodigoUnico.isEmpty())
             throw new AplicacaoException("O código único não foi gerado corretamente");
 
-        String codigo = tokens[0].trim();
-
         if (!comDigitoVerificador)
-            codigo = codigo.substring(0, codigo.length() - 2);
+            return codigoUnico;
 
-        return codigo;
+        return codigoUnico + "-" + digitoCodigoUnico;
     }
 
     public String calcularDigitoVerificador(String numero) {

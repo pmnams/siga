@@ -111,10 +111,6 @@
 					<artifactId>picketbox</artifactId>
 				</exclusion>
 				<exclusion>
-				    <groupId>com.google.guava</groupId>
-				    <artifactId>guava</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.picketlink</groupId>
 					<artifactId>picketlink-api</artifactId>
 				</exclusion>

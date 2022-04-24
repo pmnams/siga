@@ -540,7 +540,7 @@ public class ExMobilController extends
             return;
         }
 
-        if(flt.getDescrPesquisaXjus() == null || flt.getDescrPesquisaXjus().isEmpty() )
+        if (flt.getDescrPesquisaXjus() == null || flt.getDescrPesquisaXjus().isEmpty())
             return;
 
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -548,7 +548,7 @@ public class ExMobilController extends
         String filter = flt.getDescrPesquisaXjus();
         String acronimoOrgaoUsu = dao().consultarOrgaoUsuarioPorId(flt.getIdOrgaoUsu()).getAcronimoOrgaoUsu();
         String descEspecie = flt.getIdFormaDoc() == null || flt.getIdFormaDoc() == 0 ? null : dao().consultarExFormaPorId(flt.getIdFormaDoc()).getDescrFormaDoc();
-        String descModelo = flt.getIdMod() == null  || flt.getIdMod() == 0 ? null : dao().consultar(flt.getIdMod(), ExModelo.class, false).getDescMod();
+        String descModelo = flt.getIdMod() == null || flt.getIdMod() == 0 ? null : dao().consultar(flt.getIdMod(), ExModelo.class, false).getDescMod();
         String dataInicial = flt.getDtDoc() == null ? null : df.format(flt.getDtDoc());
         String dataFinal = flt.getDtDocFinal() == null ? null : df.format(flt.getDtDocFinal());
         String acl = "PUBLIC;O" + getTitular().getOrgaoUsuario().getId() + ";L"
@@ -556,28 +556,32 @@ public class ExMobilController extends
                 + getTitular().getIdInicial();
 
         try {
-            List<Long> listaIdDoc = Ex.getInstance().getBL().pesquisarXjus(
-                    filter,
-                    acronimoOrgaoUsu,
-                    descEspecie,
-                    descModelo,
-                    dataInicial,
-                    dataFinal,
-                    acl,
-                    1,
-                    1000);
+            List<Long> listaIdDoc = new ArrayList<>();
+            int page = 1;
+            do {
+                listaIdDoc.addAll(Ex.getInstance().getBL().pesquisarXjus(
+                        filter,
+                        acronimoOrgaoUsu,
+                        descEspecie,
+                        descModelo,
+                        dataInicial,
+                        dataFinal,
+                        acl,
+                        page++,
+                        1000));
+            } while (listaIdDoc.size() >= 1000);
 
             flt.setListaIdDoc(listaIdDoc);
         } catch (Exception e) {
             e.printStackTrace();
             result.include("msgCabecClass", "alert-warning");
-            result.include("mensagemCabec", "Não foi possível utilizar a pesquisa via XJUS. A consulta foi realizada via Banco de Dados: " + e.getMessage());
+            result.include("mensagemConsole", "Não foi possível utilizar a pesquisa via XJUS. A consulta será realizada via Banco de Dados: " + e.getMessage());
         }
     }
 
     private void listarItensPesquisa(final ExMobilDaoFiltro flt, final ExMobilBuilder builder) {
         //caso não tenha encontrado resultado do xjus não precisa realizar busca no BD
-        if(flt.getListaIdDoc() != null && flt.getListaIdDoc().isEmpty())
+        if (flt.getListaIdDoc() != null && flt.getListaIdDoc().isEmpty())
             return;
 
         setItens(dao().consultarPorFiltroOtimizado(flt,

@@ -417,9 +417,9 @@ public class DocumentosPost implements IDocumentosPost {
      *
      * @param str String a verificar se é numérico
      * @return <ul>
-     *         <li><b>true</b> se for totalmente numérico</li>
-     *         <li><b>false</b> se houver qualquer caracter não numérico.</li>
-     *         </ul>
+     * <li><b>true</b> se for totalmente numérico</li>
+     * <li><b>false</b> se houver qualquer caracter não numérico.</li>
+     * </ul>
      */
     static boolean isNumerico(String str) {
         return str.matches("^\\d+$");

@@ -42,7 +42,7 @@ public class SiafDoc {
     SimpleDateFormat formatoSiafem = new SimpleDateFormat("ddMMMyyyy", new Locale("pt", "BR"));
     SimpleDateFormat formatoSiga = new SimpleDateFormat("ddMMyyyy", new Locale("pt", "BR"));
 
-    private Map<String, String> formulario;
+    private final Map<String, String> formulario;
 
     public SiafDoc(Map<String, String> formulario) {
         this.formulario = formulario;
