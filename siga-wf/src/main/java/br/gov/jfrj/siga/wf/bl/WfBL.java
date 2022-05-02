@@ -26,11 +26,9 @@ import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.service.ExService;
 import br.gov.jfrj.siga.wf.dao.WfDao;
-import br.gov.jfrj.siga.wf.logic.WfPodePegar;
-import br.gov.jfrj.siga.wf.logic.WfPodeRedirecionar;
-import br.gov.jfrj.siga.wf.logic.WfPodeRetomar;
-import br.gov.jfrj.siga.wf.logic.WfPodeTerminar;
+import br.gov.jfrj.siga.wf.logic.*;
 import br.gov.jfrj.siga.wf.model.*;
+import br.gov.jfrj.siga.wf.model.enm.WfPrioridade;
 import br.gov.jfrj.siga.wf.model.enm.WfTipoDePrincipal;
 import br.gov.jfrj.siga.wf.model.enm.WfTipoDeTarefa;
 import br.gov.jfrj.siga.wf.model.enm.WfTipoDeVinculoComPrincipal;
@@ -66,20 +64,10 @@ public class WfBL extends CpBL {
      * momento da criação da instância do processo
      * <p>
      * Essas variáveis são do banco de dados corporativo.
-     *
-     * @param pdId
-     * @param cadastrante
-     * @param lotaCadastrante
-     * @param titular
-     * @param lotaTitular
-     * @param keys
-     * @param values
-     * @return
-     * @throws Exception
      */
-    public WfProcedimento createProcessInstance(long pdId, Integer idxPrimeiraTarefa, DpPessoa titular,
-                                                DpLotacao lotaTitular, CpIdentidade identidade, WfTipoDePrincipal tipoDePrincipal, String principal,
-                                                ArrayList<String> keys, ArrayList<String> values, boolean fCreateStartTask) throws Exception {
+    public WfProcedimento criarProcedimento(long pdId, Integer idxPrimeiraTarefa, DpPessoa titular,
+                                            DpLotacao lotaTitular, CpIdentidade identidade, WfTipoDePrincipal tipoDePrincipal, String principal,
+                                            List<String> keys, List<Object> values, boolean fCreateStartTask) throws Exception {
 
         // Create the process definition,
         WfDefinicaoDeProcedimento pd = WfDao.getInstance().consultar(pdId, WfDefinicaoDeProcedimento.class, false);
@@ -119,8 +107,8 @@ public class WfBL extends CpBL {
             List<WfProcedimento> l = dao().consultarProcedimentosAtivosPorPrincipal(principal);
             if (l.size() > 0)
                 throwErroDeInicializacao(pi, null,
-                        "não é permitido instanciar este procedimento com um principal que já está sendo orquestrado por pelo procedimento ativo "
-                                + l.get(0).getSigla());
+                        "não é permitido instanciar este procedimento com o principal " + principal
+                                + " que já está sendo orquestrado por pelo procedimento ativo " + l.get(0).getSigla());
         }
 
         pi.setTipoDePrincipal(tipoDePrincipal);
@@ -411,6 +399,18 @@ public class WfBL extends CpBL {
         assertLogic(new WfPodeRetomar(pi, titular, lotaTitular), "retomar");
         WfEngine engine = new WfEngine(dao(), new WfHandler(titular, lotaTitular, identidade));
         engine.resume(pi);
+    }
+
+    public void priorizar(WfProcedimento pi, WfPrioridade prioridade, DpPessoa titular, DpLotacao lotaTitular,
+                          CpIdentidade identidade) {
+        assertLogic(new WfPodePriorizar(pi, titular, lotaTitular), "priorizar");
+        if (pi.getPrioridade() == prioridade)
+            return;
+        WfMovPriorizacao mov = new WfMovPriorizacao(pi, dao().consultarDataEHoraDoServidor(), titular, lotaTitular,
+                identidade, pi.getPrioridade(), prioridade);
+        gravarMovimentacao(mov);
+        pi.setPrioridade(prioridade);
+        dao().gravar(pi);
     }
 
     private static void assertLogic(Expression expr, String descr) {

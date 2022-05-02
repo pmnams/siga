@@ -39,6 +39,8 @@ app
         function ($scope, $http, debounce) {
             $scope.data = {};
 
+            $scope.preenchimentosCache = {};
+
             $scope.gravar = function () {
                 if (!validarFormulario($scope.data.workflow))
                     return;
@@ -55,7 +57,7 @@ app
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
                     }
                 }).then(function (response) {
-                    window.location = '/sigawf/app/diagrama/listar';
+                    window.location = '/sigawf/app/diagrama/exibir?id=' + response.data.id;
                 }, function (response) {
                     alert(response.data.errormsg)
                 });
@@ -120,7 +122,7 @@ app
                         if (t.tipoResponsavel == 'RESPONSAVEL')
                             td.definicaoDeResponsavelId = t.refResponsavel;
 
-                        if ((t.tipo == 'INCLUIR_DOCUMENTO' || t.tipo == 'INCLUIR_COPIA' || t.tipo == 'CRIAR_DOCUMENTO' || t.tipo == 'AUTUAR_DOCUMENTO') && t.ref && t.ref.originalObject && t.ref.originalObject.key) {
+                        if ((t.tipo == 'SUBPROCEDIMENTO' || t.tipo == 'INCLUIR_DOCUMENTO' || t.tipo == 'INCLUIR_COPIA' || t.tipo == 'CRIAR_DOCUMENTO' || t.tipo == 'AUTUAR_DOCUMENTO') && t.ref && t.ref.originalObject && t.ref.originalObject.key) {
                             td.refId = t.ref.originalObject.key;
                             td.refSigla = t.ref.originalObject.firstLine;
                         }
@@ -225,9 +227,14 @@ app
                             }
                         }
 
-                        if (t.refId2) {
+                        if (t.refId2)
                             td.ref2 = '' + t.refId2
-                        }
+
+                        if (t.param)
+                            td.param = '' + t.param
+
+                        if (t.param2)
+                            td.param2 = '' + t.param2
 
                         pd.tarefa.push(td);
 
@@ -381,13 +388,13 @@ app
                         // Atualizar lista de preenchimentos automáticos da tarefa
                         for (var i = 0; i < $scope.data.workflow.tarefa.length; i++) {
                             var t = $scope.data.workflow.tarefa[i];
-                            if ((t.tipo === 'CRIAR_DOCUMENTO' || t.tipo === 'AUTUAR_DOCUMENTO') && t.ref) {
+                            if ((t.tipo == 'CRIAR_DOCUMENTO' || t.tipo == 'AUTUAR_DOCUMENTO') && t.ref) {
                                 t.preenchimentoModelo = t.ref;
                                 t.preenchimentoLotacaoId = undefined;
-                                if (t.tipoResponsavel === 'LOTACAO' && t.refUnidadeResponsavel && t.refUnidadeResponsavel.originalObject && t.refUnidadeResponsavel.originalObject.key && t.preenchimentoLotacaoId !== t.refUnidadeResponsavel.originalObject.key)
+                                if (t.tipoResponsavel == 'LOTACAO' && t.refUnidadeResponsavel && t.refUnidadeResponsavel.originalObject && t.refUnidadeResponsavel.originalObject.key && t.preenchimentoLotacaoId !== t.refUnidadeResponsavel.originalObject.key)
                                     t.preenchimentoLotacaoId = t.refUnidadeResponsavel.originalObject.key;
                                 t.preenchimentoPessoaId = undefined;
-                                if (t.tipoResponsavel === 'PESSOA' && t.refPessoaResponsavel && t.refPessoaResponsavel.originalObject && t.refPessoaResponsavel.originalObject.key && t.preenchimentoPessoaId !== t.refPessoaResponsavel.originalObject.key)
+                                if (t.tipoResponsavel == 'PESSOA' && t.refPessoaResponsavel && t.refPessoaResponsavel.originalObject && t.refPessoaResponsavel.originalObject.key && t.preenchimentoPessoaId !== t.refPessoaResponsavel.originalObject.key)
                                     t.preenchimentoPessoaId = t.refPessoaResponsavel.originalObject.key;
                                 $scope.atualizarPreenchimentos(t);
                             }
@@ -399,12 +406,23 @@ app
                     }, true);
 
             $scope.atualizarPreenchimentos = function (t) {
-                $http({
-                    url: '/sigaex/api/v1/modelos/' + t.ref.originalObject.key + (t.tipoResponsavel === 'PESSOA' ? '/pessoas/' + t.preenchimentoPessoaId : t.tipoResponsavel === 'LOTACAO' ? '/lotacoes/' + t.preenchimentoLotacaoId: '') + '/preenchimentos',
-                    method: "GET"
-                }).then(
+                var url = '/sigaex/api/v1/modelos/' + t.ref.originalObject.key + (t.tipoResponsavel == 'PESSOA' ? '/pessoas/' + t.preenchimentoPessoaId : t.tipoResponsavel == 'LOTACAO' ? '/lotacoes/' + t.preenchimentoLotacaoId : '') + '/preenchimentos';
+
+                if ($scope.preenchimentosCache[url]) {
+                    if ($scope.preenchimentosCache[url].value) {
+                        t.preenchimentos = $scope.preenchimentosCache[url].value;
+                    } else {
+                        $scope.preenchimentosCache[url].tarefas.push(t);
+                    }
+                    return;
+                }
+                $scope.preenchimentosCache[url] = { tarefas: [t] };
+                $http({ url: url, method: "GET" }).then(
                     function (response) {
-                        t.preenchimentos = response.data.list;
+                        $scope.preenchimentosCache[url].value = response.data.list;
+                        for (var i = 0; i < $scope.preenchimentosCache[url].tarefas.length; i++)
+                            t.preenchimentos = $scope.preenchimentosCache[url].value;
+                        $scope.preenchimentosCache[url].tarefas = [];
                     },
                     function (response) {
                     });

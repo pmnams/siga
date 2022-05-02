@@ -133,7 +133,7 @@ public class WfAppController extends WfController {
                 throw new RuntimeException("Identificador da definição de tarefa não encontrado");
         }
 
-        WfProcedimento pi = Wf.getInstance().getBL().createProcessInstance(pdId, idx, getTitular(), getLotaTitular(),
+        WfProcedimento pi = Wf.getInstance().getBL().criarProcedimento(pdId, idx, getTitular(), getLotaTitular(),
                 getIdentidadeCadastrante(), tipoDePrincipal, principal, null, null, true);
         result.redirectTo(this).procedimento(pi.getId().toString());
     }
@@ -472,6 +472,17 @@ public class WfAppController extends WfController {
             result.redirectTo("/../sigaex/app/expediente/doc/exibir?sigla=" + siglaPrincipal);
             return;
         }
+        result.redirectTo(this).procedimento(pi.getId().toString());
+    }
+
+    @Transacional
+    @Post
+    @Path("/app/procedimento/{sigla}/priorizar")
+    public void priorizar(String sigla, WfPrioridade prioridade) throws Exception {
+        WfProcedimento pi = dao().consultarPorSigla(sigla, WfProcedimento.class, null);
+
+        Wf.getInstance().getBL().priorizar(pi, prioridade, getTitular(), getLotaTitular(), getIdentidadeCadastrante());
+
         result.redirectTo(this).procedimento(pi.getId().toString());
     }
 

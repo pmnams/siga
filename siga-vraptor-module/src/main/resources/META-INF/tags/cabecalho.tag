@@ -75,11 +75,13 @@
 
     <c:set var="collapse_Expanded" scope="request" value="collapsible expanded"/>
 
-    <c:set var="siga_version" scope="request" value="1.0.1"/>
+    <c:set var="siga_version" scope="request" value="1.1.0-beta.1"/>
 
     <meta name="theme-color" content="bg-primary">
     <c:set var="thead_color" value="thead-light" scope="request"/>
 
+    <c:set var="body_color" value="body_color_default" scope="request" />
+    <c:set var="thead_color" value="thead-light" scope="request" />
     <c:set var="ico_siga" value="siga.ico"/>
     <c:set var="menu_class" value="bg-primary"/>
     <c:set var="sub_menu_class" value="bg-secondary text-white"/>

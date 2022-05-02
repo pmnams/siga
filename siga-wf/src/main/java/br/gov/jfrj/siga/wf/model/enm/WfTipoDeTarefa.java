@@ -33,6 +33,8 @@ public enum WfTipoDeTarefa implements TaskKind {
     //
     EMAIL("Email", "folder", null, TaskEmail.class, true),
     //
+    SUBPROCEDIMENTO("Subprocedimento", "rectangle", "Subprocedimento", WfTarefaSubprocedimento.class, false),
+    //
     INCLUIR_AUXILIAR("Incluir Auxiliar", "rectangle", "Incluir Auxiliar", WfTarefaDocAguardarAuxiliar.class, true);
 
     private final String descr;

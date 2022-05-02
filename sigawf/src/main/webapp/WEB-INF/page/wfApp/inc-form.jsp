@@ -5,8 +5,10 @@
         <c:set var="td" value="${pi.definicaoDeTarefaCorrente}" scope="request"/>
     </c:if>
 
-    <c:set var="msgAviso" value="${pi.getMsgAviso(titular, lotaTitular)}"/>
-    <c:if test="${empty td.id or (not pi.isDesabilitarFormulario(titular, lotaTitular) and empty msgAviso)}">
+    <c:set var="msgAviso" value="${pi.getMsgAviso(titular, lotaTitular)}" />
+    <c:set var="desabilitarFormulario" value="${pi.isDesabilitarFormulario(titular, lotaTitular)}" />
+    <c:if
+            test="${empty td.id or (not desabilitarFormulario and empty msgAviso)}">
         <div class="gt-form-row gt-width-100">
             <input type="hidden" value="${pi.id}" name="tiId"/>
 

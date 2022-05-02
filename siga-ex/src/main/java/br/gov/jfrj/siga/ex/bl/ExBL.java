@@ -2851,6 +2851,11 @@ public class ExBL extends CpBL {
             iniciarAlteracao();
 
             final ExMovimentacao mov = dao().consultar(idMov, ExMovimentacao.class, false);
+
+            if (mov != null && !ExTipoDeMovimentacao.listaTipoMovimentacoesExcluiveisFisicamente().contains(mov.getExTipoMovimentacao())) {
+                throw new AplicacaoException("Não é permitido excluir a movimentação!");
+            }
+
             // ExTipoDeMovimentacao.ANEXACAO
             // movDao.excluir(mov);
             excluirMovimentacao(mov);
@@ -2871,6 +2876,8 @@ public class ExBL extends CpBL {
     @SuppressWarnings("unchecked")
     public String finalizar(final DpPessoa cadastrante, final DpLotacao lotaCadastrante, ExDocumento doc)
             throws AplicacaoException {
+
+        verificaDocumento(cadastrante, lotaCadastrante, doc);
 
         if (doc.isFisico() && Utils.empty(doc.getDescrDocumento()))
             throw new AplicacaoException(
@@ -3006,6 +3013,44 @@ public class ExBL extends CpBL {
         }
     }
 
+    public void verificaDocumento(final DpPessoa titular, final DpLotacao lotaTitular, final ExDocumento doc) {
+        if ((doc.getSubscritor() == null)
+                && !doc.isExternoCapturado()
+                && !doc.isExterno()
+                && ((doc.isProcesso() && doc.isEletronico()) || !doc
+                .isProcesso())) {
+            throw new AplicacaoException(
+                    "É necessário definir um subscritor para o documento.");
+        }
+
+        if (doc.getDestinatario() == null
+                && doc.getLotaDestinatario() == null
+                && (doc.getNmDestinatario() == null || doc.getNmDestinatario()
+                .trim().equals(""))
+                && doc.getOrgaoExternoDestinatario() == null
+                && (doc.getNmOrgaoExterno() == null || doc.getNmOrgaoExterno()
+                .trim().equals(""))
+                && titular != null && lotaTitular != null) {
+            final CpSituacaoDeConfiguracaoEnum idSit = Ex
+                    .getInstance()
+                    .getConf()
+                    .buscaSituacao(doc.getExModelo(), titular,
+                            lotaTitular,
+                            ExTipoDeConfiguracao.DESTINATARIO);
+            if (idSit == CpSituacaoDeConfiguracaoEnum.OBRIGATORIO) {
+                throw new AplicacaoException("Para documentos do modelo "
+                        + doc.getExModelo().getNmMod()
+                        + ", é necessário definir um destinatário");
+            }
+        }
+
+        if (doc.getExClassificacao() == null) {
+            throw new AplicacaoException(
+                    "É necessário informar a classificação documental.");
+        }
+
+    }
+
     public Long obterProximoNumero(ExDocumento doc) throws Exception {
         doc.setAnoEmissao(Long.valueOf(new Date().getYear()) + 1900);
 
@@ -3134,23 +3179,12 @@ public class ExBL extends CpBL {
             ArrayList<String> values = new ArrayList<String>();
             { // Adiciona no contexto a via Geral
                 keys.add("doc_document");
-                values.add(doc.getCodigo());
-            }
-            for (ExMobil mob : doc.getExMobilSet()) {
-                if (mob.isGeral())
-                    continue;
-                if (mob.isVia() || mob.isVolume()) {
-                    keys.add("doc_" + (char) ('a' + mob.getNumSequencia()));
-                    values.add((String) mob.getSigla());
-                }
+                if (doc.isExpediente())
+                    values.add(doc.getMobilDefaultParaReceberJuntada().getSigla());
+                else
+                    values.add(doc.getCodigo());
             }
 
-            for (int n = 0; n < doc.getSetVias().size(); n++) { // Adiciona no
-                // contexto a
-                // via 'n'
-                keys.add("doc_" + (char) ('a' + n));
-                values.add(doc.getCodigo() + "-" + (char) ('A' + n));
-            }
             List<ExPapel> papeis = dao().listarExPapeis();
             for (ExPapel papel : papeis) {
                 List<DpResponsavel> responsaveis = doc.getResponsaveisPorPapel(papel);

@@ -94,6 +94,18 @@ public class WfHandler implements Handler<WfProcedimento, WfResp> {
 	@Override
 	public void afterTransition(WfProcedimento pi, Integer de, Integer para) {
 		Wf.getInstance().getBL().registrarTransicao(pi, de, para, titular, lotaTitular, identidade);
+
+		if (para == null || para == pi.getDefinicaoDeProcedimento().getDefinicaoDeTarefa().size()) {
+			// Sinalizar para todos os subprocedimentos que podem estar esperando a
+			// conclusão desse
+			try {
+				new WfEngine(WfDao.getInstance(), this).resume(pi.getSigla(), null, null);
+			} catch (Exception e) {
+				throw new RuntimeException("Erro sinalizando subprocedimentos", e);
+			}
+		}
+
 		transicionou = true;
 	}
+
 }

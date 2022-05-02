@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -18,18 +18,6 @@
  ******************************************************************************/
 package br.gov.jfrj.siga.wf.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.jws.WebService;
-import javax.persistence.EntityManager;
-import javax.xml.ws.WebServiceContext;
-
-import br.gov.jfrj.siga.wf.model.enm.WfTipoDePrincipal;
-import br.gov.jfrj.siga.wf.service.WfProcedimentoWSTO;
-import org.jboss.logging.Logger;
-
 import br.gov.jfrj.siga.Service;
 import br.gov.jfrj.siga.cp.CpIdentidade;
 import br.gov.jfrj.siga.dp.DpPessoa;
@@ -39,12 +27,20 @@ import br.gov.jfrj.siga.parser.PessoaLotacaoParser;
 import br.gov.jfrj.siga.wf.bl.Wf;
 import br.gov.jfrj.siga.wf.bl.WfBL;
 import br.gov.jfrj.siga.wf.dao.WfDao;
-import br.gov.jfrj.siga.wf.util.WfStarter;
 import br.gov.jfrj.siga.wf.model.WfDefinicaoDeProcedimento;
 import br.gov.jfrj.siga.wf.model.WfProcedimento;
+import br.gov.jfrj.siga.wf.model.enm.WfTipoDePrincipal;
+import br.gov.jfrj.siga.wf.service.WfProcedimentoWSTO;
 import br.gov.jfrj.siga.wf.service.WfService;
-import br.gov.jfrj.siga.wf.util.WfEngine;
-import br.gov.jfrj.siga.wf.util.WfHandler;
+import br.gov.jfrj.siga.wf.util.WfStarter;
+import org.jboss.logging.Logger;
+
+import javax.annotation.Resource;
+import javax.jws.WebService;
+import javax.persistence.EntityManager;
+import javax.xml.ws.WebServiceContext;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Classe que representa o webservice do workflow. O SIGA-DOC faz a chamada
@@ -144,8 +140,8 @@ public class WfServiceImpl implements WfService {
                 List<CpIdentidade> l = WfDao.getInstance().consultaIdentidades(cadastranteParser.getPessoa());
                 if (l.size() > 0)
                     identidade = l.get(0);
-                WfProcedimento pi = Wf.getInstance().getBL().createProcessInstance(pd.getId(), null,
-                        titularParser.getPessoa(), titularParser.getLotacao(), identidade, WfTipoDePrincipal.valueOf(tipoDePrincipal), principal, keys, values,
+                WfProcedimento pi = Wf.getInstance().getBL().criarProcedimento(pd.getId(), null,
+                        titularParser.getPessoa(), titularParser.getLotacao(), identidade, WfTipoDePrincipal.valueOf(tipoDePrincipal), principal, keys, (List) values,
                         false);
 
                 WfBL.transferirDocumentosVinculados(pi, siglaTitular);

@@ -82,7 +82,8 @@
                                     <td class="align-top" title="${mov.dtIniVO}">${mov.tempoRelativoVO}</td>
                                     <td class="align-top"
                                         title="${mov.hisIdcIni.dpPessoa.descricao} - ${mov.hisIdcIni.dpPessoa.lotacao.descricao}">${mov.hisIdcIni.dpPessoa.sigla}</td>
-                                    <td class="align-top" title="${mov.lotaTitular.descricao}">${mov.lotaTitular.siglaCompleta}</td>
+                                    <td class="align-top"
+                                        title="${mov.lotaTitular.descricao}">${mov.lotaTitular.siglaCompleta}</td>
                                     <td class="align-top">${mov.evento}</td>
                                     <td class="align-top" style="word-break: break-all;"><span
                                             class="align-top">${mov.descricaoEvento}</span></td>
@@ -138,7 +139,7 @@
                 <div class="card-sidebar card bg-light mb-3">
                     <div class="card-header">Variáveis</div>
                     <div class="card-body">
-                        <c:forEach var="v" items="${pi.variaveis}">
+                        <c:forEach var="v" items="${pi.variaveisOrdenadas}">
                             <p>
                                 <b>${v.nome}:</b> ${v.valorAsString}
                             </p>
@@ -236,7 +237,7 @@
                     href="$1">aqui</a> para contribuir.</c:param>
                 <c:param name="titulo">${pi.definicaoDeProcedimento.nome} - ${pi.currentTaskDefinition.nome}</c:param>
                     <c:param name="ts">${currentTimeMillis}</c:param>
-                    <c:param name="label">Passo a Passo</c:param>
+                <c:param name="label">Passo a Passo</c:param>
                 </c:url>
                 <script type="text/javascript">
                     $.ajax({
@@ -269,6 +270,8 @@
                 </c:if>
 
                     <%@ include file="anotar.jsp" %>
+
+                    <%@ include file="priorizar.jsp" %>
 
                     <%@ include file="redirecionar.jsp" %>
 

@@ -26,7 +26,7 @@
                     </div>
                     <div class="card-body">
 
-                        <form action="${request.contextPath}/public/app/processoconsultarpublico" method="GET"
+                        <form action="${request.contextPath}/public/app/processoconsultarpublico" method="get"
                               class="form">
                             <div class="row">
                                 <div class="col">

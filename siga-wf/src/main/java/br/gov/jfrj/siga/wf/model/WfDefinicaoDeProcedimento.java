@@ -22,6 +22,7 @@ import br.gov.jfrj.siga.wf.logic.WfPodeEditarDiagrama;
 import br.gov.jfrj.siga.wf.logic.WfPodeIniciarDiagrama;
 import br.gov.jfrj.siga.wf.model.enm.*;
 import br.gov.jfrj.siga.wf.model.task.WfTarefaDocCriar;
+import br.gov.jfrj.siga.wf.model.task.WfTarefaSubprocedimento;
 import br.gov.jfrj.siga.wf.util.SiglaUtils;
 import br.gov.jfrj.siga.wf.util.SiglaUtils.SiglaDecodificada;
 import com.crivano.jflow.model.ProcessDefinition;
@@ -499,7 +500,7 @@ public class WfDefinicaoDeProcedimento extends HistoricoAuditavelSuporte impleme
                             identificadores.add(vd.getIdentificador());
                         }
                     break;
-                case CRIAR_DOCUMENTO:
+                case CRIAR_DOCUMENTO: {
                     String identificador = WfTarefaDocCriar.getIdentificadorDaVariavel(td);
                     if (!identificadores.contains(identificador)) {
                         WfDefinicaoDeVariavel vdSuper = new WfDefinicaoDeVariavel();
@@ -510,6 +511,19 @@ public class WfDefinicaoDeProcedimento extends HistoricoAuditavelSuporte impleme
                         tdSuper.getDefinicaoDeVariavel().add(vdSuper);
                         identificadores.add(vdSuper.getIdentificador());
                     }
+                }
+                case SUBPROCEDIMENTO: {
+                    String identificador = WfTarefaSubprocedimento.getIdentificadorDaVariavel(td);
+                    if (!identificadores.contains(identificador)) {
+                        WfDefinicaoDeVariavel vdSuper = new WfDefinicaoDeVariavel();
+                        vdSuper.setIdentificador(identificador);
+                        vdSuper.setNome(td.getNome());
+                        vdSuper.setTipo(WfTipoDeVariavel.STRING);
+                        vdSuper.setAcesso(WfTipoDeAcessoDeVariavel.READ_WRITE);
+                        tdSuper.getDefinicaoDeVariavel().add(vdSuper);
+                        identificadores.add(vdSuper.getIdentificador());
+                    }
+                }
                 default:
             }
         }
