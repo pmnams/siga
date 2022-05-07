@@ -22,69 +22,25 @@
  */
 package br.gov.jfrj.siga.vraptor;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.text.DateFormat;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import br.com.caelum.vraptor.observer.upload.UploadSizeLimit;
-import br.gov.jfrj.siga.ex.*;
-import org.apache.commons.beanutils.BeanUtils;
-import org.jboss.logging.Logger;
-
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.observer.download.Download;
 import br.com.caelum.vraptor.observer.download.InputStreamDownload;
+import br.com.caelum.vraptor.observer.upload.UploadSizeLimit;
 import br.com.caelum.vraptor.observer.upload.UploadedFile;
 import br.com.caelum.vraptor.view.Results;
-import br.gov.jfrj.siga.base.AplicacaoException;
-import br.gov.jfrj.siga.base.Data;
-import br.gov.jfrj.siga.base.Prop;
-import br.gov.jfrj.siga.base.RegraNegocioException;
-import br.gov.jfrj.siga.base.SigaMessages;
-import br.gov.jfrj.siga.base.SigaModal;
+import br.gov.jfrj.siga.base.*;
 import br.gov.jfrj.siga.base.util.Texto;
 import br.gov.jfrj.siga.base.util.Utils;
 import br.gov.jfrj.siga.cp.bl.Cp;
 import br.gov.jfrj.siga.cp.model.DpLotacaoSelecao;
 import br.gov.jfrj.siga.cp.model.DpPessoaSelecao;
 import br.gov.jfrj.siga.cp.model.enm.CpSituacaoDeConfiguracaoEnum;
-import br.gov.jfrj.siga.cp.model.enm.CpTipoDeConfiguracao;
-import br.gov.jfrj.siga.dp.CpOrgao;
-import br.gov.jfrj.siga.dp.DpLotacao;
-import br.gov.jfrj.siga.dp.DpPessoa;
-import br.gov.jfrj.siga.dp.DpVisualizacao;
-import br.gov.jfrj.siga.dp.DpVisualizacaoAcesso;
+import br.gov.jfrj.siga.dp.*;
 import br.gov.jfrj.siga.dp.dao.CpDao;
+import br.gov.jfrj.siga.ex.*;
 import br.gov.jfrj.siga.ex.bl.AcessoConsulta;
 import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.bl.ExBL;
@@ -96,6 +52,25 @@ import br.gov.jfrj.siga.model.ContextoPersistencia;
 import br.gov.jfrj.siga.model.Selecao;
 import br.gov.jfrj.siga.persistencia.ExMobilDaoFiltro;
 import br.gov.jfrj.siga.vraptor.builder.BuscaDocumentoBuilder;
+import org.apache.commons.beanutils.BeanUtils;
+import org.jboss.logging.Logger;
+
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Controller
 public class ExDocumentoController extends ExController {
@@ -2071,11 +2046,9 @@ public class ExDocumentoController extends ExController {
         exDocumentoDto.setSigla(sigla);
         buscarDocumento(false, exDocumentoDto);
 
-        final Ex ex = Ex.getInstance();
-        final ExBL exBL = ex.getBL();
+        final ExBL exBL = Ex.getInstance().getBL();
 
-        ExProtocolo prot = new ExProtocolo();
-        prot = exBL.obterProtocolo(exDocumentoDto.getDoc());
+        ExProtocolo prot = exBL.obterProtocolo(exDocumentoDto.getDoc());
 
         if (prot == null) {
             try {
@@ -2089,8 +2062,6 @@ public class ExDocumentoController extends ExController {
         DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Calendar c = Calendar.getInstance();
         c.setTime(prot.getData());
-
-        String servidor = Prop.get("/sigaex.url");
 
         String caminho = url + "/public/app/processoautenticar?n=" + prot.getCodigo();
 
@@ -2672,34 +2643,34 @@ public class ExDocumentoController extends ExController {
             headerValue = "Não Informado";
         }
 
-		ExMobil mobPai = null;
-		if (exDocumentoDTO.getMobilPaiSel().buscarPorSigla())
-			mobPai = exDocumentoDTO.getMobilPaiSel().buscarObjeto();
+        ExMobil mobPai = null;
+        if (exDocumentoDTO.getMobilPaiSel().buscarPorSigla())
+            mobPai = exDocumentoDTO.getMobilPaiSel().buscarObjeto();
 
-		boolean isEditandoAnexo = exDocumentoDTO.isCriandoAnexo();
-		boolean isCriandoSubprocesso = exDocumentoDTO.getCriandoSubprocesso();
+        boolean isEditandoAnexo = exDocumentoDTO.isCriandoAnexo();
+        boolean isCriandoSubprocesso = exDocumentoDTO.getCriandoSubprocesso();
 
-		if (exDocumentoDTO.getDoc().getExMobilPai() != null) {
-			if (exDocumentoDTO.getDoc().getExMobilPai().isGeral() && exDocumentoDTO.getDoc().getExMobilPai().doc().isProcesso() && exDocumentoDTO.getDoc().isProcesso()) {
-				isCriandoSubprocesso = true;
-				exDocumentoDTO.setCriandoSubprocesso(true);
-			} else {
-				isEditandoAnexo = true;
-				exDocumentoDTO.setCriandoAnexo(true);
-			}
-		}
-		if(mobPai == null) {
-			mobPai = exDocumentoDTO.getDoc().getExMobilPai();
+        if (exDocumentoDTO.getDoc().getExMobilPai() != null) {
+            if (exDocumentoDTO.getDoc().getExMobilPai().isGeral() && exDocumentoDTO.getDoc().getExMobilPai().doc().isProcesso() && exDocumentoDTO.getDoc().isProcesso()) {
+                isCriandoSubprocesso = true;
+                exDocumentoDTO.setCriandoSubprocesso(true);
+            } else {
+                isEditandoAnexo = true;
+                exDocumentoDTO.setCriandoAnexo(true);
+            }
+        }
+        if (mobPai == null) {
+            mobPai = exDocumentoDTO.getDoc().getExMobilPai();
 
-		}
+        }
 
-		exDocumentoDTO.setModelos(Ex
-				.getInstance()
-				.getBL()
-				.obterListaModelos(tipo, null, isEditandoAnexo,
-						isCriandoSubprocesso, mobPai,
-						headerValue, true, getTitular(), getLotaTitular(),
-						exDocumentoDTO.getAutuando()));
+        exDocumentoDTO.setModelos(Ex
+                .getInstance()
+                .getBL()
+                .obterListaModelos(tipo, null, isEditandoAnexo,
+                        isCriandoSubprocesso, mobPai,
+                        headerValue, true, getTitular(), getLotaTitular(),
+                        exDocumentoDTO.getAutuando()));
 
         return exDocumentoDTO.getModelos();
     }
@@ -2890,7 +2861,7 @@ public class ExDocumentoController extends ExController {
 
     /**
      * Prepara os dados das Movimentações de um {@link ExDocumento Documento}
-     *  associado a uma {@link ExMobil Via} que foi
+     * associado a uma {@link ExMobil Via} que foi
      * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_TORNAR_SEM_EFEITO Cancelada}.
      * Primeiro
      * {@link ExDao#consultarTramitacoesPorMovimentacaoDocumentoCancelado(Long)

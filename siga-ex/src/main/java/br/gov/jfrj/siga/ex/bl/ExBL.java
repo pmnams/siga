@@ -6122,7 +6122,7 @@ public class ExBL extends CpBL {
     public List<ExModelo> obterListaModelos(ExTipoDocumento tipo, ExFormaDocumento forma, boolean despachando,
                                             boolean criandoSubprocesso, ExMobil mobPai, String headerValue, boolean protegido, DpPessoa titular,
                                             DpLotacao lotaTitular, boolean autuando) {
-        ArrayList<ExModelo> modeloSetFinal = new ArrayList<ExModelo>();
+        ArrayList<ExModelo> modeloSetFinal;
         ArrayList<ExModelo> provSet;
         boolean isComposto;
         if (forma != null)
@@ -6140,7 +6140,7 @@ public class ExBL extends CpBL {
 
         if (despachando) {
             isComposto = mobPai.doc().isComposto();
-            provSet = new ArrayList<ExModelo>();
+            provSet = new ArrayList<>();
             for (ExModelo mod : modeloSetFinal) {
                 if (getConf().podePorConfiguracao(titular, lotaTitular, mod,
                         ExTipoDeConfiguracao.DESPACHAVEL)) {
@@ -6157,7 +6157,7 @@ public class ExBL extends CpBL {
             modeloSetFinal = provSet;
         } else {
             if (protegido) {
-                provSet = new ArrayList<ExModelo>();
+                provSet = new ArrayList<>();
                 for (ExModelo mod : modeloSetFinal)
                     if (getConf().podePorConfiguracao(titular, lotaTitular, mod,
                             ExTipoDeConfiguracao.CRIAR_COMO_NOVO))
@@ -6167,14 +6167,14 @@ public class ExBL extends CpBL {
         }
 
         if (autuando) {
-            provSet = new ArrayList<ExModelo>();
+            provSet = new ArrayList<>();
             for (ExModelo mod : modeloSetFinal)
                 if (getConf().podePorConfiguracao(titular, lotaTitular, mod, ExTipoDeConfiguracao.AUTUAVEL))
                     provSet.add(mod);
             modeloSetFinal = provSet;
         }
         if (protegido) {
-            provSet = new ArrayList<ExModelo>();
+            provSet = new ArrayList<>();
             for (ExModelo mod : modeloSetFinal) {
                 if (getConf().podePorConfiguracao(titular, lotaTitular, mod, ExTipoDeConfiguracao.CRIAR))
                     provSet.add(mod);
@@ -7402,14 +7402,12 @@ public class ExBL extends CpBL {
             iniciarAlteracao();
 
             Date dt = dao().dt();
-            Calendar c = Calendar.getInstance();
-            c.setTime(dt);
 
             ExProtocolo prot = new ExProtocolo();
 
             prot.setCodigo(dao().gerarCodigoProtocolo());
             prot.setExDocumento(doc);
-            prot.setData(c.getTime());
+            prot.setData(dt);
 
             dao().gravar(prot);
             ContextoPersistencia.flushTransaction();

@@ -231,41 +231,38 @@
 							</a>
 						</p>
 					</div>
-				</div>				
-				<c:if test="${siga_cliente != 'GOVSP'}">
-					<div class="mt-2">
-						<siga:link icon="application_view_list" classe="once" title="Visualizar&nbsp;_Movimentações"
-							url="${pageContext.request.contextPath}/app/expediente/doc/exibir?sigla=${sigla}" atalho="${true}"
-							test="${true}" /> <span class="pl-2"></span>
-						<button type="button" class="link-btn btn btn-secondary btn-sm align-center" id="TelaCheia" data-toggle="button" aria-pressed="false" autocomplete="off"
-							accesskey="t" onclick="javascript: telaCheia(this);">
-							<u>T</u>ela Cheia
-						</button>			
-						<span class="pl-2"></span>			
-						<div class="d-inline-block align-center mb-2 mt-2">
-							<siga:link icon="wrench" title="Preferência:" test="${true}" url="" />
-							<span class="pl-2"></span>			
-							<span style="white-space: nowrap;">
-							<input type="radio" id="radioHTML" name="formato" value="html" accesskey="h" checked="checked" onclick="exibir(htmlAtual,pdfAtual,'');">
-								<u>H</u>TML&nbsp;
-							</input>
-							</span>
-							<span class="pl-2"></span>			
-							<span style="white-space: nowrap;">
-							<input type="radio" id="radioPDF" name="formato" value="pdf" accesskey="p" onclick="exibir(htmlAtual,pdfAtual,'');">
-								<u>P</u>DF -  <a id="pdflink" accesskey="a" target="_blank"> <u>a</u>brir</a>
-							</input>
-							</span>
-							<span class="pl-2"></span>			
-							<span style="white-space: nowrap;">
-							<input type="radio" id="radioPDFSemMarcas" name="formato" accesskey="s" value="pdfsemmarcas" onclick="exibir(htmlAtual,pdfAtual,'semmarcas/');">
-								PDF <u>s</u>em marcas - <a id="pdfsemmarcaslink" accesskey="b" target="_blank"> a<u>b</u>rir</a>
-							</input>
-							</span>
-						</div>
+				</div>
+				<div class="mt-2">
+					<siga:link icon="application_view_list" classe="once" title="Visualizar&nbsp;_Movimentações"
+						url="${pageContext.request.contextPath}/app/expediente/doc/exibir?sigla=${sigla}" atalho="${true}"
+						test="${true}" /> <span class="pl-2"></span>
+					<button type="button" class="link-btn btn btn-secondary btn-sm align-center" id="TelaCheia" data-toggle="button" aria-pressed="false" autocomplete="off"
+						accesskey="t" onclick="javascript: telaCheia(this);">
+						<u>T</u>ela Cheia
+					</button>
+					<span class="pl-2"></span>
+					<div class="d-inline-block align-center mb-2 mt-2">
+						<siga:link icon="wrench" title="Preferência:" test="${true}" url="" />
+						<span class="pl-2"></span>
+						<span style="white-space: nowrap;">
+						<input type="radio" id="radioHTML" name="formato" value="html" accesskey="h" checked="checked" onclick="exibir(htmlAtual,pdfAtual,'');">
+							<u>H</u>TML&nbsp;
+						</input>
+						</span>
+						<span class="pl-2"></span>
+						<span style="white-space: nowrap;">
+						<input type="radio" id="radioPDF" name="formato" value="pdf" accesskey="p" onclick="exibir(htmlAtual,pdfAtual,'');">
+							<u>P</u>DF -  <a id="pdflink" accesskey="a" target="_blank"> <u>a</u>brir</a>
+						</input>
+						</span>
+						<span class="pl-2"></span>
+						<span style="white-space: nowrap;">
+						<input type="radio" id="radioPDFSemMarcas" name="formato" accesskey="s" value="pdfsemmarcas" onclick="exibir(htmlAtual,pdfAtual,'semmarcas/');">
+							PDF <u>s</u>em marcas - <a id="pdfsemmarcaslink" accesskey="b" target="_blank"> a<u>b</u>rir</a>
+						</input>
+						</span>
 					</div>
-				</c:if>
-	
+				</div>
 			</siga:links>
 		</div>
 	</div>
@@ -552,64 +549,28 @@
 		else if (ifr.attachEvent)
 			ifr.detachEvent("onload", resize); // Bug fix line
 
-			if ('${siga_cliente}' == 'GOVSP') {
-			// Para GOVSP com link buttons
-
-			var refSiglaDocPrincipal = '&sigla=${sigla}';
-			
-			if ($('#radioHTML').hasClass('active') && refHTML != '') {
-				$('#pdflink').addClass('d-none');
-				$('#pdfsemmarcaslink').addClass('d-none');
-				ifr.src = path + refHTML + refSiglaDocPrincipal;
-				ifrp.style.border = "0px solid black";
-				ifrp.style.borderBottom = "0px solid black";
-				if (ifr.addEventListener)
-					ifr.addEventListener("load", resize, false);
-				else if (ifr.attachEvent)
-					ifr.attachEvent("onload", resize);
-			} else {
-				if ($('#radioPDFSemMarcas').hasClass('active')) {
-					$('#pdfsemmarcaslink').removeClass('d-none');
-					$('#pdflink').addClass('d-none');
-					ifr.src = path + refPDF + "&semmarcas=1";
-				} else {
-					$('#pdflink').removeClass('d-none');
-					$('#pdfsemmarcaslink').addClass('d-none');
-					ifr.src = path + refPDF + refSiglaDocPrincipal;
-				}
-				
-				if(!refPDF.includes("completo=1")) {
-					var url = ifr.src;
-					ifr.src = montarUrlDocPDF(ifr.src, "${f:resource('/sigaex.pdf.visualizador')}");
-				}
-				
-				ifrp.style.border = "1px solid black";
-				ifr.height = pageHeight() - 300;
-			}
-			
+		// Para TRF2 com radio buttons
+		if (document.getElementById('radioHTML').checked && refHTML != '') {
+			console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtmjhngf' + path + refHTML)
+			ifr.src = path + refHTML;
+			ifrp.style.border = "0px solid black";
+			ifrp.style.borderBottom = "0px solid black";
+			if (ifr.addEventListener)
+				ifr.addEventListener("load", resize, false);
+			else if (ifr.attachEvent)
+				ifr.attachEvent("onload", resize);
 		} else {
-			// Para TRF2 com radio buttons
-			if (document.getElementById('radioHTML').checked && refHTML != '') {
-				ifr.src = path + refHTML;
-				ifrp.style.border = "0px solid black";
-				ifrp.style.borderBottom = "0px solid black";
-				if (ifr.addEventListener)
-					ifr.addEventListener("load", resize, false);
-				else if (ifr.attachEvent)
-					ifr.attachEvent("onload", resize);
-			} else {
-				if (document.getElementById('radioPDFSemMarcas').checked)
-					ifr.src = path + refPDF + "&semmarcas=1"
-				else
-					ifr.src = path + refPDF;
-				
-				if(!refPDF.includes("completo=1")) {
-					var url = ifr.src;
-					ifr.src = montarUrlDocPDF(ifr.src, "${f:resource('/sigaex.pdf.visualizador')}");
-				}
-				ifrp.style.border = "0px solid black";
-				ifr.height = pageHeight() - 300;
+			if (document.getElementById('radioPDFSemMarcas').checked)
+				ifr.src = path + refPDF + "&semmarcas=1"
+			else
+				ifr.src = path + refPDF;
+
+			if(!refPDF.includes("completo=1")) {
+				var url = ifr.src;
+				ifr.src = montarUrlDocPDF(ifr.src, "${f:resource('/sigaex.pdf.visualizador')}");
 			}
+			ifrp.style.border = "0px solid black";
+			ifr.height = pageHeight() - 300;
 		}
 			
 		htmlAtual = refHTML;
