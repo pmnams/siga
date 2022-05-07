@@ -55,6 +55,7 @@ import br.gov.jfrj.siga.model.Selecao;
 import br.gov.jfrj.siga.persistencia.ExMobilDaoFiltro;
 import br.gov.jfrj.siga.vraptor.builder.BuscaDocumentoBuilder;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
@@ -452,23 +453,21 @@ public class ExDocumentoController extends ExController {
         if (isDocNovo) {
             if (!postback)
                 exDocumentoDTO = new ExDocumentoDTO();
-            exDocumentoDTO.setCriandoAnexo(criandoAnexo == null ? false
-                    : criandoAnexo);
-            exDocumentoDTO.setAutuando(autuando == null ? false : autuando);
+            exDocumentoDTO.setCriandoAnexo(criandoAnexo != null && criandoAnexo);
+            exDocumentoDTO.setAutuando(autuando != null && autuando);
 
             if (idMobilAutuado != null)
                 exDocumentoDTO.setIdMobilAutuado(idMobilAutuado);
 
             exDocumentoDTO
-                    .setCriandoSubprocesso(criandoSubprocesso == null ? false
-                            : criandoSubprocesso);
+                    .setCriandoSubprocesso(criandoSubprocesso != null && criandoSubprocesso);
 
             if (mobilPaiSel != null) {
                 exDocumentoDTO.setMobilPaiSel(mobilPaiSel);
             }
         }
 
-        if ((sigla != null) && (sigla != "")) {
+        if (StringUtils.isNotEmpty(sigla)) {
             exDocumentoDTO.setSigla(sigla);
         }
 
@@ -531,7 +530,7 @@ public class ExDocumentoController extends ExController {
                     exDocumentoDTO.setNivelAcesso(nivelDefault
                             .getIdNivelAcesso());
                 } else {
-                    if (Boolean.valueOf(System.getProperty("siga.doc.acesso.limitado"))) {
+                    if (Boolean.parseBoolean(System.getProperty("siga.doc.acesso.limitado"))) {
                         exDocumentoDTO.setNivelAcesso(ExNivelAcesso.ID_LIMITADO_AO_ORGAO);
                     } else {
                         exDocumentoDTO.setNivelAcesso(ExNivelAcesso.ID_PUBLICO);
@@ -584,8 +583,8 @@ public class ExDocumentoController extends ExController {
 
         if (exDocumentoDTO.getTipoDocumento() != null
                 && exDocumentoDTO.getTipoDocumento().equals("externo")) {
-            exDocumentoDTO.setIdMod(((ExModelo) dao()
-                    .consultarAtivoPorIdInicial(ExModelo.class, 28L))
+            exDocumentoDTO.setIdMod(dao()
+                    .consultarAtivoPorIdInicial(ExModelo.class, 28L)
                     .getIdMod());
         }
         carregarBeans(exDocumentoDTO, mobilPaiSel);
@@ -661,7 +660,7 @@ public class ExDocumentoController extends ExController {
 
         if (exDocumentoDTO.getPreenchimento() != null
                 && exDocumentoDTO.getSubscritorSel() != null && exDocumentoDTO.getSubscritorSel().getId() != null) {
-            DpPessoa p = (DpPessoa) CpDao.getInstance().consultar(exDocumentoDTO.getSubscritorSel().getId(), DpPessoa.class, false).getPessoaAtual();
+            DpPessoa p = CpDao.getInstance().consultar(exDocumentoDTO.getSubscritorSel().getId(), DpPessoa.class, false).getPessoaAtual();
             if (p.getDataFim() != null) {
                 result.include("mensagem", "documento.subscritor.inativo");
                 exDocumentoDTO.getSubscritorSel().apagar();
@@ -719,17 +718,15 @@ public class ExDocumentoController extends ExController {
         setPar(getRequest().getParameterMap());
         if (getPar() != null) {
             for (final String key : getPar().keySet()) {
-                final String as[] = getPar().get(key);
+                final String[] as = getPar().get(key);
                 final String chave = key.replace("exDocumentoDTO.", "");
                 parFreeMarker.put(chave, as);
             }
             for (String p : exDocumentoDTO.getParamsEntrevista().keySet()) {
                 if (!parFreeMarker.containsKey(p)) {
-                    final String as[] = new String[]{exDocumentoDTO
+                    final String[] as = new String[]{exDocumentoDTO
                             .getParamsEntrevista().get(p)};
                     parFreeMarker.put(p, as);
-                    // System.out.println("*** " + p + ", "
-                    // + exDocumentoDTO.getParamsEntrevista().get(p));
                 }
             }
         }
@@ -738,8 +735,6 @@ public class ExDocumentoController extends ExController {
                 .getSigla()});
         parFreeMarker.put("sigla_lota_titular", new String[]{getLotaTitular()
                 .getSiglaCompleta()});
-
-        // result.include("param", exDocumentoDTO.getParamsEntrevista());
 
         boolean podeEditarData = Ex
                 .getInstance()
@@ -753,12 +748,10 @@ public class ExDocumentoController extends ExController {
                 .pode(ExPodeEditarDescricao.class, getTitular(), getLotaTitular(),
                         exDocumentoDTO.getModelo());
 
-        List<String> l = new ArrayList<String>();
+        List<String> l = new ArrayList<>();
         for (String p : exDocumentoDTO.getParamsEntrevista().keySet()) {
             result.include(p, exDocumentoDTO.getParamsEntrevista().get(p));
             l.add(p);
-            // System.out.println("*** " + p + ", "
-            // + exDocumentoDTO.getParamsEntrevista().get(p));
         }
         result.include("vars", l);
 
@@ -1996,11 +1989,9 @@ public class ExDocumentoController extends ExController {
         exDocumentoDto.setSigla(sigla);
         buscarDocumento(false, exDocumentoDto);
 
-        final Ex ex = Ex.getInstance();
-        final ExBL exBL = ex.getBL();
+        final ExBL exBL = Ex.getInstance().getBL();
 
-        ExProtocolo prot = new ExProtocolo();
-        prot = exBL.obterProtocolo(exDocumentoDto.getDoc());
+        ExProtocolo prot = exBL.obterProtocolo(exDocumentoDto.getDoc());
 
         if (prot == null) {
             try {
@@ -2015,9 +2006,7 @@ public class ExDocumentoController extends ExController {
         Calendar c = Calendar.getInstance();
         c.setTime(prot.getData());
 
-        String servidor = Prop.get("/sigaex.url");
-
-        String caminho = servidor + "/public/app/processoautenticar?n=" + prot.getCodigo();
+        String caminho = url + "/public/app/processoautenticar?n=" + prot.getCodigo();
 
         result.include("url", caminho);
         result.include("ano", c.get(Calendar.YEAR));

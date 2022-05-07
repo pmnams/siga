@@ -1,16 +1,22 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	buffer="64kb"%>
+<%@ page pageEncoding="UTF-8" session="false"%>
 <%@ taglib uri="http://localhost/jeetags" prefix="siga"%>
 <%@ taglib uri="http://localhost/libstag" prefix="f"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 
-<link rel="stylesheet" href="/siga/bootstrap/css/bootstrap.min.css"	type="text/css" media="screen, projection, print" />
-
+<!DOCTYPE html>
 <siga:pagina titulo="Gerar Protocolo" popup="true">
+
+	<%--@elvariable id="url" type="String"--%>
+	<%--@elvariable id="sigla" type="String"--%>
+	<%--@elvariable id="dataHora" type="String"--%>
+	<%--@elvariable id="doc" type="br.gov.jfrj.siga.ex.ExDocumento"--%>
+	<%--@elvariable id="protocolo" type="br.gov.jfrj.siga.vraptor.ExProtocolo"--%>
+
+	<link rel="stylesheet" href="/siga/bootstrap/css/bootstrap.min.css"	type="text/css" media="screen, projection, print" />
 	<style>
 	   @media print { 
-	       #btn-form { display:none; } 
+	       #btn { display:none; }
 	       #bg {-webkit-print-color-adjust: exact;}
 	       
 	       
@@ -22,7 +28,17 @@
 
 			<div class="col-sm-12">
 				<div class="text-center">
-					<img src="${pageContext.request.contextPath}/imagens/${f:resource('/siga.relat.brasao')}" class="rounded float-left" width="80px"/>
+					<c:set var="brasao"  value="${f:resource('/siga.relat.brasao')}"/>
+					<c:choose>
+						<c:when test="${fn:startsWith(brasao, 'https:') or fn:startsWith(brasao, 'http:')}">
+							<c:set var = "brasao_file" value="${brasao}"/>
+						</c:when>
+						<c:otherwise>
+							<c:set var = "brasao_file" value="${pageContext.request.contextPath}/imagens/${brasao}"/>
+						</c:otherwise>
+					</c:choose>
+
+					<img src="${brasao_file}" class="rounded float-left" width="80px" alt="Brasão"/>
 					<h4><b>${f:resource('/siga.relat.titulo')}</b></h4>
 					<h5>${doc.orgaoUsuario.descricao}</h5>
 					<h5>${doc.lotacao.descricao }</h5>
@@ -34,7 +50,9 @@
 		<div  style="font-size: 26px">
 		<div class="row">
 			<div class="col-sm-12">
-				<div class="p-3 mb-2 bg-dark text-white text-center"  id="bg"><h4><b>Protocolo de Acompanhamento de Documento</b><h4></div>
+				<div class="p-3 mb-2 bg-dark text-white text-center"  id="bg">
+					<h4><b>Protocolo de Acompanhamento de Documento</b></h4>
+				</div>
 			</div>
 		</div>
 		<br>
@@ -76,13 +94,9 @@
 		<br>
 		<br>
 		<br />
-		<div id="btn-form">
-			<form name="frm" action="principal" namespace="/" method="get"
-				theme="simple">
-				<button type="button" class="btn btn-primary" onclick="javascript: document.body.offsetHeight; window.print();" >Imprimir</button>
-			</form>
+		<div id="btn">
+			<button type="button" class="btn btn-primary" onclick="document.body.offsetHeight; window.print();" >Imprimir</button>
 		</div>	
 	</div>
-		
 	
 </siga:pagina>

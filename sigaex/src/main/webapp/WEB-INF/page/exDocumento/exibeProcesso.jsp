@@ -234,8 +234,7 @@
                             </p>
                         </div>
                     </div>
-                    <c:if test="${siga_cliente != 'GOVSP'}">
-                        <div class="mt-2">
+                    <div class="mt-2">
                             <siga:link icon="application_view_list" classe="once" title="Visualizar&nbsp;_Movimentações"
                                        url="${pageContext.request.contextPath}/app/expediente/doc/exibir?sigla=${sigla}"
                                        atalho="${true}"
@@ -272,7 +271,7 @@
 							</span>
                             </div>
                         </div>
-                    </c:if>
+
 
                 </siga:links>
             </div>
@@ -595,45 +594,10 @@
         else if (ifr.attachEvent)
             ifr.detachEvent("onload", resize); // Bug fix line
 
-        if ('${siga_cliente}' == 'GOVSP') {
-            // Para GOVSP com link buttons
 
-            var refSiglaDocPrincipal = '&sigla=${sigla}';
-
-            if ($('#radioHTML').hasClass('active') && refHTML != '') {
-                $('#pdflink').addClass('d-none');
-                $('#pdfsemmarcaslink').addClass('d-none');
-                ifr.src = path + refHTML + refSiglaDocPrincipal;
-                ifrp.style.border = "0px solid black";
-                ifrp.style.borderBottom = "0px solid black";
-                if (ifr.addEventListener)
-                    ifr.addEventListener("load", resize, false);
-                else if (ifr.attachEvent)
-                    ifr.attachEvent("onload", resize);
-            } else {
-                if ($('#radioPDFSemMarcas').hasClass('active')) {
-                    $('#pdfsemmarcaslink').removeClass('d-none');
-                    $('#pdflink').addClass('d-none');
-                    ifr.src = path + refPDF + "&semmarcas=1";
-                } else {
-                    $('#pdflink').removeClass('d-none');
-                    $('#pdfsemmarcaslink').addClass('d-none');
-                    ifr.src = path + refPDF + refSiglaDocPrincipal;
-                }
-
-                if (!refPDF.includes("completo=1")) {
-                    var url = ifr.src;
-                    ifr.src = montarUrlDocPDF(ifr.src, "${f:resource('/sigaex.pdf.visualizador')}");
-                }
-
-                ifrp.style.border = "1px solid black";
-                ifr.height = pageHeight() - 300;
-            }
-
-        } else {
             // Para TRF2 com radio buttons
             if (document.getElementById('radioHTML').checked && refHTML != '') {
-                ifr.src = path + refHTML;
+                console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtmjhngf' + path + refHTML)ifr.src = path + refHTML;
                 ifrp.style.border = "0px solid black";
                 ifrp.style.borderBottom = "0px solid black";
                 if (ifr.addEventListener)
@@ -652,7 +616,7 @@
                 }
                 ifrp.style.border = "0px solid black";
                 ifr.height = pageHeight() - 300;
-            }
+
         }
 
         htmlAtual = refHTML;
