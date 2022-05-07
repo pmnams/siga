@@ -6122,16 +6122,16 @@ public class ExBL extends CpBL {
     public List<ExModelo> obterListaModelos(ExTipoDocumento tipo, ExFormaDocumento forma, boolean despachando,
                                             boolean criandoSubprocesso, ExMobil mobPai, String headerValue, boolean protegido, DpPessoa titular,
                                             DpLotacao lotaTitular, boolean autuando) {
-        ArrayList<ExModelo> modeloSetFinal;
-        ArrayList<ExModelo> provSet;
+        List<ExModelo> modeloSetFinal;
+        List<ExModelo> provSet;
         boolean isComposto;
         if (forma != null)
-            modeloSetFinal = new ArrayList<ExModelo>(forma.getExModeloSet());
+            modeloSetFinal = new ArrayList<>(forma.getExModeloSet());
         else
-            modeloSetFinal = (ArrayList) dao().listarTodosModelosOrdenarPorNome(tipo, null);
+            modeloSetFinal = dao().listarTodosModelosOrdenarPorNome(tipo, null);
         if (criandoSubprocesso && mobPai != null) {
             ExFormaDocumento especie = mobPai.doc().getExModelo().getExFormaDocumento();
-            provSet = new ArrayList<ExModelo>();
+            provSet = new ArrayList<>();
             for (ExModelo mod : modeloSetFinal)
                 if (especie.equals(mod.getExFormaDocumento()))
                     provSet.add(mod);
