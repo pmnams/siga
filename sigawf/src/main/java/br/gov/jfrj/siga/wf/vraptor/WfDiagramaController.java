@@ -508,7 +508,7 @@ public class WfDiagramaController extends WfSelecionavelController<WfDefinicaoDe
         }
         if (pd != null) {
             setTamanho(1);
-            ArrayList<Object> l = new ArrayList<>();
+            ArrayList<WfDefinicaoDeProcedimento> l = new ArrayList<>();
             l.add(pd);
             setItens(l);
         } else {

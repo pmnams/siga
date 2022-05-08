@@ -144,7 +144,7 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
         flt.setIdOrgaoUsu(orgaoUsu);
 
         String buscarFechadas = param("buscarFechadas");
-        flt.setBuscarFechadas(buscarFechadas != null ? Boolean.valueOf(buscarFechadas) : false);
+        flt.setBuscarFechadas(Boolean.parseBoolean(buscarFechadas));
         flt.setSituacaoFuncionalPessoa("");
 
         return flt;
@@ -174,7 +174,7 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
     }
 
     private boolean temPermissaoParaExportarDados() {
-        return Boolean.valueOf(Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(getTitular(), getTitular().getLotacao(), "SIGA;GI;CAD_PESSOA;EXP_DADOS"));
+        return Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(getTitular(), getTitular().getLotacao(), "SIGA;GI;CAD_PESSOA;EXP_DADOS");
     }
 
     @Get

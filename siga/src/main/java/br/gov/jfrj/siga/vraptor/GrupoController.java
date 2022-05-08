@@ -486,9 +486,9 @@ public abstract class GrupoController<T extends CpGrupo> extends
 
             List<CpConfiguracao> confs = dao().consultar(fltConf);
 
-            Iterator it = confs.iterator();
+            Iterator<CpConfiguracao> it = confs.iterator();
             while (it.hasNext()) {
-                CpConfiguracao c = (CpConfiguracao) it.next();
+                CpConfiguracao c = it.next();
                 if (c.getHisDtFim() != null
                         || c.getCpGrupo() == null
                         || !c.getCpGrupo().getIdInicial()
@@ -519,8 +519,7 @@ public abstract class GrupoController<T extends CpGrupo> extends
         flt.setIdTpGrupo(t_idTpGrupo);
         int intQtd = dao().consultarQuantidade(flt);
         setTamanho(intQtd);
-        List<CpGrupo> itgGrupos = dao().consultarPorFiltro(flt, offset,
-                0);
+        List<CpGrupo> itgGrupos = dao().consultarPorFiltro(flt, offset, 0);
 
         Iterator<CpGrupo> it = itgGrupos.iterator();
 
@@ -542,7 +541,7 @@ public abstract class GrupoController<T extends CpGrupo> extends
             }
         }
 
-        setItens(itgGrupos);
+        setItens((List<T>) itgGrupos);
         return "lista";
     }
 

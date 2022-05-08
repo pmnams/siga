@@ -521,10 +521,10 @@ public class ExMobilController extends
         result.include("idMod", idMod);
 
         if (visualizacao == 3 || visualizacao == 4) {
-            TreeMap campos = new TreeMap<String, String>();
-            for (Object[] oa : (List<Object[]>) this.getItens()) {
-                for (String s : ((ExDocumento) oa[0]).getForm().keySet()) {
-                    Object nomeCampo = preprocessarNomeCampo(s);
+            TreeMap<String, String> campos = new TreeMap<>();
+            for (Object oa : this.getItens()) {
+                for (String s : ((ExDocumento)((Object[]) oa)[0]).getForm().keySet()) {
+                    String nomeCampo = preprocessarNomeCampo(s);
                     if (nomeCampo != null)
                         campos.put(s, nomeCampo);
                 }
@@ -671,7 +671,7 @@ public class ExMobilController extends
     final static Pattern preprocessadorPatternSelecao = Pattern
             .compile("^([\\w_]+)(_[a-z]+Sel.)([\\w_]+)$");
 
-    private Object preprocessarNomeCampo(String s) {
+    private String preprocessarNomeCampo(String s) {
         Matcher m = preprocessadorPatternSelecao.matcher(s);
         if (m.find())
             s = m.replaceFirst("$1 $3");

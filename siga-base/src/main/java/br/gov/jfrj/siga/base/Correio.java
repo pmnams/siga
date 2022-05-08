@@ -20,12 +20,8 @@ package br.gov.jfrj.siga.base;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -94,10 +90,11 @@ public class Correio {
 				servidorDisponivel = true;
 				break;
 			} catch (Exception e) {
-				if (e.getCause() != null)
-					causa =  ", causa: " + e.getCause().getMessage();
+				if (e.getCause() != null) {
+					causa = ", causa: " + e.getCause().getMessage();
 					logger.warning("Servidor de e-mail '" + servidorEmail
 							+ "' indisponível: " + e.getMessage() + causa);
+				}
 			}
 		}
 
@@ -129,7 +126,7 @@ public class Correio {
 		// mostra os passos do envio da mensagem e o
 		// recebimento da mensagem do servidor no console.
 		Session session = null;
-		if (Prop.getBool("/siga.smtp.auth")) {
+		if (Boolean.TRUE.equals(Prop.getBool("/siga.smtp.auth"))) {
 			props.put("mail.smtp.auth", "true");
 			final String usuario = Prop.get("/siga.smtp.auth.usuario");
 			final String senha = Prop.get("/siga.smtp.auth.senha");
@@ -142,7 +139,7 @@ public class Correio {
 			session = Session.getInstance(props);
 		}
 
-		final boolean debug = Boolean.parseBoolean("false");
+		final boolean debug = false;
 		// final boolean debug = Boolean.parseBoolean(Mensagens
 		// .getString("servidor.smtp.debug"));
 		session.setDebug(debug);
@@ -186,7 +183,7 @@ public class Correio {
 		}
 		
 		
-		if (isVersionTest) {
+		if (Boolean.TRUE.equals(isVersionTest)) {
 			msg.setSubject(assunto + " - AMBIENTE DE TESTE FAVOR DESCONSIDERAR", "utf-8");
 		}
 		else {
@@ -206,7 +203,7 @@ public class Correio {
 			ihs.addHeader("Content-Type", "text/plain; charset=UTF-8");
 			ihs.addHeader("Content-Transfer-Encoding", "base64");
 			MimeBodyPart mb1 = new MimeBodyPart(ihs, Base64.encode(conteudo
-					.getBytes("utf-8")));
+					.getBytes(StandardCharsets.UTF_8)));
 			mp.addBodyPart(mb1);
 
 			// Do the same with the HTML part
@@ -214,7 +211,7 @@ public class Correio {
 			ihs2.addHeader("Content-Type", "text/html; charset=UTF-8");
 			ihs2.addHeader("Content-Transfer-Encoding", "base64");
 			MimeBodyPart mb2 = new MimeBodyPart(ihs2,
-					Base64.encode(conteudoHTML.getBytes("utf-8")));
+					Base64.encode(conteudoHTML.getBytes(StandardCharsets.UTF_8)));
 			mp.addBodyPart(mb2);
 
 			// Set the content for the message and transmit
@@ -231,7 +228,7 @@ public class Correio {
 		tr.sendMessage(msg, msg.getAllRecipients());
 		tr.close();
 
-		logger.log(Level.INFO,"Email enviado para " + Arrays.asList(destSet).toString() + "[" + assunto + "]");
+		logger.log(Level.INFO,"Email enviado para " + Collections.singletonList(destSet).toString() + "[" + assunto + "]");
 		logger.log(Level.FINE, "Detalhes do e-mail enviado:"
 					+ "\nAssunto: " + assunto
 					+ "\nDe: " + remetente
@@ -245,44 +242,41 @@ public class Correio {
 	}	
 	
 	public static String obterHTMLEmailParaUsuarioExternoAssinarDocumento(String uri, String siglaDocumento, String siglaUsuario) {
-		StringBuffer sbHtml = new StringBuffer();
-		
-		sbHtml.append("<html>");
-		sbHtml.append("<body>");
-		sbHtml.append("	<table>");
-		sbHtml.append("		<tbody>");
-		sbHtml.append("			<tr>");
-		sbHtml.append("				<td style='height: 80px; background-color: #f6f5f6; padding: 10px 20px;'>");
-		sbHtml.append("					<img style='padding: 10px 0px; text-align: center;' src='https://www.documentos.spsempapel.sp.gov.br/siga/imagens/logo-sem-papel-cor.png' alt='SP Sem Papel' width='108' height='50' />");		
-		sbHtml.append("				</td>");
-		sbHtml.append("			</tr>");
-		sbHtml.append("			<tr>");
-		sbHtml.append("				<td style='background-color: #bbb; padding: 0 20px;'>");
-		sbHtml.append("					<h3 style='height: 20px;'>Governo do Estado de S&atilde;o Paulo</h3>");					
-		sbHtml.append("				</td>");
-		sbHtml.append("			</tr>");
-		sbHtml.append("			<tr>");
-		sbHtml.append("				<td style='height: 310px; padding: 10px 20px;'>");
-		sbHtml.append("					<div>");
-		sbHtml.append("						<p style='color: #808080;'>Esse <a style='color: #808080;' href='" + uri +  "' target='_blank'><b>link</b></a> fornece acesso ao documento nº <b>" + siglaDocumento + "</b>, do Programa SP Sem Papel, cujo usuário <b>" + siglaUsuario +  "</b> é interessado.</p>");
-		sbHtml.append("						<p style='color: #808080;'>Para visualizar e assinar o documento, acesse o link: <a style='color: #808080;' href='" + uri +  "' target='_blank'><b>" + uri + "</b></a>");
-		sbHtml.append("						<p style='color: #808080;'>Atenção: Esse e-mail é de uso restrito ao usuário e entidade para a qual foi endereçado. Se você não é destinatário desta mensagem, você está, por meio desta, notificado que não deverá retransmitir, imprimir, copiar, examinar, distribuir ou utilizar informação contida nesta mensagem.</p>");
-		sbHtml.append("					</div>");
-		sbHtml.append("				</td>");
-		sbHtml.append("			</tr>");
-		sbHtml.append("			<tr>");
-		sbHtml.append("				<td style='height: 18px; padding: 0 20px; background-color: #eaecee;'>"); 
-		sbHtml.append("					<p>");
-		sbHtml.append("						<span style='color: #aaa;'><b>Aten&ccedil;&atilde;o:</b> esta &eacute; uma mensagem autom&aacute;tica. Por favor n&atilde;o responda&nbsp;</span>");
-		sbHtml.append("					</p>");
-		sbHtml.append("				</td>");
-		sbHtml.append("			</tr>");
-		sbHtml.append("	 	</tbody>");
-		sbHtml.append("	</table>");			
-		sbHtml.append("</body>");
-		sbHtml.append("</html>");
-		
-		return sbHtml.toString();
+
+		return "<html>" +
+				"<body>" +
+				"	<table>" +
+				"		<tbody>" +
+				"			<tr>" +
+				"				<td style='height: 80px; background-color: #f6f5f6; padding: 10px 20px;'>" +
+				"					<img style='padding: 10px 0px; text-align: center;' src='https://www.documentos.spsempapel.sp.gov.br/siga/imagens/logo-sem-papel-cor.png' alt='SP Sem Papel' width='108' height='50' />" +
+				"				</td>" +
+				"			</tr>" +
+				"			<tr>" +
+				"				<td style='background-color: #bbb; padding: 0 20px;'>" +
+				"					<h3 style='height: 20px;'>Governo do Estado de S&atilde;o Paulo</h3>" +
+				"				</td>" +
+				"			</tr>" +
+				"			<tr>" +
+				"				<td style='height: 310px; padding: 10px 20px;'>" +
+				"					<div>" +
+				"						<p style='color: #808080;'>Esse <a style='color: #808080;' href='" + uri + "' target='_blank'><b>link</b></a> fornece acesso ao documento nº <b>" + siglaDocumento + "</b>, do Programa SP Sem Papel, cujo usuário <b>" + siglaUsuario + "</b> é interessado.</p>" +
+				"						<p style='color: #808080;'>Para visualizar e assinar o documento, acesse o link: <a style='color: #808080;' href='" + uri + "' target='_blank'><b>" + uri + "</b></a>" +
+				"						<p style='color: #808080;'>Atenção: Esse e-mail é de uso restrito ao usuário e entidade para a qual foi endereçado. Se você não é destinatário desta mensagem, você está, por meio desta, notificado que não deverá retransmitir, imprimir, copiar, examinar, distribuir ou utilizar informação contida nesta mensagem.</p>" +
+				"					</div>" +
+				"				</td>" +
+				"			</tr>" +
+				"			<tr>" +
+				"				<td style='height: 18px; padding: 0 20px; background-color: #eaecee;'>" +
+				"					<p>" +
+				"						<span style='color: #aaa;'><b>Aten&ccedil;&atilde;o:</b> esta &eacute; uma mensagem autom&aacute;tica. Por favor n&atilde;o responda&nbsp;</span>" +
+				"					</p>" +
+				"				</td>" +
+				"			</tr>" +
+				"	 	</tbody>" +
+				"	</table>" +
+				"</body>" +
+				"</html>";
 	}	
 
 }

@@ -29,7 +29,6 @@ import br.gov.jfrj.siga.base.AplicacaoException;
 import br.gov.jfrj.siga.dp.dao.CpDao;
 import br.gov.jfrj.siga.model.Selecionavel;
 import br.gov.jfrj.siga.model.dao.DaoFiltroSelecionavel;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +55,7 @@ public abstract class SigaSelecionavelControllerSupport<T extends Selecionavel, 
 
     private Integer itemPagina;
 
-    private List itens;
+    private List<T> itens;
 
     private String nome;
 
@@ -68,7 +67,6 @@ public abstract class SigaSelecionavelControllerSupport<T extends Selecionavel, 
 
     private Integer tamanho;
 
-
     protected void aBuscarJson(String sigla) throws Exception {
         Long orgaoUsu = getLotaTitular().getOrgaoUsuario().getIdOrgaoUsu();
 
@@ -79,7 +77,7 @@ public abstract class SigaSelecionavelControllerSupport<T extends Selecionavel, 
 
         try {
             RetornoJson l = new RetornoJson();
-            for (Selecionavel s : (List<Selecionavel>) getItens()) {
+            for (Selecionavel s : getItens()) {
                 RetornoJsonItem i = new RetornoJsonItem();
                 i.key = Long.toString(s.getId());
                 i.firstLine = s.getSigla();
@@ -126,12 +124,13 @@ public abstract class SigaSelecionavelControllerSupport<T extends Selecionavel, 
 
         final DaoFiltroT flt = createDaoFiltro();
 
-        if ( StringUtils.isNotBlank(sigla) || StringUtils.isNotBlank(nome) ) {
-            if (fCalcularTamanho)
-                tamanho = dao().consultarQuantidade(flt);
+        // TODO: 07/05/2022 Verificar o processo de fitragem por grupos e selecionáveis 
+        //if ( StringUtils.isNotBlank(sigla) || StringUtils.isNotBlank(nome) ) {
+        if (fCalcularTamanho)
+            tamanho = dao().consultarQuantidade(flt);
 
-            itens = dao().consultarPorFiltro(flt, offset, itemPagina);
-        }
+        itens = dao().consultarPorFiltro(flt, offset, itemPagina);
+        //}
 
         result.include("currentPageNumber", calculaPaginaAtual(offset));
         return "busca";
@@ -195,7 +194,7 @@ public abstract class SigaSelecionavelControllerSupport<T extends Selecionavel, 
         return itemPagina;
     }
 
-    protected List getItens() {
+    protected List<T> getItens() {
         return itens;
     }
 
@@ -233,7 +232,7 @@ public abstract class SigaSelecionavelControllerSupport<T extends Selecionavel, 
         this.itemPagina = itemPagina;
     }
 
-    protected void setItens(final List orgaos) {
+    protected void setItens(final List<T> orgaos) {
         this.itens = orgaos;
     }
 
