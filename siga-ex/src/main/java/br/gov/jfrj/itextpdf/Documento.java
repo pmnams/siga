@@ -161,7 +161,6 @@ public class Documento {
                 dataDeInicioDeObrigacaoExibirRodapeDeAssinatura = Prop.getData("rodape.data.assinatura.ativa");
                 s.append(movAssinatura.getDescrMov().trim().toUpperCase().split(":")[0]);
 
-
                 /*** Exibe para Documentos Capturados a Funcao / Unidade ***/
                 if (movAssinatura.getExDocumento().isInternoCapturado()
                         && (movAssinatura.getExTipoMovimentacao() == ExTipoDeMovimentacao.ASSINATURA_COM_SENHA
@@ -400,18 +399,25 @@ public class Documento {
                     sigla = an.getMobil().getSigla();
                 }
 
-                byte[] ab = !estampar ? an.getArquivo().getPdf() : Stamp.stamp(an
-                                .getArquivo().getPdf(), sigla, an.getArquivo()
-                                .isRascunho(), an.isCopia(), an.getArquivo().isCancelado(), an
-                                .getArquivo().isSemEfeito(), an.getArquivo()
-                                .isInternoProduzido(), an.getArquivo().getQRCode(), an
-                                .getArquivo().getMensagem(), an.getPaginaInicial(),
-                        an.getPaginaFinal(), an.getOmitirNumeracao(),
+                byte[] ab = !estampar ? an.getArquivo().getPdf() : Stamp.stamp(
+                        an.getArquivo().getPdf(),
+                        sigla,
+                        an.getArquivo().isRascunho(),
+                        an.isCopia(),
+                        an.getArquivo().isCancelado(),
+                        an.getArquivo().isSemEfeito(),
+                        an.getArquivo().isInternoProduzido(),
+                        an.getArquivo().isPdf(),
+                        an.getArquivo().getQRCode(),
+                        an.getArquivo().getMensagem(),
+                        an.getPaginaInicial(),
+                        an.getPaginaFinal(),
+                        an.getOmitirNumeracao(),
                         Prop.get("carimbo.texto.superior"),
                         mob.getExDocumento().getOrgaoUsuario().getDescricao(),
                         mob.getExDocumento().getMarcaDagua(),
-                        an.getMobil().getDoc().getIdsDeAssinantes());
-
+                        an.getMobil().getDoc().getIdsDeAssinantes()
+                );
 
                 bytes += ab.length;
 

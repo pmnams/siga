@@ -87,7 +87,8 @@ public class ExProcessoAutenticacaoController extends ExController {
             return;
         }
 
-        String gHcaptchaResponse = request.getParameter("captcha-response");
+        String gHcaptchaResponse = request.getParameter("h-captcha-response");
+
         boolean success = false;
         if (gHcaptchaResponse != null) {
             String hostname = request.getServerName();
@@ -104,7 +105,6 @@ public class ExProcessoAutenticacaoController extends ExController {
             setDefaultResults();
             return;
         }
-        ExArquivo arq = Ex.getInstance().getBL().buscarPorProtocolo(n);
 
 
         ExMovimentacao mov = null;
@@ -114,7 +114,7 @@ public class ExProcessoAutenticacaoController extends ExController {
             byte[] certificado = Base64.decode(certificadoB64 == null ? "" : certificadoB64);
             Date dt = mov.getDtMov();
             if (certificado != null && certificado.length != 0)
-                dt = new Date(Long.valueOf(atributoAssinavelDataHora));
+                dt = new Date(Long.parseLong(atributoAssinavelDataHora));
             else
                 certificado = null;
 
@@ -148,7 +148,7 @@ public class ExProcessoAutenticacaoController extends ExController {
         try {
             n = verifyJwtToken(jwt).get("n").toString();
         } catch (InvalidKeyException | NoSuchAlgorithmException | IllegalStateException
-                | SignatureException | IOException | JWTVerifyException e) {
+                 | SignatureException | IOException | JWTVerifyException e) {
             throw new AplicacaoException("Token inválido ou expirado. Por favor, entre novamente no link do protocolo.");
         }
 
