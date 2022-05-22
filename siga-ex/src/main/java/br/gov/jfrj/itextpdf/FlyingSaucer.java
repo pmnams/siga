@@ -186,12 +186,12 @@ public class FlyingSaucer implements ConversorHtml {
 
         if (cabecalho != null) {
             //strCabecalho += strPrimeiroRodape + strRodape;
-			strCabecalho += strRodape;
-		} else if (primeiroCabecalho != null) {
-			strPrimeiroCabecalho += strRodape;
-		} else if (primeiroRodape != null || rodape != null) {
-			throw new RuntimeException("Não é possível injetar rodapé quando não existe cabeçalho");
-		}
+            strCabecalho += strRodape;
+        } else if (primeiroCabecalho != null) {
+            strPrimeiroCabecalho += strRodape;
+        } else if (primeiroRodape != null || rodape != null) {
+            throw new RuntimeException("Não é possível injetar rodapé quando não existe cabeçalho");
+        }
 
         if (primeiroCabecalho != null) {
             strPrimeiroCabecalho = corrigirEstiloEmCabecalho(strPrimeiroCabecalho);
@@ -350,7 +350,7 @@ public class FlyingSaucer implements ConversorHtml {
 //		Nheengatu h2p = new Nheengatu();
         String html = SwaggerUtils.convertStreamToString(FlyingSaucer.class.getResourceAsStream("pagina.html"));
         byte[] ab = h2p.converter(html, (byte) 0);
-        ab = Stamp.stamp(ab, "TRF2-MEM-2020/11111", false, false, false, false, true,
+        ab = Stamp.stamp(ab, "TRF2-MEM-2020/11111", false, false, false, false, true, false,
                 "https://siga.jfrj.jus.br/sigaex/public/app/autenticar?n=1111111-1111",
                 "Assinado digitalmente por USUARIO TESTE. Documento No: 1111111-1111 - https://siga.jfrj.jus.br/sigaex/public/app/autenticar?n=1111111-1111",
                 1, 1, 1, "Justiça Federal", "TRF2", "", null);
