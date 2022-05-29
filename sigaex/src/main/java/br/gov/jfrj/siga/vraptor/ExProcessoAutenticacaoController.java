@@ -96,10 +96,7 @@ public class ExProcessoAutenticacaoController extends ExController {
             JSONObject body = Hcaptcha.validar(hCaptchaSitePassword, gHcaptchaResponse,
                     request.getRemoteAddr());
 
-            if (body.getBoolean("success")) {
-                String retHostname = body.getString("hostname");
-                success = retHostname.equals(hostname);
-            }
+            success = body.getBoolean("success");
         }
         if (!success) {
             setDefaultResults();

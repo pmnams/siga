@@ -2,6 +2,7 @@ package br.gov.jfrj.siga.base.util;
 
 import br.gov.jfrj.siga.base.GZip;
 import br.gov.jfrj.siga.model.Historico;
+import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +56,7 @@ public class Utils {
     }
 
     public static String getBaseUrl(HttpServletRequest request) {
-        String scheme = request.getScheme() + "://";
+        String scheme = ((StringUtils.isNotEmpty(request.getHeader("X-Forwarded-Proto")))? request.getHeader("X-Forwarded-Proto") : request.getScheme()) + "://";
         String serverName = request.getServerName();
         String serverPort = (request.getServerPort() == 80) ? "" : ":" + request.getServerPort();
         String contextPath = request.getContextPath();

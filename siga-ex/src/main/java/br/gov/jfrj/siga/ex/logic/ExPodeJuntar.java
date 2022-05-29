@@ -1,7 +1,9 @@
 package br.gov.jfrj.siga.ex.logic;
 
+import br.gov.jfrj.siga.cp.logic.CpNaoENulo;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
+import br.gov.jfrj.siga.ex.ExDocumento;
 import br.gov.jfrj.siga.ex.ExMobil;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
@@ -10,11 +12,19 @@ import com.crivano.jlogic.*;
 public class ExPodeJuntar extends CompositeExpressionSupport {
 
     private final ExMobil mob;
+    private ExDocumento docPai;
     private final DpPessoa titular;
     private final DpLotacao lotaTitular;
 
     public ExPodeJuntar(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;
+        this.titular = titular;
+        this.lotaTitular = lotaTitular;
+    }
+
+    public ExPodeJuntar(ExDocumento docPai, ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
+        this.mob = mob;
+        this.docPai = docPai;
         this.titular = titular;
         this.lotaTitular = lotaTitular;
     }
@@ -32,6 +42,7 @@ public class ExPodeJuntar extends CompositeExpressionSupport {
      * <li>Móbil não pode estar em algum arquivo</li>
      * <li>Não pode haver configuração impeditiva</li>
      * </ul>
+     *
      */
     @Override
     protected Expression create() {
@@ -48,8 +59,19 @@ public class ExPodeJuntar extends CompositeExpressionSupport {
 
                 Not.of(new ExEstaEmTransito(mob, titular, lotaTitular)),
 
-                Or.of(And.of(new ExTemMobilPai(mob.doc()),
+                Or.of(
+
+                        And.of(
+
+                                new ExTemMobilPai(mob.doc()),
+
                                 new ExESubscritorOuCossignatario(mob.doc(), titular)),
+
+                        And.of(
+
+                                new CpNaoENulo(docPai, "documento onde foi autuado"),
+
+                                new ExEMobilAutuado(docPai, mob)),
 
                         new ExPodeMovimentar(mob, titular, lotaTitular)),
 

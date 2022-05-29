@@ -551,6 +551,15 @@ public class ExDocumentoController extends ExController {
             }
         }
 
+        // Preencher automaticamente o subscritor quando se tratar de novo documento
+        if ((isDocNovo) || (param("exDocumentoDTO.docFilho") != null)) {
+            if (exDocumentoDTO.getIdTpDoc() == ExTipoDocumento.TIPO_DOCUMENTO_INTERNO && !postback) {
+                DpPessoaSelecao subscritorSel = new DpPessoaSelecao();
+                subscritorSel.buscarPorObjeto(getCadastrante());
+                exDocumentoDTO.setSubscritorSel(subscritorSel);
+            }
+        }
+
         if (exDocumentoDTO.getId() == null && exDocumentoDTO.getDoc() != null)
             exDocumentoDTO.setId(exDocumentoDTO.getDoc().getIdDoc());
 
