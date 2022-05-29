@@ -79,9 +79,7 @@
 			<artifactId>cdi-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
-		
-		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+
 		<dependency>
 		    <groupId>com.google.guava</groupId>
 		    <artifactId>guava</artifactId>
@@ -91,6 +89,11 @@
 		<dependency>
 			<groupId>com.crivano</groupId>
 			<artifactId>swaggerservlet</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.spec.javax.xml.ws</groupId>
+			<artifactId>jboss-jaxws-api_2.3_spec</artifactId>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

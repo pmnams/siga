@@ -186,7 +186,7 @@ SenhaReset.Etapas = (function () {
                 url: '/siga/public/app/pessoa/usuarios/buscarEmailParcialmenteOculto/' + this.cpfUser.val(),
                 contentType: 'application/json',
                 type: 'GET',
-                data: {'g-recaptcha-response': grecaptcha.getResponse()},
+                data: {'captcha-response': grecaptcha.getResponse()},
                 beforeSend: onSpinnerMostrar.bind(this),
                 success: function (result) {
                     grecaptcha.reset();

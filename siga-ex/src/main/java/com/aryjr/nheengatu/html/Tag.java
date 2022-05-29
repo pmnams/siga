@@ -43,9 +43,9 @@ import com.aryjr.nheengatu.css2.Style;
 public class Tag {
 	private String name;
 
-	private final HashMap properties = new HashMap();
+	private final HashMap<String, String> properties = new HashMap<>();
 
-	private final ArrayList tags = new ArrayList();
+	private final ArrayList<Object> tags = new ArrayList<>();
 
 	private Style style;
 
@@ -102,7 +102,7 @@ public class Tag {
 	 *            The property's name.
 	 */
 	public String getPropertyValue(final String name) {
-		return (String) properties.get(name);
+		return properties.get(name);
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class Tag {
 	 * Returns all properties names.
 	 * 
 	 */
-	public Iterator getPropertiesNames() {
+	public Iterator<String> getPropertiesNames() {
 		return properties.keySet().iterator();
 	}
 
@@ -186,7 +186,7 @@ public class Tag {
 	 * Returns all tags.
 	 * 
 	 */
-	public Iterator tags() {
+	public Iterator<Object> tags() {
 		return tags.iterator();
 	}
 
@@ -195,7 +195,7 @@ public class Tag {
 	 * Returns all tags.
 	 * 
 	 */
-	public ArrayList tagsCollection() {
+	public ArrayList<Object> tagsCollection() {
 		return tags;
 	}
 
@@ -224,7 +224,7 @@ public class Tag {
 	}
 
 	public Tag getFirstTag(final String name) {
-		final Iterator it = tags.iterator();
+		final Iterator<Object> it = tags.iterator();
 		Object obj;
 		while (it.hasNext()) {
 			obj = it.next();
@@ -235,7 +235,7 @@ public class Tag {
 	}
 
 	public Tag removeFirstTag(final String name) {
-		final Iterator it = tags.iterator();
+		final Iterator<Object>  it = tags.iterator();
 		Object obj;
 		int inc = 0;
 		while (it.hasNext()) {
@@ -254,8 +254,8 @@ public class Tag {
 	 * @return A pure String with all text inside this tag.
 	 */
 	public String getText() {
-		final StringBuffer text = new StringBuffer("");
-		final Iterator it = tags.iterator();
+		final StringBuilder text = new StringBuilder();
+		final Iterator<Object>  it = tags.iterator();
 		Object obj;
 		while (it.hasNext()) {
 			obj = it.next();
@@ -274,17 +274,17 @@ public class Tag {
 	 */
 	public Tag getEmptyCopy() {
 		final Tag copy = new Tag(name);
-		final Iterator pNames = properties.keySet().iterator();
+		final Iterator<String>  pNames = properties.keySet().iterator();
 		String pName;
 		while (pNames.hasNext()) {
-			pName = (String) pNames.next();
-			copy.setPropertyValue(pName, (String) properties.get(pName));
+			pName = pNames.next();
+			copy.setPropertyValue(pName, properties.get(pName));
 		}
 		return copy;
 	}
 
 }
-/**
+/*
  * 
  * $Log: Tag.java,v $
  * Revision 1.1  2007/12/26 15:57:42  tah

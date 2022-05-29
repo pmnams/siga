@@ -35,9 +35,14 @@ import br.gov.jfrj.siga.bluc.service.BlucService;
 import br.gov.jfrj.siga.bluc.service.HashRequest;
 import br.gov.jfrj.siga.bluc.service.HashResponse;
 import br.gov.jfrj.siga.cp.CpToken;
-import br.gov.jfrj.siga.ex.*;
+import br.gov.jfrj.siga.ex.ExDocumento;
+import br.gov.jfrj.siga.ex.ExMobil;
+import br.gov.jfrj.siga.ex.ExMovimentacao;
+import br.gov.jfrj.siga.ex.ExNivelAcesso;
 import br.gov.jfrj.siga.ex.api.v1.DocumentosSiglaArquivoGet;
 import br.gov.jfrj.siga.ex.bl.Ex;
+import br.gov.jfrj.siga.ex.logic.ExPodeAcessarDocumento;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.model.ContextoPersistencia;
 import br.gov.jfrj.siga.vraptor.builder.ExDownloadRTF;
@@ -83,7 +88,7 @@ public class ExArquivoController extends ExController {
     @Get("/app/arquivo/exibir")
     public Download aExibir(final String sigla, final boolean popup, final String arquivo, byte[] certificado,
                             String hash, final String HASH_ALGORITHM, final String certificadoB64, boolean completo,
-                            final boolean semmarcas, final boolean volumes, final Long idVisualizacao, boolean exibirReordenacao) {
+                            final boolean semmarcas, final boolean volumes, final Long idVisualizacao, boolean exibirReordenacao, boolean iframe) throws Exception {
         try {
             final String servernameport = getRequest().getServerName() + ":" + getRequest().getServerPort();
             final String contextpath = getRequest().getContextPath();
@@ -129,14 +134,14 @@ public class ExArquivoController extends ExController {
             } else {
                 throw new AplicacaoException("A sigla informada não corresponde a um documento da base de dados.");
             }
-            if (!Ex.getInstance().getComp().podeAcessarDocumento(getTitular(), getLotaTitular(), mob)
+            if (!Ex.getInstance().getComp().pode(ExPodeAcessarDocumento.class, getTitular(), getLotaTitular(), mob)
                     && !podeVisualizarDocumento(mob, getTitular(), idVisualizacao)) {
                 throw new AplicacaoException("Documento " + mob.getSigla() + " inacessível ao usuário "
                         + getTitular().getSigla() + "/" + getLotaTitular().getSiglaCompleta() + ".");
             }
             final ExMovimentacao mov = Documento.getMov(mob, arquivo);
-            final boolean isArquivoAuxiliar = mov != null && mov.getExTipoMovimentacao().getId()
-                    .equals(ExTipoMovimentacao.TIPO_MOVIMENTACAO_ANEXACAO_DE_ARQUIVO_AUXILIAR);
+            final boolean isArquivoAuxiliar = mov != null && mov.getExTipoMovimentacao()
+                    .equals(ExTipoDeMovimentacao.ANEXACAO_DE_ARQUIVO_AUXILIAR);
             final boolean imutavel = (mov != null) && !completo && !estampar && !somenteHash && !pacoteAssinavel;
             String cacheControl = "private";
             final Integer grauNivelAcesso = mob.doc().getExNivelAcesso().getGrauNivelAcesso();
@@ -197,7 +202,7 @@ public class ExArquivoController extends ExController {
                     hashreq.setTime(dt);
                     HashResponse hashresp = bluc.hash(hashreq);
                     if (hashresp.getErrormsg() != null)
-                        throw new Exception(
+                        throw new AplicacaoException(
                                 "BluC não conseguiu produzir o pacote assinável. " + hashresp.getErrormsg());
                     byte[] sa = Base64.decode(hashresp.getHash());
 
@@ -214,7 +219,7 @@ public class ExArquivoController extends ExController {
                 Documento.getDocumentoHTML(baos, null, mob, mov, completo, volumes, contextpath, servernameport);
                 ab = baos.toByteArray();
                 if (ab == null) {
-                    throw new Exception("HTML inválido!");
+                    throw new AplicacaoException("HTML inválido!");
                 }
             }
             if (imutavel) {
@@ -248,7 +253,8 @@ public class ExArquivoController extends ExController {
                 return new InputStreamDownload(makeByteArrayInputStream((new byte[0]), false), TEXT_PLAIN,
                         "arquivo inválido");
             }
-            throw new RuntimeException("erro na geração do documento.", e);
+            result.include("iframe", iframe ? "sim" : "");
+            throw e;
         }
     }
 
@@ -420,7 +426,7 @@ public class ExArquivoController extends ExController {
             throw new AplicacaoException("A sigla informada não corresponde a um documento da base de dados.");
         }
 
-        if (!Ex.getInstance().getComp().podeAcessarDocumento(getTitular(), getLotaTitular(), mob)) {
+        if (!Ex.getInstance().getComp().pode(ExPodeAcessarDocumento.class, getTitular(), getLotaTitular(), mob)) {
             throw new AplicacaoException("Documento " + mob.getSigla() + " inacessível ao usuário "
                     + getTitular().getSigla() + "/" + getLotaTitular().getSiglaCompleta() + ".");
         }

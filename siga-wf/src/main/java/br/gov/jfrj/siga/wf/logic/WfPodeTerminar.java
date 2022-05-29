@@ -5,7 +5,7 @@ import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.wf.model.WfProcedimento;
 import com.crivano.jlogic.*;
 
-public class WfPodeTerminar extends CompositeExpressionSuport {
+public class WfPodeTerminar extends CompositeExpressionSupport {
 
     private final WfProcedimento pi;
     private final DpPessoa titular;

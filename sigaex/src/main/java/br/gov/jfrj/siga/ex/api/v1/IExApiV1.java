@@ -1368,6 +1368,36 @@ public interface IExApiV1 {
         public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;
     }
 
+    public interface INumeracaoExpedientePost extends ISwaggerMethod {
+        public static class Request implements ISwaggerRequest {
+            public String siglaorgao;
+            public String formadoc;
+            public String tiposequencia;
+            public String anoemissao;
+        }
+
+        public static class Response implements ISwaggerResponse {
+            public String sigladoc;
+        }
+
+        public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;
+    }
+
+    public interface INumeracaoGenericaPost extends ISwaggerMethod {
+        public static class Request implements ISwaggerRequest {
+            public String tiposequencia;
+            public String anoemissao;
+            public String zerarinicioano;
+        }
+
+        public static class Response implements ISwaggerResponse {
+            public String sequenciagenerica;
+            public String digitoverificador;
+        }
+
+        public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;
+    }
+
     public interface IDocumentosPost extends ISwaggerMethod {
         public static class Request implements ISwaggerRequest, ISwaggerRequestFile {
             public String sigla;

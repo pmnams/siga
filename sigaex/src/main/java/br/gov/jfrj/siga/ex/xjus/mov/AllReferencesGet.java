@@ -1,31 +1,43 @@
 package br.gov.jfrj.siga.ex.xjus.mov;
 
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import br.gov.jfrj.siga.ex.xjus.Utils;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.Reference;
 import br.jus.trf2.xjus.record.api.XjusRecordAPIContext;
 
-import javax.persistence.TypedQuery;
+import javax.persistence.Query;
 import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
 public class AllReferencesGet implements IXjusRecordAPI.IAllReferencesGet {
 
-    private static final String HQL = "select mov.idMov from ExMovimentacao mov where mov.exTipoMovimentacao.idTpMov in (2, 5, 6, 7, 8, 18) and mov.exMobil.exDocumento.dtFinalizacao != null and (mov.idMov > :id) order by mov.idMov";
+    private static final String HQL = "select mov.idMov from ExMovimentacao mov where mov.exTipoMovimentacao in :tpmovs and mov.exMobil.exDocumento.dtFinalizacao != null and (mov.idMov > :id) order by mov.idMov";
 
     @Override
+    @SuppressWarnings("unchecked")
     public void run(Request req, Response resp, XjusRecordAPIContext ctx) throws Exception {
         resp.list = new ArrayList<>();
         if (req.lastid == null)
             req.lastid = Utils.formatId(0L);
         try {
             ExDao dao = ExDao.getInstance();
-            TypedQuery<Long> q = dao.em().createQuery(HQL, Long.class);
+            Query q = dao.em().createQuery(HQL);
+            q.setParameter("tpmovs", EnumSet.of(
+                    ExTipoDeMovimentacao.ANEXACAO,
+                    ExTipoDeMovimentacao.DESPACHO,
+                    ExTipoDeMovimentacao.DESPACHO_TRANSFERENCIA,
+                    ExTipoDeMovimentacao.DESPACHO_INTERNO,
+                    ExTipoDeMovimentacao.DESPACHO_INTERNO_TRANSFERENCIA,
+                    ExTipoDeMovimentacao.DESPACHO_TRANSFERENCIA_EXTERNA));
             q.setMaxResults(Integer.parseInt(req.max));
             Long first = Long.valueOf(req.lastid);
-
+            // System.out.println("req.last: " + SwaggerUtils.format(first));
             q.setParameter("id", first);
-            for (Long id : q.getResultList()) {
+            // System.out.println(q.getQueryString());
+            for (Long id : (List<Long>) q.getResultList()) {
                 Reference ref = new Reference();
                 ref.id = Utils.formatId(id);
                 resp.list.add(ref);

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  * 
  *     This file is part of SIGA.
@@ -21,6 +21,7 @@ package br.gov.jfrj.siga.ex;
 import java.util.Date;
 
 import br.gov.jfrj.siga.base.SigaMessages;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 
 public class ExArquivoNumerado implements Comparable {
 	private ExArquivo arquivo;
@@ -107,11 +108,11 @@ public class ExArquivoNumerado implements Comparable {
 		}
 		return getNome();
 	};
-		
+
 	public String getNomeOuDescricaoComMovimentacao() {
 		if (getArquivo() instanceof ExMovimentacao) {
 			ExMovimentacao mov = (ExMovimentacao) getArquivo();
-			if (mov.getIdTpMov().equals(ExTipoMovimentacao.TIPO_MOVIMENTACAO_CIENCIA))
+			if (mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.CIENCIA)
 				return "Ciência (" + getNomeOuDescricao() + ")";
 		}
 		return getNomeOuDescricao();
@@ -181,8 +182,8 @@ public class ExArquivoNumerado implements Comparable {
 			ExDocumento doc = (ExDocumento) getArquivo();
 			if (doc.isProcesso())
 				return 1;
-			else if(SigaMessages.isSigaSP() && !doc.isProcesso() && doc.isFinalizado() 
-					&& doc.getMobilDefaultParaReceberJuntada().getMovsNaoCanceladas(ExTipoMovimentacao.TIPO_MOVIMENTACAO_JUNTADA).isEmpty()
+			else if(SigaMessages.isSigaSP() && !doc.isProcesso() && doc.isFinalizado()
+					&& doc.getMobilDefaultParaReceberJuntada().getMovsNaoCanceladas(ExTipoDeMovimentacao.JUNTADA).isEmpty()
 					) {
 				return 1;
 			}

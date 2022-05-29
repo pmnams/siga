@@ -115,5 +115,10 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
          </dependency>
+		<dependency>
+			<groupId>javax.jws</groupId>
+			<artifactId>jsr181-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 </project>

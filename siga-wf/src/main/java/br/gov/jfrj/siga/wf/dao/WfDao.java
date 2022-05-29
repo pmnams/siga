@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -80,6 +80,19 @@ public class WfDao extends CpDao implements com.crivano.jflow.Dao<WfProcedimento
         }
     }
 
+    public List<WfDefinicaoDeProcedimento> consultarWfDefinicoesDeProcedimentoPorNome(String nome) {
+        CriteriaQuery<WfDefinicaoDeProcedimento> q = cb().createQuery(WfDefinicaoDeProcedimento.class);
+        Root<WfDefinicaoDeProcedimento> c = q.from(WfDefinicaoDeProcedimento.class);
+        q.select(c);
+        q.where(cb().like(c.get("nome"), nome + "%"), cb().equal(c.get("hisAtivo"), 1));
+        try {
+            return em().createQuery(q).getResultList();
+        } catch (Exception ex) {
+            throw new RuntimeException("Não foi possível localizar definições de procedimento com nome '" + nome + "'",
+                    ex);
+        }
+    }
+
     public SortedSet<WfTarefa> consultarTarefasDeLotacao(DpLotacao lotaTitular) {
         // TODO Auto-generated method stub
         return null;
@@ -94,7 +107,7 @@ public class WfDao extends CpDao implements com.crivano.jflow.Dao<WfProcedimento
     }
 
     public List<WfProcedimento> consultarProcedimentosAtivosPorPrincipal(String principal) {
-        String sql = "select p from WfProcedimento p where p.hisDtFim is null and p.principal like :principal";
+        String sql = "select p from WfProcedimento p where p.hisDtFim is null and p.principal is not null and p.principal <> '' and p.principal like :principal";
         javax.persistence.Query query = ContextoPersistencia.em().createQuery(sql);
         query.setParameter("principal", principal + "%");
         List<WfProcedimento> result = query.getResultList();
@@ -194,7 +207,10 @@ public class WfDao extends CpDao implements com.crivano.jflow.Dao<WfProcedimento
         query.setParameter("idPessoaIni", titular.getIdPessoaIni());
         query.setParameter("idLotacaoIni", lotaTitular.getIdLotacaoIni());
         List<WfProcedimento> result = query.getResultList();
-        return result;
+        List<WfProcedimento> l = new ArrayList<>();
+        result.stream().forEach(i -> l.add(i));
+        l.sort(null);
+        return l;
     }
 
     public List<WfResponsavel> consultarResponsaveisPorDefinicaoDeResponsavel(WfDefinicaoDeResponsavel dr) {

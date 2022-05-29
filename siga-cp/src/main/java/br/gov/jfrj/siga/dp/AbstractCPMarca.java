@@ -40,7 +40,7 @@ import br.gov.jfrj.siga.model.Objeto;
 
 /**
  * A class that represents a row in the EX_DOCUMENTO table. You can customize
- * the behavior of this class by editing the class, {@link ExDocumento()}.
+ * the behavior of this class by editing the class.
  */
 @MappedSuperclass
 public abstract class AbstractCPMarca extends Objeto implements Serializable {

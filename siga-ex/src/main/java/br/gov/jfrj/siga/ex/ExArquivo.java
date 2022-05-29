@@ -267,15 +267,11 @@ public abstract class ExArquivo extends Objeto {
         return getReferencia() + ".pdf";
     }
 
-    ;
-
     public String getReferenciaPDFCompleto() {
         if (getNumPaginas() == null || getNumPaginas() == 0)
             return null;
         return getReferencia() + ".pdf&completo=1";
     }
-
-    ;
 
     /**
      * Retorna a referência do objeto mais o extensão ".pdf".
@@ -284,13 +280,11 @@ public abstract class ExArquivo extends Objeto {
         return getReferencia() + ".zip";
     }
 
-    ;
-
     public Map<String, String> getResumo() {
         return null;
     }
 
-    ;
+
 
     public abstract String getSiglaAssinatura();
 

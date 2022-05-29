@@ -129,6 +129,9 @@ public class DpLotacaoController extends SigaSelecionavelControllerSupport<DpLot
          * flt.setIdOrgaoUsu(paramInteger("orgaoUsu"));
          */
         flt.setIdOrgaoUsu(orgaoUsu);
+        if (flt.getIdOrgaoUsu() == null && getLotaTitular() != null) {
+            flt.setIdOrgaoUsu(getLotaTitular().getOrgaoUsuario().getIdOrgaoUsu());
+        }
 
         String buscarFechadas = param("buscarFechadas");
         flt.setBuscarFechadas(buscarFechadas != null ? Boolean.valueOf(buscarFechadas) : false);
@@ -151,7 +154,13 @@ public class DpLotacaoController extends SigaSelecionavelControllerSupport<DpLot
     @Get
     @Post
     @Path({"/public/app/lotacao/selecionar", "app/lotacao/selecionar", "/lotacao/selecionar.action"})
-    public String selecionar(String sigla) {
+    public String selecionar(String sigla, String matricula) {
+        if (matricula != null && orgaoUsu == null) {
+            DpPessoa pessoa = CpDao.getInstance().getPessoaFromSigla(matricula);
+            if (pessoa != null)
+                orgaoUsu = pessoa.getOrgaoUsuario().getId();
+        }
+
         String resultado = super.aSelecionar(sigla);
         if (getSel() != null) {
             try {
@@ -229,6 +238,7 @@ public class DpLotacaoController extends SigaSelecionavelControllerSupport<DpLot
             }
             dpLotacao.setIdOrgaoUsu(idOrgaoUsu);
             dpLotacao.setNome(Texto.removeAcento(nome));
+            dpLotacao.setSigla(nome);
             dpLotacao.setBuscarFechadas(Boolean.TRUE);
             setItens(CpDao.getInstance().consultarPorFiltro(dpLotacao, paramoffset, 15));
             result.include("itens", getItens());

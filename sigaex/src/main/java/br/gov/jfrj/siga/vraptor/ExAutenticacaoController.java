@@ -14,6 +14,7 @@ import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.*;
 import br.gov.jfrj.siga.ex.bl.Ex;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import br.gov.jfrj.siga.ex.vo.ExDocumentoVO;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import com.auth0.jwt.JWTSigner;
@@ -71,9 +72,10 @@ public class ExAutenticacaoController extends ExController {
 
         // Só para já dar o erro logo.
         String pwd = getJwtPassword();
-        String recaptchaSiteKey = getRecaptchaSiteKey();
-        String recaptchaSitePassword = getRecaptchaSitePassword();
-        result.include("recaptchaSiteKey", recaptchaSiteKey);
+        String captchaSiteKey = Prop.get("/siga.hcaptcha.key");
+        String captchaSitePassword = Prop.get("/siga.hcaptcha.pwd");
+
+        result.include("hcaptchaSiteKey", captchaSiteKey);
         result.include("n", n);
 
         if (n == null || n.trim().length() == 0) {
@@ -82,17 +84,17 @@ public class ExAutenticacaoController extends ExController {
         }
 
         String gRecaptchaResponse = request
-                .getParameter("captcha-response");
+                .getParameter("g-recaptcha-response");
 
         boolean success = false;
         if (gRecaptchaResponse != null) {
-            JSONObject body = Hcaptcha.validar(recaptchaSitePassword, gRecaptchaResponse, request.getRemoteAddr());
+            JSONObject body = Hcaptcha.validar(captchaSitePassword, gRecaptchaResponse, request.getRemoteAddr());
 
             String hostname = request.getServerName();
             if (body.getBoolean("success")) {
                 String retHostname = body.getString("hostname");
                 // Aceitando também o site-key de desenvolvimento padrão do reCaptcha
-                success = retHostname.equals(hostname) || ("6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI".equals(recaptchaSiteKey) && "testkey.google.com".equals(retHostname));
+                success = retHostname.equals(hostname);
             }
         }
         if (!success) {
@@ -132,7 +134,7 @@ public class ExAutenticacaoController extends ExController {
                                 dt,
                                 assinatura,
                                 certificado,
-                                ExTipoMovimentacao.TIPO_MOVIMENTACAO_ASSINATURA_DIGITAL_MOVIMENTACAO);
+                                ExTipoDeMovimentacao.ASSINATURA_DIGITAL_MOVIMENTACAO);
             } catch (final Exception e) {
                 throw new AplicacaoException(e.getMessage());
             }
@@ -171,10 +173,10 @@ public class ExAutenticacaoController extends ExController {
             ExMovimentacao mov = dao().consultar(idMov, ExMovimentacao.class,
                     false);
 
-            switch (mov.getExTipoMovimentacao().getId().intValue()) {
-                case (int) ExTipoMovimentacao.TIPO_MOVIMENTACAO_CONFERENCIA_COPIA_COM_SENHA:
-                case (int) ExTipoMovimentacao.TIPO_MOVIMENTACAO_ASSINATURA_COM_SENHA:
-                case (int) ExTipoMovimentacao.TIPO_MOVIMENTACAO_ASSINATURA_MOVIMENTACAO_COM_SENHA:
+            switch ((ExTipoDeMovimentacao) mov.getExTipoMovimentacao()) {
+                case CONFERENCIA_COPIA_COM_SENHA:
+                case ASSINATURA_COM_SENHA:
+                case ASSINATURA_MOVIMENTACAO_COM_SENHA:
                     fileName = arq.getReferencia() + "_" + mov.getIdMov() + ".jwt";
                     contentType = "application/jwt";
                     if (mov.getAuditHash() == null)
@@ -183,9 +185,9 @@ public class ExAutenticacaoController extends ExController {
                     bytes = mov.getAuditHash().getBytes(StandardCharsets.UTF_8);
                     break;
 
-                case (int) ExTipoMovimentacao.TIPO_MOVIMENTACAO_CONFERENCIA_COPIA_DOCUMENTO:
-                case (int) ExTipoMovimentacao.TIPO_MOVIMENTACAO_ASSINATURA_DIGITAL_DOCUMENTO:
-                case (int) ExTipoMovimentacao.TIPO_MOVIMENTACAO_ASSINATURA_DIGITAL_MOVIMENTACAO:
+                case CONFERENCIA_COPIA_DOCUMENTO:
+                case ASSINATURA_DIGITAL_DOCUMENTO:
+                case ASSINATURA_DIGITAL_MOVIMENTACAO:
                     fileName = arq.getReferencia() + "_" + mov.getIdMov() + ".p7s";
                     contentType = mov.getConteudoTpMov();
                     bytes = mov.getConteudoBlobMov2();
@@ -301,14 +303,6 @@ public class ExAutenticacaoController extends ExController {
 
             result.include("docVO", docVO);
         }
-    }
-
-    private static String getRecaptchaSiteKey() {
-        return Prop.get("/siga.recaptcha.key");
-    }
-
-    private static String getRecaptchaSitePassword() {
-        return Prop.get("/siga.recaptcha.pwd");
     }
 
     private static String getJwtPassword() {

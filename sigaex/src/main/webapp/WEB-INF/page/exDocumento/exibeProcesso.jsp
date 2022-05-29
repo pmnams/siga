@@ -8,82 +8,82 @@
 
 <!DOCTYPE html>
 <siga:pagina titulo="Documento" popup="${param.popup}">
-    <%--@elvariable id="docVO" type="br.gov.jfrj.siga.ex.vo.ExDocumentoVO"--%>
-    <%--@elvariable id="mob" type="br.gov.jfrj.siga.ex.ExMobil"--%>
+    <%--@elvariable id="docVO" type="br.gov.jfrj.siga.ex.vo.ExDocumentoVO" --%>
+    <%--@elvariable id="mob" type="br.gov.jfrj.siga.ex.ExMobil" --%>
     <%--@elvariable id="sigla" type="String"--%>
     <%--@elvariable id="excedeuTamanhoMax" type="boolen"--%>
-    <%--@elvariable id="idVisualizacao" type="Long"--%>
-    <%--@elvariable id="lota" type="br.gov.jfrj.siga.dp.DpLotacao"--%>
-    <%--@elvariable id="podeExibirReordenacao" type="boolean"--%>
+    <%--@elvariable id="idVisualizacao" type="Long" --%>
+    <%--@elvariable id="lota" type="br.gov.jfrj.siga.dp.DpLotacao" --%>
+    <%--@elvariable id="podeExibirReordenacao" type="boolean" --%>
     <%--@elvariable id="podeExibirTodosOsVolumes" type="boolean"--%>
 
-<c:if test="${not docVO.digital}">
-	<script type="text/javascript">
-		$("html").addClass("fisico");
-		$("body").addClass("fisico");
-	</script>
-</c:if>
+    <c:if test="${not docVO.digital}">
+        <script type="text/javascript">
+            $("html").addClass("fisico");
+            $("body").addClass("fisico");
+        </script>
+    </c:if>
 
-<c:if test="${mob.doc.podeReordenar()}">
-	<style>
-		.tabela-ordenavel tbody {
-			cursor: move;
-		}
+    <c:if test="${mob.doc.podeReordenar()}">
+        <style>
+            .tabela-ordenavel tbody {
+                cursor: move;
+            }
 
-		.tabela-ordenavel tbody tr {
-			border: 2px dashed #A9A9A9;
-		}
+            .tabela-ordenavel tbody tr {
+                border: 2px dashed #A9A9A9;
+            }
 
-		.tabela-ordenavel tbody tr:hover,
-		.tabela-ordenavel tbody tr:focus {
-			border-left: 3px dashed #007BFF;
-			border-right: 3px dashed #007BFF;
-			background-color: #CED4DA;
-		}
+            .tabela-ordenavel tbody tr:hover,
+            .tabela-ordenavel tbody tr:focus {
+                border-left: 3px dashed #007BFF;
+                border-right: 3px dashed #007BFF;
+                background-color: #CED4DA;
+            }
 
-		.tabela-ordenavel tbody a {
-			pointer-events: none;
-		}
+            .tabela-ordenavel tbody a {
+                pointer-events: none;
+            }
 
-		.menu-ordenacao {
-			text-align: center;
-			height: auto;
-			max-height: 0;
-			opacity: 0;
-			position: relative;
-			left: -999px;
-			transition: left .3s, opacity .3s, max-height .5s;
-		}
+            .menu-ordenacao {
+                text-align: center;
+                height: auto;
+                max-height: 0;
+                opacity: 0;
+                position: relative;
+                left: -999px;
+                transition: left .3s, opacity .3s, max-height .5s;
+            }
 
-		.form {
-			text-align: center;
-		}
+            .form {
+                text-align: center;
+            }
 
-		.checkbox-oculto {
-			display: none;
-		}
+            .checkbox-oculto {
+                display: none;
+            }
 
-		#btnOrdenarDocumentos {
-			background-color: transparent;
-		}
+            #btnOrdenarDocumentos {
+                background-color: transparent;
+            }
 
-		#btnOrdenarDocumentos:disabled,
-		#btnSalvarOrdenacao:disabled {
-			cursor: not-allowed;
-		}
+            #btnOrdenarDocumentos:disabled,
+            #btnSalvarOrdenacao:disabled {
+                cursor: not-allowed;
+            }
 
-		.container-tabela-lista-documentos {
-			overflow: hidden;
-		}
+            .container-tabela-lista-documentos {
+                overflow: hidden;
+            }
 
-		@media screen and (max-width: 575px) {
-  			.container-tabela-lista-documentos {
-    			overflow: auto;
-    			max-height: 112px;
-  			}
-		}
-	</style>
-</c:if>
+            @media screen and (max-width: 575px) {
+                .container-tabela-lista-documentos {
+                    overflow: auto;
+                    max-height: 112px;
+                }
+            }
+        </style>
+    </c:if>
 
     <script type="text/javascript">
         const iframeids = ["maincntnt"]
@@ -182,13 +182,15 @@
         <div class="row mt-3" id="inicio">
             <div class="col">
                 <h2>
-                    ${docVO.sigla}
-                    <a class="btn btn-secondary float-right"
+
+                        ${docVO.sigla}
+
+                    <a class="btn btn-secondary float-right "
                        href="${pageContext.request.contextPath}/app/expediente/doc/exibir?sigla=${sigla}" accesskey="r">Volta<u>r</u></a>
                 </h2>
             </div>
         </div>
-        <div class="row mt-3">
+        <div class="row mt-3 ">
             <div class="col">
                 <c:forEach var="m" items="${docVO.mobs}" varStatus="loop">
                     <c:if test="${((((mob.id == m.mob.id))))}">
@@ -234,7 +236,7 @@
                                    test="${true}"/> <span class="pl-2"></span>
                         <button type="button" class="link-btn btn btn-secondary btn-sm align-center" id="TelaCheia"
                                 data-toggle="button" aria-pressed="false"
-                                accesskey="t" onclick="telaCheia(this);">
+                                accesskey="t" onclick=" telaCheia(this);">
                             <u>T</u>ela Cheia
                         </button>
                         <span class="pl-2"></span>
@@ -244,22 +246,25 @@
                             <span style="white-space: nowrap;">
 							<input type="radio" id="radioHTML" name="formato" value="html" accesskey="h"
                                    checked="checked" onclick="exibir(htmlAtual,pdfAtual);"/>
-                                    <label for="radioHTML"><u>H</u>TML&nbsp;</label>
+								<label for="radioHTML"><u>H</u>TML&nbsp;
+                                    </label>
 							</span>
                             <span class="pl-2"></span>
                             <span style="white-space: nowrap;">
 							<input type="radio" id="radioPDF" name="formato" value="pdf" accesskey="p"
                                    onclick="exibir(htmlAtual,pdfAtual);"/>
-                                    <label for="radioPDF"><u>P</u>DF</label> -  <a id="pdflink" accesskey="a"
-                                                                                   target="_blank"> <u>a</u>brir</a>
+								<label for="radioPDF"><u>P</u>DF</label> -  <a id="pdflink" accesskey="a"
+                                                                               target="_blank"> <u>a</u>brir</a>
+
 							</span>
                             <span class="pl-2"></span>
                             <span style="white-space: nowrap;">
 							<input type="radio" id="radioPDFSemMarcas" name="formato" accesskey="s" value="pdfsemmarcas"
                                    onclick="exibir(htmlAtual,pdfAtual);"/>
-                                    <label for="radioPDFSemMarcas">PDF <u>s</u>em marcas</label> - <a
-                                    id="pdfsemmarcaslink" accesskey="b"
-                                    target="_blank"> a<u>b</u>rir</a>
+								<label for="radioPDFSemMarcas">PDF <u>s</u>em marcas</label> - <a id="pdfsemmarcaslink"
+                                                                                                  accesskey="b"
+                                                                                                  target="_blank"> a<u>b</u>rir</a>
+
 							</span>
                         </div>
                     </div>
@@ -278,7 +283,9 @@
 						<span class="titulo-docs">
 							<fmt:message key='documento.dossie'/>  /  <fmt:message key='usuario.lotacao'/>
 							<c:if test="${mob.doc.podeReordenar()}">													
-								<button type="button" class="btn" id="btnOrdenarDocumentos" data-toggle="tooltip" data-placement="top" title="Reordenar itens" ${arqsNum.size() == 1 ? 'disabled' : ''}>
+								<button type="button" class="btn" id="btnOrdenarDocumentos" data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Reordenar itens" ${arqsNum.size() == 1 ? 'disabled' : ''}>
 									<i class="fas fa-sort"></i>
 								</button>
                                 <c:if test="${mob.doc.podeReordenar() && podeExibirReordenacao && mob.doc.temOrdenacao()}">
@@ -459,166 +466,173 @@
     </div>
 </siga:pagina>
 <c:if test="${mob.doc.podeReordenar()}">
-	<script src="/siga/javascript/jquery-ui-1.12.1/custom/sortable/jquery-ui-1.12.1.min.js"></script>
-	<script src="/siga/javascript/jqueryui-touch-punch-0.2.3/jquery.ui.touch-punch-0.2.3.min.js"></script>
+    <script src="/siga/javascript/jquery-ui-1.12.1/custom/sortable/jquery-ui-1.12.1.min.js"></script>
+    <script src="/siga/javascript/jqueryui-touch-punch-0.2.3/jquery.ui.touch-punch-0.2.3.min.js"></script>
 </c:if>
 <script src="/siga/bootstrap/js/bootstrap.min.js"></script>
 <c:if test="${mob.doc.podeReordenar() && podeExibirReordenacao && mob.doc.temOrdenacao()}">
-	<script>
-		$(document).ready(function() {
-			//se exibindo documentos reordenados, não permite visualização PDF
-			$('#radioPDF').attr('data-toggle', 'tooltip').attr('data-placement', 'top').attr('title', 'Indisponível enquanto documento estiver reordenado').removeAttr('onclick').css({'cursor':'not-allowed', 'color':'rgba(0, 0, 0, 0.3)', 'border':'1px solid rgba(0, 0, 0, 0.3)'});
-			$('#radioPDFSemMarcas').attr('data-toggle', 'tooltip').attr('data-placement', 'top').attr('title', 'Indisponível enquanto documento estiver reordenado').removeAttr('onclick').css({'cursor':'not-allowed', 'color':'rgba(0, 0, 0, 0.3)', 'border':'1px solid rgba(0, 0, 0, 0.3)'});
-		});
-	</script>
+    <script>
+        $(document).ready(function () {
+            //se exibindo documentos reordenados, não permite visualização PDF
+            $('#radioPDF').attr('data-toggle', 'tooltip').attr('data-placement', 'top').attr('title', 'Indisponível enquanto documento estiver reordenado').removeAttr('onclick').css({
+                'cursor': 'not-allowed',
+                'color': 'rgba(0, 0, 0, 0.3)',
+                'border': '1px solid rgba(0, 0, 0, 0.3)'
+            });
+            $('#radioPDFSemMarcas').attr('data-toggle', 'tooltip').attr('data-placement', 'top').attr('title', 'Indisponível enquanto documento estiver reordenado').removeAttr('onclick').css({
+                'cursor': 'not-allowed',
+                'color': 'rgba(0, 0, 0, 0.3)',
+                'border': '1px solid rgba(0, 0, 0, 0.3)'
+            });
+        });
+    </script>
 </c:if>
 <script>
-	$(function () {
-		analisarAlturaListaDocumentos();
+    $(function () {
+        analisarAlturaListaDocumentos();
 
-		$('[data-toggle="tooltip"]').tooltip();
-	});
+        $('[data-toggle="tooltip"]').tooltip();
+    });
 
-	function analisarAlturaListaDocumentos() {
-		const containerListaDeDocumentos = $('#documentosDossie');
-		const alturaContainerListaDeDocumentos = containerListaDeDocumentos.height();
-		const distanciaTopo = containerListaDeDocumentos.offset().top;
-		const alturaJanela = window.screen.availHeight;
-		const diferencaNecessaria = 102;
-		const alturaLimite = alturaJanela - distanciaTopo - diferencaNecessaria;
+    function analisarAlturaListaDocumentos() {
+        const containerListaDeDocumentos = $('#documentosDossie');
+        const alturaContainerListaDeDocumentos = containerListaDeDocumentos.height();
+        const distanciaTopo = containerListaDeDocumentos.offset().top;
+        const alturaJanela = window.screen.availHeight;
+        const diferencaNecessaria = 102;
+        const alturaLimite = alturaJanela - distanciaTopo - diferencaNecessaria;
 
-		if (alturaContainerListaDeDocumentos > alturaLimite) {
-			aplicarMaxHeight(containerListaDeDocumentos, alturaLimite);
-			aplicarScroll(containerListaDeDocumentos.find('.container-tabela-lista-documentos'));
-		}
-	}
+        if (alturaContainerListaDeDocumentos > alturaLimite) {
+            aplicarMaxHeight(containerListaDeDocumentos, alturaLimite);
+            aplicarScroll(containerListaDeDocumentos.find('.container-tabela-lista-documentos'));
+        }
+    }
 
-	function aplicarMaxHeight(elemento, altura) {
-		elemento.css('max-height', altura + 'px');
-	}
+    function aplicarMaxHeight(elemento, altura) {
+        elemento.css('max-height', altura + 'px');
+    }
 
-	function aplicarScroll (elemento) {
-		elemento.css('overflow', 'auto');
-	}
+    function aplicarScroll(elemento) {
+        elemento.css('overflow', 'auto');
+    }
 </script>
 <script>
-	let htmlAtual = '${arqsNum[0].referenciaHtmlCompletoDocPrincipal}';
-	let pdfAtual = '${arqsNum[0].referenciaPDFCompletoDocPrincipal}';
-	let path = '/sigaex/app/arquivo/exibir?idVisualizacao=${idVisualizacao}';
+    let htmlAtual = '${arqsNum[0].referenciaHtmlCompletoDocPrincipal}';
+    let pdfAtual = '${arqsNum[0].referenciaPDFCompletoDocPrincipal}';
+    let path = '/sigaex/app/arquivo/exibir?idVisualizacao=${idVisualizacao}&iframe=true';
 
-	if ('${mob.doc.podeReordenar()}' === 'true' && '${podeExibirReordenacao}' === 'true') path += '&exibirReordenacao=true';
-	path += '&arquivo=';
+    if ('${mob.doc.podeReordenar()}' === 'true' && '${podeExibirReordenacao}' === 'true') path += '&exibirReordenacao=true';
+    path += '&arquivo=';
 
-	function fixlinks(refHTML, refPDF) {
-
-
-			document.getElementById('pdflink').href = path + refPDF ;
-
-		if (document.getElementById('radioPDFSemMarcas') != null) {
-			document.getElementById('pdfsemmarcaslink').href = path + refPDF
-					+ "&semmarcas=1";
-		}
-	}
-
-	//Nato: convem remover as outras maneiras de chamar o resize() e deixar apenas o jquery.
-	function exibir(refHTML, refPDF) {
-		const ifr = document.getElementById('painel');
-		const ifrp = document.getElementById('paipainel');
-
-		if('${excedeuTamanhoMax}' === 'true' && !($('#radioHTML').hasClass('active') || document.getElementById('radioHTML').checked)) {
-			sigaModal.alerta("Agregação de documentos excedeu o tamanho máximo permitido.");
-			return;
-		}
-
-		if (ifr.addEventListener)
-			ifr.removeEventListener("load", resize, false);
-		else if (ifr.addEventListener)
-			ifr.removeEventListener("onload", resize); // Bug fix line
-
-		// Para TRF2 com radio buttons
-		if (document.getElementById('radioHTML').checked && refHTML !== '') {
-
-			ifr.src = path + refHTML;
-			ifrp.style.border = "0px solid black";
-			ifrp.style.borderBottom = "0px solid black";
-			if (ifr.addEventListener)
-				ifr.addEventListener("load", resize, false);
-			else if (ifr.addEventListener)
-				ifr.addEventListener("onload", resize);
-		} else {
-			if (document.getElementById('radioPDFSemMarcas').checked)
-				ifr.src = path + refPDF + "&semmarcas=1"
-			else
-				ifr.src = path + refPDF;
-
-			if(!refPDF.includes("completo=1")) {
-
-				ifr.src = montarUrlDocPDF(ifr.src, "${f:resource('/sigaex.pdf.visualizador')}");
-			}
-			ifrp.style.border = "0px solid black";
-			ifr.height = pageHeight() - 300;
-		}
-
-		htmlAtual = refHTML;
-		pdfAtual = refPDF;
-
-		fixlinks(refHTML, refPDF);
-		$('#painel').load(function() {
-			setTimeout(function() {
-				resize();
-			}, 100);
-		});
-	}
+    function fixlinks(refHTML, refPDF) {
 
 
+        document.getElementById('pdflink').href = path + refPDF;
 
-	exibir(htmlAtual, pdfAtual);
-	fixlinks(htmlAtual, pdfAtual);
-	resize();
+        if (document.getElementById('radioPDFSemMarcas') != null) {
+            document.getElementById('pdfsemmarcaslink').href = path + refPDF
+                + "&semmarcas=1";
+        }
+    }
 
-	function exibirNoIFrame(url) {
-		const ifr = document.getElementById('painel');
-		const ifrp = document.getElementById('paipainel');
+    //Nato: convem remover as outras maneiras de chamar o resize() e deixar apenas o jquery.
+    function exibir(refHTML, refPDF) {
+        const ifr = document.getElementById('painel');
+        const ifrp = document.getElementById('paipainel');
 
-		if (ifr.addEventListener)
-			ifr.removeEventListener("load", resize, false);
-		else if (ifr.addEventListener)
-			ifr.removeEventListener("onload", resize);
-		if (document.getElementById('radioHTML').checked) {
-			ifrp.style.border = "0px solid black";
-			ifrp.style.borderBottom = "0px solid black";
-			if (ifr.addEventListener)
-				ifr.addEventListener("load", resize, false);
-			else if (ifr.addEventListener)
-				ifr.addEventListener("onload", resize);
-		} else {
-			ifr.height = "0";
-			ifrp.style.border = "0px solid black";
-			ifr.height = pageHeight() - 150;
-		}
-		ifr.src = url;
-	}
+        if ('${excedeuTamanhoMax}' === 'true' && !($('#radioHTML').hasClass('active') || document.getElementById('radioHTML').checked)) {
+            sigaModal.alerta("Agregação de documentos excedeu o tamanho máximo permitido.");
+            return;
+        }
 
-	function toggleBotaoHtmlPdf(btn) {
-	    const sel = btn.data('title');
-	    const tog = btn.data('toggle');
-	    $('#'+tog).prop('value', sel);
+        if (ifr.addEventListener)
+            ifr.removeEventListener("load", resize, false);
+        else if (ifr.addEventListener)
+            ifr.removeEventListener("onload", resize); // Bug fix line
 
-	    $('a[data-toggle="'+tog+'"]').not('[data-title="'+sel+'"]').removeClass('active').addClass('notActive');
-	    $('a[data-toggle="'+tog+'"][data-title="'+sel+'"]').removeClass('notActive').addClass('active');
-	}
 
+        // Para TRF2 com radio buttons
+        if (document.getElementById('radioHTML').checked && refHTML !== '') {
+            ifr.src = path + refHTML;
+            ifrp.style.border = "0px solid black";
+            ifrp.style.borderBottom = "0px solid black";
+            if (ifr.addEventListener)
+                ifr.addEventListener("load", resize, false);
+            else if (ifr.addEventListener)
+                ifr.addEventListener("onload", resize);
+        } else {
+            if (document.getElementById('radioPDFSemMarcas').checked)
+                ifr.src = path + refPDF + "&semmarcas=1"
+            else
+                ifr.src = path + refPDF;
+
+            if (!refPDF.includes("completo=1")) {
+
+                ifr.src = montarUrlDocPDF(ifr.src, "${f:resource('/sigaex.pdf.visualizador')}");
+            }
+            ifrp.style.border = "0px solid black";
+            ifr.height = pageHeight() - 300;
+
+        }
+
+        htmlAtual = refHTML;
+        pdfAtual = refPDF;
+
+        fixlinks(refHTML, refPDF);
+        $('#painel').load(function () {
+            setTimeout(function () {
+                resize();
+            }, 100);
+        });
+    }
+
+
+    exibir(htmlAtual, pdfAtual);
+    fixlinks(htmlAtual, pdfAtual);
+    resize();
+
+    function exibirNoIFrame(url) {
+        const ifr = document.getElementById('painel');
+        const ifrp = document.getElementById('paipainel');
+
+        if (ifr.addEventListener)
+            ifr.removeEventListener("load", resize, false);
+        else if (ifr.addEventListener)
+            ifr.removeEventListener("onload", resize);
+        if (document.getElementById('radioHTML').checked) {
+            ifrp.style.border = "0px solid black";
+            ifrp.style.borderBottom = "0px solid black";
+            if (ifr.addEventListener)
+                ifr.addEventListener("load", resize, false);
+            else if (ifr.addEventListener)
+                ifr.addEventListener("onload", resize);
+        } else {
+            ifr.height = "0";
+            ifrp.style.border = "0px solid black";
+            ifr.height = pageHeight() - 150;
+        }
+        ifr.src = url;
+    }
+
+    function toggleBotaoHtmlPdf(btn) {
+        const sel = btn.data('title');
+        const tog = btn.data('toggle');
+        $('#' + tog).prop('value', sel);
+
+        $('a[data-toggle="' + tog + '"]').not('[data-title="' + sel + '"]').removeClass('active').addClass('notActive');
+        $('a[data-toggle="' + tog + '"][data-title="' + sel + '"]').removeClass('notActive').addClass('active');
+    }
 </script>
 <script>
-	$('#radioBtnXXXX a').on('click', function(){
-	    const sel = $(this).data('title');
-	    const tog = $(this).data('toggle');
-	    $('#'+tog).prop('value', sel);
+    $('#radioBtnXXXX a').on('click', function () {
+        const sel = $(this).data('title');
+        const tog = $(this).data('toggle');
+        $('#' + tog).prop('value', sel);
 
-	    $('a[data-toggle="'+tog+'"]').not('[data-title="'+sel+'"]').removeClass('active').addClass('notActive');
-	    $('a[data-toggle="'+tog+'"][data-title="'+sel+'"]').removeClass('notActive').addClass('active');
-	})
+        $('a[data-toggle="' + tog + '"]').not('[data-title="' + sel + '"]').removeClass('active').addClass('notActive');
+        $('a[data-toggle="' + tog + '"][data-title="' + sel + '"]').removeClass('notActive').addClass('active');
+    })
 </script>
 <c:if test="${mob.doc.podeReordenar()}">
-	<script src="/siga/javascript/documento.reordenar-doc.js"></script>
+    <script src="/siga/javascript/documento.reordenar-doc.js"></script>
 </c:if>

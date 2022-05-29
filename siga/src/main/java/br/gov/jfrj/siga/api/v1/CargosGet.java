@@ -18,20 +18,15 @@ public class CargosGet implements ICargosGet {
         if (StringUtils.isEmpty(req.idOrgao))
             throw new SwaggerException("O id do órgão é obrigatório.", 400, null, req, resp, null);
 
-//			if (Long.valueOf(req.idOrgao) != so.getTitular().getOrgaoUsuario().getIdOrgaoUsu()) 
-//				throw new SwaggerException(
-//						"Usuário não autorizado para consultar dados deste órgão.", 403, null, req, resp, null);
-
-        resp.list = pesquisarPorNome(req, resp);
+        resp.list = pesquisarPorNome(req);
         if (resp.list.isEmpty())
             throw new SwaggerException("Nenhum cargo foi encontrado para os parâmetros informados.", 404, null, req,
                     resp, null);
-
     }
 
-    private List<Cargo> pesquisarPorNome(Request req, Response resp) {
+    private List<Cargo> pesquisarPorNome(Request req) {
         final DpCargoDaoFiltro flt = new DpCargoDaoFiltro();
-        if (!(req.nomeCargo == null || req.nomeCargo.isEmpty() || req.nomeCargo == ""))
+        if (!(req.nomeCargo == null || req.nomeCargo.isEmpty()))
             flt.setNome(Texto.removeAcentoMaiusculas(req.nomeCargo));
         flt.setIdOrgaoUsu(Long.valueOf(req.idOrgao));
         List<DpCargo> l = CpDao.getInstance().consultarPorFiltro(flt);
@@ -49,7 +44,7 @@ public class CargosGet implements ICargosGet {
         crgo.sigla = (cargo.getSigla() != null ? cargo.getSigla() : null);
         crgo.idCargo = cargo.getId().toString();
         crgo.idCargoIni = cargo.getIdCargoIni().toString();
-        crgo.idExterna = (cargo.getIdExterna() != null ? cargo.getIdExterna().toString() : null);
+        crgo.idExterna = (cargo.getIdExterna() != null ? cargo.getIdExterna() : null);
         crgo.nome = (cargo.getNomeCargo() != null ? cargo.getNomeCargo() : null);
         return crgo;
     }

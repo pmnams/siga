@@ -20,6 +20,7 @@ import br.gov.jfrj.relatorio.dinamico.RelatorioRapido;
 import br.gov.jfrj.relatorio.dinamico.RelatorioTemplate;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.ex.ExMobil;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.model.ContextoPersistencia;
 import net.sf.jasperreports.engine.JRException;
@@ -100,16 +101,14 @@ import net.sf.jasperreports.engine.JRException;
 							+ "right join mov.exMobil mob "
 							+ "inner join mob.exDocumento doc "
 							+ "where mov.dtIniMov between :dtini and :dtfim "
-//							+ "where (:dtIni is null or doc.dtDoc >= :dtini) "
-//							+ "	and (:dtFim is null or doc.dtDoc <= :dtfim) "
 							+ queryOrgao
 							+ queryLotacao
-							+ "	and mov.exTipoMovimentacao.idTpMov = '1' "
-//							+ "		or mov.exTipoMovimentacao.idTpMov = '64') "
+							+ " and mov.exTipoMovimentacao = :tpmov "
 							+ "order by doc.lotaCadastrante.siglaLotacao, "
 							+ "doc.exModelo.nmMod, "
 							+ "mob.idMobil "
 							);
+			query.setParameter("tpmov", ExTipoDeMovimentacao.CRIACAO);
 			
 			if (parametros.get("orgao") != null && parametros.get("orgao") != "") {
 				query.setParameter("orgao", Long.valueOf((String) parametros.get("orgao")));

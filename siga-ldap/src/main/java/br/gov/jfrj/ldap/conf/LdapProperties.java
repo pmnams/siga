@@ -21,8 +21,7 @@ package br.gov.jfrj.ldap.conf;
 import br.gov.jfrj.siga.base.AplicacaoException;
 import br.gov.jfrj.siga.base.Criptografia;
 import br.gov.jfrj.siga.base.Prop;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+import org.bouncycastle.util.encoders.Base64;
 
 public class LdapProperties {
 
@@ -82,13 +81,10 @@ public class LdapProperties {
 		}
 	}
 
-	protected String descriptografarSenha(String senhaCriptografada)
-			 {
-		BASE64Encoder enc = new BASE64Encoder();
-		BASE64Decoder dec = new BASE64Decoder();
+	protected String descriptografarSenha(String senhaCriptografada) {
 		try {
-			return new String(Criptografia.desCriptografar(dec
-					.decodeBuffer(senhaCriptografada), enc.encode(CHAVE_CRIPTO
+			return new String(Criptografia.desCriptografar(Base64
+					.decode(senhaCriptografada), Base64.toBase64String(CHAVE_CRIPTO
 					.getBytes())));
 		} catch (Exception e) {
 			throw new AplicacaoException("Erro ao descriptografar a senha LDAP", 9, e);

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  * 
  *     This file is part of SIGA.
@@ -447,6 +447,7 @@ public abstract class AbstractExModelo extends HistoricoAuditavelSuporte
 		if (this.cpArquivo==null && (this.conteudoBlobMod!=null || CpArquivoTipoArmazenamentoEnum.BLOB.equals(CpArquivoTipoArmazenamentoEnum.valueOf(Prop.get("/siga.armazenamento.arquivo.tipo"))))) {
 			this.conteudoBlobMod = createBlob;
 		} else if(cacheConteudoBlobMod != null){
+			this.cpArquivo.setTipoArmazenamento(CpArquivoTipoArmazenamentoEnum.TABELA);
 			cpArquivo = CpArquivo.updateConteudo(cpArquivo, cacheConteudoBlobMod);
 		}
 	}

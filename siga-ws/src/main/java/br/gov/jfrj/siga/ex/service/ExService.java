@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -142,4 +142,11 @@ public interface ExService extends Remote {
 
     @WebMethod
     public Boolean atualizarPrincipal(String codigoDocumento, String tipoPrincipal, String siglaPrincipal) throws Exception;
+
+    @WebMethod
+    public Boolean isAuxiliarIncluso(String codigoDocumentoVia, Date depoisDaData) throws Exception;
+
+    @WebMethod
+    String obterSiglaAtual(String codigoDocumentoVia) throws Exception;
+
 }

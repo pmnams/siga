@@ -17,7 +17,6 @@ public class CronologiaComparator implements Comparator<ExMovimentacao> {
             } else if (o2.getDtIniMov() != null) {
                 i = o2.getDtIniMov().compareTo(o1.getDtIniMov());
             }
-
             if (i != 0)
                 return i;
 
@@ -28,10 +27,9 @@ public class CronologiaComparator implements Comparator<ExMovimentacao> {
                 return Integer.MIN_VALUE;
 
             // Pelo tipo da movimentação
-
             if (o1.getExTipoMovimentacao() != null && o2.getExTipoMovimentacao() != null) {
-                i = ExMovimentacao.tpMovDesempatePosicao(o1.getExTipoMovimentacao().getId(),
-                        o2.getExTipoMovimentacao().getId());
+                i = ExMovimentacao.tpMovDesempatePosicao(o1.getExTipoMovimentacao(),
+                        o2.getExTipoMovimentacao());
                 if (i != 0)
                     return i;
             }

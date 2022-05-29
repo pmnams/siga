@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -25,6 +25,7 @@ import br.gov.jfrj.siga.cp.grupo.ConfiguracaoGrupoFabrica;
 import br.gov.jfrj.siga.cp.model.enm.CpSituacaoDeConfiguracaoEnum;
 import br.gov.jfrj.siga.cp.model.enm.CpTipoDeConfiguracao;
 import br.gov.jfrj.siga.cp.model.enm.ITipoDeConfiguracao;
+import br.gov.jfrj.siga.cp.model.enm.ITipoDeMovimentacao;
 import br.gov.jfrj.siga.dp.*;
 import br.gov.jfrj.siga.dp.dao.CpDao;
 import br.gov.jfrj.siga.dp.dao.CpGrupoDaoFiltro;
@@ -544,13 +545,18 @@ public class CpConfiguracaoBL {
                 && ((filtro != 0 && cfg != filtro) || ((filtro == 0) && !atributosDesconsiderados.contains(atributo)));
     }
 
+    protected boolean desigual(ITipoDeMovimentacao cfg, ITipoDeMovimentacao filtro,
+                               Set<Integer> atributosDesconsiderados, int atributo) {
+        return cfg != null
+                && ((filtro != null && cfg != filtro) || ((filtro == null) && !atributosDesconsiderados.contains(atributo)));
+    }
+
     /**
      * Verifica se a configuracao refere-se a um perfil ao qual a pessoa/lotacao
      * pertence
      *
      * @param cfg    - A configuração a ser verificada
      * @param perfis - os perfis da pessoa/lotacao
-     * @return
      */
     private boolean perfisContemGrupo(CpConfiguracaoCache cfg, SortedSet<CpPerfil> perfis) {
         for (CpPerfil cpPerfil : perfis) {

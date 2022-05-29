@@ -1,156 +1,162 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	buffer="32kb"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@ taglib uri="http://localhost/customtag" prefix="tags"%>
-<%@ taglib uri="http://localhost/jeetags" prefix="siga"%>
-<%@ taglib uri="/WEB-INF/tld/func.tld" prefix="f"%>
+         buffer="32kb" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://localhost/customtag" prefix="tags" %>
+<%@ taglib uri="http://localhost/jeetags" prefix="siga" %>
+<%@ taglib uri="/WEB-INF/tld/func.tld" prefix="f" %>
 
 <siga:pagina titulo="Mesa Virtual">
 
-	<div id="app" class="container-fluid content">
-		<c:if test="${not empty acessoAnteriorData}">
-			<div class="row" id="row-bem-vindo">
-				<div class="col">
-					<p id="bem-vindo" class="alert alert-success mb-3 mb-0">Último
-						acesso em ${acessoAnteriorData} no endereço
-						${acessoAnteriorMaquina}.</p>
-					<script>
-						setTimeout(function() {
-							$('#bem-vindo').fadeTo(1000, 0, function() {
-								$('#row-bem-vindo').slideUp(1000);
-							});
-						}, 5000);
-					</script>
-				</div>
-			</div>
-		</c:if>
+    <div id="app" class="container-fluid content">
+        <c:if test="${not empty acessoAnteriorData}">
+            <div class="row" id="row-bem-vindo">
+                <div class="col">
+                    <p id="bem-vindo" class="alert alert-success mb-3 mb-0">Último
+                        acesso em ${acessoAnteriorData} no endereço
+                            ${acessoAnteriorMaquina}.</p>
+                    <script>
+                        setTimeout(function () {
+                            $('#bem-vindo').fadeTo(1000, 0, function () {
+                                $('#row-bem-vindo').slideUp(1000);
+                            });
+                        }, 5000);
+                    </script>
+                </div>
+            </div>
+        </c:if>
 
-		<div class="row">
-			<div class="col col-12 col-md-auto">
-				<h2 class="mb-3"><i class="fa fa-file-alt"></i> Mesa Virtual</h2>
-			</div>
-			<div class="col my-1" style="vertical-align: text-bottom;"> 
+        <div class="row">
+            <div class="col col-12 col-md-auto">
+                <h2 class="mb-3"><i class="fa fa-file-alt"></i> Mesa Virtual</h2>
+            </div>
+            <div class="col my-1" style="vertical-align: text-bottom;">
 				<span class="h-100  d-inline-block my-2" style="vertical-align: text-bottom;">
 					<c:if test="${not empty visualizacao}"><b>(Delegante: ${visualizacao.titular.nomePessoa})</b></c:if> 
-				</span> 
-			</div> 
-			<c:if test="${f:podeUtilizarServicoPorConfiguracao(titular,lotaTitular,'SIGA;DOC:Módulo de Documentos') && !ehPublicoExterno}">
-				<div class="col col-12 col-sm-4 col-md-auto ml-md-auto mb-2">
-					<a href="expediente/doc/editar" class="btn btn-success form-control"> <i class="fas fa-plus-circle mr-1"></i>
-						<fmt:message key="documento.novo"/></a>
-				</div>
-				<div class="col col-12 col-sm-4 col-md-auto mb-2">
-					<a href="expediente/doc/listar?primeiraVez=sim" class="btn btn-primary form-control">
-						<i class="fas fa-search mr-1"></i><fmt:message key="documento.pesquisar"/> 
-					</a>
-				</div>
-			</c:if>
-			<div class="col col-12 col-sm-4 col-md-auto" v-if="carregando || (!errormsg &amp;&amp; filtrados.length >= 0)">
-				<div class="input-group mb-3">
-					<input type="text" class="form-control" placeholder="Filtrar" v-model="filtro" ng-model-options="{ debounce: 200 }">
-				</div>
-			</div>
-			<div class="col col-sm-12" v-if="errormsg">
-				<p class="alert alert-danger">
-					<strong>Erro!</strong> {{errormsg}}
-				</p>
-			</div>
-		</div>
+				</span>
+            </div>
+            <c:if test="${f:podeUtilizarServicoPorConfiguracao(titular,lotaTitular,'SIGA;DOC:Módulo de Documentos') && !ehPublicoExterno}">
+                <div class="col col-12 col-sm-4 col-md-auto ml-md-auto mb-2">
+                    <a href="expediente/doc/editar" class="btn btn-success form-control"> <i
+                            class="fas fa-plus-circle mr-1"></i>
+                        <fmt:message key="documento.novo"/></a>
+                </div>
+                <div class="col col-12 col-sm-4 col-md-auto mb-2">
+                    <a href="expediente/doc/listar?primeiraVez=sim" class="btn btn-primary form-control">
+                        <i class="fas fa-search mr-1"></i>Pesquisar</a>
+                </div>
+            </c:if>
+            <div class="col col-12 col-sm-4 col-md-auto"
+                 v-if="carregando || (!errormsg &amp;&amp; filtrados.length >= 0)">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Filtrar" v-model="filtro"
+                           ng-model-options="{ debounce: 200 }">
+                </div>
+            </div>
+            <div class="col col-sm-12" v-if="errormsg">
+                <p class="alert alert-danger">
+                    <strong>Erro!</strong> {{errormsg}}
+                </p>
+            </div>
+        </div>
 
-		<div class="row d-print-none"
-			v-if="!carregando &amp;&amp; lista.length > 0"></div>
+        <div class="row d-print-none"
+             v-if="!carregando &amp;&amp; lista.length > 0"></div>
 
-		<div class="row mt-3" v-if="carregando &amp;&amp; primeiraCarga">
-			<div class="col col-12">
-				<p class="alert alert-warning">
-					<strong>Aguarde,</strong> carregando documentos...
-				</p>
-			</div>
-		</div>
+        <div class="row mt-3" v-if="carregando &amp;&amp; primeiraCarga">
+            <div class="col col-12">
+                <p class="alert alert-warning">
+                    <strong>Aguarde,</strong> carregando documentos...
+                </p>
+            </div>
+        </div>
 
-		<div class="row mt-3"
-			v-if="!errormsg && !carregando &amp;&amp; filtrados.length == 0">
-			<div class="col col-12">
-				<p class="alert alert-warning">
-					<strong>Atenção!</strong> Nenhum documento na mesa.
-				</p>
-			</div>
-		</div>
-		
-		<div class="row" v-if="filtrados.length > 0">
-			<div class="col-sm-12">
-				<table class="table table-sm table-borderless">
-					<tbody>
-						<template v-for="f in filtrados">
-						<tr v-if="f.grupoExibir" class="table-group table-group-title alert alert-info align-middle">
-							<th colspan="6" class="pb-0 pl-0">
-								 <h5 class="mb-1 pl-2"><i :class="f.grupoIcone"></i> {{f.grupoNome}}</h5>
-							</th>
-						</tr>
-						<tr v-if="f.grupoExibir" class="table-head">
-							<th class="d-none d-md-block">Tempo</th>
-							<th><fmt:message key = "usuario.mesavirtual.codigo"/></th>
-							<th class="d-none d-md-block">Descrição</th>
-							<c:if test="${siga_cliente == 'GOVSP'}">
-								<th></th>
-							</c:if>
-							<th>Origem</th>
-							<th class="d-none d-md-block"><fmt:message key = "usuario.mesavirtual.etiquetas"/></th>
-							<th v-show="filtradosTemAlgumErro">Atenção</th>
-						</tr>
-						<tr v-bind:class="{odd: f.odd}">
-							<td class="d-none d-md-block" :title="f.datahora">{{f.tempoRelativo}}</td>
-							<td>
-								<c:choose>
-									<c:when test="${not empty idVisualizacao && idVisualizacao != 0}">
-										<a :href="'expediente/doc/visualizar?sigla=' + f.codigo + '&idVisualizacao='+${idVisualizacao}">{{f.sigla}}</a>
-									</c:when>
-									<c:otherwise>
-										<a :href="'expediente/doc/exibir?sigla=' + f.codigo">{{f.sigla}}</a>
-									</c:otherwise>
-								</c:choose>
-								<span class="d-inline d-md-none"> - {{f.descr}}</span>
-							</td>
-							<td class="d-none d-md-block">{{f.descr}}</td>
-							<c:if test="${siga_cliente == 'GOVSP'}">
-								<td v-if="f.dataDevolucao == 'ocultar'"></td>
-								<td v-if="f.dataDevolucao == 'alerta'"><i class="fa fa-exclamation-triangle text-warning"></i></td>
-								<td v-if="f.dataDevolucao == 'atrasado'"><i class="fa fa-exclamation-triangle text-danger"></i></td>
-							</c:if>
-							<td>{{f.origem}}</td>
-							<td class="d-none d-md-block" style="padding: 0;"><div
-									class="xrp-label-container">
-									<!-- class="list-unstyled blog-tags" -->
-									<span v-for="m in f.list" :title="m.titulo"><button
-											class="btn btn-default btn-sm xrp-label">
+        <div class="row mt-3"
+             v-if="!errormsg && !carregando &amp;&amp; filtrados.length == 0">
+            <div class="col col-12">
+                <p class="alert alert-warning">
+                    <strong>Atenção!</strong> Nenhum documento na mesa.
+                </p>
+            </div>
+        </div>
+
+        <div class="row" v-if="filtrados.length > 0">
+            <div class="col-sm-12">
+                <table class="table table-sm table-borderless">
+                    <tbody>
+                    <template v-for="f in filtrados">
+                        <tr v-if="f.grupoExibir" class="table-group table-group-title alert alert-info align-middle">
+                            <th colspan="6" class="pb-0 pl-0">
+                                <h5 class="mb-1 pl-2"><i :class="f.grupoIcone"></i> {{f.grupoNome}}</h5>
+                            </th>
+                        </tr>
+                        <tr v-if="f.grupoExibir" class="table-head">
+                            <th class="d-none d-md-block">Tempo</th>
+                            <th><fmt:message key="usuario.mesavirtual.codigo"/></th>
+                            <th class="d-none d-md-block">Descrição</th>
+                            <c:if test="${siga_cliente == 'GOVSP'}">
+                                <th></th>
+                            </c:if>
+                            <th>Origem</th>
+                            <th class="d-none d-md-block"><fmt:message key="usuario.mesavirtual.etiquetas"/></th>
+                            <th v-show="filtradosTemAlgumErro">Atenção</th>
+                        </tr>
+                        <tr v-bind:class="{odd: f.odd}">
+                            <td class="d-none d-md-block" :title="f.datahora">{{f.tempoRelativo}}</td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${not empty idVisualizacao && idVisualizacao != 0}">
+                                        <a :href="'expediente/doc/visualizar?sigla=' + f.codigo + '&idVisualizacao='+${idVisualizacao}">{{f.sigla}}</a>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <a :href="'expediente/doc/exibir?sigla=' + f.codigo">{{f.sigla}}</a>
+                                    </c:otherwise>
+                                </c:choose>
+                                <span class="d-inline d-md-none"> - {{f.descr}}</span>
+                            </td>
+                            <td class="d-none d-md-block">{{f.descr}}</td>
+                            <c:if test="${siga_cliente == 'GOVSP'}">
+                                <td v-if="f.dataDevolucao == 'ocultar'"></td>
+                                <td v-if="f.dataDevolucao == 'alerta'"><i
+                                        class="fa fa-exclamation-triangle text-warning"></i></td>
+                                <td v-if="f.dataDevolucao == 'atrasado'"><i
+                                        class="fa fa-exclamation-triangle text-danger"></i></td>
+                            </c:if>
+                            <td>{{f.origem}}</td>
+                            <td class="d-none d-md-block" style="padding: 0;">
+                                <div
+                                        class="xrp-label-container">
+                                    <!-- class="list-unstyled blog-tags" -->
+                                    <span v-for="m in f.list" :title="m.titulo"><button
+                                            class="btn btn-default btn-sm xrp-label">
 											<i :class="m.icone"></i> {{m.nome}}<span
-												v-if="m.pessoa &amp;&amp; !m.daPessoa"> -
+                                            v-if="m.pessoa &amp;&amp; !m.daPessoa"> -
 												{{m.pessoa}}</span><span
-												v-if="m.unidade &amp;&amp; (!m.daLotacao || (!m.daPessoa && !m.deOutraPessoa))">
+                                            v-if="m.unidade &amp;&amp; (!m.daLotacao || (!m.daPessoa && !m.deOutraPessoa))">
 												/ {{m.unidade}}</span>
 										</button></span>
-								</div></td>
-							<td v-show="filtradosTemAlgumErro" style="color: red">{{f.errormsg}}</td>
-						</tr>
-						<tr v-if="f.grupoEspacar" class="table-group table-group-separator">
-							<th colspan="6" class="pb-2 pb-0 pl-0"></th>
-						</tr>
-						</template>
-					</tbody>
-				</table>
-			</div>
-		</div>
-		<p class="alert alert-success"
-			v-if="acessos &amp;&amp; acessos.length >= 1">Último acesso em
-			{{acessos[1].datahora}} no endereço {{acessos[1].ip}}.</p>
-	</div>
+                                </div>
+                            </td>
+                            <td v-show="filtradosTemAlgumErro" style="color: red">{{f.errormsg}}</td>
+                        </tr>
+                        <tr v-if="f.grupoEspacar" class="table-group table-group-separator">
+                            <th colspan="6" class="pb-2 pb-0 pl-0"></th>
+                        </tr>
+                    </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p class="alert alert-success"
+           v-if="acessos &amp;&amp; acessos.length >= 1">Último acesso em
+            {{acessos[1].datahora}} no endereço {{acessos[1].ip}}.</p>
+    </div>
 
-	<script type="text/javascript" src="../javascript/vue.min.js"></script>
+    <script type="text/javascript" src="../javascript/vue.min.js"></script>
 
 
-	<script type="text/javascript" language="Javascript1.1">
+    <script type="text/ecmascript">
 	var httpGet = function(url, success, error) {  
 		  var xhr = XMLHttpRequest ? new XMLHttpRequest() : 
 		                             new ActiveXObject("Microsoft.XMLHTTP"); 
@@ -357,5 +363,6 @@
 
 		  }
 		});
-</script>
+
+    </script>
 </siga:pagina>

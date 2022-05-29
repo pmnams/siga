@@ -9,6 +9,8 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import br.gov.jfrj.siga.ex.logic.ExPodeAcessarDocumento;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import com.lowagie.text.pdf.codec.Base64;
 
 import br.gov.jfrj.itextpdf.Documento;
@@ -22,7 +24,6 @@ import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.ExMobil;
 import br.gov.jfrj.siga.ex.ExMovimentacao;
 import br.gov.jfrj.siga.ex.ExNivelAcesso;
-import br.gov.jfrj.siga.ex.ExTipoMovimentacao;
 import br.gov.jfrj.siga.ex.bl.Ex;
 
 public class SigaDocPdfUtils {
@@ -77,16 +78,14 @@ public class SigaDocPdfUtils {
 						"A sigla informada não corresponde a um documento da base de dados.");
 			}
 			if (!Ex.getInstance().getComp()
-					.podeAcessarDocumento(titular, lotaTitular, mob)) {
+					.pode(ExPodeAcessarDocumento.class, titular, lotaTitular, mob)) {
 				throw new AplicacaoException("Documento " + mob.getSigla()
 						+ " inacessível ao usuário " + titular.getSigla() + "/"
 						+ lotaTitular.getSiglaCompleta() + ".");
 			}
 			final ExMovimentacao mov = Documento.getMov(mob, arquivo);
 			final boolean isArquivoAuxiliar = mov != null
-					&& mov.getExTipoMovimentacao()
-							.getId()
-							.equals(ExTipoMovimentacao.TIPO_MOVIMENTACAO_ANEXACAO_DE_ARQUIVO_AUXILIAR);
+					&& mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.ANEXACAO_DE_ARQUIVO_AUXILIAR;
 			final boolean imutavel = (mov != null) && !completo && !estampar
 					&& !somenteHash && !pacoteAssinavel;
 			String cacheControl = "private";

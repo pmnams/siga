@@ -38,56 +38,62 @@
 
                     <c:if test="${not empty loginMensagem}">
                         <div class="login-invalido ">
-                            <div  class="login-invalido-descricao ">
-								<p class="alert alert-danger">${loginMensagem}</p>
-							</div>
-						</div>
-					</c:if>
+                            <div class="login-invalido-descricao ">
+                                <p class="alert alert-danger">${loginMensagem}</p>
+                            </div>
+                        </div>
+                    </c:if>
 
-					<form id="formLogin" role="form" method="post"
-						enctype="application/x-www-form-urlencoded">
-						<div class="form-group">
-							<label for="username"><fmt:message key="usuario.matricula"/></label>
+                    <form id="formLogin" role="form" method="post"
+                          enctype="application/x-www-form-urlencoded">
+                        <div class="form-group">
+                            <label for="username"><fmt:message key="usuario.matricula"/></label>
 
-						    <div class="input-group">
-						      <div class="input-group-prepend">
-						        <span class="input-group-text" id="icon-user"><i class="fas fa-user"></i></span>
-						      </div>
-						      <input id="username" type="text" name="username" placeholder="<fmt:message key="usuario.digite.usuario"/>" onblur="javascript:converteUsuario(this)" autocorrect="off"
-								autocapitalize="none" class="form-control" aria-label="Usuário" aria-describedby="icon-user">
-						    </div>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="icon-user"><i class="fas fa-user"></i></span>
+                                </div>
+                                <input id="username" type="text" name="username"
+                                       placeholder="<fmt:message key="usuario.digite.usuario"/>"
+                                       onblur="javascript:converteUsuario(this)" autocorrect="off"
+                                       autocapitalize="none" class="form-control" aria-label="Usuário"
+                                       aria-describedby="icon-user">
+                            </div>
 
-						</div>
-						<div class="form-group">
-							<label for="password">Senha</label>
-							<div class="input-group">
-						      <div class="input-group-prepend">
-						        <span class="input-group-text" id="icon-pass"><i class="fas fa-lock"></i></span>
-						      </div>
-						      <input type="password" name="password" id="password" placeholder="Senha"
-								class="form-control" aria-label="Usuário" aria-describedby="icon-pass">
-						    </div>
-						</div>
-						<c:if test="${isSenhaUsuarioExpirada}">
-							<div class="js-link-trocar-senha  hidden" style="text-align: center; margin: 0; padding: 0;">
-								<button type="button" class="btn  btn-link" data-siga-modal-abrir="trocaSenhaUsuario">
-								    Trocar senha
-								</button>
-							</div>
-						</c:if>
-						<div class="row pt-3">
-							<div class="col">
-								<div class="text-center">
-									<button type="submit" class="btn btn-lg btn-primary btn-block"><i class="fas fa-sign-in-alt"></i> Entrar</button>
-									<div class="mt-4">
-										<%-- Todo--%>
-<%--										<a href="/siga/public/app/usuario/incluir_usuario"--%>
-<%--											class="btn btn-secondary btn-block mb-2">--%>
-<%--											<fmt:message key = "usuario.sounovo"/>--%>
-<%--										</a>--%>
-<%--										<a href="/siga/public/app/usuario/senha/reset" class="btn btn-link btn-block">--%>
-<%--											<strong>Esqueci minha senha</strong>--%>
-<%--										</a>--%>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Senha</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="icon-pass"><i class="fas fa-lock"></i></span>
+                                </div>
+                                <input type="password" name="password" id="password" placeholder="Senha"
+                                       class="form-control" aria-label="Usuário" aria-describedby="icon-pass">
+                            </div>
+                        </div>
+                        <c:if test="${isSenhaUsuarioExpirada}">
+                            <div class="js-link-trocar-senha  hidden"
+                                 style="text-align: center; margin: 0; padding: 0;">
+                                <button type="button" class="btn  btn-link" data-siga-modal-abrir="trocaSenhaUsuario">
+                                    Trocar senha
+                                </button>
+                            </div>
+                        </c:if>
+                        <div class="row pt-3">
+                            <div class="col">
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-lg btn-primary btn-block"><i
+                                            class="fas fa-sign-in-alt"></i> Entrar
+                                    </button>
+                                    <div class="mt-4">
+                                            <%-- Todo--%>
+                                            <%--										<a href="/siga/public/app/usuario/incluir_usuario"--%>
+                                            <%--											class="btn btn-secondary btn-block mb-2">--%>
+                                            <%--											<fmt:message key = "usuario.sounovo"/>--%>
+                                            <%--										</a>--%>
+                                            <%--										<a href="/siga/public/app/usuario/senha/reset" class="btn btn-link btn-block">--%>
+                                            <%--											<strong>Esqueci minha senha</strong>--%>
+                                            <%--										</a>--%>
                                     </div>
 
                                     <c:choose>

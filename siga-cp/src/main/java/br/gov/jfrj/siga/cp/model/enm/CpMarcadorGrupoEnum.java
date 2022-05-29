@@ -43,8 +43,8 @@ public enum CpMarcadorGrupoEnum implements IEnumWithId {
     private final boolean collapsed;
     private final boolean hide;
 
-    private CpMarcadorGrupoEnum(Integer id, String nome, String icone, boolean visible, boolean collapsed,
-                                boolean hide) {
+    CpMarcadorGrupoEnum(Integer id, String nome, String icone, boolean visible, boolean collapsed,
+                        boolean hide) {
         this.id = id;
         this.nome = nome;
         this.icone = icone;
@@ -82,7 +82,7 @@ public enum CpMarcadorGrupoEnum implements IEnumWithId {
     }
 
     public static List<String> getIdList() {
-        List<String> idList = new ArrayList<String>();
+        List<String> idList = new ArrayList<>();
         for (CpMarcadorGrupoEnum i : CpMarcadorGrupoEnum.values()) {
             idList.add((i.id).toString());
         }
@@ -106,6 +106,6 @@ public enum CpMarcadorGrupoEnum implements IEnumWithId {
     }
 
     public static List<CpMarcadorGrupoEnum> disponiveis() {
-        return Arrays.asList(values()).stream().filter(f -> f != QUALQUER && f != NENHUM).collect(Collectors.toList());
+        return Arrays.stream(values()).filter(f -> f != QUALQUER && f != NENHUM).collect(Collectors.toList());
     }
 }

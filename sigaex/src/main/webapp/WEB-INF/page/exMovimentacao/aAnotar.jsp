@@ -15,7 +15,7 @@
 			</script>
 		</c:if>
 
-		<script type="text/javascript" language="Javascript1.1">
+		<script type="text/ecmascript">
 			function sbmt() {
 				frm.action = '${pageContext.request.contextPath}/app/expediente/mov/anotar?id=${doc.idDoc}';
 				frm.submit();
@@ -80,7 +80,7 @@
 	<div class="container-fluid">
 		<div class="card bg-light mb-3">
 			<div class="card-header">
-				<h5>
+				<h5 class="mb-0">
 					Anotação - ${mob.siglaEDescricaoCompleta}
 				</h5>
 			</div>
@@ -92,7 +92,7 @@
 						<div class="col-md-2 col-sm-3">
 							<div class="form-group">
 								<label for="dtMovString">Data</label>
-								<input class="form-control" type="text" name="dtMovString"
+								<input class="form-control" type="text" name="dtMovString" id="dtMovString"
 								value="${dtMovString}" onblur="javascript:verifica_data(this,0);" />
 							</div>
 						</div>
@@ -146,7 +146,7 @@
 							<div class="form-group">
 								<label for="descrMov">Nota</label>
 								<textarea class="form-control" name="descrMov" cols="60" rows="5" onkeydown="corrige();tamanho();" maxlength="500"
-									onblur="tamanho();" onclick="tamanho();">${descrMov}</textarea>
+									onblur="tamanho();" onclick="tamanho();" id="descrMov">${descrMov}</textarea>
 								<small class="form-text text-muted" id="Qtd">Restam&nbsp;500&nbsp;caracteres</small>
 							</div>
 						</div>

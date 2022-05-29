@@ -14,8 +14,12 @@ import br.gov.jfrj.siga.bluc.service.HashRequest;
 import br.gov.jfrj.siga.bluc.service.HashResponse;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
-import br.gov.jfrj.siga.ex.*;
+import br.gov.jfrj.siga.ex.ExArquivo;
+import br.gov.jfrj.siga.ex.ExDocumento;
+import br.gov.jfrj.siga.ex.ExMobil;
+import br.gov.jfrj.siga.ex.ExMovimentacao;
 import br.gov.jfrj.siga.ex.bl.Ex;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import br.gov.jfrj.siga.ex.vo.ExDocumentoVO;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.persistencia.ExMobilDaoFiltro;
@@ -92,10 +96,7 @@ public class ExProcessoAutenticacaoController extends ExController {
             JSONObject body = Hcaptcha.validar(hCaptchaSitePassword, gHcaptchaResponse,
                     request.getRemoteAddr());
 
-            if (body.getBoolean("success")) {
-                String retHostname = body.getString("hostname");
-                success = retHostname.equals(hostname);
-            }
+            success = body.getBoolean("success");
         }
         if (!success) {
             setDefaultResults();
@@ -116,7 +117,7 @@ public class ExProcessoAutenticacaoController extends ExController {
 
             try {
                 Ex.getInstance().getBL().assinarMovimentacao(null, null, mov, dt, assinatura, certificado,
-                        ExTipoMovimentacao.TIPO_MOVIMENTACAO_ASSINATURA_DIGITAL_MOVIMENTACAO);
+                        ExTipoDeMovimentacao.ASSINATURA_DIGITAL_MOVIMENTACAO);
             } catch (final Exception e) {
                 throw new AplicacaoException(e.getMessage());
             }

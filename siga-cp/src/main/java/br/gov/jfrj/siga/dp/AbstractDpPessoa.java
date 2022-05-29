@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -37,6 +37,9 @@ import java.util.Set;
         @NamedQuery(name = "consultarPorIdDpPessoa", query = "select pes from DpPessoa pes where pes.idPessoaIni = :idPessoa"),
         @NamedQuery(name = "consultarPorIdInicialDpPessoa", query = "select pes from DpPessoa pes where pes.idPessoaIni = :idPessoaIni and pes.dataFimPessoa = null"),
         @NamedQuery(name = "consultarPorSiglaDpPessoa", query = "select pes from DpPessoa pes where pes.matricula = :matricula and pes.sesbPessoa = :sesb and pes.dataFimPessoa = null"),
+        @NamedQuery(name = "consultarPorSiglaInclusiveFechadasDpPessoa", query = "select pes from DpPessoa pes where pes.matricula = :matricula and pes.sesbPessoa = :sesb "
+                + " 	and exists (select 1 from DpPessoa pAux where pAux.idPessoaIni = pes.idPessoaIni "
+                + "	 group by pAux.idPessoaIni having max(pAux.dataInicioPessoa) = pes.dataInicioPessoa)"),
         @NamedQuery(name = "consultarPessoaAtualPelaInicial", query = "from DpPessoa pes "
                 + "		where pes.idPessoaIni = :idPessoaIni "
                 + "		and exists (select 1 from DpPessoa pAux where pAux.idPessoaIni = :idPessoaIni"

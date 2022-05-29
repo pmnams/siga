@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  * 
  *     This file is part of SIGA.
@@ -26,6 +26,7 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import br.gov.jfrj.siga.base.util.Utils;
 import org.hibernate.annotations.BatchSize;
 
 import br.gov.jfrj.siga.dp.DpLotacao;
@@ -74,8 +75,7 @@ public class ExPreenchimento extends AbstractExPreenchimento implements
 
 	/**
 	 * Constructor of ExTipoDespacho instances given a simple primary key.
-	 * 
-	 * @param idTpDespacho
+	 *
 	 */
 	public ExPreenchimento(final java.lang.Long idPreenchimento) {
 		super(idPreenchimento);
@@ -91,6 +91,13 @@ public class ExPreenchimento extends AbstractExPreenchimento implements
 				return i;
 		}
 		return this.getIdPreenchimento().compareTo(o.getIdPreenchimento());
+	}
+
+	public String descricaoNaLista(DpLotacao lotCorrente) {
+		if (Utils.equivale(lotCorrente, getDpLotacao()))
+			return getNomePreenchimento();
+		else
+			return (getDpLotacao() != null ? getDpLotacao().getSiglaCompleta() + ": " : "") + getNomePreenchimento();
 	}
 
 }
