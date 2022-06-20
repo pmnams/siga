@@ -3,6 +3,6 @@
 
 # Allow files and directories
 !/target/**
-!/docker
+!/infra/config/base/siga-skel
 
 /docker/swarm
