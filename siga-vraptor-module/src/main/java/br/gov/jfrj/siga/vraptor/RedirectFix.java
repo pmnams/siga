@@ -12,6 +12,8 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Specializes;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @Specializes
 @Dependent
@@ -20,9 +22,11 @@ public class RedirectFix extends DefaultPageResult {
     @Inject
     private HttpServletRequest request;
 
-    /** @deprecated */
+    /**
+     * @deprecated
+     */
     protected RedirectFix() {
-        this((MutableRequest)null, (MutableResponse)null, (MethodInfo)null, (PathResolver)null, (Proxifier)null);
+        this(null, null, null, null, null);
     }
 
     @Inject
@@ -32,14 +36,22 @@ public class RedirectFix extends DefaultPageResult {
     }
 
     @Override
-    public void redirectTo(String url) {
-        if (url.startsWith("/") && !StringUtils.isEmpty(request.getHeader("X-Forwarded-Proto")))
-            url = request.getHeader("X-Forwarded-Proto") + "://" +
-                    request.getHeader("X-Forwarded-Host") + ":" +
-                    request.getHeader("X-Forwarded-Port") +
-                    request.getContextPath() + url;
+    public void redirectTo(final String url) {
+        String proto = StringUtils.defaultIfBlank(request.getHeader("X-Forwarded-Proto"), request.getScheme());
+        String host = StringUtils.defaultIfBlank(request.getHeader("X-Forwarded-Host"), request.getServerName());
+        String port = StringUtils.defaultIfBlank(request.getHeader("X-Forwarded-Port"), String.valueOf(request.getServerPort()));
+        String path = request.getContextPath() + request.getServletPath();
 
-        super.redirectTo(url);
+        String target;
+        try {
+            target = new URI(proto, null, host, Integer.parseInt(port), path, null, null)
+                    .resolve(url)
+                    .toString();
+        } catch (URISyntaxException e) {
+            target = url;
+        }
+
+        super.redirectTo(target);
     }
 
 }
