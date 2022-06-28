@@ -45,7 +45,7 @@ public class RedirectFix extends DefaultPageResult {
         String target;
         try {
             target = new URI(proto, null, host, Integer.parseInt(port), path, null, null)
-                    .resolve(url)
+                    .resolve((url.startsWith("/"))? request.getContextPath() + url : url)
                     .toString();
         } catch (URISyntaxException e) {
             target = url;

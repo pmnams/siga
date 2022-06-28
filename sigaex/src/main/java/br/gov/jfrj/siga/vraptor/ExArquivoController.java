@@ -258,7 +258,6 @@ public class ExArquivoController extends ExController {
         }
     }
 
-
     @Get("/app/arquivo/status/{sigla}/{uuid}/{jwt}/{filename}")
     public void status(String sigla, String uuid, String jwt, String filename) {
         result.include("sigla", sigla);
