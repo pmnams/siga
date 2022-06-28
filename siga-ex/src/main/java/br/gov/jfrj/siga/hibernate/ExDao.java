@@ -632,9 +632,9 @@ public class ExDao extends CpDao {
         }
 
         if (flt.getListaIdDoc() != null && !flt.getListaIdDoc().isEmpty()) {
-            for(int i = 0; i <= flt.getListaIdDoc().size()/1000; i++) {
-                int toIndex =  (i + 1)*1000 > flt.getListaIdDoc().size() ? flt.getListaIdDoc().size() : (i + 1)*1000;
-                query.setParameter("listaIdDoc"+i, flt.getListaIdDoc().subList(i*1000, toIndex));
+            for (int i = 0; i <= flt.getListaIdDoc().size() / 1000; i++) {
+                int toIndex = (i + 1) * 1000 > flt.getListaIdDoc().size() ? flt.getListaIdDoc().size() : (i + 1) * 1000;
+                query.setParameter("listaIdDoc" + i, flt.getListaIdDoc().subList(i * 1000, toIndex));
             }
         }
     }
@@ -889,18 +889,28 @@ public class ExDao extends CpDao {
         return query.getResultList();
     }
 
-    public List consultarPaginaInicial(DpPessoa pes, DpLotacao lot,
-                                       Integer idTipoForma) {
+    public List consultarPaginaInicial(DpPessoa pes, DpLotacao lot, Integer idTipoForma) {
+
+        List listEstadosReduzida = new ArrayList<Object[]>();
+
+        for (Object o : consultarPaginaInicial(pes, lot)) {
+            if (Long.valueOf(idTipoForma) == ((Object[]) o)[8]) {
+                listEstadosReduzida.add(o);
+            }
+        }
+
+        return listEstadosReduzida;
+    }
+
+    public List consultarPaginaInicial(DpPessoa pes, DpLotacao lot) {
         try {
-            Query sql = em().createNamedQuery(
-                    "consultarPaginaInicial");
+            Query sql = em().createNamedQuery("consultarPaginaInicial");
 
             Date dt = super.consultarDataEHoraDoServidor();
             Date amanha = new Date(dt.getTime() + 24 * 60 * 60 * 1000L);
             sql.setParameter("amanha", amanha, TemporalType.DATE);
             sql.setParameter("idPessoaIni", pes.getIdPessoaIni());
             sql.setParameter("idLotacaoIni", lot.getIdLotacaoIni());
-            sql.setParameter("idTipoForma", Long.valueOf(idTipoForma));
 
             List result = sql.getResultList();
 

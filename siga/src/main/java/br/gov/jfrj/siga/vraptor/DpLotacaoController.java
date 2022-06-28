@@ -128,8 +128,11 @@ public class DpLotacaoController extends SigaSelecionavelControllerSupport<DpLot
          * flt.setIdOrgaoUsu(getLotaTitular().getOrgaoUsuario().getIdOrgaoUsu()); else
          * flt.setIdOrgaoUsu(paramInteger("orgaoUsu"));
          */
+
+        String paramBuscarTodosOrgaos = param("buscarTodosOrgaos");
+        boolean buscarTodosOrgaos =  paramBuscarTodosOrgaos != null ? Boolean.valueOf(paramBuscarTodosOrgaos) : false;
         flt.setIdOrgaoUsu(orgaoUsu);
-        if (flt.getIdOrgaoUsu() == null && getLotaTitular() != null) {
+        if (flt.getIdOrgaoUsu() == null && !buscarTodosOrgaos && getLotaTitular() != null ) {
             flt.setIdOrgaoUsu(getLotaTitular().getOrgaoUsuario().getIdOrgaoUsu());
         }
 
@@ -237,8 +240,7 @@ public class DpLotacaoController extends SigaSelecionavelControllerSupport<DpLot
                 paramoffset = 0;
             }
             dpLotacao.setIdOrgaoUsu(idOrgaoUsu);
-            dpLotacao.setNome(Texto.removeAcento(nome));
-            dpLotacao.setSigla(nome);
+            dpLotacao.setNome(nome);
             dpLotacao.setBuscarFechadas(Boolean.TRUE);
             setItens(CpDao.getInstance().consultarPorFiltro(dpLotacao, paramoffset, 15));
             result.include("itens", getItens());

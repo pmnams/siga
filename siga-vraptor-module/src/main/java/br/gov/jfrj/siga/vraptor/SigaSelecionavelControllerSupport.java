@@ -125,7 +125,7 @@ public abstract class SigaSelecionavelControllerSupport<T extends Selecionavel, 
         final DaoFiltroT flt = createDaoFiltro();
 
         // TODO: 07/05/2022 Verificar o processo de fitragem por grupos e selecionáveis 
-        //if ( StringUtils.isNotBlank(sigla) || StringUtils.isNotBlank(nome) ) {
+        //if (!flt.exigeNomeSigla() || (StringUtils.isNotBlank(sigla) || StringUtils.isNotBlank(nome))) {
         if (fCalcularTamanho)
             tamanho = dao().consultarQuantidade(flt);
 

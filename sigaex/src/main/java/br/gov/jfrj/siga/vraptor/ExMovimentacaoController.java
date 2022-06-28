@@ -2986,14 +2986,15 @@ public class ExMovimentacaoController extends ExController {
     public void assina_lote() throws Exception {
         boolean apenasComSolicitacaoDeAssinatura = !Ex.getInstance().getConf().podePorConfiguracao(getTitular(), ExTipoDeConfiguracao.PODE_ASSINAR_SEM_SOLICITACAO);
         final List<ExDocumento> itensComoSubscritor = dao().listarDocPendenteAssinatura(getTitular(), apenasComSolicitacaoDeAssinatura);
-        final List<ExDocumento> itensFinalizados = new ArrayList<ExDocumento>();
+        final List<ExDocumento> itensFinalizados = new ArrayList<>();
 
         for (final ExDocumento doc : itensComoSubscritor) {
 
             if (doc.isFinalizado())
                 itensFinalizados.add(doc);
         }
-        final List<ExDocumento> documentosQuePodemSerAssinadosComSenha = new ArrayList<ExDocumento>();
+        final List<ExDocumento> documentosQuePodemSerAssinadosComSenha = new ArrayList<>();
+        Boolean podeAssinarComCertDigital = false;
 
         for (final ExDocumento exDocumento : itensFinalizados) {
             if (Ex.getInstance()
@@ -3002,10 +3003,19 @@ public class ExMovimentacaoController extends ExController {
                             exDocumento.getMobilGeral())) {
                 documentosQuePodemSerAssinadosComSenha.add(exDocumento);
             }
+
+            if (!podeAssinarComCertDigital && Ex.getInstance()
+                    .getComp()
+                    .pode(ExPodeAssinar.class, getTitular(), getLotaTitular(),
+                            exDocumento.getMobilGeral())) {
+                podeAssinarComCertDigital = true;
+            }
         }
 
         result.include("documentosQuePodemSerAssinadosComSenha",
                 documentosQuePodemSerAssinadosComSenha);
+        result.include("podeAssinarComCertDigital",
+                podeAssinarComCertDigital);
         result.include("itensSolicitados", itensFinalizados);
         result.include("request", getRequest());
     }
@@ -4559,10 +4569,8 @@ public class ExMovimentacaoController extends ExController {
         lot.buscar();
         ListaLotPubl listaLotPubl = getListaLotacaoPublicacao(doc);
 
-        result.include("tipoMateria",
-                PublicacaoDJEBL.obterSugestaoTipoMateria(doc));
-        result.include("cadernoDJEObrigatorio",
-                PublicacaoDJEBL.obterObrigatoriedadeTipoCaderno(doc));
+        result.include("tipoMateria", "A");
+        result.include("cadernoDJEObrigatorio",	true);
         result.include("descrPublicacao",
                 descrPublicacao == null ? doc.getDescrDocumento()
                         : descrPublicacao);

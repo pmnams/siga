@@ -3,6 +3,7 @@ package br.gov.jfrj.siga.ex.logic;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.ExMobil;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import com.crivano.jlogic.*;
 
@@ -69,7 +70,9 @@ public class ExPodeAnexarArquivo extends CompositeExpressionSupport {
 
                         And.of(new ExEMobilGeral(mob), Not.of(new ExEProcesso(mob.doc())))),
 
-                new ExPodeMovimentarPorConfiguracao(ExTipoDeMovimentacao.ANEXACAO, titular,
-                        lotaTitular));
+                new ExPodePorConfiguracao(titular, lotaTitular)
+                        .withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
+                        .withExTpMov(ExTipoDeMovimentacao.ANEXACAO)
+                        .withExMod(mob.doc().getExModelo()));
     }
 }

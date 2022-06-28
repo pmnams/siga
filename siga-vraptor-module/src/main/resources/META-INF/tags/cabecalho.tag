@@ -75,13 +75,13 @@
 
     <c:set var="collapse_Expanded" scope="request" value="collapsible expanded"/>
 
-    <c:set var="siga_version" scope="request" value="1.1.0"/>
+    <c:set var="siga_version" scope="request" value="1.1.1"/>
 
     <meta name="theme-color" content="bg-primary">
     <c:set var="thead_color" value="thead-light" scope="request"/>
 
-    <c:set var="body_color" value="body_color_default" scope="request" />
-    <c:set var="thead_color" value="thead-light" scope="request" />
+    <c:set var="body_color" value="body_color_default" scope="request"/>
+    <c:set var="thead_color" value="thead-light" scope="request"/>
     <c:set var="ico_siga" value="siga.ico"/>
     <c:set var="menu_class" value="bg-primary"/>
     <c:set var="sub_menu_class" value="bg-secondary text-white"/>
@@ -103,7 +103,7 @@
     <c:set var="uri_logo_siga_pequeno"
            value="${f:resource('/siga.external.base.url')}/siga/imagens/logo-siga-140x40.png" scope="request"/>
 
-    <link rel="stylesheet" href="/siga/css/style_siga.css" type="text/css" media="screen, projection">
+    <link rel="stylesheet" href="/siga/css/style_siga.css?v=1647962650" type="text/css" media="screen, projection">
     <link rel="shortcut icon" href="/siga/imagens/${ico_siga}"/>
 
 
@@ -420,7 +420,7 @@
         </c:if>
     </div>
     <script>
-        if('${mensagemConsole}' != '')
+        if ('${mensagemConsole}' != '')
             console.log('${mensagemConsole}');
     </script>
     <div class="row ${mensagemCabec==null?'d-none':''}" id="mensagemCabecId">
@@ -464,4 +464,4 @@
             }
         }
     }
-</script>		
+</script>

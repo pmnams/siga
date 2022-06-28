@@ -265,6 +265,8 @@
         Siga.ajax(url, null, "GET", function(response){
             resposta_ajax_
 
+
+
         ${propriedade}${tipoSel}(response);
 	});	*/
         $.get(url, function (response) {
@@ -312,8 +314,8 @@
                                 value="<c:out value="${requestScope[propriedadeTipoSel].sigla}"/>"
                                 id="formulario_${inputNameTipoSel}_sigla"
                                 onkeypress="return handleEnter(this, event)" ${requiredValue}
-                                onblur="javascript: ajax_${propriedade}${tipoSel}();"
-                                <c:if test="${not empty onblur}">${onblur};</c:if>
+                                onblur="javascript: ajax_${propriedade}${tipoSel}();<c:if
+                                        test="${not empty onblur}">${onblur};</c:if>"
                                 onchange="<c:if test="${not empty onchange}">javascript: ${onchange};</c:if>"
                                 class="form-control" style="width: 1%;" ${disabledTxt} />
     <c:if test="${buscar != 'nao'}">
@@ -375,3 +377,5 @@
         </c:if>
     </script>
 </c:if>
+
+<siga:siga-spinner/>

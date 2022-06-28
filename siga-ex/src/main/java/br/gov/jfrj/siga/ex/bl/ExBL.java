@@ -3626,13 +3626,16 @@ public class ExBL extends CpBL {
         ExConfiguracaoBL confBL = Ex.getInstance().getConf();
         lista = (TreeSet) confBL.getListaPorTipo(ExTipoDeConfiguracao.DEFINICAO_AUTOMATICA_DE_PAPEL);
         if (lista != null) {
-            CpConfiguracao confFiltro = new CpConfiguracao();
+            ExConfiguracao confFiltro = new ExConfiguracao();
             confFiltro.setDpPessoa(doc.getTitular());
             confFiltro.setLotacao(doc.getLotaTitular());
+            confFiltro.setExFormaDocumento(doc.getExFormaDocumento());
+            confFiltro.setExModelo(doc.getExModelo());
             confBL.deduzFiltro(confFiltro);
             Set<Integer> atributosDesconsiderados = new HashSet<>();
             atributosDesconsiderados.add(CpConfiguracaoBL.PESSOA_OBJETO);
             atributosDesconsiderados.add(CpConfiguracaoBL.LOTACAO_OBJETO);
+            atributosDesconsiderados.add(ExConfiguracaoBL.PAPEL);
 
             CpConfiguracaoCache filtroConfiguracaoCache = confFiltro.converterParaCache();
             for (ExConfiguracaoCache conf : lista) {
@@ -4601,7 +4604,7 @@ public class ExBL extends CpBL {
             Pendencias p = mob.calcularTramitesPendentes();
 
             ExMovimentacao recebimento = null;
-            if (p.fIncluirCadastrante && (Utils.equivale(mob.doc().getLotaCadastrante(), lotaTitular)
+            if (p.fIncluirCadastrante && (Utils.equivale(mob.getLotaTitular(), lotaTitular)
                     || Utils.equivale(mob.getTitular(), titular))) {
                 recebimento = null;
             } else {

@@ -1,9 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-         buffer="64kb" %>
+<%@ page pageEncoding="UTF-8" session="false" buffer="64kb" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://localhost/jeetags" prefix="siga" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
+<!DOCTYPE html>
 <siga:pagina titulo="Listar Lota&ccedil;&atilde;o">
     <link rel="stylesheet" href="/siga/javascript/select2/select2.css" type="text/css" media="screen, projection"/>
     <link rel="stylesheet" href="/siga/javascript/select2/select2-bootstrap.css" type="text/css"
@@ -53,7 +53,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label>Nome/sigla</label>
+                                <label>Nome ou Sigla</label>
                                 <input type="text" id="nome" name="nome" value="${nome}" maxlength="100"
                                        class="form-control"/>
                             </div>
@@ -145,7 +145,7 @@
                                         </c:when>
                                         <c:otherwise>
                                             <a href="${urlSuspender}"
-                                               onclick='javascript:atualizarUrl("javascript:submitPost(\"${urlSuspender}\")", "Deseja desfazer a Suspensão da
+                                               onclick='atualizarUrl("javascript:submitPost(\"${urlSuspender}\")", "Deseja desfazer a Suspensão da
                                                    <fmt:message key="usuario.lotacao"/>");return false;'
                                                class="dropdown-item" role="button" aria-pressed="true"
                                                data-siga-modal-abrir="confirmacaoModal" style="min-width: 80px;">Ativar

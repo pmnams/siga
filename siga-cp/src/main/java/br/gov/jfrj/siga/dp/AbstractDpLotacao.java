@@ -62,21 +62,18 @@ import java.util.TreeSet;
         // se sou do TRF2 e buscar "SG", deve retornar apenas T2-SG. Sem a especificação do órgão, retornaria as SGs de todos os órgãos. Se eu sou do TRF2 e
         // prefixar aconsulta com com JFRJSG, deve retornar apenas RJ-SG.
         @NamedQuery(name = "consultarPorFiltroDpLotacao", query = "from DpLotacao lot "
-                + "  where "
-                + "     ( (upper(lot.siglaLotacao) like upper(:sigla || '%') or upper(lot.nomeLotacaoAI) like upper('%' || :nome || '%')) "
-                + "	       and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or lot.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu)"
-                + "          or ( :nome != null and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or lot.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu) and (upper(concat(lot.orgaoUsuario.acronimoOrgaoUsu, lot.siglaLotacao)) like upper(:nome || '%')"
-                + "          or upper(concat(lot.orgaoUsuario.siglaOrgaoUsu, lot.siglaLotacao)) like upper(:nome || '%'))))"
+                + "where ((upper(lot.nomeLotacaoAI) like upper('%' || :nome || '%') or upper(lot.siglaLotacao) like upper('%' || :sigla || '%')) "
+                + " and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or lot.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu)"
+                + " or ( :nome != null and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or lot.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu) and (upper(concat(lot.orgaoUsuario.acronimoOrgaoUsu, lot.siglaLotacao)) like upper(:nome || '%')"
+                + " or upper(concat(lot.orgaoUsuario.siglaOrgaoUsu, lot.siglaLotacao)) like upper(:nome || '%'))))"
                 + "	and lot.dataFimLotacao = null"
-                + "	order by lot.nomeLotacao"),
+                + "	 order by lot.nomeLotacao"),
         @NamedQuery(name = "consultarQuantidadeDpLotacao", query = "select count(lot) from DpLotacao lot "
-                + "  where "
-                + "     ( (upper(lot.siglaLotacao) like upper('%' || :nome || '%') or upper(lot.nomeLotacaoAI) like upper('%' || :nome || '%')) "
-                + "	       and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or lot.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu)"
-                + "          or ( :nome != null and (upper(concat(lot.orgaoUsuario.acronimoOrgaoUsu, lot.siglaLotacao)) like upper(:nome || '%')"
-                + "          or upper(concat(lot.orgaoUsuario.siglaOrgaoUsu, lot.siglaLotacao)) like upper(:nome || '%'))))"
-                + "	and lot.dataFimLotacao = null"
-                + "	order by lot.nomeLotacao"),
+                + " where ((upper(lot.nomeLotacaoAI) like upper('%' || :nome || '%') or upper(lot.siglaLotacao) like upper('%' || :sigla || '%'))"
+                + "	 and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or lot.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu)"
+                + "  or ( :nome != null and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or lot.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu) and (upper(concat(lot.orgaoUsuario.acronimoOrgaoUsu, lot.siglaLotacao)) like upper(:nome || '%')"
+                + "  or upper(concat(lot.orgaoUsuario.siglaOrgaoUsu, lot.siglaLotacao)) like upper(:nome || '%'))))"
+                + "	 and lot.dataFimLotacao = null"),
         @NamedQuery(name = "consultarPorFiltroDpLotacaoInclusiveFechadas", query = "from DpLotacao lotacao"
                 + "  where (:idOrgaoUsu = null or :idOrgaoUsu = 0L or lotacao.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu)"
                 + "		and ((upper(lotacao.nomeLotacaoAI) like upper('%' || :nome || '%')) or (upper(lotacao.siglaLotacao) like upper('%'  || :sigla || '%')))"
@@ -144,7 +141,7 @@ public abstract class AbstractDpLotacao extends DpResponsavel implements
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "lotacaoInicial")
     @Desconsiderar
-    private Set<DpLotacao> lotacoesPosteriores = new TreeSet<DpLotacao>();
+    private Set<DpLotacao> lotacoesPosteriores = new TreeSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_ORGAO_USU", nullable = false)
@@ -153,12 +150,12 @@ public abstract class AbstractDpLotacao extends DpResponsavel implements
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "lotacaoPai")
     @Desconsiderar
-    private Set<DpLotacao> dpLotacaoSubordinadosSet = new TreeSet<DpLotacao>();
+    private Set<DpLotacao> dpLotacaoSubordinadosSet = new TreeSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "lotacao")
     @Where(clause = "DATA_FIM_PESSOA is null")
     @Desconsiderar
-    private Set<DpPessoa> dpPessoaLotadosSet = new TreeSet<DpPessoa>();
+    private Set<DpPessoa> dpPessoaLotadosSet = new TreeSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_TP_LOTACAO")
@@ -217,15 +214,14 @@ public abstract class AbstractDpLotacao extends DpResponsavel implements
      */
     @Override
     public boolean equals(final Object rhs) {
-        if ((rhs == null) || !(rhs instanceof DpLotacao))
+        if (!(rhs instanceof DpLotacao))
             return false;
         final DpLotacao that = (DpLotacao) rhs;
 
         if ((this.getIdLotacao() == null ? that.getIdLotacao() == null : this
                 .getIdLotacao().equals(that.getIdLotacao()))) {
-            if ((this.getNomeLotacao() == null ? that.getNomeLotacao() == null
-                    : this.getNomeLotacao().equals(that.getNomeLotacao())))
-                return true;
+            return this.getNomeLotacao() == null ? that.getNomeLotacao() == null
+                    : this.getNomeLotacao().equals(that.getNomeLotacao());
 
         }
         return false;

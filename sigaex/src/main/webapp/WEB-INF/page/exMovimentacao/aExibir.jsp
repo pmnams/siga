@@ -1,15 +1,14 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-         buffer="64kb" %>
+<%@ page pageEncoding="UTF-8" session="false" buffer="64kb" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://localhost/customtag" prefix="tags" %>
 <%@ taglib uri="http://localhost/jeetags" prefix="siga" %>
 <%@ taglib uri="http://localhost/functiontag" prefix="f" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
+<!DOCTYPE html>
 <siga:pagina titulo="Documento" popup="${popup}"
              compatibilidade="IE=EmulateIE9">
-    <script type="text/javascript" language="Javascript1.1">
+    <script>
         /*  converte para maiúscula a sigla do estado  */
         function converteUsuario(nomeusuario) {
             re = /^[a-zA-Z]{2}\d{3,6}$/;
@@ -65,6 +64,7 @@
                     "/sigaex/app/arquivo/exibir?${mov.exTipoMovimentacao == 'CANCELAMENTO_JUNTADA' ? 'sigla='.concat(mov.exMobilRef.doc.sigla).concat('&'):''}arquivo=${mov.referencia}.pdf",
                     "_blank");
         }
+
 
 
 
@@ -332,6 +332,7 @@
 
             <tags:assinatura_botoes assinar="true"
                                     autenticar="${mov.exTipoMovimentacao == 'ANEXACAO'}"
+                                    assinarCertDigital="${podeAssinarCertDigital}"
 
                                     assinarComSenha="${podeAssinarComSenha and not obrigatorioUtilizarSegundoFatorPin}"
                                     autenticarComSenha="${podeAutenticarComSenha and not obrigatorioUtilizarSegundoFatorPin}"

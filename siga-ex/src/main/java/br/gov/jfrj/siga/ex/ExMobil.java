@@ -47,7 +47,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@SuppressWarnings("serial")
 @Entity
 @BatchSize(size = 500)
 @Table(name = "siga.ex_mobil")
@@ -2320,6 +2319,10 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
     }
 
     public DpPessoa getTitular() {
+        ExMovimentacao desentranhamento = getUltimaMovimentacaoNaoCancelada(ExTipoDeMovimentacao.CANCELAMENTO_JUNTADA);
+        if (desentranhamento != null)
+            return desentranhamento.getCadastrante();
+
         ExMovimentacao criacao = getUltimaMovimentacaoNaoCancelada(ExTipoDeMovimentacao.CRIACAO);
         if (criacao != null)
             return criacao.getCadastrante();
@@ -2328,6 +2331,10 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
     }
 
     public DpLotacao getLotaTitular() {
+        ExMovimentacao desentranhamento = getUltimaMovimentacaoNaoCancelada(ExTipoDeMovimentacao.CANCELAMENTO_JUNTADA);
+        if (desentranhamento != null)
+            return desentranhamento.getLotaCadastrante();
+
         ExMovimentacao criacao = getUltimaMovimentacaoNaoCancelada(ExTipoDeMovimentacao.CRIACAO);
         if (criacao != null)
             return criacao.getLotaCadastrante();
@@ -2447,16 +2454,28 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
         for (ExMovimentacao mov : movs) {
             if (mov.isCancelada())
                 continue;
+
             ITipoDeMovimentacao t = mov.getExTipoMovimentacao();
+
+            // Se encontrar um desentranhamento, simular como se fosse uma via recém criada pelo titular da movimentação
+            if (t == ExTipoDeMovimentacao.CANCELAMENTO_JUNTADA) {
+                p.recebimentosPendentes.clear();
+                p.tramitesPendentes.clear();
+                p.fIncluirCadastrante = true;
+                continue;
+            }
+
             if ((t == ExTipoDeMovimentacao.DESPACHO_TRANSFERENCIA
                     || t == ExTipoDeMovimentacao.TRANSFERENCIA
                     || t == ExTipoDeMovimentacao.TRAMITE_PARALELO
                     || t == ExTipoDeMovimentacao.NOTIFICACAO)) {
                 // Recebimento sem movRef limpa todos os pendentes até agora
-                if (mov.getExMovimentacaoRef() == null || !p.recebimentosPendentes.contains(mov.getExMovimentacaoRef()))
-                    p.recebimentosPendentes.clear();
-                else
-                    p.recebimentosPendentes.remove(mov.getExMovimentacaoRef());
+                if (t == ExTipoDeMovimentacao.DESPACHO_TRANSFERENCIA || t == ExTipoDeMovimentacao.TRANSFERENCIA) {
+                    if (mov.getExMovimentacaoRef() == null || !p.recebimentosPendentes.contains(mov.getExMovimentacaoRef()))
+                        p.recebimentosPendentes.clear();
+                    else
+                        p.recebimentosPendentes.remove(mov.getExMovimentacaoRef());
+                }
                 p.tramitesPendentes.add(mov);
             }
             if (t == ExTipoDeMovimentacao.RECEBIMENTO) {
@@ -2504,7 +2523,7 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
             if (mov.getExMovimentacaoRef() == null)
                 continue;
             if (mov.getExMovimentacaoRef().getExTipoMovimentacao() == ExTipoDeMovimentacao.NOTIFICACAO)
-                p.tramitesDeNotificacoesPendentes.add(mov);
+                p.recebimentosDeNotificacoesPendentes.add(mov);
         }
 
         return p;
