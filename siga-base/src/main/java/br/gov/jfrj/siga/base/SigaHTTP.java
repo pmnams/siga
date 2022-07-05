@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -340,7 +341,7 @@ public class SigaHTTP {
 			System.setProperty("http.keepAlive", "false");
 
 			if (payload != null) {
-				byte ab[] = payload.getBytes("UTF-8");
+				byte[] ab = payload.getBytes(StandardCharsets.UTF_8);
 				conn.setRequestMethod("POST");
 				// Send post request
 				conn.setDoOutput(true);

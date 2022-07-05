@@ -802,8 +802,7 @@ public class CpDao extends ModeloDao {
             else
                 query = em().createNamedQuery("consultarQuantidadeDpLotacaoInclusiveFechadas");
 
-            query.setParameter("sigla", o.getNome() == null ? "" : o.getNome().replace(' ', '%'));
-            query.setParameter("nome", o.getNome() == null ? "" : Texto.removeAcento(o.getNome()).replace(' ', '%'));
+            query.setParameter("nome", o.getNome() != null ? o.getNome().replace(' ', '%') : "%");
 
             if (o.getIdOrgaoUsu() != null)
                 query.setParameter("idOrgaoUsu", o.getIdOrgaoUsu());
