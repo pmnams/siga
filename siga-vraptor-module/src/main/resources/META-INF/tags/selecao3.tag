@@ -119,7 +119,7 @@ var modalsimulawindow${propriedadeClean} = 	function(url) {
 				+	'    <div class="modal-content">'
 				+	'    <div class="modal-header">'
 				+   '           <img src="${uri_logo_siga_pequeno}" class="siga-modal__logo" alt="logo siga">'
-				+	'	        <button type="button" id="btnsenhaDialog${propriedadeClean}" class="close  p-0  m-0  siga-modal__btn-close" aria-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>'				
+				+	'	        <button type="button" id="btnsenhaDialog${propriedadeClean}" class="close  p-3  m-1  siga-modal__btn-close" aria-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>'
 				+   '    </div>'
 				+	'      <div class="modal-body">'
 				+	'	   	   <div class="embed-responsive embed-responsive-16by9">'

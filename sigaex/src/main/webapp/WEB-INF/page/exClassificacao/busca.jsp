@@ -46,7 +46,6 @@
             }
         }
 
-
         function sbmt(offset) {
             if (offset == null) {
                 offset = 0;

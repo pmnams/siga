@@ -802,7 +802,8 @@ public class CpDao extends ModeloDao {
             else
                 query = em().createNamedQuery("consultarQuantidadeDpLotacaoInclusiveFechadas");
 
-            query.setParameter("nome", o.getNome() != null ? o.getNome().replace(' ', '%') : "%");
+            query.setParameter("sigla", o.getNome() == null ? "" : o.getNome().replace(' ', '%'));
+            query.setParameter("nome", o.getNome() == null ? "" : Texto.removeAcento(o.getNome()).replace(' ', '%'));
 
             if (o.getIdOrgaoUsu() != null)
                 query.setParameter("idOrgaoUsu", o.getIdOrgaoUsu());
@@ -825,7 +826,6 @@ public class CpDao extends ModeloDao {
         return consultarPorSigla(o);
     }
 
-    @SuppressWarnings("unchecked")
     public CpGrupo consultarPorSigla(final CpGrupo o) {
         final Query query = em().createNamedQuery("consultarPorSiglaCpGrupo");
         query.setParameter("siglaGrupo", o.getSigla());

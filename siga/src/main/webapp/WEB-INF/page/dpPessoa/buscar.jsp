@@ -51,6 +51,15 @@
             }
         }
 
+        function sbmt(offset) {
+            if (offset == null) {
+                offset = 0;
+            }
+            frm.elements["paramoffset"].value = offset;
+            frm.elements["p.offset"].value = offset;
+            frm.submit();
+        }
+
         $(document).ready(function () {
             frm.onsubmit = submit;
 

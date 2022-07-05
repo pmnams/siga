@@ -44,7 +44,7 @@
    					</div>
    				</c:if>   				
    				<c:if test="${empty botaoFecharNoCabecalho or not botaoFecharNoCabecalho eq 'false'}">
-					<button type="button" class="close  p-0  m-0  siga-modal__btn-close" data-dismiss="modal" aria-label="Close">
+					<button type="button" class="close  p-3  m-1  siga-modal__btn-close" data-dismiss="modal" aria-label="Close">
 		          		<span aria-hidden="true">&times;</span>
 		        	</button>   				    					
 	        	</c:if>			  				       			     
