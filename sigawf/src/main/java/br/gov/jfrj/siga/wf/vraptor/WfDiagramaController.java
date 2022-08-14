@@ -132,8 +132,6 @@ public class WfDiagramaController extends WfSelecionavelController<WfDefinicaoDe
         }
     }
 
-    private HttpServletResponse response;
-    private ServletContext context;
     private WfUtil util;
 
     /**
@@ -147,8 +145,6 @@ public class WfDiagramaController extends WfSelecionavelController<WfDefinicaoDe
     public WfDiagramaController(HttpServletRequest request, Result result, WfDao dao, SigaObjects so, EntityManager em,
                                 HttpServletResponse response, ServletContext context, WfUtil util) {
         super(request, result, dao, so, em);
-        this.response = response;
-        this.context = context;
         this.util = util;
     }
 
@@ -158,10 +154,8 @@ public class WfDiagramaController extends WfSelecionavelController<WfDefinicaoDe
             assertAcesso(VERIFICADOR_ACESSO);
             List<WfDefinicaoDeProcedimento> modelos = dao().listarAtivos(WfDefinicaoDeProcedimento.class, "nome");
             result.include("itens", modelos);
-        } catch (AplicacaoException e) {
+        } catch (Exception e) {
             throw new AplicacaoException(e.getMessage(), 0, e);
-        } catch (Exception ex) {
-            throw new AplicacaoException(ex.getMessage(), 0, ex);
         }
     }
 
@@ -500,6 +494,10 @@ public class WfDiagramaController extends WfSelecionavelController<WfDefinicaoDe
     protected String aBuscar(String sigla, String postback) throws Exception {
         WfDefinicaoDeProcedimentoDaoFiltro flt = new WfDefinicaoDeProcedimentoDaoFiltro();
         flt.setSigla(sigla);
+
+        if (getTitular() != null)
+            flt.setOuDefault(getTitular().getOrgaoUsuario());
+
         WfDao dao = WfDao.getInstance();
         WfDefinicaoDeProcedimento pd = null;
         try {

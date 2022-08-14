@@ -33,7 +33,8 @@ public class ExPodeAssinarMovimentacao extends CompositeExpressionSupport {
 
     @Override
     protected Expression create() {
-        return new ExPodePorConfiguracao(titular, lotaTitular).withExMod(mob.doc().getExModelo())
+        return new ExPodePorConfiguracao(titular, lotaTitular)
+                .withExMod(mob.doc().getExModelo())
                 .withExFormaDoc(mob.doc().getExFormaDocumento()).withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
                 .withExTpMov(ExTipoDeMovimentacao.ASSINATURA_DIGITAL_MOVIMENTACAO);
     }

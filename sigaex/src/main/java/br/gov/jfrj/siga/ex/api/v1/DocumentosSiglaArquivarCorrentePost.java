@@ -14,7 +14,6 @@ public class DocumentosSiglaArquivarCorrentePost implements IDocumentosSiglaArqu
     @Override
     public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception {
         DpPessoa cadastrante = ctx.getCadastrante();
-        DpPessoa titular = cadastrante;
         DpLotacao lotaCadastrante = cadastrante.getLotacao();
         DpLotacao lotaTitular = ctx.getLotaTitular();
 
@@ -22,12 +21,12 @@ public class DocumentosSiglaArquivarCorrentePost implements IDocumentosSiglaArqu
 
         Ex.getInstance().getComp().afirmar(
                 "O documento " + mob.getSigla() + " não pode ser arquivado no corrente por "
-                        + titular.getSiglaCompleta() + "/" + lotaTitular.getSiglaCompleta(),
-                ExPodeArquivarCorrente.class, titular, lotaTitular, mob);
+                        + cadastrante.getSiglaCompleta() + "/" + lotaTitular.getSiglaCompleta(),
+                ExPodeArquivarCorrente.class, cadastrante, lotaTitular, mob);
 
-        ctx.assertAcesso(mob, titular, lotaTitular);
+        ctx.assertAcesso(mob, cadastrante, lotaTitular);
 
-        Ex.getInstance().getBL().arquivarCorrente(cadastrante, lotaCadastrante, mob, null, null, titular, false);
+        Ex.getInstance().getBL().arquivarCorrente(cadastrante, lotaCadastrante, mob, null, null, cadastrante, false);
 
         resp.sigla = mob.doc().getCodigo();
         resp.status = "OK";

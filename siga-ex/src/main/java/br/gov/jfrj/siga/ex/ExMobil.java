@@ -67,16 +67,15 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
 
         ExMovimentacao mov = null;
         ExMovimentacao penMov = null;
-        for (final Object element : movs) {
-            final ExMovimentacao movIterate = (ExMovimentacao) element;
+        for (final ExMovimentacao currentMov : movs) {
 
-            if (movIterate.getExTipoMovimentacao() != ExTipoDeMovimentacao.CANCELAMENTO_DE_MOVIMENTACAO
-                    && movIterate.getExMovimentacaoCanceladora() == null) {
-                if (mov == null && penMov == null) {
-                    mov = movIterate;
+            if (currentMov.getExTipoMovimentacao() != ExTipoDeMovimentacao.CANCELAMENTO_DE_MOVIMENTACAO
+                    && currentMov.getExMovimentacaoCanceladora() == null) {
+                if (mov == null) {
+                    mov = currentMov;
                 } else {
                     penMov = mov;
-                    mov = movIterate;
+                    mov = currentMov;
                 }
             }
         }
@@ -87,7 +86,6 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
      * Retorna as movimentações de um Mobil de acordo com um tipo específico de
      * movimentação.
      *
-     * @param tpMov
      * @return Lista de movimentações de um Mobil de acordo com um tipo
      * específico de movimentação.
      */
@@ -551,6 +549,19 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
         }
     }
 
+    /**
+     * Retorna a sigla denormalizada já calculada do mobil. Se não estiver no banco, calcula e armazena
+     *
+     * @return Sigla do mobil.
+     */
+    public String getDnmSigla() {
+        if (super.getDnmSigla() == null) {
+            setDnmSigla(getSigla());
+            return getSigla();
+        }
+        return super.getDnmSigla();
+    }
+
     /*
      * public Long getId() { if (getExDocumento() == null) return null;
      * ExMovimentacao mov = getExDocumento()
@@ -658,20 +669,26 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
      * Retorna se um móbil mob recebeu alguma movimentação de um dos tipos
      * informados que não tenha sido cancelada e também não tenha sido revertida
      * pela movimentação de reversão do tipo informado.
-     *
-     * @param tpMovs
-     * @param tpMovReversao
-     * @param mob
-     * @return
      */
     public boolean sofreuMov(ITipoDeMovimentacao[] tpMovs, ITipoDeMovimentacao[] tpMovReversao, ExMobil mob) {
-        return getUltimaMovimentacao(tpMovs, tpMovReversao, mob, false, null) != null;
+        return getUltimaMovimentacao(tpMovs, tpMovReversao, mob, false, null, false) != null;
+    }
+
+
+    /**
+     * Retorna a última movimentação não cancelada e que não seja canceladora de outra que o móbil recebeu.
+     * Verifica se já está registrada no mobil, se não estiver obtem das movs
+     *
+     * @return
+     */
+    public ExMovimentacao getUltimaMovimentacaoNaoCanceladaENaoCanceladora() {
+        if (super.getUltimaMovimentacaoNaoCancelada() != null)
+            return super.getUltimaMovimentacaoNaoCancelada();
+        return getUltimaMovimentacao(new ITipoDeMovimentacao[]{}, new ITipoDeMovimentacao[]{}, this, true, null, true);
     }
 
     /**
      * Retorna a última movimentação não cancelada que o móbil recebeu.
-     *
-     * @return
      */
     public ExMovimentacao getUltimaMovimentacaoNaoCancelada() {
         return getUltimaMovimentacaoNaoCancelada(null, null);
@@ -680,9 +697,6 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
     /**
      * Retorna a última movimentação não cancelada de um tipo específico que o
      * móbil recebeu.
-     *
-     * @param tpMov
-     * @return
      */
     public ExMovimentacao getUltimaMovimentacaoNaoCancelada(ITipoDeMovimentacao tpMov) {
         return getUltimaMovimentacaoNaoCancelada(tpMov, null);
@@ -692,25 +706,18 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
      * Retorna a última movimentação não cancelada de um tipo específico que o
      * móbil recebeu e que não tenha sido revertida pela movimentação de
      * reversão do tipo especificado.
-     *
-     * @param tpMov
-     * @param tpMovReversao
-     * @return
      */
     public ExMovimentacao getUltimaMovimentacaoNaoCancelada(ITipoDeMovimentacao tpMov, ITipoDeMovimentacao tpMovReversao) {
-        return getUltimaMovimentacao(tpMov != null ? new ITipoDeMovimentacao[]{tpMov} : new ITipoDeMovimentacao[]{}, tpMovReversao != null ? new ITipoDeMovimentacao[]{tpMovReversao} : new ITipoDeMovimentacao[]{}, this, false, null);
+        return getUltimaMovimentacao(tpMov != null ? new ITipoDeMovimentacao[]{tpMov} : new ITipoDeMovimentacao[]{}, tpMovReversao != null ? new ITipoDeMovimentacao[]{tpMovReversao} : new ITipoDeMovimentacao[]{}, this, false, null, false);
     }
 
     /**
      * Retorna a última movimentação não cancelada que o móbil recebeu, com base
      * nas informações constantes na movimentação informada como parâmetro.
-     *
-     * @param movParam
-     * @return
      */
     public ExMovimentacao getUltimaMovimentacaoNaoCancelada(ExMovimentacao movParam) {
         return getUltimaMovimentacao(new ITipoDeMovimentacao[]{movParam.getExTipoMovimentacao()}, new ITipoDeMovimentacao[]{},
-                this, false, movParam.getDtMov());
+                this, false, movParam.getDtMov(), false);
     }
 
     /**
@@ -719,17 +726,14 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
      * @return Última movimentação de um Mobil.
      */
     public ExMovimentacao getUltimaMovimentacao() {
-        return getUltimaMovimentacao(new ITipoDeMovimentacao[]{}, new ITipoDeMovimentacao[]{}, this, true, null);
+        return getUltimaMovimentacao(new ITipoDeMovimentacao[]{}, new ITipoDeMovimentacao[]{}, this, true, null, false);
     }
 
     /**
      * Retorna a última movimentação de um tipo específico que o móbil recebeu.
-     *
-     * @param tpMov
-     * @return
      */
     public ExMovimentacao getUltimaMovimentacao(ITipoDeMovimentacao tpMov) {
-        return getUltimaMovimentacao(new ITipoDeMovimentacao[]{tpMov}, new ITipoDeMovimentacao[]{}, this, true, null);
+        return getUltimaMovimentacao(new ITipoDeMovimentacao[]{tpMov}, new ITipoDeMovimentacao[]{}, this, true, null, false);
     }
 
     /**
@@ -737,15 +741,9 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
      * permitirCancelada) que o móbil mob recebeu e que seja de um dos tpMovs
      * informados, que não tenha sido revertida por uma movimentação do
      * tpMovReversao e que tenha ocorrido na data dt
-     *
-     * @param tpMovs
-     * @param mob
-     * @param permitirCancelada
-     * @param dt
-     * @return
      */
     public ExMovimentacao getUltimaMovimentacao(ITipoDeMovimentacao[] tpMovs, ITipoDeMovimentacao[] tpMovsReversao, ExMobil mob,
-                                                boolean permitirCancelada, Date dt) {
+                                                boolean permitirCancelada, Date dt, boolean permitirCanceladora) {
 
         if (mob == null)
             return null;
@@ -756,7 +754,8 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
 
         ExMovimentacao movReturn = null;
         for (ExMovimentacao mov : movSet) {
-            if (!permitirCancelada && (mov.isCancelada() || mov.isCanceladora()))
+            if ((!permitirCancelada && mov.isCancelada())
+                    || (!permitirCanceladora && mov.isCanceladora()))
                 continue;
 
             if (tpMovs.length == 0)
@@ -765,7 +764,7 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
                 for (ITipoDeMovimentacao t : tpMovs)
                     if (mov.getExTipoMovimentacao() == t)
 
-                        if (dt == null || (dt != null && mov.getDtMov().equals(dt))) {
+                        if (dt == null || (mov.getDtMov().equals(dt))) {
                             movReturn = mov;
                             break;
                         }
@@ -895,8 +894,6 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
 
     /**
      * Retorna se o móbil sofreu movimentação de eliminação.
-     *
-     * @return
      */
     public boolean isEliminado() {
 
@@ -1317,8 +1314,6 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
     /**
      * Retorna, num Set, os móbiles que tenham sido referenciados a este móbil
      * ou vice-versa.
-     *
-     * @return
      */
     public Set<ExMobil> getVinculados() {
         Set<ExMobil> set = new LinkedHashSet<ExMobil>();
@@ -2319,10 +2314,6 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
     }
 
     public DpPessoa getTitular() {
-        ExMovimentacao desentranhamento = getUltimaMovimentacaoNaoCancelada(ExTipoDeMovimentacao.CANCELAMENTO_JUNTADA);
-        if (desentranhamento != null)
-            return desentranhamento.getCadastrante();
-
         ExMovimentacao criacao = getUltimaMovimentacaoNaoCancelada(ExTipoDeMovimentacao.CRIACAO);
         if (criacao != null)
             return criacao.getCadastrante();
@@ -2331,10 +2322,6 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
     }
 
     public DpLotacao getLotaTitular() {
-        ExMovimentacao desentranhamento = getUltimaMovimentacaoNaoCancelada(ExTipoDeMovimentacao.CANCELAMENTO_JUNTADA);
-        if (desentranhamento != null)
-            return desentranhamento.getLotaCadastrante();
-
         ExMovimentacao criacao = getUltimaMovimentacaoNaoCancelada(ExTipoDeMovimentacao.CRIACAO);
         if (criacao != null)
             return criacao.getLotaCadastrante();
@@ -2408,7 +2395,6 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
 
     public Pendencias calcularTramitesPendentes() {
         SortedSet<ExMovimentacao> movs = new TreeSet<>();
-        ;
         if (isVolume()) {
             ExMobil mob = this;
 
@@ -2454,16 +2440,7 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
         for (ExMovimentacao mov : movs) {
             if (mov.isCancelada())
                 continue;
-
             ITipoDeMovimentacao t = mov.getExTipoMovimentacao();
-
-            // Se encontrar um desentranhamento, simular como se fosse uma via recém criada pelo titular da movimentação
-            if (t == ExTipoDeMovimentacao.CANCELAMENTO_JUNTADA) {
-                p.recebimentosPendentes.clear();
-                p.tramitesPendentes.clear();
-                p.fIncluirCadastrante = true;
-                continue;
-            }
 
             if ((t == ExTipoDeMovimentacao.DESPACHO_TRANSFERENCIA
                     || t == ExTipoDeMovimentacao.TRANSFERENCIA
@@ -2551,6 +2528,7 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
         for (ExMovimentacao m : movs) {
             if (m.getExMovimentacaoCanceladora() != null)
                 continue;
+
             for (ExMovimentacao m2 : movs) {
                 long mResp = (m.getResp() != null ? m.getResp().getId() : 0);
                 long m2Resp = (m2.getResp() != null ? m2.getResp().getId() : 0);
@@ -2580,5 +2558,4 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
         }
         return set;
     }
-
 }

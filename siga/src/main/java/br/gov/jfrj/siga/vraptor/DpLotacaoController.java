@@ -130,9 +130,9 @@ public class DpLotacaoController extends SigaSelecionavelControllerSupport<DpLot
          */
 
         String paramBuscarTodosOrgaos = param("buscarTodosOrgaos");
-        boolean buscarTodosOrgaos =  paramBuscarTodosOrgaos != null ? Boolean.valueOf(paramBuscarTodosOrgaos) : false;
+        boolean buscarTodosOrgaos = paramBuscarTodosOrgaos != null ? Boolean.valueOf(paramBuscarTodosOrgaos) : false;
         flt.setIdOrgaoUsu(orgaoUsu);
-        if (flt.getIdOrgaoUsu() == null && !buscarTodosOrgaos && getLotaTitular() != null ) {
+        if (flt.getIdOrgaoUsu() == null && !buscarTodosOrgaos && getLotaTitular() != null) {
             flt.setIdOrgaoUsu(getLotaTitular().getOrgaoUsuario().getIdOrgaoUsu());
         }
 

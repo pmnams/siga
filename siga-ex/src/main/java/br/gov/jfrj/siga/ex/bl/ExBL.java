@@ -1618,6 +1618,11 @@ public class ExBL extends CpBL {
         try {
             if (doc.isAssinadoPorTodosOsSignatariosComTokenOuSenha())
                 removerPapel(doc, ExPapel.PAPEL_REVISOR);
+
+            if (podeExibirArvoreDocsCossigRespAss(cadastrante, lotaCadastrante)
+                    && doc.isFinalizado() && doc.isAssinadoDigitalmente() && possuiAssinaturaCossigRespAssHoje(doc)) {
+                removerDnmAcessoTempArvoreDocsCossigRespAssDepoisAssinar(cadastrante, lotaCadastrante, doc);
+            }
         } catch (final Exception e) {
             throw new RuntimeException("Erro ao remover revisores: " + e.getLocalizedMessage(), e);
         }
@@ -2411,6 +2416,10 @@ public class ExBL extends CpBL {
                 mov.setLotaResp(mob.getExDocumento().getLotaTitular());
             }
 
+            if (podeExibirArvoreDocsCossigRespAss(cadastrante, lotaCadastrante)) {
+                tratarFluxoDesentrDesfJuntadaArvoreDocsCossigRespAss(mob, cadastrante, lotaCadastrante);
+            }
+
             gravarMovimentacao(mov);
 
             concluirAlteracaoComRecalculoAcesso(mov);
@@ -2608,7 +2617,17 @@ public class ExBL extends CpBL {
                     mov.setExClassificacao(null);
                 }
 
+                if (ExTipoDeMovimentacao.JUNTADA.equals(ultMovNaoCancelada.getExTipoMovimentacao())) {
+                    if (podeExibirArvoreDocsCossigRespAss(cadastrante, lotaCadastrante))
+                        tratarFluxoDesentrDesfJuntadaArvoreDocsCossigRespAss(mob, cadastrante, lotaCadastrante);
+                }
+
                 gravarMovimentacaoCancelamento(mov, ultMovNaoCancelada);
+
+                if (ExTipoDeMovimentacao.CANCELAMENTO_JUNTADA.equals(ultMovNaoCancelada.getExTipoMovimentacao())) {
+                    if (podeExibirArvoreDocsCossigRespAss(cadastrante, lotaCadastrante))
+                        tratarFluxoJuntarArvoreDocsCossigRespAss(mob, cadastrante, lotaCadastrante);
+                }
 
                 if (ultMovNaoCancelada.getExTipoMovimentacao()
                         == ExTipoDeMovimentacao.ANOTACAO) {
@@ -2757,6 +2776,9 @@ public class ExBL extends CpBL {
             mob.setExTipoMobil(dao().consultar(ExTipoMobil.TIPO_MOBIL_VIA, ExTipoMobil.class, false));
             mob.setNumSequencia(numSequencia);
             mob.setExDocumento(doc);
+            mob.setDnmSigla(mob.getSigla());
+            if (!Objects.equals(doc.getMobilGeral().getDnmSigla(), doc.getSigla()))
+                doc.getMobilGeral().setDnmSigla(doc.getSigla());
             doc.getExMobilSet().add(mob);
             mob = dao().gravar(mob);
 
@@ -2849,7 +2871,6 @@ public class ExBL extends CpBL {
     public void excluirMovimentacao(DpPessoa cadastrante, final DpLotacao lotaCadastrante, ExMobil mob, Long idMov) {
         try {
             iniciarAlteracao();
-
             final ExMovimentacao mov = dao().consultar(idMov, ExMovimentacao.class, false);
 
             if (mov != null && !ExTipoDeMovimentacao.listaTipoMovimentacoesExcluiveisFisicamente().contains(mov.getExTipoMovimentacao())) {
@@ -2858,22 +2879,33 @@ public class ExBL extends CpBL {
 
             // ExTipoDeMovimentacao.ANEXACAO
             // movDao.excluir(mov);
+            ExMobil mobil = mov.getExMobil();
             excluirMovimentacao(mov);
+            ExMovimentacao ultMov = mobil
+                    .getUltimaMovimentacao(new ITipoDeMovimentacao[] {},
+                            new ITipoDeMovimentacao[] {}, mobil, false, null, false);
+            mobil.setUltimaMovimentacaoNaoCancelada(ultMov);
+            mobil.setDnmDataUltimaMovimentacaoNaoCancelada(ultMov.getDtIniMov());
+
             if (mob.doc().isPendenteDeAssinatura()
                     && ((mob.doc().isFisico() && !mob.doc().isFinalizado()) || (mob.doc().isEletronico()
                     && mob.doc().getAssinaturasEAutenticacoesComTokenOuSenhaERegistros().isEmpty()))) {
                 processar(mob.getExDocumento(), true, false);
                 // mob.getExDocumento().armazenar();
+                if (podeExibirArvoreDocsCossigRespAss(cadastrante, lotaCadastrante)
+                        && ExTipoDeMovimentacao.INCLUSAO_DE_COSIGNATARIO.equals(mov.getExTipoMovimentacao())) {
+                    StringBuffer descrMov = new StringBuffer("Remoção de Cossignatário ou Responsável pela Assinatura concluída:");
+                    List<ExDocumento> listaViasDocPai = mob.doc().getTodosOsPaisDasViasCossigRespAss();
+                    removerDnmAcessoTempArvoreDocsCossigRespAss(cadastrante, mob.doc(), listaViasDocPai, Arrays.asList(mov.getSubscritor()), descrMov);
+                }
             }
             concluirAlteracao(mov);
-
         } catch (final Exception e) {
             cancelarAlteracao();
             throw new RuntimeException("Erro ao excluir movimentação.", e);
         }
     }
 
-    @SuppressWarnings("unchecked")
     public String finalizar(final DpPessoa cadastrante, final DpLotacao lotaCadastrante, ExDocumento doc)
             throws AplicacaoException {
 
@@ -2997,6 +3029,10 @@ public class ExBL extends CpBL {
             }
 
             concluirAlteracaoDocComRecalculoAcesso(doc);
+            if (podeExibirArvoreDocsCossigRespAss(cadastrante, lotaCadastrante)
+                    && doc.isFinalizado() && possuiInclusaoCossigRespAss(doc)) {
+                incluirDnmAcessoTempArvoreDocsCossigRespAss(cadastrante, lotaCadastrante, doc, doc.getTodosOsPaisDasViasCossigRespAss());
+            }
 
             if (setVias == null || setVias.size() == 0)
                 criarVia(cadastrante, lotaCadastrante, doc, null);
@@ -3134,6 +3170,9 @@ public class ExBL extends CpBL {
             mob.setExTipoMobil(dao().consultar(ExTipoMobil.TIPO_MOBIL_VOLUME, ExTipoMobil.class, false));
             mob.setNumSequencia((int) dao().obterProximoNumeroVolume(doc));
             mob.setExDocumento(doc);
+            mob.setDnmSigla(mob.getSigla());
+            if (!Objects.equals(doc.getMobilGeral().getDnmSigla(), doc.getSigla()))
+                doc.getMobilGeral().setDnmSigla(doc.getSigla());
             doc.getExMobilSet().add(mob);
             mob = dao().gravar(mob);
 
@@ -3259,11 +3298,17 @@ public class ExBL extends CpBL {
             return false;
         if (doc.getExNivelAcessoAtual() == null)
             return false;
-        if (doc.getExNivelAcessoAtual().getGrauNivelAcesso() > ExNivelAcesso.NIVEL_ACESSO_ENTRE_ORGAOS
-                || (doc.getExNivelAcessoAtual().getGrauNivelAcesso() == ExNivelAcesso.NIVEL_ACESSO_ENTRE_ORGAOS && doc
+        if (doc.getExNivelAcessoAtual().getGrauNivelAcesso() > ExNivelAcesso.NIVEL_ACESSO_ENTRE_ORGAOS)
+            return true;
+        if (doc.getOrgaoUsuario() == null)
+            return false;
+        if (lotaTitular == null)
+            return false;
+        if (lotaTitular.getOrgaoUsuario() == null)
+            return false;
+        if (doc.getExNivelAcessoAtual().getGrauNivelAcesso() == ExNivelAcesso.NIVEL_ACESSO_ENTRE_ORGAOS && doc
                 .getOrgaoUsuario().getIdOrgaoUsu() != lotaTitular
-                .getOrgaoUsuario().getIdOrgaoUsu()))
-
+                .getOrgaoUsuario().getIdOrgaoUsu())
             return true;
         return false;
     }
@@ -3445,6 +3490,9 @@ public class ExBL extends CpBL {
                     doc.getMobilGeral().getExMovimentacaoSet().remove(mov);
                     dao().excluir(mov);
                 }
+
+                if (doc.getMobilGeral().getDnmSigla() == null)
+                    doc.getMobilGeral().setDnmSigla(doc.getSigla());
             }
 
             // a estrutura try catch abaixo foi colocada de modo a impedir que
@@ -3689,6 +3737,11 @@ public class ExBL extends CpBL {
         ExMovimentacao movCancelamento = null;
         List<ExMovimentacao> movs = doc.getMobilGeral()
                 .getMovimentacoesPorTipo(ExTipoDeMovimentacao.VINCULACAO_PAPEL, false);
+        removerPapel(doc, movs, idPapel, null, null);
+    }
+
+    private void removerPapel(ExDocumento doc, List<ExMovimentacao> movs, long idPapel, DpPessoa cadastrante, String descrMov) throws Exception {
+        ExMovimentacao movCancelamento = null;
         boolean removido = false;
         for (ExMovimentacao mov : movs) {
             if (mov.isCancelada() || !mov.getExPapel().getIdPapel().equals(idPapel))
@@ -3696,8 +3749,9 @@ public class ExBL extends CpBL {
             if (movCancelamento == null) {
                 Date dt = dao().consultarDataEHoraDoServidor();
                 movCancelamento = criarNovaMovimentacao(
-                        ExTipoDeMovimentacao.CANCELAMENTO_DE_MOVIMENTACAO, null, null,
+                        ExTipoDeMovimentacao.CANCELAMENTO_DE_MOVIMENTACAO, cadastrante, null,
                         doc.getMobilGeral(), dt, null, null, null, null, null);
+                movCancelamento.setDescrMov(descrMov);
                 movCancelamento.setExMovimentacaoRef(mov);
             }
             gravarMovimentacaoCancelamento(movCancelamento, mov);
@@ -3705,6 +3759,17 @@ public class ExBL extends CpBL {
         }
         if (removido)
             concluirAlteracaoDocComRecalculoAcesso(doc);
+    }
+
+    private List<ExMovimentacao> getMovsCossigRespAssPorDocOrigem(List<ExMovimentacao> movs, DpPessoa subscritor, ExMobil mobRefMov) {
+        List<ExMovimentacao> movsPessoa = new ArrayList<ExMovimentacao>();
+        for (ExMovimentacao mov : movs) {
+            if (!mov.isCancelada() && mov.getSubscritor().equivale(subscritor)
+                    && mov.getExMobilRef().equals(mobRefMov)) {
+                movsPessoa.add(mov);
+            }
+        }
+        return movsPessoa;
     }
 
     private void processarResumo(ExDocumento doc) throws Exception, UnsupportedEncodingException {
@@ -3774,6 +3839,176 @@ public class ExBL extends CpBL {
         }
     }
 
+    private boolean possuiInclusaoCossigRespAss(ExDocumento doc) {
+        return !doc.getListaCossigRespAssDiffCadastranteDoc().isEmpty();
+    }
+
+    private boolean possuiAssinaturaCossigRespAssHoje(ExDocumento doc) {
+        return !doc.getListaCossigRespAssDocHoje().isEmpty() ? Boolean.TRUE : Boolean.FALSE;
+    }
+
+    private boolean podeExibirArvoreDocsCossigRespAss(DpPessoa cadastrante, DpLotacao lotaCadastrante) {
+        return Ex.getInstance().getConf().podePorConfiguracao(
+                cadastrante, lotaCadastrante, ExTipoDeConfiguracao.EXIBIR_ARVORE_DOCS_SUBSCRITOR_COSSIGNATARIO);
+    }
+
+    private boolean podeAddMovVinculPapelCossigRespAss(ExDocumento docOrigem, ExDocumento docPai, DpPessoa dpPessoaResp) {
+        //Valida se for usuario externo
+        boolean podeAddMov = dpPessoaResp.isUsuarioExterno() ? Boolean.FALSE : Boolean.TRUE;
+        if (podeAddMov) {
+            //Valida se pessoa ja possui vinculo de Papel Cossig Resp Ass
+            podeAddMov = docPai.possuiVinculPapelRevisorCossigRespAss(dpPessoaResp, docOrigem.getMobilGeral()) ? Boolean.FALSE : Boolean.TRUE;
+        }
+        return podeAddMov;
+    }
+
+    private void incluirDnmAcessoTempArvoreDocsCossigRespAss(
+            DpPessoa cadastrante, DpLotacao lotaCadastrante, ExDocumento docOrigem, List<ExDocumento> listaViasDocPai) {
+        Date dt = ExDao.getInstance().dt();
+        //obter lista cossig/resp ass diferente do user cadastrante doc origem
+        List<DpPessoa> listaCossigDoc = docOrigem.getListaCossigRespAssDiffCadastranteDoc();
+        ExPapel exPapel = dao().consultar(ExPapel.PAPEL_COSSIGNATARIO_RESP_ASSINATURA, ExPapel.class, false);
+
+        for (ExDocumento docPai : listaViasDocPai) {
+            for (DpPessoa dpPessoaResp : listaCossigDoc) {
+                if (podeAddMovVinculPapelCossigRespAss(docOrigem, docPai, dpPessoaResp)) {
+                    StringBuffer descrMov = new StringBuffer("Inclusão de Cossignatário ou Responsável pela Assinatura:")
+                            .append(dpPessoaResp.getDescricaoIniciaisMaiusculas())
+                            .append(" - DOC ORIGEM:").append(docOrigem.getCodigo());
+                    vincularPapel(docOrigem.getCadastrante(), docOrigem.getLotaCadastrante(), docPai.getMobilGeral(), dt,
+                            dpPessoaResp.getLotacao(), dpPessoaResp, null, null, descrMov.toString(), null, exPapel, docOrigem.getMobilGeral());
+                }
+            }
+        }
+    }
+
+    private void removerDnmAcessoTempArvoreDocsCossigRespAssDepoisAssinar(DpPessoa cadastrante, DpLotacao lotaCadastrante, ExDocumento doc) throws Exception {
+        //obter lista de Cossig/Resp ass que assinaram doc hoje
+        List<DpPessoa> listaSubscrCancelMovPapel = doc.getListaCossigRespAssDocHoje();
+        StringBuffer descrMov = new StringBuffer("Assinatura de Cossignatário ou Responsável pela Assinatura concluída:");
+        //obter Vias do doc pai
+        List<ExDocumento> listaViasDocPai = doc.getTodosOsPaisDasViasCossigRespAss();
+        removerDnmAcessoTempArvoreDocsCossigRespAss(cadastrante, doc, listaViasDocPai, listaSubscrCancelMovPapel, descrMov);
+    }
+
+    private void removerDnmAcessoTempArvoreDocsCossigRespAss(DpPessoa cadastrante,
+                                                             ExDocumento docOrigem, List<ExDocumento> listaViasDocPai, List<DpPessoa> listaSubscritor, StringBuffer descrMov) throws Exception {
+        if (!listaSubscritor.isEmpty()) {
+            //obter movs de inclusao de Papel cossig ou resp assinatura doc Pai
+            List<ExMovimentacao> movsPai = listaViasDocPai.iterator().next().getMovsVinculacaoPapelCossigRespAssinatura();
+            //obter movs do pai que possam movs de inclusao de Papel cossig ou resp
+            List<ExMovimentacao> movsCossigResp = obterMovsPaiComCossigRespAssDocsFilhos(movsPai, Arrays.asList(docOrigem));
+            String codDocOrigem = docOrigem.getCodigo();
+            //Remover de todas as vias doc pai
+            for (ExDocumento docPai : listaViasDocPai) {
+                for (DpPessoa subscritor : listaSubscritor) {
+                    descrMov.append(subscritor.getDescricaoIniciaisMaiusculas()).append(" - DOC ORIGEM:").append(codDocOrigem);
+                    List<ExMovimentacao> movsPersist = getMovsCossigRespAssPorDocOrigem(movsCossigResp, subscritor, docOrigem.getMobilGeral());
+                    removerPapel(docPai, movsPersist, ExPapel.PAPEL_COSSIGNATARIO_RESP_ASSINATURA, cadastrante, descrMov.toString());
+                }
+            }
+
+        }
+    }
+
+    private void tratarFluxoJuntarArvoreDocsCossigRespAss(ExMobil mob, DpPessoa cadastrante, DpLotacao lotaCadastrante) throws Exception {
+        ExDocumento docAtual = mob.doc();
+        //obter Vias do doc pai
+        List<ExDocumento> viasDocPai = docAtual.getTodosOsPaisDasViasCossigRespAss();
+        //obter movs de inclusao de Papel cossig ou resp assinatura doc Pai
+        List<ExMovimentacao> movsCossigResp = docAtual.getMovsVinculacaoPapelCossigRespAssinatura();
+
+        if (!viasDocPai.isEmpty() && movsCossigResp.iterator().hasNext()) {
+            Date dt = ExDao.getInstance().dt();
+            ExPapel exPapel = dao().consultar(ExPapel.PAPEL_COSSIGNATARIO_RESP_ASSINATURA, ExPapel.class, false);
+            for (ExMovimentacao movCossig : movsCossigResp) {
+                DpPessoa subscritorTemp = movCossig.getSubscritor();
+                ExMobil mobRefMov = movCossig.getExMobilRef();
+                String codDocOrigemTemp = mobRefMov.getDoc().getCodigo();
+                //Cria Descricoes Movs Remocao e Inclusao
+                String descrMovRemocao = getDescricaoMovPapelMontada("Juntada", docAtual, subscritorTemp, codDocOrigemTemp, "Remoção");
+                String descrMovInsercao = getDescricaoMovPapelMontada("Juntada", docAtual, subscritorTemp, codDocOrigemTemp, "Inclusão");
+                //Movimentos de Cossig/Resp Assinatura Por Doc de Origem
+                List<ExMovimentacao> movsPersist = getMovsCossigRespAssPorDocOrigem(
+                        Arrays.asList(movCossig), subscritorTemp, mobRefMov);
+                for (ExDocumento docVia : viasDocPai) {
+                    //Remove papel do docAtual
+                    removerPapel(docAtual, movsPersist, ExPapel.PAPEL_COSSIGNATARIO_RESP_ASSINATURA, cadastrante, descrMovRemocao.toString());
+                    //Inclui papel das vias do novo docPai
+                    vincularPapel(cadastrante, lotaCadastrante, docVia.getMobilGeral(), dt,
+                            subscritorTemp.getLotacao(), subscritorTemp, null, null,
+                            descrMovInsercao.toString(), null, exPapel, mobRefMov);
+                }
+            }
+        }
+    }
+
+    private void tratarFluxoDesentrDesfJuntadaArvoreDocsCossigRespAss(ExMobil mob, DpPessoa cadastrante, DpLotacao lotaCadastrante) throws Exception {
+        ExDocumento docAtual = mob.doc();
+        List<ExDocumento> viasDocPai = docAtual.getTodosOsPaisDasViasCossigRespAss();
+
+        if (!viasDocPai.isEmpty()) {
+            //Movimentacoes de inclusao de Papel cossig ou resp assinatura doc Pai
+            List<ExMovimentacao> movsPaiTemp = viasDocPai.iterator().next().getMovsVinculacaoPapelCossigRespAssinatura();
+            if (movsPaiTemp.iterator().hasNext()) {
+                //Obtem Movs Cossig/Resp Ass validos para Desentranhamento/Desfazer Juntada
+                List<ExMovimentacao> movsCossigResp = obterMovsCossigRespAssValidosDesentrDesfJuntada(mob, movsPaiTemp);
+                Date dt = ExDao.getInstance().dt();
+                ExPapel exPapel = dao().consultar(ExPapel.PAPEL_COSSIGNATARIO_RESP_ASSINATURA, ExPapel.class, false);
+                for (ExMovimentacao movCossig : movsCossigResp) {
+                    DpPessoa subscritorTemp = movCossig.getSubscritor();
+                    ExMobil mobRefMov = movCossig.getExMobilRef();
+                    String codDocOrigemTemp = mobRefMov.getDoc().getCodigo();
+
+                    //Cria Descricoes Movs Remocao e Inclusao
+                    String descrMovRemocao = getDescricaoMovPapelMontada("Desentranhamento", docAtual, subscritorTemp, codDocOrigemTemp, "Remoção");
+                    String descrMovInsercao = getDescricaoMovPapelMontada("Desentranhamento", docAtual, subscritorTemp, codDocOrigemTemp, "Inclusão");
+                    //Movimentos de Cossig/Resp Assinatura Por Doc de Origem
+                    List<ExMovimentacao> movsPersist = getMovsCossigRespAssPorDocOrigem(
+                            Arrays.asList(movCossig), subscritorTemp, mobRefMov);
+                    for (ExDocumento docVia : viasDocPai) {
+                        //Remove papel das vias do docPai
+                        removerPapel(docVia, movsPersist, ExPapel.PAPEL_COSSIGNATARIO_RESP_ASSINATURA, cadastrante, descrMovRemocao);
+                        //Inclui papel das vias do novo docPai
+                        vincularPapel(cadastrante, lotaCadastrante, docAtual.getMobilGeral(), dt,
+                                subscritorTemp.getLotacao(), subscritorTemp, null, null,
+                                descrMovInsercao, null, exPapel, mobRefMov);
+                    }
+                }
+            }
+        }
+    }
+
+    private List<ExMovimentacao> obterMovsCossigRespAssValidosDesentrDesfJuntada(ExMobil mob, List<ExMovimentacao> movsPai) {
+        // Achar todos docs filhos do Doc que foi Desentranhado
+        List<ExDocumento> listaMobilsFilhos = new ArrayList<>(mob.doc().getTodosDocumentosFilhosSet());
+        return obterMovsPaiComCossigRespAssDocsFilhos(movsPai, listaMobilsFilhos);
+    }
+
+    private List<ExMovimentacao> obterMovsPaiComCossigRespAssDocsFilhos(List<ExMovimentacao> movsPai, List<ExDocumento> docsFilhosCossigResp) {
+        List<ExMovimentacao> listaMovCossigResp = new ArrayList<>();
+        for (ExMovimentacao movPai : movsPai) {
+            // Obter Codigo do Doc persistido no campo ObsOrgao
+            ExMobil docVia = movPai.getExMobilRef();
+            if (docVia != null) {
+                for (ExDocumento exDoc : docsFilhosCossigResp) {
+                    if (docVia.doc().getCodigo().equals(exDoc.getCodigo()))
+                        listaMovCossigResp.add(movPai);
+                }
+            }
+        }
+        return listaMovCossigResp.stream().distinct().collect(Collectors.toList());
+    }
+
+    private String getDescricaoMovPapelMontada(String tituloDesc, ExDocumento docAtual, DpPessoa substritor, String codDocOrigem, String nomeMov) {
+        StringBuffer descrMovInsercao = new StringBuffer(tituloDesc).append(" de Documento:")
+                .append(docAtual)
+                .append(" - ").append(nomeMov).append(" de Cossignatário ou Responsável pela Assinatura:")
+                .append(substritor.getDescricaoIniciaisMaiusculas()).append(" - DOC ORIGEM:")
+                .append(codDocOrigem);
+        return descrMovInsercao.toString();
+    }
+
     public void bCorrigirDataFimMov(final ExMovimentacao mov) throws Exception {
         try {
             iniciarAlteracao();
@@ -3821,10 +4056,10 @@ public class ExBL extends CpBL {
         // ExDao.getInstance().gravar(ultMov);
         // }
 
-        if (!SigaMessages.isSigaSP() && mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.ANEXACAO_DE_ARQUIVO_AUXILIAR) {
-            mov.setNumPaginas(mov.getContarNumeroDePaginas());
-        } else {
+        if (SigaMessages.isSigaSP()) {
             mov.setNumPaginas(mov.getContarNumeroDePaginas()); //Sempre conta a página para SP
+        } else if (mov.getExTipoMovimentacao() != ExTipoDeMovimentacao.ANEXACAO_DE_ARQUIVO_AUXILIAR) {
+            mov.setNumPaginas(mov.getContarNumeroDePaginas());
         }
 
         dao().gravar(mov);
@@ -3834,9 +4069,22 @@ public class ExBL extends CpBL {
          */
 
         if (mov.getExMobil().getExMovimentacaoSet() == null)
-            mov.getExMobil().setExMovimentacaoSet(new TreeSet<ExMovimentacao>());
+            mov.getExMobil().setExMovimentacaoSet(new TreeSet<>());
 
         mov.getExMobil().getExMovimentacaoSet().add(mov);
+
+        if (mov.getExTipoMovimentacao() != ExTipoDeMovimentacao.CANCELAMENTO_DE_MOVIMENTACAO) {
+            mov.getExMobil().setUltimaMovimentacaoNaoCancelada(mov);
+            mov.getExMobil().setDnmDataUltimaMovimentacaoNaoCancelada(mov.getDtIniMov());
+            dao().gravar(mov.getExMobil());
+        } else {
+            ExMovimentacao movUlt = mov.getExMobil()
+                    .getUltimaMovimentacao(new ITipoDeMovimentacao[] {},
+                            new ITipoDeMovimentacao[] {}, mov.getExMobil(), false, null, false);
+            mov.getExMobil().setUltimaMovimentacaoNaoCancelada(movUlt);
+            mov.getExMobil().setDnmDataUltimaMovimentacaoNaoCancelada(movUlt.getDtIniMov());
+            dao().gravar(mov.getExMobil());
+        }
 
         if (mov.getExTipoMovimentacao() != ExTipoDeMovimentacao.CANCELAMENTO_DE_MOVIMENTACAO) {
             Notificador.notificarDestinariosEmail(mov, Notificador.TIPO_NOTIFICACAO_GRAVACAO);
@@ -4044,6 +4292,10 @@ public class ExBL extends CpBL {
             processar(doc, true, false);
             // doc.armazenar();
             concluirAlteracaoDocComRecalculoAcesso(mov);
+            if (podeExibirArvoreDocsCossigRespAss(cadastrante, lotaCadastrante)
+                    && doc.isFinalizado() && possuiInclusaoCossigRespAss(doc)) {
+                incluirDnmAcessoTempArvoreDocsCossigRespAss(cadastrante, lotaCadastrante, doc, doc.getTodosOsPaisDasViasCossigRespAss());
+            }
         } catch (final Exception e) {
             cancelarAlteracao();
             throw new RuntimeException("Erro ao incluir Cossignatário.", e);
@@ -4158,6 +4410,10 @@ public class ExBL extends CpBL {
                 throw new AplicacaoException("Opção inválida.");
 
             gravarMovimentacao(mov);
+
+            if (podeExibirArvoreDocsCossigRespAss(cadastrante, lotaCadastrante)) {
+                tratarFluxoJuntarArvoreDocsCossigRespAss(mob, cadastrante, lotaCadastrante);
+            }
 
             atualizarMarcas(false, mob);
 
@@ -4372,6 +4628,7 @@ public class ExBL extends CpBL {
         novoDoc.getExMobilSet().add(mob);
 
         novoDoc = gravar(cadastrante, cadastrante, lotaCadastrante, novoDoc);
+        mob.setDnmSigla(mob.getSigla());
 
         // mob = dao().gravar(mob);
 
@@ -5176,10 +5433,18 @@ public class ExBL extends CpBL {
         }
     }
 
-    // Nato: removi: final HttpServletRequest request,
     public void vincularPapel(final DpPessoa cadastrante, final DpLotacao lotaCadastrante, final ExMobil mob,
                               final Date dtMov, DpLotacao lotaResponsavel, final DpPessoa responsavel, final DpPessoa subscritor,
                               final DpPessoa titular, final String descrMov, String nmFuncaoSubscritor, ExPapel papel)
+            throws AplicacaoException {
+        vincularPapel(cadastrante, lotaCadastrante, mob, dtMov, lotaResponsavel,
+                responsavel, subscritor, titular, descrMov, nmFuncaoSubscritor, papel, null);
+    }
+
+    // Nato: removi: final HttpServletRequest request,
+    public void vincularPapel(final DpPessoa cadastrante, final DpLotacao lotaCadastrante, final ExMobil mob,
+                              final Date dtMov, DpLotacao lotaResponsavel, final DpPessoa responsavel, final DpPessoa subscritor,
+                              final DpPessoa titular, final String descrMov, String nmFuncaoSubscritor, ExPapel papel, ExMobil exMobRef)
             throws AplicacaoException {
 
         if (descrMov == null) {
@@ -5200,7 +5465,7 @@ public class ExBL extends CpBL {
             mov.setNmFuncaoSubscritor(nmFuncaoSubscritor);
             mov.setDescrMov(descrMov);
             mov.setExPapel(papel);
-
+            mov.setExMobilRef(exMobRef);
             gravarMovimentacao(mov);
             concluirAlteracaoComRecalculoAcesso(mov);
         } catch (final Exception e) {
@@ -7788,6 +8053,7 @@ public class ExBL extends CpBL {
             mob.setExTipoMobil(dao().consultar(ExTipoMobil.TIPO_MOBIL_GERAL, ExTipoMobil.class, false));
             mob.setNumSequencia(1);
             mob.setExDocumento(doc);
+            mob.setDnmSigla(mob.getSigla());
             doc.getExMobilSet().add(mob);
             mob = dao().gravar(mob);
         }

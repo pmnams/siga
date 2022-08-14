@@ -88,6 +88,8 @@
 
             return false;
         });
+
+    $('[data-html="true"]').tooltip();
 </script>
 
 </body>

@@ -8,6 +8,14 @@ public class WfDefinicaoDeProcedimentoDaoFiltro extends DaoFiltroSelecionavel {
 
     private String nome = null;
 
+    public CpOrgaoUsuario getOuDefault() {
+        return ouDefault;
+    }
+
+    public void setOuDefault(CpOrgaoUsuario ouDefault) {
+        this.ouDefault = ouDefault;
+    }
+
     public String getNome() {
         return nome;
     }

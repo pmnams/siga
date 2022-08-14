@@ -1,4 +1,4 @@
-/*-*****************************************************************************
+/*******************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -112,6 +112,8 @@ public class SigaLibsEL {
     }
 
     public static String esperaSimples(Date dt) {
+        if (dt == null)
+            return null;
         SigaCalendar c = new SigaCalendar();
         SigaCalendar lAnterior = new SigaCalendar(dt.getTime());
         // long l = -c.diffDayPeriods(lAnterior);
@@ -392,11 +394,11 @@ public class SigaLibsEL {
 //	public static Object evaluate(String expression, Object root) throws Exception {
 //		Object expr = Ognl.parseExpression(expression);
 //
-//	    OgnlContext ctx = new OgnlContext(); 
-//	    
+//	    OgnlContext ctx = new OgnlContext();
+//
 //	    Map vars = new HashMap();
 //		vars.putAll((Map) root);
-//		
+//
 //	    Object output = Ognl.getValue(expr, ctx, vars);
 //		return output;
 //	}
@@ -411,7 +413,7 @@ public class SigaLibsEL {
 //		      add(new BeanELResolver());
 //		    }
 //		  }
-//		
+//
 //		  return new ELContext(resolver);
 //		}
 
@@ -419,7 +421,7 @@ public class SigaLibsEL {
 //	public static Object evaluate(String expression, Object root) throws Exception {
 //		Map vars = new HashMap();
 //		vars.putAll((Map) root);
-//		
+//
 //		ELResolver elResolver = new ELResolver(vars);
 //	    final VariableMapper variableMapper = new DemoVariableMapper();
 //	    final DemoFunctionMapper functionMapper = new DemoFunctionMapper();
@@ -430,7 +432,7 @@ public class SigaLibsEL {
 //	    compositeELResolver.add(new ListELResolver());
 //	    compositeELResolver.add(new BeanELResolver());
 //	    compositeELResolver.add(new MapELResolver());
-//	    
+//
 //	    ELContext context = new ELContext() {
 //	      @Override
 //	      public ELResolver getELResolver() {
@@ -445,11 +447,11 @@ public class SigaLibsEL {
 //	        return variableMapper;
 //	      }
 //	    };
-//		
+//
 //		Object expr = Ognl.parseExpression(expression);
 //
 //	    OgnlContext ctx = new OgnlContext();
-//	    
+//
 //	    Object output = Ognl.getValue(expr, ctx, vars);
 //		return output;
 //	}
@@ -474,5 +476,15 @@ public class SigaLibsEL {
 
     public static boolean podeUtilizarSegundoFatorPin(final DpPessoa cadastrante, final DpLotacao lotacaoCadastrante) throws Exception {
         return Cp.getInstance().getConf().podePorConfiguracao(cadastrante, lotacaoCadastrante, CpTipoDeConfiguracao.SEGUNDO_FATOR_PIN);
+    }
+
+    public static String getMesaVersao(DpPessoa titular, DpLotacao lotaTitular) throws Exception {
+        String mesaVersao = Prop.get("/siga.mesa.versao");
+        if (Cp.getInstance()
+                .getConf()
+                .podeUtilizarServicoPorConfiguracao(titular, lotaTitular,
+                        "SIGA:Sistema Integrado de Gestão Administrativa;DOC:Módulo de Documentos;MESA2:Mesa Versão 2;BETA:Utilizar versão beta"))
+            mesaVersao = "2";
+        return mesaVersao;
     }
 }

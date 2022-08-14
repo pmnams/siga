@@ -12,7 +12,7 @@
     <%--@elvariable id="mob" type="br.gov.jfrj.siga.vraptor.ExMobil"--%>
     <%--@elvariable id="sigla" type="String"--%>
 
-    <c:set var="extensoesInvalidas" scope="session" value="${f:resource('arquivosAuxiliares.extensoes.excecao')}"/>
+    <c:set var="extensoesInvalidas" scope="session" value="${f:resource('arquivosAuxiliares.extensoes.excecao')}" />
 
     <c:if test="${not mob.doc.eletronico}">
         <script type="text/javascript">

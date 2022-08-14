@@ -23,6 +23,7 @@ package br.gov.jfrj.siga.ex;
 
 import br.gov.jfrj.itextpdf.Documento;
 import br.gov.jfrj.siga.base.AplicacaoException;
+import br.gov.jfrj.siga.base.DateUtils;
 import br.gov.jfrj.siga.base.Prop;
 import br.gov.jfrj.siga.base.SigaMessages;
 import br.gov.jfrj.siga.base.util.Texto;
@@ -1793,7 +1794,6 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
 
     /**
      * Retorna as {@link ExMovimentacao Movimentações} de
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_ASSINATURA_DIGITAL_DOCUMENTO
      * Assinaturas Com Token} válidas.
      *
      * @return Movimentações de Assinaturas Com Token
@@ -1808,7 +1808,6 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
 
     /**
      * Retorna as {@link ExMovimentacao Movimentações} de
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_CONFERENCIA_COPIA_DOCUMENTO
      * Autenticação com token} validas.
      *
      * @return Movimentações de Autenticação com token.
@@ -1824,7 +1823,6 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
 
     /**
      * Retorna as {@link ExMovimentacao Movimentações} de
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_ASSINATURA_COM_SENHA Assinaturas
      * Com Senha} válidas.
      *
      * @return Movimentações de Assinaturas Com Senha
@@ -1846,7 +1844,6 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
 
     /**
      * Retorna as {@link ExMovimentacao Movimentações} de
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_CONFERENCIA_COPIA_COM_SENHA
      * Autenticação com senha} validas.
      *
      * @return Movimentações de Autenticação com senha.
@@ -1879,9 +1876,6 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
 
     /**
      * Retorna as {@link ExMovimentacao movimentações} de assinatura, seja
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_ASSINATURA_COM_SENHA com senha},
-     * seja com
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_ASSINATURA_DIGITAL_DOCUMENTO
      * token}, validas.
      *
      * @return As Movimentações de Assinatura.
@@ -1905,9 +1899,6 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
 
     /**
      * Retorna as {@link ExMovimentacao movimentações} de autenticação, seja
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_CONFERENCIA_COPIA_COM_SENHA com
-     * senha}, seja com
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_CONFERENCIA_COPIA_DOCUMENTO
      * token}, validas.
      *
      * @return As Movimentações de Autenticação.
@@ -2412,6 +2403,34 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
         return subscritores;
     }
 
+    public List<DpPessoa> getListaCossigRespAssDiffCadastranteDoc() {
+        List<DpPessoa> listaSubscritor = new ArrayList<>();
+        for (DpPessoa dpPessoa : this.getSubscritorECosignatarios()) {
+            if (!this.getCadastrante().equivale(dpPessoa))
+                listaSubscritor.add(dpPessoa);
+        }
+        return listaSubscritor;
+    }
+
+    public List<DpPessoa> getListaCossigRespAssDocHoje() {
+        List<DpPessoa> listaSubscrCossigFinal = new ArrayList<DpPessoa>();
+        List<DpPessoa> listaSubscrCossig = this.getListaCossigRespAssDiffCadastranteDoc();
+
+        if (!listaSubscrCossig.isEmpty()) {
+            Set<ExMovimentacao> listaMovAssinaturas = this.getAssinaturasComTokenOuSenhaERegistros();
+            for (ExMovimentacao mov : listaMovAssinaturas) {
+                if (DateUtils.isToday(mov.getData())) {
+                    for (DpPessoa pessoa : listaSubscrCossig) {
+                        if (mov.getCadastrante().equivale(pessoa)) {
+                            listaSubscrCossigFinal.add(pessoa);
+                        }
+                    }
+                }
+            }
+        }
+        return listaSubscrCossigFinal;
+    }
+
     /**
      * Retorna uma lista com o todos os cossignatários.
      */
@@ -2669,6 +2688,20 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
         return pais;
     }
 
+    public List<ExDocumento> getTodosOsPaisDasViasCossigRespAss() {
+        List<ExDocumento> pais = new ArrayList<>();
+        if (this.getExMobilPai() != null) {
+            pais = this.getExMobilPai().getDoc().getTodosOsPaisDasVias();
+            if (pais.isEmpty())
+                pais.add(this.getExMobilPai().getDoc());
+        } else {
+            pais = this.getTodosOsPaisDasVias();
+            if (pais.isEmpty())
+                pais.add(this);
+        }
+        return pais;
+    }
+
     public List<Object> getListaDeAcessos() {
         if (getDnmAcesso() == null || isDnmAcessoMAisAntigoQueODosPais()) {
             Ex.getInstance().getBL().atualizarDnmAcesso(this);
@@ -2734,6 +2767,34 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
                 lista.add(mov.getLotaSubscritor());
         }
         return lista.size() == 0 ? null : lista;
+    }
+
+    public boolean possuiVinculPapelRevisorCossigRespAss(DpPessoa dpPessoa, ExMobil mobRefMov) {
+        List<ExMovimentacao> movs = this.getMobilGeral()
+                .getMovimentacoesPorTipo(ExTipoDeMovimentacao.VINCULACAO_PAPEL, Boolean.TRUE);
+        for (ExMovimentacao mov : movs) {
+            if (mov.getExPapel().getIdPapel().equals(ExPapel.PAPEL_COSSIGNATARIO_RESP_ASSINATURA)) {
+                if (dpPessoa != null) {
+                    if (mov.getSubscritor().equivale(dpPessoa) && mov.getExMobilRef().equals(mobRefMov))
+                        return Boolean.TRUE;
+                } else {
+                    return Boolean.TRUE;
+                }
+            }
+        }
+        return Boolean.FALSE;
+    }
+
+    public List<ExMovimentacao> getMovsVinculacaoPapelCossigRespAssinatura() {
+        List<ExMovimentacao> movs = this.getMobilGeral()
+                .getMovimentacoesPorTipo(ExTipoDeMovimentacao.VINCULACAO_PAPEL, Boolean.TRUE);
+        List<ExMovimentacao> movsReturn = new ArrayList<>();
+        for (ExMovimentacao mov : movs) {
+            if (mov.getExPapel().getIdPapel().equals(ExPapel.PAPEL_COSSIGNATARIO_RESP_ASSINATURA)) {
+                movsReturn.add(mov);
+            }
+        }
+        return movsReturn;
     }
 
     @Override

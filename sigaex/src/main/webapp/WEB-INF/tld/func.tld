@@ -105,13 +105,6 @@
         </function-signature>
     </function>
     <function>
-        <name>podeAtenderPedidoPublicacaoPorConfiguracao</name>
-        <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
-        <function-signature>java.lang.Boolean podeAtenderPedidoPublicacaoPorConfiguracao(br.gov.jfrj.siga.dp.DpPessoa,
-            br.gov.jfrj.siga.dp.DpLotacao)
-        </function-signature>
-    </function>
-    <function>
         <name>podeDefinirPublicadoresPorConfiguracao</name>
         <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
         <function-signature>java.lang.Boolean podeDefinirPublicadoresPorConfiguracao(br.gov.jfrj.siga.dp.DpPessoa,

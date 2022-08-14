@@ -14,19 +14,19 @@ public class DocumentosSiglaDesarquivarCorrentePost implements IDocumentosSiglaD
     @Override
     public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception {
         DpPessoa cadastrante = ctx.getCadastrante();
-        DpPessoa titular = cadastrante;
         DpLotacao lotaCadastrante = cadastrante.getLotacao();
         DpLotacao lotaTitular = ctx.getLotaTitular();
 
         ExMobil mob = ctx.buscarEValidarMobil(req.sigla, req, resp, "Documento a Desarquivar");
 
-        Ex.getInstance().getComp().afirmar("O documento " + mob.getSigla() + " não pode ser desarquivado do corrente por "
-                + titular.getSiglaCompleta() + "/" + lotaTitular.getSiglaCompleta(), ExPodeDesarquivarCorrente.class, titular, lotaTitular, mob);
+        Ex.getInstance().getComp().afirmar(
+                "O documento " + mob.getSigla() + " não pode ser desarquivado do corrente por "
+                        + cadastrante.getSiglaCompleta() + "/" + lotaTitular.getSiglaCompleta(),
+                ExPodeDesarquivarCorrente.class, cadastrante, lotaTitular, mob);
 
+        ctx.assertAcesso(mob, cadastrante, lotaTitular);
 
-        ctx.assertAcesso(mob, titular, lotaTitular);
-
-        Ex.getInstance().getBL().desarquivarCorrente(cadastrante, lotaCadastrante, mob, null, titular);
+        Ex.getInstance().getBL().desarquivarCorrente(cadastrante, lotaCadastrante, mob, null, cadastrante);
 
         resp.sigla = mob.doc().getCodigo();
         resp.status = "OK";

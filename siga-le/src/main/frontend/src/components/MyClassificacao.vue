@@ -5,7 +5,7 @@
     }}</label>
     <v-autocomplete
       :name="name"
-      v-bind:value="value"
+      v-bind:value="definedValue"
       v-on:input="$emit('input', $event)"
       v-on:change="$emit('change', $event)"
       :items="classificacoes"
@@ -23,7 +23,7 @@
 <script>
 import UtilsBL from "../bl/utils.js";
 import ItemTemplate from "./ItemTemplate.vue";
-
+ApiContextSupport.java
 export default {
   name: "my-classificacao",
   props: ["value", "name", "label"],
@@ -33,6 +33,12 @@ export default {
       classificacoes: [],
       template: ItemTemplate,
     };
+  },
+  computed: {
+    definedValue() {
+      if (this.value) return this.value;
+      return "";
+    },
   },
   methods: {
     getLabelClassificacao: function(item) {

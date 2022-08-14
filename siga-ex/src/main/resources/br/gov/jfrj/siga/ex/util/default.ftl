@@ -1877,6 +1877,7 @@ Descrição: Esta macro é utilizada pelo Integrador
 
 
 
+
     </script>
 
     <div id="xstandard_temp" style="display:none">
@@ -4769,84 +4770,81 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
                     style="font-size: 15px;">********************************* FIM *********************************</span>
         </center>
 
+        [#assign idOrgaoUsu=""/]
+        [#assign acronimoOrgaoUsu=""/]
+        [#assign descricaoOrgaoUsu=""/]
+
+        [#if !mov??]
+            [#if doc.lotaCadastrante??]
+                [#assign descricaoOrgaoUsu=(doc.lotaCadastrante.orgaoUsuario.descricao)!/]
+                [#assign idOrgaoUsu=(doc.lotaCadastrante.orgaoUsuario.idOrgaoUsu)!/]
+                [#assign acronimoOrgaoUsu=(doc.lotaCadastrante.orgaoUsuario.acronimoOrgaoUsu)!/]
+            [/#if]
+        [#else]
+            [#assign descricaoOrgaoUsu=mov.lotaCadastrante.orgaoUsuario.descricao/]
+            [#assign idOrgaoUsu=mov.lotaCadastrante.orgaoUsuario.idOrgaoUsu/]
+            [#assign acronimoOrgaoUsu=mov.lotaCadastrante.orgaoUsuario.acronimoOrgaoUsu/]
+        [/#if]
+
+        <table width="96%" style="page-break-inside: avoid">
+            <tr>
+                <td width="100%" style="border: 1px solid black;">
+                    <table width="100%" align="left">
+                        <col width="15%"></col>
+                        <col width="85%"></col>
+                        <tr>
+                            <td width="15%" align="left" valign="bottom"><img
+                                        src="${_pathBrasao}" width="65" height="65"/>
+                            </td>
+                            <td>
+                                <table align="left" width="100%">
+                                    <tr>
+                                        <td width="18%" width="100%" align="left">
+                                            <p style="font-size: 11pt;">${func.resource('modelos.cabecalho.titulo')!}</p>
+                                        </td>
+                                    </tr>
+                                    [#if func.resource('siga.ex.modelos.cabecalho.subtitulo')??]
+                                        <tr>
+                                            <td width="100%" align="left">
+                                                <p style="font-size: 10pt; font-weight: bold;">${func.resource('modelos.cabecalho.subtitulo')!}</p>
+                                            </td>
+                                        </tr>
+                                    [/#if]
+                                    <tr>
+                                        <td width="100%" align="left">
+                                            <p style="font-size: 8pt;">
+                                                [#if !mov??]
+                                                    [#if doc.lotaCadastrante??]
+                                                        ${(doc.lotaCadastrante.orgaoUsuario.descricaoMaiusculas)!}
+                                                    [/#if]
+                                                [#else]
+                                                    ${(mov.lotaCadastrante.orgaoUsuario.descricaoMaiusculas)!}
+                                                [/#if]</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td width="100%" style="padding-left: 0px; margin-left: 0px;">
+                    ${templateInfosComplementaresDocumento}
+                </td>
+            </tr>
+        </table>
 
         <!-- INICIO PRIMEIRO RODAPE
-			[#assign idOrgaoUsu=""/]
-			[#assign acronimoOrgaoUsu=""/]
-			[#assign descricaoOrgaoUsu=""/]
-
-			[#if !mov??]
-				[#if doc.lotaCadastrante??]
-					[#assign descricaoOrgaoUsu=(doc.lotaCadastrante.orgaoUsuario.descricao)!/]
-					[#assign idOrgaoUsu=(doc.lotaCadastrante.orgaoUsuario.idOrgaoUsu)!/]
-					[#assign acronimoOrgaoUsu=(doc.lotaCadastrante.orgaoUsuario.acronimoOrgaoUsu)!/]
-				[/#if]
-			[#else]
-				[#assign descricaoOrgaoUsu=mov.lotaCadastrante.orgaoUsuario.descricao/]
-				[#assign idOrgaoUsu=mov.lotaCadastrante.orgaoUsuario.idOrgaoUsu/]
-				[#assign acronimoOrgaoUsu=mov.lotaCadastrante.orgaoUsuario.acronimoOrgaoUsu/]
-			[/#if]
-
-			<span align="center">
-			<table bgcolor="#000000" width="96%">
-				<tr>
-					<td width="100%">
-						<table width="100%" align="left" bgcolor="#FFFFFF">
-							<col width="15%"></col>
-							<col width="85%"></col>
-							<tr bgcolor="#FFFFFF">
-								<td width="15%" align="left" valign="bottom"><img
-									src="${_pathBrasao}" width="65" height="65" />
-								</td>
-								<td>
-									<table align="left" width="100%" bgcolor="#FFFFFF">
-										<tr>
-											<td width="18%" width="100%" align="left">
-											<p style="font-size: 11pt;">${func.resource('modelos.cabecalho.titulo')!}</p>
-											</td>
-										</tr>
-										[#if func.resource('siga.ex.modelos.cabecalho.subtitulo')??]
-											<tr>
-												<td width="100%" align="left">
-												<p style="font-size: 10pt; font-weight: bold;">${func.resource('modelos.cabecalho.subtitulo')!}</p>
-												</td>
-											</tr>
-										[/#if]
-										<tr>
-											<td width="100%" align="left">
-												<p style="font-size: 8pt;">
-												[#if !mov??]
-													[#if doc.lotaCadastrante??]
-														${(doc.lotaCadastrante.orgaoUsuario.descricaoMaiusculas)!}
-													[/#if]
-												[#else]
-													${(mov.lotaCadastrante.orgaoUsuario.descricaoMaiusculas)!}
-												[/#if]</p>
-											</td>
-										</tr>
-									</table>
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<td width="100%" style="padding-left: 0px; margin-left: 0px;">
-						${templateInfosComplementaresDocumento}
-					</td>
-				</tr>
-			</table>
-	        </span>
-		FIM PRIMEIRO RODAPE -->
-
+        FIM PRIMEIRO RODAPE -->
         <!-- INICIO RODAPE
-			<table width="100%" border="0" cellpadding="0" bgcolor="#000000">
-				<col></col>
-				<tr>
-					<td width="100%" align="right"><div id="numero_pagina" /></td>
-				</tr>
-			</table>
-		FIM RODAPE -->
+                            <table width="100%" border="0" cellpadding="0" bgcolor="#000000">
+                                <col></col>
+                                <tr>
+                                    <td width="100%" align="right"><div id="numero_pagina" /></td>
+                                </tr>
+                            </table>
+                        FIM RODAPE -->
     [/@documento]
 [/#macro]
 
