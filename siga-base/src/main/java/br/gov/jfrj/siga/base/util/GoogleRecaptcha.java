@@ -1,18 +1,13 @@
-package br.gov.jfrj.siga.unirest.proxy;
+package br.gov.jfrj.siga.base.util;
+
+import br.gov.jfrj.siga.base.Prop;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.URL;
-import java.net.URLEncoder;
-
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.exceptions.UnirestException;
-
-import br.gov.jfrj.siga.base.Prop;
+import java.net.*;
 
 public class GoogleRecaptcha {
 	

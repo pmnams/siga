@@ -1100,7 +1100,7 @@ public class ExDocumentoController extends ExController {
 
         final ExDocumentoVO docVO = new ExDocumentoVO(exDocumentoDTO.getDoc(),
                 exDocumentoDTO.getMob(), getCadastrante(), getTitular(),
-                getLotaTitular(), true, true, false, true);
+                getLotaTitular(), true, true, false, false);
 
         if (exDocumentoDTO.getMob().isEliminado()) {
             throw new AplicacaoException(
@@ -1148,7 +1148,7 @@ public class ExDocumentoController extends ExController {
 
         final ExDocumentoVO docVO = new ExDocumentoVO(exDocumentoDTO.getDoc(),
                 exDocumentoDTO.getMob(), getCadastrante(), getTitular(),
-                getLotaTitular(), true, true, false, true);
+                getLotaTitular(), true, true, false, false);
 
         if (exDocumentoDTO.getMob().isEliminado()) {
             throw new AplicacaoException(
@@ -1318,14 +1318,19 @@ public class ExDocumentoController extends ExController {
             if (Ex.getInstance().getComp().pode(ExDeveReceberEletronico.class, getTitular(), getLotaTitular(), exDocumentoDto.getMob())) {
                 SigaTransacionalInterceptor.upgradeParaTransacional();
                 Ex.getInstance().getBL().receber(getCadastrante(), getTitular(), getLotaTitular(), exDocumentoDto.getMob(), new Date());
-                ExDao.getInstance().em().refresh(exDocumentoDto.getMob());
+
+                // Nato: commentei essa linha pois estava fazendo com que o "caixa de entrada" permanecesse visível na caixa de marcas,
+                // mesmo depois do recebimento. É possível que isso acarrete algum problema em outros lugares. Neste caso, sugiro rehabilitar
+                // o código.
+                //
+                // ExDao.getInstance().em().refresh(exDocumentoDto.getMob());
             }
         } else {
             ExMovimentacao mov = exDocumentoDto.getMob().getUltimaMovimentacaoNaoCancelada(ExTipoDeMovimentacao.TRANSFERENCIA);
 
             if (Ex.getInstance().getComp().pode(ExPodeReceber.class, getTitular(), getLotaTitular(), exDocumentoDto.getMob())
                     && !exDocumentoDto.getMob().isEmTransitoExterno()
-                    && (mov.getCadastrante() == null || !mov.getCadastrante().equivale(getTitular()))
+                    && (mov != null && (mov.getCadastrante() == null || !mov.getCadastrante().equivale(getTitular())))
                     && !exDocumentoDto.getMob().isJuntado()) {
                 recebimentoPendente = true;
             }
@@ -2757,39 +2762,6 @@ public class ExDocumentoController extends ExController {
 
         result.redirectTo("/app/expediente/doc/".concat(
                 dto.getMob().getCodigoCompacto()).concat(".pdf"));
-    }
-
-    @Transacional
-    @Get("/app/expediente/doc/corrigir_arquivamentos_volume")
-    public void aCorrigirArquivamentosVolume(Integer de, Integer ate,
-                                             Boolean efetivar) throws Exception {
-        assertAcesso("");
-
-        int idPrimeiroDoc, idUltimoDoc;
-        Boolean efetivarDoc = false;
-        try {
-            idPrimeiroDoc = de;
-        } catch (Exception e) {
-            idPrimeiroDoc = 1;
-        }
-        try {
-            idUltimoDoc = ate;
-        } catch (Exception e) {
-            idUltimoDoc = 999999999;
-        }
-        try {
-            if (efetivar == null) {
-                efetivarDoc = false;
-            } else {
-                efetivarDoc = efetivar;
-            }
-        } catch (Exception e) {
-            efetivarDoc = false;
-        }
-        Ex.getInstance()
-                .getBL()
-                .corrigirArquivamentosEmVolume(idPrimeiroDoc, idUltimoDoc,
-                        efetivarDoc);
     }
 
     /**

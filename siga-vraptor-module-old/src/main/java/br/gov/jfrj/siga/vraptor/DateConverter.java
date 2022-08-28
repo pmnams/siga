@@ -22,8 +22,7 @@ public class DateConverter implements Converter<Date> {
 		}
 
 		try {
-			Date d = df.parse(s);
-			return d;
+			return df.parse(s);
 		} catch (final ParseException e) {
 			return null;
 		}

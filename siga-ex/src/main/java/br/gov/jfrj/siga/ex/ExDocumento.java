@@ -2702,6 +2702,19 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
         return pais;
     }
 
+    public boolean paiPossuiMovsVinculacaoPapelCossigRespAssinatura(){
+        List<ExDocumento> viasDocPai = this.getTodosOsPaisDasViasCossigRespAss();
+        if (viasDocPai.iterator().hasNext()) {
+            List<ExMovimentacao> movs = viasDocPai.iterator().next().getMovsVinculacaoPapelCossigRespAssinatura();
+            for (ExMovimentacao mov : movs) {
+                ExMobil docVia = mov.getExMobilRef();
+                if(docVia.doc().getCodigo().equals(this.getCodigo()))
+                    return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
+    }
+
     public List<Object> getListaDeAcessos() {
         if (getDnmAcesso() == null || isDnmAcessoMAisAntigoQueODosPais()) {
             Ex.getInstance().getBL().atualizarDnmAcesso(this);

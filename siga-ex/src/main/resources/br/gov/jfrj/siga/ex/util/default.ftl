@@ -905,7 +905,8 @@ Descrição: Esta macro é utilizada pelo Integrador
     [/#if]
 [/#macro]
 
-[#macro documento formato="A4" orientacao="retrato" margemEsquerda="3cm" margemDireita="2cm" margemSuperior="1cm" margemInferior="2cm"]
+[#macro documento formato="A4" orientacao="portrait" margemEsquerda="3cm" margemDireita="2cm" margemSuperior="1cm" margemInferior="2cm"]
+    <!-- size: ${formato} ${orientacao}; -->
     [#if !gerar_entrevista!false || gerar_finalizacao!false || gerar_assinatura!false]
         <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
         <head>
@@ -1873,6 +1874,7 @@ Descrição: Esta macro é utilizada pelo Integrador
               sbmt();
             }
         }
+
 
 
 

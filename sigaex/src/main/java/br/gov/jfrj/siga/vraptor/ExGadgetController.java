@@ -69,7 +69,7 @@ public class ExGadgetController extends ExController {
             String idTpMarcadorExcluidos = (StringUtils.isNotBlank(idTpMarcadorExcluir) ? idTpMarcadorExcluir + "," : "") + idTpMarcadorIgnoradosQuadroQuantitativo;
 
             final String[] as = idTpMarcadorExcluidos.split(",");
-            final Set<Long> excluir = new HashSet<Long>();
+            final Set<Long> excluir = new HashSet<>();
 
             for (final String s : as) {
                 excluir.add(Long.valueOf(s));

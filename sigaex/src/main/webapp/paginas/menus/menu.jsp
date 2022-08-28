@@ -15,7 +15,8 @@
             <li><a class="dropdown-item"
                    href="/sigaex/app/expediente/doc/editar">Novo</a></li>
             <c:if test="${!ehPublicoExterno && f:podeUtilizarServicoPorConfiguracao(titular,lotaTitular,'SIGA:Sistema Integrado de Gestão Administrativa;DOC:Módulo de Documentos;PESQ:Pesquisar')}">
-                <li><a class="dropdown-item" href="/sigaex/app/mesa${fx:getMesaVersao(titular,lotaTitular)}">Mesa Virtual </a></li>
+                <li><a class="dropdown-item" href="/sigaex/app/mesa${fx:getMesaVersao(titular,lotaTitular)}">Mesa
+                    Virtual </a></li>
             </c:if>
             <li><a class="dropdown-item" href="/sigaex/app/mesa">Mesa Virtual </a></li>
 
@@ -88,7 +89,7 @@
             </c:catch>
             <c:catch>
                 <c:if
-                        test="${f:podeArquivarPermanentePorConfiguracao(titular,lotaTitular)}">
+                        test="${f:podeArquivarIntermediarioPorConfiguracao(titular,lotaTitular)}">
                     <li><a class="dropdown-item"
                            href="/sigaex/app/expediente/mov/arquivar_intermediario_lote">Arquivar
                         Intermediário em Lote</a></li>

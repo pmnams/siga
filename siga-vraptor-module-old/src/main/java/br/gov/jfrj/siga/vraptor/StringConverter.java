@@ -12,11 +12,7 @@ import br.com.caelum.vraptor.converter.Converter;
 public class StringConverter implements Converter<String> {
 
 	public String convert(String value, Class<? extends String> type) {
-		String s = stringOrNull(value);
-		if (s == null) {
-			return null;
-		}
-		return s;
+		return stringOrNull(value);
 	}
 	
 	private static String stringOrNull(String s) {

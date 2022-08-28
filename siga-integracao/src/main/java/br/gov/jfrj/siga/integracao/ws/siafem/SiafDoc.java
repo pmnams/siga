@@ -91,12 +91,34 @@ public class SiafDoc {
 //			- número do processo legado (10 posições alfanumérico)
 //			- desdobramento (1 posição)
             if (this.processo != null && !this.processo.isEmpty()) {
-                this.objetoProcesso = this.tipoLicitacao = this.id = this.ata = this.convenio = this.finalidade =
-                        this.flagPresencial = this.flagEletronico = this.cnpj = this.naturezaDespesa1 = this.naturezaDespesa2 =
-                                this.naturezaDespesa3 = this.naturezaDespesa4 = this.naturezaDespesa5 = this.codMunicipio =
-                                        this.signatarioCedente = this.signatarioConvenente = this.dataCelebracao = this.dataPublicacao =
-                                                this.dataVigenciaInicial = this.dataVigenciaFinal = this.valorTotal = this.valorContrapartida =
-                                                        this.situacao = this.objetoResumido1 = this.objetoResumido2 = this.objetoResumido3 = "";
+                this.objetoProcesso
+                        = this.tipoLicitacao
+                        = this.id
+                        = this.ata
+                        = this.convenio
+                        = this.finalidade
+                        = this.flagPresencial
+                        = this.flagEletronico
+                        = this.cnpj
+                        = this.naturezaDespesa1
+                        = this.naturezaDespesa2
+                        = this.naturezaDespesa3
+                        = this.naturezaDespesa4
+                        = this.naturezaDespesa5
+                        = this.codMunicipio
+                        = this.signatarioCedente
+                        = this.signatarioConvenente
+                        = this.dataCelebracao
+                        = this.dataPublicacao
+                        = this.dataVigenciaInicial
+                        = this.dataVigenciaFinal
+                        = this.valorTotal
+                        = this.valorContrapartida
+                        = this.situacao
+                        = this.objetoResumido1
+                        = this.objetoResumido2
+                        = this.objetoResumido3
+                        = "";
             }
 
         } catch (Exception e) {
@@ -161,7 +183,7 @@ public class SiafDoc {
 
     private String[] TAGS = {"UG", "Gestao", "Processo", "Desdobramento", "CodUnico", "CodSemPapel", "Objeto",
             "TipoLicitacao", "ID", "ATA", "Convenio", "FlagPresencial", "FlagEletronico", "Finalidade", "CNPJ",
-            "CodMunicipio", "SignatarioCedente", "SignatarioConvenente", "NaturezaDespesa1", "NaturezaDespesa2",
+            "CodMunicipio", "SignatarioCedente", "SignatarioConvenente", "NaturezaDespesa", "NaturezaDespesa2",
             "NaturezaDespesa3", "NaturezaDespesa4", "NaturezaDespesa5", "DataVigenciaInicial", "DataVigenciaFinal",
             "DataCelebracao", "DataPublicacao", "ValorContrapartida", "ValorTotal", "Situacao",
             "ObjetoResumido1", "ObjetoResumido2", "ObjetoResumido3"};
@@ -189,7 +211,7 @@ public class SiafDoc {
             "         <CodMunicipio/>\n" +
             "         <SignatarioCedente/>\n" +
             "         <SignatarioConvenente/>\n" +
-            "         <NaturezaDespesa1/>\n" +
+            "         <NaturezaDespesa/>\n" +
             "         <NaturezaDespesa2/>\n" +
             "         <NaturezaDespesa3/>\n" +
             "         <NaturezaDespesa4/>\n" +
