@@ -38,19 +38,16 @@ public class ExPodeSolicitarAssinatura extends CompositeExpressionSupport {
     @Override
     protected Expression create() {
         return And.of(
-
                 Not.of(new ExEstaAssinadoPorTodosOsSignatariosComTokenOuSenha(doc)),
-
                 Not.of(new ExTemAssinaturaSolicitada(doc)),
-
-                Not.of(new ExTemLotaSubscritor(doc)),
-
-                new ExPodePorConfiguracao(titular, lotaTitular).withExMod(doc.getExModelo())
-                        .withExFormaDoc(doc.getExFormaDocumento()).withPessoaObjeto(doc.getSubscritor())
+                new ExTemLotaSubscritor(doc),
+                new ExPodePorConfiguracao(titular, lotaTitular)
+                        .withExMod(doc.getExModelo())
+                        .withExFormaDoc(doc.getExFormaDocumento())
+                        .withPessoaObjeto(doc.getSubscritor())
                         .withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
                         .withExTpMov(ExTipoDeMovimentacao.SOLICITACAO_DE_ASSINATURA)
 
         );
-
     }
 }
