@@ -61,8 +61,7 @@ public class IdentidadeController extends GiControllerSupport {
 		
 		try {
 			dataExpiracao = df.parse(dtExpiracao + " 00:00");
-		} catch (final ParseException e) {
-		} catch (final NullPointerException e) {
+		} catch (final ParseException | NullPointerException ignored) {
 		}
 
 		CpIdentidade ident = daoId(id);
