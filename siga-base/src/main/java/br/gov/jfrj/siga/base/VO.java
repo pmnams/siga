@@ -31,7 +31,10 @@ public class VO {
             int i = Boolean.compare(o1.isPode(), o2.isPode());
             if (i != 0)
                 return -i;
-            return o1.getNome().replace("_", "").compareTo(o2.getNome().replace("_", ""));
+
+            return o1.getNome()
+                    .replace("_", "")
+                    .compareTo(o2.getNome().replace("_", ""));
         }
     }
 
@@ -50,4 +53,10 @@ public class VO {
     public void addAcao(AcaoVO acao) {
         acoes.add(acao);
     }
+
+    public void addAcao(AcaoVO acao, boolean condicao) {
+        if (condicao)
+            acoes.add(acao);
+    }
+
 }

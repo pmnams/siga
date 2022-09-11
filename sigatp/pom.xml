@@ -40,7 +40,7 @@
         <!-- Demais dependencias -->
         <dependency>
             <groupId>siga</groupId>
-            <artifactId>siga-vraptor-module-old</artifactId>
+            <artifactId>siga-vraptor-module</artifactId>
         </dependency>
 
         <!-- DEPENDENCIAS PARA VRAPTORE JSP -->

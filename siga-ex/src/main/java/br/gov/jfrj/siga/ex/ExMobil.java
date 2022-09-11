@@ -28,6 +28,7 @@ import br.gov.jfrj.siga.ex.bl.ExParte;
 import br.gov.jfrj.siga.ex.logic.ExPodeDisponibilizarNoAcompanhamentoDoProtocolo;
 import br.gov.jfrj.siga.ex.logic.ExPodeReceber;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeVinculo;
 import br.gov.jfrj.siga.ex.util.CronologiaComparator;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.model.Selecionavel;
@@ -1312,18 +1313,20 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
      * Retorna, num Set, os móbiles que tenham sido referenciados a este móbil
      * ou vice-versa.
      */
-    public Set<ExMobil> getVinculados() {
-        Set<ExMobil> set = new LinkedHashSet<ExMobil>();
+    public Set<ExMobil> getVinculados(ExTipoDeVinculo tipo) {
+        Set<ExMobil> set = new LinkedHashSet<>();
         for (ExMovimentacao mov : getCronologiaSet())
             if (!mov.isCancelada()) {
-                if (mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.REFERENCIA) {
-                    set.add(mov.getExMobilRef());
+                if (mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.REFERENCIA
+                        && (tipo == null || tipo == mov.getTipoDeVinculo())) {
+                    set.add(mov.getExMobilRef().doc().getMobilGeral());
                     set.add(mov.getExMobil());
                 }
             }
         set.remove(this);
         if (!isGeral())
-            set.addAll(doc().getMobilGeral().getVinculados());
+            set.addAll(doc().getMobilGeral().getVinculados(tipo));
+
         return set;
     }
 
@@ -2484,21 +2487,14 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
                     p.tramitesPendentes.remove(mov.getExMovimentacaoRef());
                 p.recebimentosPendentes.add(mov);
             }
-            if (mov.getExMovimentacaoRef() != null) {
-                if (t == ExTipoDeMovimentacao.CONCLUSAO) {
-                    // Existe a conclusão direta, que cancela um trâmite pendente, ou a conclusão
-                    // normal que cancela um recebimento pendente
-                    if (p.tramitesPendentes.contains(mov.getExMovimentacaoRef()))
-                        p.tramitesPendentes.remove(mov.getExMovimentacaoRef());
+            if (mov.getExMovimentacaoRef() != null && t == ExTipoDeMovimentacao.CONCLUSAO) {
+                // Existe a conclusão direta, que cancela um trâmite pendente, ou a conclusão
+                // normal que cancela um recebimento pendente
+                p.tramitesPendentes.remove(mov.getExMovimentacaoRef());
+                p.recebimentosPendentes.remove(mov.getExMovimentacaoRef());
+            } else if (t == ExTipoDeMovimentacao.CONCLUSAO)
+                p.fIncluirCadastrante = false;
 
-                    if (p.recebimentosPendentes.contains(mov.getExMovimentacaoRef()))
-                        p.recebimentosPendentes.remove(mov.getExMovimentacaoRef());
-
-                }
-            } else {
-                if (t == ExTipoDeMovimentacao.CONCLUSAO)
-                    p.fIncluirCadastrante = false;
-            }
             if ((t == ExTipoDeMovimentacao.TRANSFERENCIA || t == ExTipoDeMovimentacao.DESPACHO_TRANSFERENCIA)
                     && (Utils.equivale(mov.getCadastrante(), doc().getCadastrante())
                     || Utils.equivale(mov.getLotaCadastrante(), doc().getLotaCadastrante())

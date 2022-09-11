@@ -42,6 +42,7 @@ import br.gov.jfrj.siga.ex.logic.*;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDePrincipal;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeVinculo;
 import br.gov.jfrj.siga.ex.service.ExService;
 import br.gov.jfrj.siga.ex.util.BIE.ManipuladorEntrevista;
 import br.gov.jfrj.siga.ex.util.*;
@@ -4614,8 +4615,6 @@ public class ExBL extends CpBL {
             iniciarAlteracao();
 
             for (ExMobil m : set) {
-                final ExMobil geral = mob.doc().getMobilGeral();
-
                 Pendencias p = m.calcularTramitesPendentes();
 
                 // Concluir trâmites ou recebimentos de notificação pendentes quando já é atendente.
@@ -4630,7 +4629,7 @@ public class ExBL extends CpBL {
                         if (r.isRespPreferencialmentePelaLotacao(titular, lotaTitular))
                             tramitesERecebimentosPendentes.add(r);
 
-                    // Tem mais de um trâmite ou recebimento pendente para o usuário ou a lotação
+                    // Tem mais de um trâmite ou recebimento pendente para o utilizador ou a lotação
                     if (tramitesERecebimentosPendentes.size() > 1) {
 
                         // Tenta selecionar um recebimento da lotação, que não seja de notificação, que será mantido
@@ -4639,7 +4638,7 @@ public class ExBL extends CpBL {
                                 selecionado = r;
                                 break;
                             }
-                        // Seleciona o primeiro item, pois o set já está ordenado
+                        // Seleciona o primeiro item, pois o ‘set’ já está ordenado
                         if (selecionado == null)
                             selecionado = tramitesERecebimentosPendentes.stream().findFirst().get();
                         // Conclui demais tramites e recebimentos pendentes
@@ -4683,21 +4682,14 @@ public class ExBL extends CpBL {
                     ExMovimentacao tramite = null;
                     for (ExMovimentacao t : p.tramitesPendentes) {
                         if (t.isResp(titular, lotaTitular)) {
-                            tramite = t;
                             break;
                         }
 
-                        if (tramite == null && !mob.isEmTransitoExterno())
+                        if (!mob.isEmTransitoExterno())
                             throw new AplicacaoException("Não foi encontrado nenhum trâmite pendente para o usuário corrente ou sua lotação");
 
                         mov.setResp(titular);
                         mov.setLotaResp(lotaTitular);
-
-                        if (tramite != null) {
-                            mov.setDestinoFinal(tramite.getDestinoFinal());
-                            mov.setLotaDestinoFinal(tramite.getLotaDestinoFinal());
-                            mov.setExMovimentacaoRef(tramite);
-                        }
 
                         // Localiza a última movimentação de marcação de lotação, para cancelar ela com o recebimento
                         ExMovimentacao movAnterior = localizaMarcacaoDePasta(m, tramite);
@@ -4708,7 +4700,6 @@ public class ExBL extends CpBL {
                             gravarMovimentacao(mov);
                     }
                 }
-
 
                 // Se houver configuração para restringir acesso somente para quem recebeu,
                 // remove a lotação das permissões de acesso e inclui o recebedor
@@ -4900,12 +4891,15 @@ public class ExBL extends CpBL {
         }
     }
 
-    public void referenciarDocumento(final DpPessoa cadastrante, final DpLotacao lotaCadastrante, final ExMobil mob,
-                                     final ExMobil mobRef, final Date dtMov, final DpPessoa subscritor, final DpPessoa titular)
+    public void referenciarDocumento(final DpPessoa cadastrante, final DpLotacao lotaCadastrante, ExMobil mob,
+                                     ExMobil mobRef, final ExTipoDeVinculo tipo, final Date dtMov, final DpPessoa subscritor, final DpPessoa titular)
             throws AplicacaoException {
 
         if (mobRef == null)
             throw new AplicacaoException("não foi selecionado um documento para o vinculo");
+
+        mob = mob.doc().getMobilGeral();
+        mobRef = mobRef.doc().getMobilGeral();
 
         if (mob.getExDocumento().getIdDoc().equals(mobRef.getExDocumento().getIdDoc())
                 && mob.getNumSequencia().equals(mobRef.getNumSequencia())
@@ -4922,7 +4916,8 @@ public class ExBL extends CpBL {
                     cadastrante, lotaCadastrante, mob, dtMov, subscritor, null, titular, null, null);
 
             mov.setExMobilRef(mobRef);
-            mov.setDescrMov("Vínculo: documento " + mov.getExMobilRef().getCodigo().toString());
+            mov.setTipoDeVinculo(tipo);
+            mov.setDescrMov(tipo.getAcao() + ": " + mov.getExMobilRef().getCodigo().toString());
 
             gravarMovimentacao(mov);
             concluirAlteracao(mov);

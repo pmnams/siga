@@ -44,6 +44,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static br.gov.jfrj.siga.ex.util.ProcessadorHtml.novoHtmlPersonalizado;
 
@@ -232,6 +233,25 @@ public class Documento {
             }
         }
         return retorno;
+    }
+
+    public static String getVinculosString(Set<ExMovimentacao> movs) {
+        List<String> als = movs.stream().map(m -> m.getExMobilRef().getSigla()).collect(Collectors.toList());
+        StringBuilder retorno = new StringBuilder();
+        if (als.size() > 0) {
+            for (int i = 0; i < als.size(); i++) {
+                String nome = als.get(i);
+                if (i > 0) {
+                    if (i == als.size() - 1) {
+                        retorno.append(" e ");
+                    } else {
+                        retorno.append(", ");
+                    }
+                }
+                retorno.append(nome);
+            }
+        }
+        return retorno.toString();
     }
 
     public static String getAssinantesStringComMatricula(Set<ExMovimentacao> movsAssinatura, Date dtDoc) {

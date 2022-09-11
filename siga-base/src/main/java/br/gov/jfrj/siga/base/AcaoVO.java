@@ -136,7 +136,7 @@ public class AcaoVO {
 
     public static List<AcaoVO> ordena(List<AcaoVO> acoes, Comparator<AcaoVO> comparator) {
         if (comparator != null)
-            Collections.sort(acoes, comparator);
+            acoes.sort(comparator);
         return acoes;
     }
 

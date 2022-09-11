@@ -587,27 +587,44 @@ public class ExMarcadorBL {
     public void calcularMarcadoresDeTramite() {
         Pendencias p = mob.calcularTramitesPendentes();
 
-        Set<ExMovimentacao> enviados = new TreeSet<>();
-        enviados.addAll(p.tramitesPendentes);
+        Set<ExMovimentacao> enviados = new TreeSet<>(p.tramitesPendentes);
         enviados.removeAll(p.tramitesDeNotificacoesPendentes);
         for (ExMovimentacao tramite : enviados) {
             acrescentarMarcaTransferencia(
-                    mob.doc().isEletronico() ? CpMarcadorEnum.EM_TRANSITO_ELETRONICO.getId()
+                    mob.doc().isEletronico()
+                            ? CpMarcadorEnum.EM_TRANSITO_ELETRONICO.getId()
                             : CpMarcadorEnum.EM_TRANSITO.getId(),
-                    tramite.getDtIniMov(), null, tramite.getCadastrante(), tramite.getLotaCadastrante(), null);
+                    tramite.getDtIniMov(),
+                    null,
+                    tramite.getCadastrante(),
+                    tramite.getLotaCadastrante(),
+                    null
+            );
 
             acrescentarMarcaTransferencia(
-                    mob.doc().isEletronico() ? CpMarcadorEnum.CAIXA_DE_ENTRADA.getId()
+                    mob.doc().isEletronico()
+                            ? CpMarcadorEnum.CAIXA_DE_ENTRADA.getId()
                             : CpMarcadorEnum.A_RECEBER.getId(),
-                    tramite.getDtIniMov(), null, tramite.getResp(), tramite.getLotaResp(), null);
+                    tramite.getDtIniMov(),
+                    null,
+                    tramite.getResp(),
+                    tramite.getLotaResp(),
+                    null
+            );
             if (tramite.getExTipoMovimentacao() == ExTipoDeMovimentacao.DESPACHO_TRANSFERENCIA
-                    && mob.doc().isEletronico() && !tramite.isAssinada())
-                acrescentarMarcaTransferencia(CpMarcadorEnum.DESPACHO_PENDENTE_DE_ASSINATURA.getId(),
-                        tramite.getDtIniMov(), null, tramite.getResp(), tramite.getLotaResp(), null);
+                    && mob.doc().isEletronico()
+                    && !tramite.isAssinada())
+                acrescentarMarcaTransferencia(
+                        CpMarcadorEnum.DESPACHO_PENDENTE_DE_ASSINATURA.getId(),
+                        tramite.getDtIniMov(),
+                        null,
+                        tramite.getResp(),
+                        tramite.getLotaResp(),
+                        null
+                );
         }
 
-        Set<ExMovimentacao> recebidos = new TreeSet<>();
-        recebidos.addAll(p.recebimentosPendentes);
+        Set<ExMovimentacao> recebidos = new TreeSet<>(p.recebimentosPendentes);
         recebidos.removeAll(p.recebimentosDeNotificacoesPendentes);
         for (ExMovimentacao recebimento : recebidos) {
             acrescentarMarcaTransferencia(

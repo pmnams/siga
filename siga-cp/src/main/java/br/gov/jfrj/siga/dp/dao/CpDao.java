@@ -31,7 +31,10 @@ import br.gov.jfrj.siga.cp.bl.Cp;
 import br.gov.jfrj.siga.cp.bl.CpConfiguracaoBL;
 import br.gov.jfrj.siga.cp.bl.SituacaoFuncionalEnum;
 import br.gov.jfrj.siga.cp.model.HistoricoAuditavel;
-import br.gov.jfrj.siga.cp.model.enm.*;
+import br.gov.jfrj.siga.cp.model.enm.CpMarcadorFinalidadeEnum;
+import br.gov.jfrj.siga.cp.model.enm.CpSituacaoDeConfiguracaoEnum;
+import br.gov.jfrj.siga.cp.model.enm.CpTipoDeConfiguracao;
+import br.gov.jfrj.siga.cp.model.enm.ITipoDeConfiguracao;
 import br.gov.jfrj.siga.cp.util.MatriculaUtils;
 import br.gov.jfrj.siga.dp.*;
 import br.gov.jfrj.siga.model.CarimboDeTempo;
@@ -2921,7 +2924,7 @@ public class CpDao extends ModeloDao {
         Query sql = em().createNamedQuery(
                 "consultarPainelQuadro");
         Date dt = consultarDataEHoraDoServidor();
-        Date amanha = new Date(dt.getTime() + 24*60*60*1000L);
+        Date amanha = new Date(dt.getTime() + 24 * 60 * 60 * 1000L);
         sql.setParameter("amanha", amanha, TemporalType.DATE);
         sql.setParameter("idPessoaIni", pes.getIdPessoaIni());
         sql.setParameter("idLotacaoIni", lot.getIdLotacaoIni());
@@ -2933,7 +2936,7 @@ public class CpDao extends ModeloDao {
         Query sql = em().createNamedQuery(
                 "consultarPainelLista");
         Date dt = consultarDataEHoraDoServidor();
-        Date amanha = new Date(dt.getTime() + 24*60*60*1000L);
+        Date amanha = new Date(dt.getTime() + 24 * 60 * 60 * 1000L);
         sql.setParameter("amanha", amanha, TemporalType.DATE);
         sql.setParameter("idPessoaIni", pes != null ? pes.getIdPessoaIni() : null);
         sql.setParameter("idLotacaoIni", lot != null ? lot.getIdLotacaoIni() : null);
@@ -2958,27 +2961,27 @@ public class CpDao extends ModeloDao {
         return sql.getResultList();
     }
 
-    public Long qtdeMarcasMarcadorPessoa(DpPessoa pessoa, CpMarcadorEnum marcador) {
+    public Long qtdeMarcasMarcadorPessoa(DpPessoa pessoa, List<Long> marcadores) {
         CriteriaBuilder qb = em().getCriteriaBuilder();
         CriteriaQuery<Long> cq = qb.createQuery(Long.class);
         Root<CpMarca> c = cq.from(CpMarca.class);
         cq.select(qb.count(c));
         Predicate predicateAnd;
         Predicate predicateEqualPessoa = cb().equal(c.get("dpPessoaIni"), pessoa);
-        Predicate predicateEqualMarca = cb().equal(c.get("cpMarcador"), marcador.getId());
+        Predicate predicateEqualMarca = cb().and(c.get("cpMarcador").in(marcadores));
         predicateAnd = cb().and(predicateEqualPessoa, predicateEqualMarca);
         cq.where(predicateAnd);
         return em().createQuery(cq).getSingleResult();
     }
 
-    public Long qtdeMarcasMarcadorLotacao(DpLotacao lotacao, CpMarcadorEnum marcador) {
+    public Long qtdeMarcasMarcadorLotacao(DpLotacao lotacao, List<Long> marcadores) {
         CriteriaBuilder qb = em().getCriteriaBuilder();
         CriteriaQuery<Long> cq = qb.createQuery(Long.class);
         Root<CpMarca> c = cq.from(CpMarca.class);
         cq.select(qb.count(c));
         Predicate predicateAnd;
         Predicate predicateEqualLotacao = cb().equal(c.get("dpLotacaoIni"), lotacao);
-        Predicate predicateEqualMarca = cb().equal(c.get("cpMarcador"), marcador.getId());
+        Predicate predicateEqualMarca = cb().and(c.get("cpMarcador").in(marcadores));
         predicateAnd = cb().and(predicateEqualLotacao, predicateEqualMarca);
         cq.where(predicateAnd);
         return em().createQuery(cq).getSingleResult();

@@ -31,6 +31,7 @@ import br.gov.jfrj.siga.ex.bl.ExAssinavelDoc;
 import br.gov.jfrj.siga.ex.logic.*;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeVinculo;
 import br.gov.jfrj.siga.ex.util.DatasPublicacaoDJE;
 import br.gov.jfrj.siga.ex.util.PublicacaoDJEBL;
 import br.gov.jfrj.siga.ex.vo.ExMobilVO;
@@ -1635,8 +1636,11 @@ public class ExMovimentacaoController extends ExController {
                 .novaInstancia().setSigla(sigla);
         final ExDocumento doc = buscarDocumento(builder);
 
-        Ex.getInstance().getComp().afirmar("Não é possível fazer vinculação", ExPodeReferenciar.class, getTitular(), getLotaTitular(), builder.getMob());
+        Ex.getInstance()
+                .getComp()
+                .afirmar("Não é possível fazer vinculação", ExPodeReferenciar.class, getTitular(), getLotaTitular(), builder.getMob());
 
+        result.include("listaTipoDeVinculo", ExTipoDeVinculo.values());
         result.include("sigla", sigla);
         result.include("doc", doc);
         result.include("mob", builder.getMob());
@@ -1709,7 +1713,8 @@ public class ExMovimentacaoController extends ExController {
                                    final String dtMovString, final boolean substituicao,
                                    final DpPessoaSelecao titularSel,
                                    final DpPessoaSelecao subscritorSel,
-                                   final ExMobilSelecao documentoRefSel) {
+                                   final ExMobilSelecao documentoRefSel,
+                                   final ExTipoDeVinculo tipo) {
         final BuscaDocumentoBuilder builder = BuscaDocumentoBuilder
                 .novaInstancia().setSigla(sigla);
         buscarDocumento(builder);
@@ -1736,12 +1741,17 @@ public class ExMovimentacaoController extends ExController {
 
         Ex.getInstance()
                 .getBL()
-                .referenciarDocumento(getCadastrante(), getLotaTitular(),
-                        builder.getMob(), mov.getExMobilRef(), mov.getDtMov(),
-                        mov.getSubscritor(), mov.getTitular());
+                .referenciarDocumento(
+                        getCadastrante(),
+                        getLotaTitular(),
+                        builder.getMob(),
+                        mov.getExMobilRef(),
+                        tipo, mov.getDtMov(),
+                        mov.getSubscritor(),
+                        mov.getTitular()
+                );
 
-        ExDocumentoController.redirecionarParaExibir(result, mov
-                .getExDocumento().getSigla());
+        ExDocumentoController.redirecionarParaExibir(result, mov.getExDocumento().getSigla());
     }
 
     @Post("/app/expediente/mov/transferir")

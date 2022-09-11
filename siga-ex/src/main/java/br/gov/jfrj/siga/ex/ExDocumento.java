@@ -37,9 +37,11 @@ import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.bl.ExAcesso;
 import br.gov.jfrj.siga.ex.logic.ExPodeAcessarDocumento;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeVinculo;
 import br.gov.jfrj.siga.ex.util.*;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.model.CarimboDeTempo;
+import com.google.common.collect.Lists;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicUpdate;
 import org.jboss.logging.Logger;
@@ -57,6 +59,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A class that represents a row in the 'EX_DOCUMENTO' table. This class may be
@@ -1792,6 +1795,16 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
         return getIdDoc() + "-" + Math.abs(getDescrCurta().hashCode() % 10000);
     }
 
+    public Set<ExMovimentacao> getVinculosPorTipo(ExTipoDeVinculo tipo) {
+        if (getMobilGeral() == null)
+            return new TreeSet<>();
+        return getMobilGeral()
+                .getMovsNaoCanceladas(ExTipoDeMovimentacao.REFERENCIA, true)
+                .stream()
+                .filter(i -> i.getTipoDeVinculo() == tipo)
+                .collect(Collectors.toSet());
+    }
+
     /**
      * Retorna as {@link ExMovimentacao Movimentações} de
      * Assinaturas Com Token} válidas.
@@ -1800,7 +1813,7 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
      */
     public Set<ExMovimentacao> getAssinaturasComToken() {
         if (getMobilGeral() == null)
-            return new TreeSet<ExMovimentacao>();
+            return new TreeSet<>();
         return getMobilGeral()
                 .getMovsNaoCanceladas(
                         ExTipoDeMovimentacao.ASSINATURA_DIGITAL_DOCUMENTO);
@@ -1991,6 +2004,18 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
                     : "";
 
         return retorno;
+    }
+
+    public String getVinculosCompleto() {
+        StringBuilder retorno = new StringBuilder();
+        for (ExTipoDeVinculo tipo : Lists.reverse(Lists.newArrayList(ExTipoDeVinculo.values()))) {
+            if (tipo != ExTipoDeVinculo.REVOGACAO)
+                continue;
+            String s = Documento.getVinculosString(getVinculosPorTipo(tipo));
+            if (s.length() > 0)
+                retorno.append(tipo.getAcao()).append(" ").append(s).append(". ");
+        }
+        return retorno.toString();
     }
 
     private String removeAssinadosPor(Set<ExMovimentacao> listaAssinantes) {
@@ -2702,13 +2727,13 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
         return pais;
     }
 
-    public boolean paiPossuiMovsVinculacaoPapelCossigRespAssinatura(){
+    public boolean paiPossuiMovsVinculacaoPapelCossigRespAssinatura() {
         List<ExDocumento> viasDocPai = this.getTodosOsPaisDasViasCossigRespAss();
         if (viasDocPai.iterator().hasNext()) {
             List<ExMovimentacao> movs = viasDocPai.iterator().next().getMovsVinculacaoPapelCossigRespAssinatura();
             for (ExMovimentacao mov : movs) {
                 ExMobil docVia = mov.getExMobilRef();
-                if(docVia.doc().getCodigo().equals(this.getCodigo()))
+                if (docVia.doc().getCodigo().equals(this.getCodigo()))
                     return Boolean.TRUE;
             }
         }
@@ -3116,6 +3141,10 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
 
     public ExRef getRef() {
         return new ExRef(this);
+    }
+
+    public String fragmento(String nome) {
+        return Texto.extrai(getHtml(), "<!-- " + nome + " -->", "<!-- /" + nome + " -->");
     }
 
 }
