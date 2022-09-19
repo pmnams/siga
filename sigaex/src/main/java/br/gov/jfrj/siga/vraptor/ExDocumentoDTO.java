@@ -237,6 +237,8 @@ public class ExDocumentoDTO {
 
     private List<ExNivelAcesso> listaNivelAcesso;
 
+    private boolean podeIncluirSubscrArvoreDocs;
+
     public ExDocumentoDTO() {
         classificacaoSel = new ExClassificacaoSelecao();
         destinatarioSel = new DpPessoaSelecao();
@@ -1036,6 +1038,14 @@ public class ExDocumentoDTO {
 
     public String getDtPrazoAssinatura() {
         return dtPrazoAssinaturaString;
+    }
+
+    public boolean isPodeIncluirSubscrArvoreDocs() {
+        return podeIncluirSubscrArvoreDocs;
+    }
+
+    public void setPodeIncluirSubscrArvoreDocs(boolean podeIncluirSubscrArvoreDocs) {
+        this.podeIncluirSubscrArvoreDocs = podeIncluirSubscrArvoreDocs;
     }
 
 }

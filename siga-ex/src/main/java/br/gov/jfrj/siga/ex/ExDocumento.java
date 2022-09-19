@@ -2740,6 +2740,16 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
         return Boolean.FALSE;
     }
 
+    public boolean possuiMovsVinculacaoPapelCossigRespAssinatura() {
+        List<ExMovimentacao> movs = this.getMovsVinculacaoPapelCossigRespAssinatura();
+        for (ExMovimentacao mov : movs) {
+            ExMobil docVia = mov.getExMobilRef();
+            if (docVia.doc().getCodigo().equals(this.getCodigo()))
+                return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
+
     public List<Object> getListaDeAcessos() {
         if (getDnmAcesso() == null || isDnmAcessoMAisAntigoQueODosPais()) {
             Ex.getInstance().getBL().atualizarDnmAcesso(this);
@@ -2811,7 +2821,7 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
         List<ExMovimentacao> movs = this.getMobilGeral()
                 .getMovimentacoesPorTipo(ExTipoDeMovimentacao.VINCULACAO_PAPEL, Boolean.TRUE);
         for (ExMovimentacao mov : movs) {
-            if (mov.getExPapel().getIdPapel().equals(ExPapel.PAPEL_COSSIGNATARIO_RESP_ASSINATURA)) {
+            if (mov.getExPapel().getIdPapel().equals(ExPapel.PAPEL_AUTORIZADO_COSSIG)) {
                 if (dpPessoa != null) {
                     if (mov.getSubscritor().equivale(dpPessoa) && mov.getExMobilRef().equals(mobRefMov))
                         return Boolean.TRUE;
@@ -2828,7 +2838,7 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
                 .getMovimentacoesPorTipo(ExTipoDeMovimentacao.VINCULACAO_PAPEL, Boolean.TRUE);
         List<ExMovimentacao> movsReturn = new ArrayList<>();
         for (ExMovimentacao mov : movs) {
-            if (mov.getExPapel().getIdPapel().equals(ExPapel.PAPEL_COSSIGNATARIO_RESP_ASSINATURA)) {
+            if (mov.getExPapel().getIdPapel().equals(ExPapel.PAPEL_AUTORIZADO_COSSIG)) {
                 movsReturn.add(mov);
             }
         }
@@ -3144,7 +3154,7 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
     }
 
     public String fragmento(String nome) {
-        return Texto.extrai(getHtml(), "<!-- " + nome + " -->", "<!-- /" + nome + " -->");
+        return Texto.extrai(getHtml(), "<!-- fragmento:" + nome + " -->", "<!-- /fragmento:" + nome + " -->");
     }
 
 }

@@ -22,6 +22,7 @@ import br.gov.jfrj.siga.wf.model.enm.WfTipoDePrincipal;
 import br.gov.jfrj.siga.wf.model.enm.WfTipoDeVinculoComPrincipal;
 import br.gov.jfrj.siga.wf.util.NaoSerializar;
 import br.gov.jfrj.siga.wf.util.WfDefinicaoDeProcedimentoDaoFiltro;
+import br.gov.jfrj.siga.wf.util.WfTarefa;
 import br.gov.jfrj.siga.wf.util.WfUtil;
 import com.google.gson.*;
 import org.apache.axis.encoding.Base64;
@@ -43,10 +44,8 @@ public class WfDiagramaController extends WfSelecionavelController<WfDefinicaoDe
 
     private static final String VERIFICADOR_ACESSO = "FE;DEFP:Gerenciar Diagramas";
     private static final String UTF8 = "utf-8";
-
     public static String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
     public static final SimpleDateFormat isoFormatter = new SimpleDateFormat(ISO_FORMAT);
-
     public static final Gson gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
 
                 @Override
@@ -162,11 +161,19 @@ public class WfDiagramaController extends WfSelecionavelController<WfDefinicaoDe
     @Get("app/diagrama/exibir")
     public void exibe(final String id) throws Exception {
         assertAcesso(VERIFICADOR_ACESSO);
-        if (id != null) {
-            WfDefinicaoDeProcedimento pd = buscar(id);
-            result.include("pd", pd);
-            result.include("dot", util.getDot(pd));
+        if (id == null)
+            throw new AplicacaoException("Id não pode ser nula");
+
+        WfDefinicaoDeProcedimento pd = buscar(id);
+        result.include("pd", pd);
+        result.include("dot", util.getDot(pd));
+
+        SortedSet<WfTarefa> tis = new TreeSet<>();
+        List<WfProcedimento> pis = dao().consultarProcedimentosAtivosPorDiagrama(pd);
+        for (WfProcedimento pi : pis) {
+            tis.add(new WfTarefa(pi));
         }
+        result.include("tarefas", tis);
     }
 
     @Get("app/diagrama/documentar")

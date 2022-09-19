@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -52,7 +52,7 @@ import java.util.Map;
 
 @Controller
 public class ExMesa2Controller extends ExController {
-    private static final String ACESSO_MESA2BETA = "MESA2:Mesa Versão 2;BETA:Utilizar versão beta";
+    private static final String ACESSO_MESA2BETA = "SIGA:Sistema Integrado de Gestão Administrativa;DOC:Módulo de Documentos;MESA2:Mesa Versão 2;BETA:Utilizar versão beta";
 
     /**
      * @deprecated CDI eyes only
@@ -77,12 +77,17 @@ public class ExMesa2Controller extends ExController {
         }
 
         result.include("ehPublicoExterno", AcessoConsulta.ehPublicoExterno(getTitular()));
-        try {
-            result.include("podeNovoDocumento", Cp.getInstance().getConf().podePorConfiguracao(getTitular(), getTitular().getLotacao(),
-                    ExTipoDeConfiguracao.CRIAR_NOVO_EXTERNO));
-        } catch (Exception e) {
-            throw e;
-        }
+        result.include(
+                "podeNovoDocumento",
+                Cp.getInstance()
+                        .getConf()
+                        .podePorConfiguracao(
+                                getTitular(),
+                                getTitular().getLotacao(),
+                                ExTipoDeConfiguracao.CRIAR_NOVO_EXTERNO
+                        )
+        );
+
         if (exibirAcessoAnterior != null && exibirAcessoAnterior) {
             CpAcesso a = dao.consultarAcessoAnterior(so.getCadastrante());
             if (a == null)

@@ -28,6 +28,7 @@ import br.gov.jfrj.siga.ex.*;
 import br.gov.jfrj.siga.ex.bl.AcessoConsulta;
 import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.bl.ExAssinavelDoc;
+import br.gov.jfrj.siga.ex.bl.ExConsultaTempDocCompleto;
 import br.gov.jfrj.siga.ex.logic.*;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
@@ -111,6 +112,10 @@ public class ExMovimentacaoController extends ExController {
         }
 
         return doc;
+    }
+
+    private ExConsultaTempDocCompleto getExConsTempDocCompleto() {
+        return ExConsultaTempDocCompleto.getInstance();
     }
 
     @Get("app/expediente/mov/anexar")
@@ -1239,7 +1244,7 @@ public class ExMovimentacaoController extends ExController {
         final ExMovimentacaoBuilder movimentacaoBuilder = ExMovimentacaoBuilder
                 .novaInstancia().setMob(mob);
 
-        final boolean podeExibirArvoreDocsCossig = Ex.getInstance().getBL().podeExibirArvoreDocsCossigRespAss(getCadastrante(), getLotaCadastrante());
+        final boolean podeExibirArvoreDocsCossig = getExConsTempDocCompleto().podeExibirArvoreDocsCossigRespAss(getCadastrante(), getLotaCadastrante());
 
         Ex.getInstance().getComp().afirmar("Não é possível incluir cossignatário", ExPodeIncluirCossignatario.class, getTitular(), getLotaTitular(), builder.getMob());
 
@@ -1249,16 +1254,18 @@ public class ExMovimentacaoController extends ExController {
         result.include("mob", builder.getMob());
         result.include("listaCossignatarios", builder.getMob().getMovimentacoesPorTipo(ExTipoDeMovimentacao.INCLUSAO_DE_COSIGNATARIO, Boolean.TRUE));
 
+        //Exibir ou nao Checkbox para acesso que Cossignatarios acessem docs completos
         result.include("podeExibirArvoreDocsCossig", podeExibirArvoreDocsCossig);
         if (podeExibirArvoreDocsCossig)
-            result.include("podeIncluirCossigArvoreDocs", doc.paiPossuiMovsVinculacaoPapelCossigRespAssinatura());
+            //Check automatico de checkbox cossignatarios
+            result.include("podeIncluirCossigArvoreDocs", doc.paiPossuiMovsVinculacaoPapelCossigRespAssinatura() || doc.possuiMovsVinculacaoPapelCossigRespAssinatura());
     }
 
     @Transacional
     @Get("/app/expediente/mov/incluir_excluir_acesso_temp_arvore_docs")
     public void incluirExcluirDnmAcessoTempArvoreDocsCossigRespAss(final String sigla, boolean incluirCossig) {
 
-        final boolean podeExibirArvoreDocsCossig = Ex.getInstance().getBL().podeExibirArvoreDocsCossigRespAss(getCadastrante(), getLotaCadastrante());
+        final boolean podeExibirArvoreDocsCossig = getExConsTempDocCompleto().podeExibirArvoreDocsCossigRespAss(getCadastrante(), getLotaCadastrante());
         if (podeExibirArvoreDocsCossig) {
             final BuscaDocumentoBuilder builder = BuscaDocumentoBuilder.novaInstancia().setSigla(sigla);
             final ExDocumento doc = buscarDocumento(builder);
@@ -1266,9 +1273,9 @@ public class ExMovimentacaoController extends ExController {
             List<ExMovimentacao> listaCossignatarios = mob.getMovimentacoesPorTipo(ExTipoDeMovimentacao.INCLUSAO_DE_COSIGNATARIO, Boolean.TRUE);
             if (!listaCossignatarios.isEmpty()) {
                 if (incluirCossig)
-                    Ex.getInstance().getBL().incluirDnmAcessoTempArvoreDocsCossigRespAssFluxoTela(getCadastrante(), getLotaTitular(), doc);
+                    getExConsTempDocCompleto().incluirSomenteCossigsAcessoTempArvoreDocs(getCadastrante(), getLotaTitular(), doc);
                 else
-                    Ex.getInstance().getBL().removerDnmAcessoTempArvoreDocsCossigRespAssFluxoTela(getCadastrante(), getLotaTitular(), listaCossignatarios, doc);
+                    getExConsTempDocCompleto().removerDnmAcessoTempArvoreDocsCossigRespAssFluxoTela(getCadastrante(), getLotaTitular(), listaCossignatarios, doc);
             }
         }
         result.forwardTo(this).incluirCosignatario(sigla);
@@ -2740,7 +2747,8 @@ public class ExMovimentacaoController extends ExController {
 
         result.include("mov", mov);
         result.include("itens", arrays);
-        result.include("lotaTitular", mov.getLotaTitular());
+        result.include("lotaTitular", getLotaTitular());
+        // todo - Comentado no oficial?
         result.include("lotaResponsavelSel", lotaResponsavelSel);
         result.include("cpOrgaoSel", cpOrgaoSel);
         result.include("responsavelSel", responsavelSel);

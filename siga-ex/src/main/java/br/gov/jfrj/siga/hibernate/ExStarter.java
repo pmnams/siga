@@ -7,6 +7,7 @@ import br.gov.jfrj.siga.cp.model.enm.CpTipoDeMovimentacao;
 import br.gov.jfrj.siga.cp.util.SigaFlyway;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jboss.logging.Logger;
 
 import javax.annotation.PostConstruct;
@@ -17,6 +18,7 @@ import javax.ejb.TransactionManagementType;
 import javax.naming.NamingException;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.security.Security;
 
 @Startup
 @Singleton
@@ -32,6 +34,8 @@ public class ExStarter {
         CpTipoDeConfiguracao.mapear(CpTipoDeConfiguracao.values());
         CpTipoDeConfiguracao.mapear(ExTipoDeConfiguracao.values());
         CpTipoDeMovimentacao.mapear(ExTipoDeMovimentacao.values());
+
+        Security.addProvider(new BouncyCastleProvider());
 
         emf = Persistence.createEntityManagerFactory("default");
         Service.setUsuarioDeSistema(UsuarioDeSistemaEnum.SIGA_EX);

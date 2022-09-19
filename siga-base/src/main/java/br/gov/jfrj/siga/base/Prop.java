@@ -286,6 +286,8 @@ public class Prop {
         /* Indica onde está armazenado o Manual de Operações do SIGA
          * */
         provider.addPublicProperty("/siga.manual.url", "/siga/arquivos/apostila_sigaex.pdf");
+        /* Permite inativar lotação com determinadas marcações */
+        provider.addPublicProperty("/siga.lotacao.inativacao.marcadores.permitidos", "false");
         // CKEditor
         provider.addPublicProperty("/ckeditor.url", get("/siga.external.base.url") + "/ckeditor/ckeditor/ckeditor.js");
     }

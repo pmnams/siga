@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -51,7 +51,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SigaLibsEL {
-    private static String month[] = new String[]{"Jan", "Fev", "Mar", "Abr",
+    private static final String[] month = new String[]{"Jan", "Fev", "Mar", "Abr",
             "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"};
 
     public static String concat(final String s, final String s2) {

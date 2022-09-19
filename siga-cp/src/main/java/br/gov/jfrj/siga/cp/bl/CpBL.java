@@ -1524,8 +1524,7 @@ public class CpBL {
 
     public CpToken gerarUrlPermanente(Long idRef) {
         try {
-            CpToken sigaUrlPermanente = new CpToken();
-            sigaUrlPermanente = dao().obterCpTokenPorTipoIdRef(CpToken.TOKEN_URLPERMANENTE, idRef); //Se tem token não expirado, devolve token
+            CpToken sigaUrlPermanente = dao().obterCpTokenPorTipoIdRef(CpToken.TOKEN_URLPERMANENTE, idRef); //Se tem token não expirado, devolve token
             if (sigaUrlPermanente == null) {
                 sigaUrlPermanente = new CpToken();
                 //Seta tipo 1 - Token para URL Permamente
@@ -1534,10 +1533,20 @@ public class CpBL {
                 sigaUrlPermanente.setToken(SigaUtil.randomAlfanumerico(128));
                 sigaUrlPermanente.setIdRef(idRef);
 
-                try {
-                    dao().gravar(sigaUrlPermanente);
-                } catch (final Exception e) {
+                Date dt = dao().consultarDataEHoraDoServidor();
+                Calendar c = Calendar.getInstance();
+                c.setTime(dt);
+                c.add(Calendar.YEAR, 1);
 
+                sigaUrlPermanente.setDtIat(dt);
+                sigaUrlPermanente.setDtExp(c.getTime());
+
+                try {
+                    dao().iniciarTransacao();
+                    dao().gravar(sigaUrlPermanente);
+                    dao().commitTransacao();
+                } catch (final Exception e) {
+                    dao().rollbackTransacao();
                     throw new AplicacaoException("Erro na gravação", 0, e);
                 }
             }
