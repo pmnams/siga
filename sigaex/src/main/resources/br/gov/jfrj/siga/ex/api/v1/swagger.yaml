@@ -2526,9 +2526,9 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
-  /processos/{sigla}/gerar-link:
+  /documentos/{sigla}/gerar-link-publico:
     post:
-      description: Gera o link de acesso ao processo
+      description: Gera o link público do documento
       tags: [ acao ]
       security:
         - Bearer: [ ]
@@ -2541,7 +2541,27 @@ paths:
             type: object
             properties:
               link:
-                description: Link de acesso ao processo
+                description: Link de acesso ao documento
+                type: string
+        500:
+          description: Error ocurred
+          schema:
+            $ref: "#/definitions/Error"
+
+  /documentos/{sigla}/link-publico:
+    get:
+      description: Obtém o link público do documento
+      tags: [ consulta ]
+      parameters:
+        - $ref: "#/parameters/sigla"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              link:
+                description: Link público de acesso ao documento
                 type: string
         500:
           description: Error ocurred

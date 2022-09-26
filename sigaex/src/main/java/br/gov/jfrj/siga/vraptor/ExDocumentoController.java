@@ -44,7 +44,7 @@ import br.gov.jfrj.siga.ex.*;
 import br.gov.jfrj.siga.ex.bl.AcessoConsulta;
 import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.bl.ExBL;
-import br.gov.jfrj.siga.ex.bl.ExConsultaTempDocCompleto;
+import br.gov.jfrj.siga.ex.bl.ExVisualizacaoTempDocCompl;
 import br.gov.jfrj.siga.ex.logic.*;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
@@ -116,8 +116,8 @@ public class ExDocumentoController extends ExController {
         return doc;
     }
 
-    private ExConsultaTempDocCompleto getExConsTempDocCompleto() {
-        return ExConsultaTempDocCompleto.getInstance();
+    private ExVisualizacaoTempDocCompl getExConsTempDocCompleto() {
+        return ExVisualizacaoTempDocCompl.getInstance();
     }
 
     @Transacional
@@ -768,7 +768,10 @@ public class ExDocumentoController extends ExController {
             l.add(p);
         }
 
-        final boolean podeExibirArvoreDocsSubscr = getExConsTempDocCompleto().podeExibirArvoreDocsCossigRespAss(getCadastrante(), getLotaCadastrante());
+        final boolean podeExibirArvoreDocsSubscr = getExConsTempDocCompleto().podeExibirCheckBoxVisTempDocsComplCossigsSubscritor(getCadastrante(), getLotaCadastrante(), exDocumentoDTO.getDoc());
+        if (podeExibirArvoreDocsSubscr && exDocumentoDTO.getDoc() != null) {
+            exDocumentoDTO.setPodeIncluirSubscrArvoreDocs(exDocumentoDTO.getDoc().paiPossuiMovsVinculacaoPapel(ExPapel.PAPEL_AUTORIZADO) || exDocumentoDTO.getDoc().possuiMovsVinculacaoPapel(ExPapel.PAPEL_AUTORIZADO));
+        }
 
         result.include("vars", l);
 
@@ -1750,16 +1753,15 @@ public class ExDocumentoController extends ExController {
             /*
              * fim da alteracao
              */
-
-            final boolean podeExibirArvoreDocsCossig = getExConsTempDocCompleto().podeExibirArvoreDocsCossigRespAss(getCadastrante(), getLotaCadastrante());
-            if	(podeExibirArvoreDocsCossig) {
-                if (!exDocumentoDTO.getDoc().isFinalizado()
-                        && !exDocumentoDTO.getDoc().getSubscritor().equivale(getCadastrante())) {
-                    if (exDocumentoDTO.isPodeIncluirSubscrArvoreDocs())
-                        getExConsTempDocCompleto()
-                                .incluirSomenteSubscritorAcessoTempArvoreDocs(getCadastrante(), getLotaTitular(), exDocumentoDTO.getDoc());
-                    else
-                        getExConsTempDocCompleto().removerDnmAcessoTempArvoreDocsCossigRespAssDocTemp(getCadastrante(), getLotaTitular(), exDocumentoDTO.getDoc());
+            final boolean podeExibirArvoreDocsCossig = getExConsTempDocCompleto().podeVisualizarTempDocComplCossigsSubscritor(getCadastrante(), getLotaCadastrante());
+            if (podeExibirArvoreDocsCossig) {
+                //input checkbox selecionado
+                if (exDocumentoDTO.isPodeIncluirSubscrArvoreDocs()) {
+                    getExConsTempDocCompleto().removerSubscrVisTempDocsComplFluxoGravar(getCadastrante(), getLotaTitular(), exDocumentoDTO.getDoc());
+                    getExConsTempDocCompleto()
+                            .incluirSubscritorVisTempDocsCompl(getCadastrante(), getLotaTitular(), exDocumentoDTO.getDoc(), exDocumentoDTO.isPodeIncluirSubscrArvoreDocs());
+                } else {
+                    getExConsTempDocCompleto().removerSubscrVisTempDocsComplFluxoGravar(getCadastrante(), getLotaTitular(), exDocumentoDTO.getDoc());
                 }
             }
 

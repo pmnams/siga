@@ -123,8 +123,8 @@ public class ExBL extends CpBL {
         this.processadorModeloJsp = processadorModelo;
     }
 
-    private ExConsultaTempDocCompleto getExConsTempDocCompleto() {
-        return ExConsultaTempDocCompleto.getInstance();
+    private ExVisualizacaoTempDocCompl getExConsTempDocCompleto() {
+        return ExVisualizacaoTempDocCompl.getInstance();
     }
 
     // Executa algoritmo de comparação entre dois sets e
@@ -1508,12 +1508,12 @@ public class ExBL extends CpBL {
             if (doc.isAssinadoPorTodosOsSignatariosComTokenOuSenha())
                 removerPapel(doc, ExPapel.PAPEL_REVISOR);
 
-            if (getExConsTempDocCompleto().podeExibirArvoreDocsCossigRespAss(cadastrante, lotaCadastrante)
+            if (getExConsTempDocCompleto().podeVisualizarTempDocComplCossigsSubscritor(cadastrante, lotaCadastrante)
                     && doc.isFinalizado()
                     && doc.isAssinadoDigitalmente()
-                    && getExConsTempDocCompleto().possuiAssinaturaCossigRespAssHoje(doc)
+                    && getExConsTempDocCompleto().possuiAssinaturaCossigsSubscritorHoje(doc)
             ) {
-                getExConsTempDocCompleto().removerDnmAcessoTempArvoreDocsCossigRespAssDepoisAssinar(cadastrante, lotaCadastrante, doc);
+                getExConsTempDocCompleto().removerCossigsSubscritorVisTempDocsComplFluxoDepoisAssinar(cadastrante, lotaCadastrante, usuarioDoToken, doc);
             }
 
         } catch (final Exception e) {
@@ -2215,6 +2215,11 @@ public class ExBL extends CpBL {
         }
         try {
             iniciarAlteracao();
+
+            if (getExConsTempDocCompleto().podeVisualizarTempDocComplCossigsSubscritor(cadastrante, lotaCadastrante)) {
+                getExConsTempDocCompleto().removerCossigsSubscritorVisTempDocsComplFluxosRefazerCancelarExcluirDoc(cadastrante, lotaCadastrante, doc);
+            }
+
             cancelarMovimentacoes(cadastrante, lotaCadastrante, doc);
             cancelarMovimentacoesReferencia(cadastrante, lotaCadastrante, doc);
             concluirAlteracaoDocComRecalculoAcesso(doc);
@@ -2309,8 +2314,8 @@ public class ExBL extends CpBL {
                 mov.setLotaResp(mob.getExDocumento().getLotaTitular());
             }
 
-            if (getExConsTempDocCompleto().podeExibirArvoreDocsCossigRespAss(cadastrante, lotaCadastrante)) {
-                getExConsTempDocCompleto().tratarFluxoDesentrDesfJuntadaArvoreDocsCossigRespAss(mob, cadastrante, lotaCadastrante);
+            if (getExConsTempDocCompleto().podeVisualizarTempDocComplCossigsSubscritor(cadastrante, lotaCadastrante)) {
+                getExConsTempDocCompleto().tratarFluxoDesentrDesfJuntadaVisTempDocsCompl(mob, cadastrante, lotaCadastrante);
             }
 
             gravarMovimentacao(mov);
@@ -2511,15 +2516,15 @@ public class ExBL extends CpBL {
                 }
 
                 if (ExTipoDeMovimentacao.JUNTADA.equals(ultMovNaoCancelada.getExTipoMovimentacao())) {
-                    if (getExConsTempDocCompleto().podeExibirArvoreDocsCossigRespAss(cadastrante, lotaCadastrante))
-                        getExConsTempDocCompleto().tratarFluxoDesentrDesfJuntadaArvoreDocsCossigRespAss(mob, cadastrante, lotaCadastrante);
+                    if (getExConsTempDocCompleto().podeVisualizarTempDocComplCossigsSubscritor(cadastrante, lotaCadastrante))
+                        getExConsTempDocCompleto().tratarFluxoDesentrDesfJuntadaVisTempDocsCompl(mob, cadastrante, lotaCadastrante);
                 }
 
                 gravarMovimentacaoCancelamento(mov, ultMovNaoCancelada);
 
                 if (ExTipoDeMovimentacao.CANCELAMENTO_JUNTADA.equals(ultMovNaoCancelada.getExTipoMovimentacao())) {
-                    if (getExConsTempDocCompleto().podeExibirArvoreDocsCossigRespAss(cadastrante, lotaCadastrante))
-                        getExConsTempDocCompleto().tratarFluxoJuntarArvoreDocsCossigRespAss(mob, cadastrante, lotaCadastrante);
+                    if (getExConsTempDocCompleto().podeVisualizarTempDocComplCossigsSubscritor(cadastrante, lotaCadastrante))
+                        getExConsTempDocCompleto().tratarFluxoDesentrDesfJuntadaVisTempDocsCompl(mob, cadastrante, lotaCadastrante);
                 }
 
                 if (ultMovNaoCancelada.getExTipoMovimentacao()
@@ -2785,7 +2790,7 @@ public class ExBL extends CpBL {
                     && mob.doc().getAssinaturasEAutenticacoesComTokenOuSenhaERegistros().isEmpty()))) {
                 processar(mob.getExDocumento(), true, false);
                 // mob.getExDocumento().armazenar();
-                getExConsTempDocCompleto().removerDnmAcessoTempArvoreDocsCossigRespAssFluxoTela(cadastrante, lotaCadastrante, Collections.singletonList(mov), mob.doc());
+                getExConsTempDocCompleto().removerCossigsVisTempDocsComplFluxoTelaCossignatarios(cadastrante, lotaCadastrante, Collections.singletonList(mov), mob.doc());
             }
             concluirAlteracao(mov);
         } catch (final Exception e) {
@@ -2917,12 +2922,12 @@ public class ExBL extends CpBL {
             }
 
             concluirAlteracaoDocComRecalculoAcesso(doc);
-            if (getExConsTempDocCompleto().podeExibirArvoreDocsCossigRespAss(cadastrante, lotaCadastrante)
-                    && doc.isFinalizado() && getExConsTempDocCompleto().possuiInclusaoCossigRespAss(doc)) {
-                //Aqui tem que pegar as movimentações  do doc atual
-
-                getExConsTempDocCompleto().incluirSomenteCossigsAcessoTempArvoreDocs(cadastrante, lotaCadastrante, doc);
-                getExConsTempDocCompleto().removerDnmAcessoTempArvoreDocsCossigRespAssDocTemp(cadastrante, lotaCadastrante, doc);
+            if (getExConsTempDocCompleto().podeVisualizarTempDocComplCossigsSubscritor(cadastrante, lotaCadastrante)
+                    && doc.isFinalizado() && getExConsTempDocCompleto().possuiInclusaoCossigsSubscritor(doc)) {
+                //Incluir Mov Papel todos Cossignatarios e subscritor
+                getExConsTempDocCompleto().incluirCossigsSubscrVisTempDocsComplFluxoFinalizar(cadastrante, lotaCadastrante, doc);
+                //Remover todas movs Papel todos Cossignatarios e subscritor
+                getExConsTempDocCompleto().removerCossigsSubscrVisTempDocsComplFluxoFinalizar(cadastrante, lotaCadastrante, doc);
             }
 
             if (setVias == null || setVias.size() == 0)
@@ -3876,6 +3881,10 @@ public class ExBL extends CpBL {
                 throw new AplicacaoException("Documento já foi excluído anteriormente", 1, e);
             }
 
+            if (getExConsTempDocCompleto().podeVisualizarTempDocComplCossigsSubscritor(titular, lotaTitular)) {
+                getExConsTempDocCompleto().removerCossigsSubscritorVisTempDocsComplFluxosRefazerCancelarExcluirDoc(titular, lotaTitular, doc);
+            }
+
             if (doc.isFinalizado())
                 throw new AplicacaoException("Documento já foi finalizado e não pode ser excluído", 2);
             for (ExMobil m : doc.getExMobilSet()) {
@@ -3900,8 +3909,13 @@ public class ExBL extends CpBL {
                     final Object[] aMovimentacao = set.toArray();
                     for (int i = 0; i < set.size(); i++) {
                         final ExMovimentacao movimentacao = (ExMovimentacao) aMovimentacao[i];
-                        Ex.getInstance().getBL().excluirMovimentacao(titular, lotaTitular, movimentacao.getExMobil(),
-                                movimentacao.getIdMov());
+                        if (!movimentacao.isCancelada())
+                            Ex.getInstance().getBL().excluirMovimentacao(
+                                    titular,
+                                    lotaTitular,
+                                    movimentacao.getExMobil(),
+                                    movimentacao.getIdMov()
+                            );
                     }
                 }
 
@@ -4008,7 +4022,7 @@ public class ExBL extends CpBL {
             // doc.armazenar();
             concluirAlteracaoDocComRecalculoAcesso(mov);
             if (podeIncluirCossigArvoreDocs)
-                getExConsTempDocCompleto().incluirSomenteCossigsAcessoTempArvoreDocs(cadastrante, lotaCadastrante, doc);
+                getExConsTempDocCompleto().incluirCossigsVisTempDocsCompl(cadastrante, lotaCadastrante, doc, podeIncluirCossigArvoreDocs);
         } catch (final Exception e) {
             cancelarAlteracao();
             throw new RuntimeException("Erro ao incluir Cossignatário.", e);
@@ -4122,8 +4136,8 @@ public class ExBL extends CpBL {
                 throw new AplicacaoException("Opção inválida.");
 
             gravarMovimentacao(mov);
-            if (getExConsTempDocCompleto().podeExibirArvoreDocsCossigRespAss(cadastrante, lotaCadastrante)) {
-                getExConsTempDocCompleto().tratarFluxoJuntarArvoreDocsCossigRespAss(mob, cadastrante, lotaCadastrante);
+            if (getExConsTempDocCompleto().podeVisualizarTempDocComplCossigsSubscritor(cadastrante, lotaCadastrante)) {
+                getExConsTempDocCompleto().tratarFluxoJuntarVisTempDocsCompl(mob, cadastrante, lotaCadastrante);
             }
 
             atualizarMarcas(false, mob);
@@ -4204,6 +4218,10 @@ public class ExBL extends CpBL {
         // As alterações devem ser feitas em cancelardocumento.
         try {
             iniciarAlteracao();
+
+            if (getExConsTempDocCompleto().podeVisualizarTempDocComplCossigsSubscritor(cadastrante, lotaCadastrante)) {
+                getExConsTempDocCompleto().removerCossigsSubscritorVisTempDocsComplFluxosRefazerCancelarExcluirDoc(cadastrante, lotaCadastrante, doc);
+            }
 
             cancelarMovimentacoesReferencia(cadastrante, lotaCadastrante, doc);
 
@@ -7627,16 +7645,12 @@ public class ExBL extends CpBL {
 
         /* END Gravação dos Marcadores  */
 
-        /*3- Gerar URL Permanente */
-        CpToken sigaUrlPermanente = new CpToken();
+        CpToken sigaUrlPermanente;
         try {
+            /*3- Gerar URL Permanente */
             sigaUrlPermanente = Cp.getInstance().getBL().gerarUrlPermanente(mob.getDoc().getIdDoc());
-        } catch (Exception e) {
-            throw new RuntimeException("Ocorreu um erro ao gerar Token.", e);
-        }
 
-        /*4- Gerar Movimentação de Publicação */
-        try {
+            /*4- Gerar Movimentação de Publicação */
             final ExMovimentacao mov = criarNovaMovimentacao(
                     ExTipoDeMovimentacao.PUBLICACAO_PORTAL_TRANSPARENCIA, cadastrante, lotaCadastrante,
                     mob, null, cadastrante, null, cadastrante, null, null);
@@ -8162,6 +8176,21 @@ public class ExBL extends CpBL {
         }
 
         return ret;
+    }
+
+    public void gravarMovimentacaoLinkPublico(final DpPessoa cadastrante, final DpPessoa titular, final DpLotacao lotaTitular, final ExMobil mob) {
+
+        try {
+            final ExMovimentacao mov = criarNovaMovimentacao(ExTipoDeMovimentacao.GERAR_LINK_PUBLICO_PROCESSO, cadastrante,
+                    lotaTitular, mob, null, cadastrante, null, titular, lotaTitular, null);
+
+            mov.setDescrMov("Gerado link público do documento " + mob.getSigla());
+            gravarMovimentacao(mov);
+        } catch (final Exception e) {
+            cancelarAlteracao();
+            throw new AplicacaoException("Erro ao gravar link público do documento", ExTipoDeMovimentacao.GERAR_LINK_PUBLICO_PROCESSO.getId(), e);
+        }
+
     }
 
 }

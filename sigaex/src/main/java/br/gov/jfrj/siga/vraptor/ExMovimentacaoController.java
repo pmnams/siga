@@ -28,7 +28,7 @@ import br.gov.jfrj.siga.ex.*;
 import br.gov.jfrj.siga.ex.bl.AcessoConsulta;
 import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.bl.ExAssinavelDoc;
-import br.gov.jfrj.siga.ex.bl.ExConsultaTempDocCompleto;
+import br.gov.jfrj.siga.ex.bl.ExVisualizacaoTempDocCompl;
 import br.gov.jfrj.siga.ex.logic.*;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
@@ -114,8 +114,8 @@ public class ExMovimentacaoController extends ExController {
         return doc;
     }
 
-    private ExConsultaTempDocCompleto getExConsTempDocCompleto() {
-        return ExConsultaTempDocCompleto.getInstance();
+    private ExVisualizacaoTempDocCompl getExConsTempDocCompleto() {
+        return ExVisualizacaoTempDocCompl.getInstance();
     }
 
     @Get("app/expediente/mov/anexar")
@@ -216,9 +216,9 @@ public class ExMovimentacaoController extends ExController {
             throw new AplicacaoException("O arquivo a ser anexado não foi selecionado!");
         }
 
-        int qtdMaxArquivoUpload = Prop.getInt("qtd.max.arquivo.anexado.upload");
+        Integer qtdMaxArquivoUpload = Prop.getInt("qtd.max.arquivo.anexado.upload");
 
-        if (arquivoLista.size() > qtdMaxArquivoUpload) {
+        if (Objects.nonNull(qtdMaxArquivoUpload) && arquivoLista.size() > qtdMaxArquivoUpload) {
             throw new AplicacaoException(String.format("A quantidade de arquivos selecionados excedeu o permitido (%s).", qtdMaxArquivoUpload));
         }
 
@@ -1244,8 +1244,7 @@ public class ExMovimentacaoController extends ExController {
         final ExMovimentacaoBuilder movimentacaoBuilder = ExMovimentacaoBuilder
                 .novaInstancia().setMob(mob);
 
-        final boolean podeExibirArvoreDocsCossig = getExConsTempDocCompleto().podeExibirArvoreDocsCossigRespAss(getCadastrante(), getLotaCadastrante());
-
+        final boolean podeExibirArvoreDocsCossig = getExConsTempDocCompleto().podeExibirCheckBoxVisTempDocsComplCossigsSubscritor(getCadastrante(), getLotaCadastrante(), doc);
         Ex.getInstance().getComp().afirmar("Não é possível incluir cossignatário", ExPodeIncluirCossignatario.class, getTitular(), getLotaTitular(), builder.getMob());
 
         result.include("sigla", sigla);
@@ -1254,18 +1253,17 @@ public class ExMovimentacaoController extends ExController {
         result.include("mob", builder.getMob());
         result.include("listaCossignatarios", builder.getMob().getMovimentacoesPorTipo(ExTipoDeMovimentacao.INCLUSAO_DE_COSIGNATARIO, Boolean.TRUE));
 
-        //Exibir ou nao Checkbox para acesso que Cossignatarios acessem docs completos
+        //Exibir ou nao Checkbox para acesso que Cossignatarios acessem documentos completos
         result.include("podeExibirArvoreDocsCossig", podeExibirArvoreDocsCossig);
         if (podeExibirArvoreDocsCossig)
             //Check automatico de checkbox cossignatarios
-            result.include("podeIncluirCossigArvoreDocs", doc.paiPossuiMovsVinculacaoPapelCossigRespAssinatura() || doc.possuiMovsVinculacaoPapelCossigRespAssinatura());
+            result.include("podeIncluirCossigArvoreDocs", doc.paiPossuiMovsVinculacaoPapel(ExPapel.PAPEL_AUTORIZADO_COSSIG) || doc.possuiMovsVinculacaoPapel(ExPapel.PAPEL_AUTORIZADO_COSSIG));
     }
 
     @Transacional
     @Get("/app/expediente/mov/incluir_excluir_acesso_temp_arvore_docs")
-    public void incluirExcluirDnmAcessoTempArvoreDocsCossigRespAss(final String sigla, boolean incluirCossig) {
-
-        final boolean podeExibirArvoreDocsCossig = getExConsTempDocCompleto().podeExibirArvoreDocsCossigRespAss(getCadastrante(), getLotaCadastrante());
+    public void incluirExcluirDnmAcessoTempArvoreDocsCossigs(final String sigla, boolean incluirCossig) {
+        final boolean podeExibirArvoreDocsCossig = getExConsTempDocCompleto().podeVisualizarTempDocComplCossigsSubscritor(getCadastrante(), getLotaCadastrante());
         if (podeExibirArvoreDocsCossig) {
             final BuscaDocumentoBuilder builder = BuscaDocumentoBuilder.novaInstancia().setSigla(sigla);
             final ExDocumento doc = buscarDocumento(builder);
@@ -1273,9 +1271,9 @@ public class ExMovimentacaoController extends ExController {
             List<ExMovimentacao> listaCossignatarios = mob.getMovimentacoesPorTipo(ExTipoDeMovimentacao.INCLUSAO_DE_COSIGNATARIO, Boolean.TRUE);
             if (!listaCossignatarios.isEmpty()) {
                 if (incluirCossig)
-                    getExConsTempDocCompleto().incluirSomenteCossigsAcessoTempArvoreDocs(getCadastrante(), getLotaTitular(), doc);
+                    getExConsTempDocCompleto().incluirCossigsVisTempDocsCompl(getCadastrante(), getLotaTitular(), doc, true);
                 else
-                    getExConsTempDocCompleto().removerDnmAcessoTempArvoreDocsCossigRespAssFluxoTela(getCadastrante(), getLotaTitular(), listaCossignatarios, doc);
+                    getExConsTempDocCompleto().removerCossigsVisTempDocsComplFluxoTelaCossignatarios(getCadastrante(), getLotaTitular(), listaCossignatarios, doc);
             }
         }
         result.forwardTo(this).incluirCosignatario(sigla);

@@ -42,7 +42,6 @@ public class RecordIdContentGet implements IXjusRecordAPI.IRecordIdContentGet {
         }
     }
 
-
     public String getContext() {
         return "obter a lista de índices";
     }
