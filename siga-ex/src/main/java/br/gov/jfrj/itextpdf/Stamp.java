@@ -1,38 +1,31 @@
 package br.gov.jfrj.itextpdf;
 
 import br.gov.jfrj.itextpdf.LocalizaAnotacao.LocalizaAnotacaoResultado;
-import br.gov.jfrj.siga.Service;
 import br.gov.jfrj.siga.base.Prop;
 import br.gov.jfrj.siga.base.SigaHTTP;
 import br.gov.jfrj.siga.base.SigaMessages;
-import br.gov.jfrj.siga.bluc.service.*;
 import com.google.common.collect.ImmutableMap;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-
 import com.itextpdf.awt.geom.AffineTransform;
-import com.itextpdf.text.*;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-import com.itextpdf.text.pdf.security.PdfPKCS7;
 import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.tsp.TimeStampTokenInfo;
 
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -68,101 +61,81 @@ public class Stamp {
             abPdf = estamparAssinaturas(abPdf, idsAssinantes);
 
         PdfReader pdfIn = new PdfReader(abPdf);
-        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-            // insert at specific position
-            Security.insertProviderAt(new BouncyCastleProvider(), 1);
-        }
-
-        PdfPKCS7 pk = pdfIn.getAcroFields().verifySignature("Signature1");
-       //rg.bouncycastle.tsp.TimeStampTokenInfo
-
-        CertificateResponse resp;
-        try {
-            final byte[] cert = pk.getSigningCertificate().getEncoded();
-
-            BlucService bluc = Service.getBlucService();
-            CertificateRequest certreq = new CertificateRequest();
-            certreq.setCertificate(BlucService.bytearray2b64(cert));
-            resp = bluc.certificate(certreq);
-
-        } catch (final Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-
         Document doc = new Document(PageSize.A4, 0, 0, 0, 0);
 
-        try (ByteArrayOutputStream boA4 = new ByteArrayOutputStream()) {
+        if (pdfIn.getAcroFields().getSignatureNames().isEmpty())
+            try (ByteArrayOutputStream boA4 = new ByteArrayOutputStream()) {
 			/*-- Alterado de PdfWriter p/ PdfCopy(Essa classe permite manter os "stamps" originais do arquivo importado) 
 			por Marcos(CMSP) em 21/02/19 --*/
-            // PdfCopy writer = new PdfCopy(doc, boA4);
-            /*-- Alerado de volta pois ficou desabilitado o redimensionamento do PDF de modo
-             *   que os códigos de barra 2D e 3D não ficassem por cima do texto. Por Renato em 25/04/2019 --*/
-            PdfWriter writer = PdfWriter.getInstance(doc, boA4);
-            doc.open();
-            PdfContentByte cb = writer.getDirectContent();
+                // PdfCopy writer = new PdfCopy(doc, boA4);
+                /*-- Alerado de volta pois ficou desabilitado o redimensionamento do PDF de modo
+                 *   que os códigos de barra 2D e 3D não ficassem por cima do texto. Por Renato em 25/04/2019 --*/
+                PdfWriter writer = PdfWriter.getInstance(doc, boA4);
+                doc.open();
+                PdfContentByte cb = writer.getDirectContent();
 
-            // Resize every page to A4 size
-            //
-            // double thetaRotation = 0.0;
-            for (int i = 1; i <= pdfIn.getNumberOfPages(); i++) {
-                int rot = pdfIn.getPageRotation(i);
+                // Resize every page to A4 size
+                //
+                // double thetaRotation = 0.0;
+                for (int i = 1; i <= pdfIn.getNumberOfPages(); i++) {
+                    int rot = pdfIn.getPageRotation(i);
 
-                PdfImportedPage page = writer.getImportedPage(pdfIn, i);
-                float w = page.getWidth();
-                float h = page.getHeight();
+                    PdfImportedPage page = writer.getImportedPage(pdfIn, i);
+                    float w = page.getWidth();
+                    float h = page.getHeight();
 
-                doc.setPageSize((rot != 0 && rot != 180) ^ (w > h) ? PageSize.A4.rotate() : PageSize.A4);
-                doc.newPage();
+                    doc.setPageSize((rot != 0 && rot != 180) ^ (w > h) ? PageSize.A4.rotate() : PageSize.A4);
+                    doc.newPage();
 
-                cb.saveState();
+                    cb.saveState();
 
-                if (rot != 0 && rot != 180) {
-                    float swap = w;
-                    w = h;
-                    h = swap;
-                }
-
-                float pw = doc.getPageSize().getWidth();
-                float ph = doc.getPageSize().getHeight();
-                double scale = Math.min(pw / w, ph / h);
-
-                // do my transformations :
-                cb.transform(AffineTransform.getScaleInstance(scale, scale));
-
-                if (!internoProduzido && !isPdf) {
-                    cb.transform(AffineTransform.getTranslateInstance(pw * SAFETY_MARGIN, ph * SAFETY_MARGIN));
-                    cb.transform(AffineTransform.getScaleInstance(1.0f - 2 * SAFETY_MARGIN, 1.0f - 2 * SAFETY_MARGIN));
-                }
-
-                if (rot != 0) {
-                    double theta = -rot * (Math.PI / 180);
-                    if (rot == 180) {
-                        cb.transform(AffineTransform.getRotateInstance(theta, w / 2, h / 2));
-                    } else {
-                        cb.transform(AffineTransform.getRotateInstance(theta, h / 2, w / 2));
+                    if (rot != 0 && rot != 180) {
+                        float swap = w;
+                        w = h;
+                        h = swap;
                     }
-                    if (rot == 90) {
-                        cb.transform(AffineTransform.getTranslateInstance((w - h) / 2, (w - h) / 2));
-                    } else if (rot == 270) {
-                        cb.transform(AffineTransform.getTranslateInstance((h - w) / 2, (h - w) / 2));
+
+                    float pw = doc.getPageSize().getWidth();
+                    float ph = doc.getPageSize().getHeight();
+                    double scale = Math.min(pw / w, ph / h);
+
+                    // do my transformations :
+                    cb.transform(AffineTransform.getScaleInstance(scale, scale));
+
+                    if (!internoProduzido && !isPdf) {
+                        cb.transform(AffineTransform.getTranslateInstance(pw * SAFETY_MARGIN, ph * SAFETY_MARGIN));
+                        cb.transform(AffineTransform.getScaleInstance(1.0f - 2 * SAFETY_MARGIN, 1.0f - 2 * SAFETY_MARGIN));
                     }
+
+                    if (rot != 0) {
+                        double theta = -rot * (Math.PI / 180);
+                        if (rot == 180) {
+                            cb.transform(AffineTransform.getRotateInstance(theta, w / 2, h / 2));
+                        } else {
+                            cb.transform(AffineTransform.getRotateInstance(theta, h / 2, w / 2));
+                        }
+                        if (rot == 90) {
+                            cb.transform(AffineTransform.getTranslateInstance((w - h) / 2, (w - h) / 2));
+                        } else if (rot == 270) {
+                            cb.transform(AffineTransform.getTranslateInstance((h - w) / 2, (h - w) / 2));
+                        }
+                    }
+
+                    // Logger.getRootLogger().error(
+                    // "----- dimensoes: " + rot + ", " + w + ", " + h);
+                    // Logger.getRootLogger().error("----- page: " + pw + ", " + ph);
+
+                    // cb.transform(AffineTransform.getTranslateInstance(
+                    // ((pw / scale) - w) / 2, ((ph / scale) - h) / 2));
+
+                    // put the page
+                    cb.addTemplate(page, 0, 0);
+                    cb.restoreState();
                 }
+                doc.close();
 
-                // Logger.getRootLogger().error(
-                // "----- dimensoes: " + rot + ", " + w + ", " + h);
-                // Logger.getRootLogger().error("----- page: " + pw + ", " + ph);
-
-                // cb.transform(AffineTransform.getTranslateInstance(
-                // ((pw / scale) - w) / 2, ((ph / scale) - h) / 2));
-
-                // put the page
-                cb.addTemplate(page, 0, 0);
-                cb.restoreState();
+                abPdf = boA4.toByteArray();
             }
-            doc.close();
-
-            abPdf = boA4.toByteArray();
-        }
 
         try (ByteArrayOutputStream bo2 = new ByteArrayOutputStream()) {
             final PdfReader reader = new PdfReader(abPdf);
@@ -193,6 +166,7 @@ public class Stamp {
                 Rectangle r = stamp.getReader().getPageSizeWithRotation(i);
 
                 image39.setInitialRotation((float) Math.PI / 2.0f);
+
                 image39.setAbsolutePosition(
                         r.getWidth() - image39.getHeight() + (STAMP_BORDER_IN_CM - PAGE_BORDER_IN_CM) * CM_UNIT,
                         BARCODE_HEIGHT_IN_CM * CM_UNIT

@@ -1,1 +1,1 @@
-Siga-Versao: 1.1.4-beta.4
+Siga-Versao: 1.1.5-beta.1
