@@ -86,8 +86,12 @@ public class BlucService {
 		// "application/json").body(req)
 		// .asString().getBody();
 
-		return Unirest.post(url).header("accept", "application/json").header("Content-Type", "application/json")
-				.body(req).asObject(respClass).getBody();
+		return Unirest.post(url)
+				.header("accept", "application/json")
+				.header("Content-Type", "application/json")
+				.body(req)
+				.asObject(respClass)
+				.getBody();
 
 		// HttpClient client = HttpClientBuilder.create().build();
 		//
@@ -147,6 +151,10 @@ public class BlucService {
 
 	public ValidateResponse validate(ValidateRequest req) throws Exception {
 		return json2json(req, ValidateResponse.class, this.endpoint + "/validate");
+	}
+
+	public CertificateResponse certificate(CertificateRequest req) throws Exception {
+		return json2json(req, CertificateResponse.class, this.endpoint + "/certificate");
 	}
 
 	public static String bytearray2b64(byte[] ab) {
