@@ -40,6 +40,14 @@ public class Prop {
         return Boolean.valueOf(p.trim());
     }
 
+    public static Integer getInt(String nome, Integer preset) {
+        try {
+            return getInt(nome);
+        } catch (Exception e) {
+            return preset;
+        }
+    }
+
     public static Integer getInt(String nome) {
         String p = Prop.get(nome);
         if (p == null)

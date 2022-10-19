@@ -145,7 +145,7 @@ public class ExMovimentacaoController extends ExController {
         result.include("titularSel", movimentacaoBuilder.getTitularSel());
         result.include("request", getRequest());
         result.include("assinandoAnexosGeral", assinandoAnexosGeral);
-        result.include("tamanhoMaxArquivoAnexadoUpload", Prop.getInt("pdf.tamanho.maximo") / 1024 / 1024);
+        result.include("tamanhoMaxArquivoAnexadoUpload", Prop.getInt("pdf.tamanho.maximo", 10) / 1024 / 1024);
         result.include("qtdMaxArquivoAnexadoUpload", Prop.getInt("qtd.max.arquivo.anexado.upload"));
     }
 
@@ -253,7 +253,7 @@ public class ExMovimentacaoController extends ExController {
         int numBytes = baArquivo.length;
 
         //if (numBytes > 10 * 1024 * 1024 ) {
-        if (numBytes > Prop.getInt("pdf.tamanho.maximo")) {
+        if (numBytes > Prop.getInt("pdf.tamanho.maximo", 10)) {
             throw new AplicacaoException(String.format("O tamanho do arquivo %s é superior ao permitido (10MB).", arquivo.getFileName()));
         }
     }
@@ -663,13 +663,15 @@ public class ExMovimentacaoController extends ExController {
     }
 
     private AtivoEFixo obterAtivoEFixo(ExModelo modelo, ExTipoDocumento tipoDocumento, ITipoDeConfiguracao tipoConf) {
-        final CpSituacaoDeConfiguracaoEnum idSit = Ex
-                .getInstance()
+        final CpSituacaoDeConfiguracaoEnum idSit = Ex.getInstance()
                 .getConf()
-                .buscaSituacao(modelo,
+                .buscaSituacao(
+                        modelo,
                         tipoDocumento,
-                        getTitular(), getLotaTitular(),
-                        tipoConf);
+                        getTitular(),
+                        getLotaTitular(),
+                        tipoConf
+                );
 
         AtivoEFixo af = new AtivoEFixo();
 
@@ -2588,7 +2590,7 @@ public class ExMovimentacaoController extends ExController {
             movimentacaoBuilder.setLotaSubscritorSel(lotaSubscritorSel);
         }
 
-        if (!Prop.getBool("/siga.marcadores.permite.data.retroativa")) {
+        if (Boolean.FALSE.equals(Prop.getBool("/siga.marcadores.permite.data.retroativa"))) {
             if (!Utils.empty(planejada) && !DateUtils.isSameDay(new Date(), dtPlanejada) && dtPlanejada.before(new Date()))
                 throw new AplicacaoException("Data Planejada não pode ser anterior à hoje.");
 
@@ -4819,7 +4821,7 @@ public class ExMovimentacaoController extends ExController {
     public void ciencia_gravar(final Integer postback, final String sigla, final String descrMov) {
         this.setPostback(postback);
 
-        if (Prop.getBool("/siga.ciencia.preenchimento.obrigatorio") && (descrMov == null || descrMov.trim().length() == 0)) {
+        if (Boolean.TRUE.equals(Prop.getBool("/siga.ciencia.preenchimento.obrigatorio")) && (descrMov == null || descrMov.trim().length() == 0)) {
             throw new AplicacaoException("Necessário o preenchimento do campo para dar Ciência.");
         }
 
