@@ -69,9 +69,6 @@ public class ExAutenticacaoController extends ExController {
                            final String ass, final String assinaturaB64,
                            final String certificadoB64, final String atributoAssinavelDataHora)
             throws Exception {
-
-        // Só para já dar o erro logo.
-        String pwd = getJwtPassword();
         String captchaSiteKey = Prop.get("/siga.hcaptcha.key");
         String captchaSitePassword = Prop.get("/siga.hcaptcha.pwd");
 
@@ -90,12 +87,7 @@ public class ExAutenticacaoController extends ExController {
         if (gRecaptchaResponse != null) {
             JSONObject body = Hcaptcha.validar(captchaSitePassword, gRecaptchaResponse, request.getRemoteAddr());
 
-            String hostname = request.getServerName();
-            if (body.getBoolean("success")) {
-                String retHostname = body.getString("hostname");
-                // Aceitando também o site-key de desenvolvimento padrão do reCaptcha
-                success = retHostname.equals(hostname);
-            }
+            success = body.getBoolean("success");
         }
         if (!success) {
             setDefaultResults();
