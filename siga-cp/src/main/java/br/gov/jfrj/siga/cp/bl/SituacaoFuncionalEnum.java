@@ -9,7 +9,7 @@ public enum SituacaoFuncionalEnum {
 	APENAS_ATIVOS(new String[]{"1"}), 
 	ATIVOS_E_CEDIDOS(new String[]{"1","2"}); 
 	
-	String[] situacao;
+	final String[] situacao;
 	
 	private SituacaoFuncionalEnum(String[] situacao) {
 		this.situacao = situacao;

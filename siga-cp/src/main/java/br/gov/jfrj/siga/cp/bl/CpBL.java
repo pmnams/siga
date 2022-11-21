@@ -1209,9 +1209,16 @@ public class CpBL {
                 identidadeCadastrante.getPessoaAtual().getLotacao(),
                 "SIGA:Sistema Integrado de Gestão Administrativa;GI:Módulo de Gestão de Identidade;CAD_PESSOA:Cadastrar Pessoa;ALT:Alterar Órgão Cadastro Pessoa");
 
+        Boolean podeAlterarMariculaPessoa = Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(
+                identidadeCadastrante.getPessoaAtual(),
+                identidadeCadastrante.getPessoaAtual().getLotacao(),
+                "SIGA:Sistema Integrado de Gestão Administrativa;GI:Módulo de Gestão de Identidade;CAD_PESSOA:Cadastrar Pessoa;ALT_MATRICULA:Alterar matrícula pessoa"
+        );
+
         DpPessoa pessoa = new DpPessoa();
         DpPessoa pessoaAnt = new DpPessoa();
-        List<CpIdentidade> lista = new ArrayList<CpIdentidade>();
+        List<CpIdentidade> lista = new ArrayList<>();
+        boolean alteracaoMatricula = false;
 
         if (id != null) {
             pessoaAnt = CpDao.getInstance().consultar(id, DpPessoa.class, false).getPessoaAtual();
@@ -1223,8 +1230,17 @@ public class CpBL {
                     throw new AplicacaoException(
                             "A unidade da pessoa não pode ser alterada, pois existem documentos pendentes");
                 }
-                pessoa.setIdInicial(pessoaAnt.getIdInicial());
-                pessoa.setMatricula(pessoaAnt.getMatricula());
+
+                if (podeAlterarMariculaPessoa && !Objects.equals(mnMatricula, pessoaAnt.getMatricula())) {
+                    if (qtde > 0) {
+                        throw new AplicacaoException("A matícula da pessoa não pode ser alterada, pois existem documentos pendentes");
+                    }
+
+                    pessoaAnt.setSituacaoFuncionalPessoa("17"); // Removido
+                    alteracaoMatricula = true;
+                } else {
+                    pessoa.setIdInicial(pessoaAnt.getIdInicial());
+                }
 
                 if (podeAlterarOrgaoPessoa && !idLotacao.equals(pessoaAnt.getLotacao().getId())) {
                     List<Long> marcadores = new ArrayList<>();
@@ -1300,9 +1316,9 @@ public class CpBL {
         pessoa.setEmailPessoa(Texto.removerEspacosExtra(email).trim().replace(" ", "").toLowerCase());
 
         CpOrgaoUsuario ou = new CpOrgaoUsuario();
-        DpCargo cargo = new DpCargo();
+        DpCargo cargo;
         DpFuncaoConfianca funcao = new DpFuncaoConfianca();
-        DpLotacao lotacao = new DpLotacao();
+        DpLotacao lotacao;
 
         ou.setIdOrgaoUsu(idOrgaoUsu);
         ou = CpDao.getInstance().consultarPorId(ou);
@@ -1341,6 +1357,13 @@ public class CpBL {
         }
         pessoa.setSesbPessoa(ou.getSigla());
 
+        if (mnMatricula != null)
+            pessoa.setMatricula(mnMatricula);
+        else
+            pessoa.setMatricula(10000 + pessoa.getId());
+
+        if (Objects.nonNull(CpDao.getInstance().consultarPorSigla(pessoa)))
+            throw new AplicacaoException("Já existe uma pessoa com o mesmo numero de matrícula cadastrada no órgão informado");
 
         // ÓRGÃO / CARGO / FUNÇÃO DE CONFIANÇA / LOTAÇÃO e CPF iguais.
         DpPessoaDaoFiltro dpPessoa = new DpPessoaDaoFiltro();
@@ -1353,34 +1376,29 @@ public class CpBL {
         dpPessoa.setId(id);
 
         dpPessoa.setBuscarFechadas(Boolean.FALSE);
-        Integer tamanho = CpDao.getInstance().consultarQuantidade(dpPessoa);
+        int tamanho = CpDao.getInstance().consultarQuantidade(dpPessoa);
 
         if (tamanho > 0) {
             throw new AplicacaoException("Usuário já cadastrado com estes dados: Órgão, Cargo, Função, Unidade e CPF");
         }
 
-        List<DpPessoa> listaPessoasMesmoCPF = new ArrayList<DpPessoa>();
-        DpPessoa pessoa2 = new DpPessoa();
-
-
-        listaPessoasMesmoCPF.addAll(CpDao.getInstance().listarCpfAtivoInativo(pessoa.getCpfPessoa()));
-
-
+        DpPessoa pessoa2;
+        List<DpPessoa> listaPessoasMesmoCPF = new ArrayList<>(CpDao.getInstance().listarCpfAtivoInativo(pessoa.getCpfPessoa()));
         try {
-            //		dao().em().getTransaction().begin();
+            if (pessoaAnt.getId() != null) {
 
-            if (pessoaAnt != null && pessoaAnt.getId() != null) {
-                pessoa.setMatricula(pessoaAnt.getMatricula());
+                if (!alteracaoMatricula && mnMatricula > 0)
+                    pessoa.setMatricula(pessoaAnt.getMatricula());
+
                 if (pessoaAnt.getDataFimPessoa() != null) {
                     pessoa.setDataFimPessoa(pessoaAnt.getDataFimPessoa());
                 }
 
                 CpIdentidade ident = null;
-
-                if (!pessoa.getOrgaoUsuario().equivale(pessoaAnt.getOrgaoUsuario())) {
+                if (!pessoa.getOrgaoUsuario().equivale(pessoaAnt.getOrgaoUsuario()) || alteracaoMatricula) {
                     ident = new CpIdentidade();
                     CpIdentidade identAnt;
-                    identAnt = CpDao.getInstance().consultaIdentidadeCadastrante(pessoaAnt.getSesbPessoa() + pessoaAnt.getMatricula(), true);
+                    identAnt = CpDao.getInstance().consultaIdentidadeCadastrante(pessoaAnt.getSesbPessoa() + pessoaAnt.getMatricula(), !alteracaoMatricula);
                     PropertyUtils.copyProperties(ident, identAnt);
                     ident.setCpOrgaoUsuario(pessoa.getOrgaoUsuario());
                     ident.setNmLoginIdentidade(pessoa.getSesbPessoa() + pessoa.getMatricula());
@@ -1395,6 +1413,12 @@ public class CpBL {
                     CpDao.getInstance().gravar(ident);
                 }
 
+                if (alteracaoMatricula) {
+                    List<CpIdentidade> identidades = CpDao.getInstance().consultaIdentidades(pessoaAnt);
+                    for (CpIdentidade ide : identidades)
+                        Cp.getInstance().getBL().cancelarIdentidade(ide, identidadeCadastrante);
+                }
+
                 if (ident != null && !pessoa.getOrgaoUsuario().equivale(pessoaAnt.getOrgaoUsuario())) {
                     this.desativarConfiguracoesPessoa(identidadeCadastrante, pessoaAnt.getPessoaInicial() != null ? pessoaAnt.getPessoaInicial() : pessoaAnt, data);
 
@@ -1407,11 +1431,9 @@ public class CpBL {
             } else {
                 pessoa.setHisIdcIni(identidadeCadastrante);
                 CpDao.getInstance().gravar(pessoa);
-
                 pessoa.setIdPessoaIni(pessoa.getId());
-                if (mnMatricula != null)
-                    pessoa.setMatricula(mnMatricula);
-                else
+
+                if (pessoa.getMatricula() == null)
                     pessoa.setMatricula(10000 + pessoa.getId());
 
                 CpDao.getInstance().gravar(pessoa);

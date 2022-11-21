@@ -46,9 +46,16 @@ import java.util.Set;
                 + "				group by pAux.idPessoaIni having max(pAux.dataInicioPessoa) = pes.dataInicioPessoa)"),
         @NamedQuery(name = "consultarPorIdInicialDpPessoaInclusiveFechadas", query = "select pes from DpPessoa pes where pes.idPessoaIni = :idPessoaIni"),
         @NamedQuery(name = "consultarPorCpf", query = "from DpPessoa pes where pes.cpfPessoa = :cpfPessoa and pes.dataFimPessoa = null"),
-        @NamedQuery(name = "consultarPorCpfAtivoInativo", query = "from DpPessoa pes where pes.cpfPessoa = :cpfPessoa"
-                + "  and exists (select 1 from DpPessoa pAux where pAux.idPessoaIni = pes.idPessoaIni "
-                + "		group by pAux.idPessoaIni having max(pAux.dataInicioPessoa) = pes.dataInicioPessoa)"),
+        @NamedQuery(name = "consultarPorCpfAtivoInativo", query = "from DpPessoa pes"
+                + " where pes.cpfPessoa = :cpfPessoa"
+                + "  and pes.situacaoFuncionalPessoa != '17' "
+                + "  and exists ("
+                + "   select 1 from DpPessoa pAux"
+                + "   where pAux.idPessoaIni = pes.idPessoaIni "
+                + "	   group by pAux.idPessoaIni"
+                + "    having max(pAux.dataInicioPessoa) = pes.dataInicioPessoa"
+                + " )"
+        ),
         @NamedQuery(name = "consultarPorEmail", query = "from DpPessoa pes where pes.emailPessoa = :emailPessoa and pes.dataFimPessoa = null"),
         @NamedQuery(name = "consultarPorEmailIgualCpfDiferente", query = "select count(1) "
                 + " from DpPessoa pes "
@@ -117,6 +124,7 @@ import java.util.Set;
                 + " and (:funcao = null or :funcao = 0L or pes.funcaoConfianca.idFuncao = :funcao) "
                 + " and (:email = null or (upper(pes.emailPessoa) like upper('%' || :email || '%')) ) "
                 + " and (:identidade = null or (upper(pes.identidade) like upper('%' || :identidade || '%')) ) "
+                + " and pes.situacaoFuncionalPessoa != '17' "
                 + "	group by pes.idPessoaIni"
                 + ", pes.idPessoa having pes.idPessoa = (select max(a.idPessoa) from DpPessoa a where a.idPessoaIni = pes.idPessoaIni)"
                 + ") order by pes.nomePessoaAI"),
@@ -844,7 +852,6 @@ public abstract class AbstractDpPessoa extends DpResponsavel implements
      * Define o nome de exibição (apelido ou nome com pronome de tratamento, por
      * exemplo)
      *
-     * @param nomeExibicao
      */
     public void setNomeExibicao(String nomeExibicao) {
         this.nomeExibicao = nomeExibicao;
@@ -854,7 +861,6 @@ public abstract class AbstractDpPessoa extends DpResponsavel implements
      * Retorna o nome de exibição (apelido ou nome com pronome de tratamento,
      * por exemplo)
      *
-     * @return
      */
     public String getNomeExibicao() {
         return nomeExibicao;
