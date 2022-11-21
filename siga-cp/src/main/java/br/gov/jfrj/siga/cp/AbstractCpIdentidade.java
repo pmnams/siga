@@ -43,14 +43,25 @@ import br.gov.jfrj.siga.sinc.lib.Desconsiderar;
 // Ver um lugar melhor para queries assim ficarem quando não se estiver usando
 // XML
 @NamedQueries({
-        @NamedQuery(name = "consultarIdentidadeCadastrante", query = "select u from CpIdentidade u, DpPessoa pes "
-                + "     where u.nmLoginIdentidade = :nmUsuario"
-                + "      and u.dpPessoa.cpfPessoa = pes.cpfPessoa"
-                + "      and pes.sesbPessoa = :sesbPessoa"
-                + "      and pes.dataFimPessoa is null"),
+        @NamedQuery(
+                name = "consultarIdentidadeCadastrante",
+                query = "select u from CpIdentidade u, DpPessoa pes "
+                        + " where pes.dataFimPessoa is null"
+                        + " and (("
+                        + "  u.nmLoginIdentidade = :nmUsuario"
+                        + "  and u.dpPessoa.idPessoaIni = pes.idPessoaIni"
+                        + "  and pes.sesbPessoa = :sesbPessoa"
+                        + " )"
+                        + " or ("
+                        + "  pes.cpfPessoa is not null"
+                        + "  and pes.cpfPessoa <> :cpfZero"
+                        + "  and pes.cpfPessoa = :cpf"
+                        + " ))"
+        ),
         @NamedQuery(name = "consultarIdentidades", query = "select u from CpIdentidade u , DpPessoa pes "
                 + "     where pes.idPessoaIni = :idPessoaIni"
-                + "      and u.dpPessoa = pes" + "      and u.hisDtFim is null"),
+                + "      and u.dpPessoa = pes"
+                + "      and u.hisDtFim is null"),
         @NamedQuery(name = "consultarIdentidadeCadastranteAtiva", query = "select u from CpIdentidade u , DpPessoa pes "
                 + "where ((u.nmLoginIdentidade = :nmUsuario and pes.sesbPessoa = :sesbPessoa and pes.sesbPessoa is not null) or "
                 + " (pes.cpfPessoa is not null and pes.cpfPessoa <> :cpfZero and pes.cpfPessoa = :cpf)) "

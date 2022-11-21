@@ -580,7 +580,6 @@ public class CpDao extends ModeloDao {
         return l.get(0);
     }
 
-    @SuppressWarnings("unchecked")
     public DpFuncaoConfianca consultarPorIdInicialDpFuncaoConfiancaAtual(final Long idFuncaoIni) {
         CriteriaQuery<DpFuncaoConfianca> q = cb().createQuery(DpFuncaoConfianca.class);
         Root<DpFuncaoConfianca> c = q.from(DpFuncaoConfianca.class);
@@ -589,9 +588,8 @@ public class CpDao extends ModeloDao {
         return em().createQuery(q).getResultStream().findFirst().orElse(null);
     }
 
-    @SuppressWarnings("unchecked")
     public DpFuncaoConfianca consultarPorNomeOrgao(final DpFuncaoConfianca o) {
-        final Query query = em().createNamedQuery("consultarPorNomeOrgaoDpFuncaoConfianca");
+        final TypedQuery<DpFuncaoConfianca> query = em().createNamedQuery("consultarPorNomeOrgaoDpFuncaoConfianca", DpFuncaoConfianca.class);
         query.setParameter("nome", o.getNomeFuncao());
         query.setParameter("idOrgaoUsuario", o.getOrgaoUsuario().getIdOrgaoUsu());
 
@@ -983,16 +981,14 @@ public class CpDao extends ModeloDao {
 
     public DpPessoa consultarPorSigla(final DpPessoa o, final boolean buscarFechadas) {
         try {
-            final Query query = buscarFechadas ?
-                    em().createNamedQuery("consultarPorSiglaInclusiveFechadasDpPessoa") :
-                    em().createNamedQuery("consultarPorSiglaDpPessoa");
+            final TypedQuery<DpPessoa> query = buscarFechadas ?
+                    em().createNamedQuery("consultarPorSiglaInclusiveFechadasDpPessoa", DpPessoa.class) :
+                    em().createNamedQuery("consultarPorSiglaDpPessoa", DpPessoa.class);
             query.setParameter("sesb", o.getSesbPessoa());
             query.setParameter("matricula", o.getMatricula());
 
             final List<DpPessoa> l = query.getResultList();
-            if (l.size() != 1)
-                return null;
-            return l.get(0);
+            return l.isEmpty()? null : l.get(0);
         } catch (final NullPointerException e) {
             return null;
         }
@@ -1008,7 +1004,7 @@ public class CpDao extends ModeloDao {
         DpPessoa pessoaTemplate = new DpPessoa();
         pessoaTemplate.setSesbPessoa(MatriculaUtils.getSiglaDoOrgaoDaMatricula(principal));
         pessoaTemplate.setMatricula(MatriculaUtils.getParteNumericaDaMatricula(principal));
-        DpPessoa pessoaNova = CpDao.getInstance().consultarPorSigla(pessoaTemplate);
+        DpPessoa pessoaNova = CpDao.getInstance().consultarPorSigla(pessoaTemplate, false);
         return pessoaNova;
     }
 
@@ -1390,7 +1386,6 @@ public class CpDao extends ModeloDao {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public List<DpPessoa> consultarPessoaComOrgaoFuncaoCargo(final DpPessoa pes) {
         try {
             final Query query;
@@ -1607,13 +1602,15 @@ public class CpDao extends ModeloDao {
 
             /* Constantes para Evitar Parse Oracle */
             qry.setParameter("cpfZero", 0L);
-            qry.setParameter("sfp1", "1");
-            qry.setParameter("sfp2", "2");
-            qry.setParameter("sfp4", "4");
-            qry.setParameter("sfp12", "12");
-            qry.setParameter("sfp22", "22");
-            qry.setParameter("sfp31", "31");
-            qry.setParameter("sfp36", "36");
+            if (fAtiva) {
+                qry.setParameter("sfp1", "1");
+                qry.setParameter("sfp2", "2");
+                qry.setParameter("sfp4", "4");
+                qry.setParameter("sfp12", "12");
+                qry.setParameter("sfp22", "22");
+                qry.setParameter("sfp31", "31");
+                qry.setParameter("sfp36", "36");
+            }
 
             // Cache was disabled because it would interfere with the
             // "change password" action.
