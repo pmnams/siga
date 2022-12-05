@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
@@ -36,6 +37,10 @@ public class ExRequerenteDoc extends AbstractExRequerenteDoc {
 	
 	public String getDtNascimentoFormatado() {
 		Date data = this.getDataNascimento();
+
+		if (Objects.isNull(data))
+			return "";
+
 		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 		return df.format(data);
 	}
