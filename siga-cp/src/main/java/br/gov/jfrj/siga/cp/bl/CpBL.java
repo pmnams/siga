@@ -1359,10 +1359,9 @@ public class CpBL {
 
         if (mnMatricula != null)
             pessoa.setMatricula(mnMatricula);
-        else
-            pessoa.setMatricula(10000 + pessoa.getId());
 
-        if (Objects.nonNull(CpDao.getInstance().consultarPorSigla(pessoa)))
+        DpPessoa pessoaMatricula = CpDao.getInstance().consultarPorSigla(pessoa);
+        if (Objects.nonNull(pessoaMatricula) && Objects.nonNull(pessoaAnt.getIdPessoaIni()) && !Objects.equals(pessoaAnt.getIdPessoaIni(), pessoaMatricula.getIdPessoaIni()))
             throw new AplicacaoException("Já existe uma pessoa com o mesmo numero de matrícula cadastrada no órgão informado");
 
         // ÓRGÃO / CARGO / FUNÇÃO DE CONFIANÇA / LOTAÇÃO e CPF iguais.
@@ -1387,7 +1386,7 @@ public class CpBL {
         try {
             if (pessoaAnt.getId() != null) {
 
-                if (!alteracaoMatricula && mnMatricula > 0)
+                if (!alteracaoMatricula)
                     pessoa.setMatricula(pessoaAnt.getMatricula());
 
                 if (pessoaAnt.getDataFimPessoa() != null) {
@@ -1395,7 +1394,7 @@ public class CpBL {
                 }
 
                 CpIdentidade ident = null;
-                if (!pessoa.getOrgaoUsuario().equivale(pessoaAnt.getOrgaoUsuario()) || alteracaoMatricula) {
+                if (!pessoa.getOrgaoUsuario().equivale(pessoaAnt.getOrgaoUsuario())) {
                     ident = new CpIdentidade();
                     CpIdentidade identAnt;
                     identAnt = CpDao.getInstance().consultaIdentidadeCadastrante(pessoaAnt.getSesbPessoa() + pessoaAnt.getMatricula(), !alteracaoMatricula);
@@ -1433,7 +1432,7 @@ public class CpBL {
                 CpDao.getInstance().gravar(pessoa);
                 pessoa.setIdPessoaIni(pessoa.getId());
 
-                if (pessoa.getMatricula() == null)
+                if (pessoa.getMatricula() == null || pessoa.getMatricula() <= 0)
                     pessoa.setMatricula(10000 + pessoa.getId());
 
                 CpDao.getInstance().gravar(pessoa);
