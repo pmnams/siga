@@ -65,7 +65,6 @@ import java.util.stream.Collectors;
  * A class that represents a row in the 'EX_DOCUMENTO' table. This class may be
  * customized as it is never re-generated after being created.
  */
-@SuppressWarnings("serial")
 @Entity
 @BatchSize(size = 500)
 @Table(name = "siga.ex_documento")

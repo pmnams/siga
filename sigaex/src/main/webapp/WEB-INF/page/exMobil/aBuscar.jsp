@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="/siga/javascript/select2/select2.css" type="text/css" media="screen, projection"/>
 <link rel="stylesheet" href="/siga/javascript/select2/select2-bootstrap.css" type="text/css"
       media="screen, projection"/>
-<script type="text/javascript" language="Javascript1.1">
+<script type="text/javascript">
 window.onload = function() {
 	var frmsel = document.getElementById('idFormaDoc');
 	var modsel = document.getElementById('idMod');

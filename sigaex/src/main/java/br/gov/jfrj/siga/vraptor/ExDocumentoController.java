@@ -681,6 +681,17 @@ public class ExDocumentoController extends ExController {
             }
         }
 
+        if (Objects.isNull(exDocumentoDTO.getRequerenteDocSel())) {
+            ExRequerenteDoc req = exDocumentoDTO.getDoc().getRequerenteDoc();
+            if (Objects.nonNull(req)) {
+                ExRequerenteDocSelecao reqSel = new ExRequerenteDocSelecao();
+                exDocumentoDTO.setRequerenteDocSel(reqSel);
+                reqSel.setId(req.getId());
+
+                exDocumentoDTO.getRequerenteDocSel().buscar();
+            }
+        }
+
         exDocumentoDTO.getSubscritorSel().buscar();
         exDocumentoDTO.getDestinatarioSel().buscar();
         exDocumentoDTO.getLotacaoDestinatarioSel().buscar();
@@ -1553,8 +1564,12 @@ public class ExDocumentoController extends ExController {
                 exDocumentoDTO.setDoc(new ExDocumento());
             }
 
-            DpPessoa subscritor = exDocumentoDTO.getSubscritorSel().getObjeto();
+            if (Objects.nonNull(exDocumentoDTO.getRequerenteDocSel())) {
+                ExRequerenteDoc requerente = exDocumentoDTO.getRequerenteDocSel().getObjeto();
+                exDocumentoDTO.getDoc().setRequerenteDoc(requerente);
+            }
 
+            DpPessoa subscritor = exDocumentoDTO.getSubscritorSel().getObjeto();
             if (subscritor != null && !new ExPodeRestringirCossignatarioSubscritor(getTitular(), getLotaTitular(), subscritor, subscritor.getLotacao(),
                     subscritor.getCargo(),
                     subscritor.getFuncaoConfianca(),

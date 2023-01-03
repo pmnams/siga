@@ -609,6 +609,10 @@ public class ExDao extends CpDao {
             query.setParameter("subscritorSelId", flt.getSubscritorSelId());
         }
 
+        if (flt.getRequerenteDocSelId() != null && flt.getRequerenteDocSelId() != 0) {
+            query.setParameter("requerenteDocSelId", flt.getRequerenteDocSelId());
+        }
+
         if (flt.getNmSubscritorExt() != null
 
                 && !flt.getNmSubscritorExt().trim().equals("")) {

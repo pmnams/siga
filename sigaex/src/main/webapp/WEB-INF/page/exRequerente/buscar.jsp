@@ -51,6 +51,7 @@
                     <tr>
                         <script class="temp">
                             requerentes["${requerente.id}"] = {
+                                id: "${requerente.id}",
                                 nomeRequerente: "${requerente.nomeRequerente}",
                                 email: "${requerente.emailRequerente}",
                                 tipo: "${requerente.tipoRequerente}",
@@ -73,7 +74,7 @@
                             </c:if>
                         </script>
                         <td><a
-                                href="javascript: parent.setEntrevista(requerentes['${requerente.id}']);">${requerente.nomeRequerente}</a>
+                                href="javascript: requerenteOnClick(requerentes['${requerente.id}']);">${requerente.nomeRequerente}</a>
                         </td>
                         <td>${requerente.cpfFormatado}</td>
                         <td>${requerente.emailRequerente}</td>
@@ -85,12 +86,22 @@
         <script>
             function buscar(event) {
 
-                if (event && event.keyCode != 13)
+                if (event && event.keyCode !== 13)
                     return null;
 
                 let value = document.getElementById('ref').value;
                 location.replace('/sigaex/app/requerente/buscar?ref=' + value);
             }
+
+            function requerenteOnClick(requerente) {
+
+                if (parent.setEntrevista)
+                    parent.setEntrevista(requerente)
+                else
+                    parent.retorna_requerenteDoc(requerente.id, requerente.cadastro, requerente.nomeRequerente)
+
+            }
+
         </script>
     </main>
 </siga:pagina>

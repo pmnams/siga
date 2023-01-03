@@ -79,6 +79,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.*;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -5640,7 +5641,7 @@ public class ExBL extends CpBL {
                     attrs.put("nmMod", doc.getExModelo().getNmMod());
                     byte[] fm = doc.getExModelo().getConteudoBlobMod2();
                     if (fm != null)
-                        attrs.put("template", new String(fm, "utf-8"));
+                        attrs.put("template", new String(fm, StandardCharsets.UTF_8));
                     p = processadorModeloFreemarker;
                 }
             }

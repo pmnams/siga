@@ -2392,9 +2392,9 @@ Pede deferimento.</span><br/><br/><br/>
             <td width="100%">
                 <table width="100%" border="0" cellpadding="2">
                     <tr>
-                        <td width="100%" align="center" valign="bottom"><img src="${_pathBrasao}"
-                                                                             width="${_widthBrasao}"
-                                                                             height="${_heightBrasao}"/></td>
+                        <td width="100%" align="center" valign="bottom">
+                            <img src="${_pathBrasao}" width="${_widthBrasao}" height="${_heightBrasao}"/>
+                        </td>
                     </tr>
                     <tr>
                         <td width="100%" align="center">
@@ -2431,6 +2431,18 @@ Pede deferimento.</span><br/><br/><br/>
         <tr bgcolor="#FFFFFF">
             <td width="100%">
                 <table width="100%" border="0" cellpadding="2">
+                    [#if _brasaoTodasPaginas]
+                        [#assign heightBrasao = _heightBrasao?number]
+                        <style>
+                            @page {
+                                margin-top: ${(3 + heightBrasao / 37.80)?string.computer}cm;
+                            }
+                        </style>
+
+                        <td width="100%" align="center" valign="bottom">
+                            <img src="${_pathBrasao}" width="${_widthBrasao}" height="${_heightBrasao}"/>
+                        </td>
+                    [/#if]
                     <tr>
                         <td width="100%" align="center">
                             <p style="font-family: AvantGarde Bk BT, Arial; font-size: 11pt;">${_tituloGeral}</p>
@@ -4853,28 +4865,28 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 [#macro diminuirEspacamento texto=""]
     <style>
         p {
-            margin-bottom: 0px;
-            margin-top: 0px;
+            margin-bottom: 0;
+            margin-top: 0;
         }
 
         ol {
-            margin-bottom: 0px;
-            margin-top: 0px;
+            margin-bottom: 0;
+            margin-top: 0;
         }
 
         ol li {
-            margin-bottom: 0px;
-            margin-top: 0px;
+            margin-bottom: 0;
+            margin-top: 0;
         }
 
         ul {
-            margin-bottom: 0px;
-            margin-top: 0px;
+            margin-bottom: 0;
+            margin-top: 0;
         }
 
         ul li {
-            margin-bottom: 0px;
-            margin-top: 0px;
+            margin-bottom: 0;
+            margin-top: 0;
         }
     </style>
     ${texto}
@@ -4884,5 +4896,6 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 [#assign _pathBrasaoSecundario = "contextpath/imagens/Logotipo_Prodesp_Governo_SP.png" /]
 [#assign _widthBrasao = "auto" /]
 [#assign _heightBrasao = "65" /]
+[#assign _brasaoTodasPaginas = false /]
 [#assign _tituloGeral = "PODER JUDICIÁRIO" /]
 [#assign _subtituloGeral = "JUSTIÇA FEDERAL" /]

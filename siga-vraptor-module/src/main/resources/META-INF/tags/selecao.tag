@@ -265,9 +265,6 @@
         Siga.ajax(url, null, "GET", function(response){
             resposta_ajax_
 
-
-
-
         ${propriedade}${tipoSel}(response);
 	});	*/
         $.get(url, function (response) {

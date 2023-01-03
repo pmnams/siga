@@ -167,6 +167,10 @@ public class MontadorQuery implements IMontadorQuery {
             sbf.append(" and doc.subscritor.idPessoaIni = :subscritorSelId");
         }
 
+        if (flt.getRequerenteDocSelId() != null && flt.getRequerenteDocSelId() != 0) {
+            sbf.append(" and doc.requerenteDoc.idRequerente = :requerenteDocSelId");
+        }
+
         if (flt.getNmSubscritorExt() != null
                 && !flt.getNmSubscritorExt().trim().equals("")) {
             sbf.append(" and upper(doc.nmSubscritorExt) like :nmSubscritorExt");

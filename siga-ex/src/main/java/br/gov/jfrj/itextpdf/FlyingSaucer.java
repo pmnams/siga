@@ -134,15 +134,12 @@ public class FlyingSaucer implements ConversorHtml {
 //		docBuilder.setEntityResolver(new DummyEntityResolver());
 //		Document dom = docBuilder.parse(new ByteArrayInputStream(sHtml.getBytes(StandardCharsets.UTF_8)));
 
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(sHtml);
-        org.w3c.dom.Document dom = new W3CDom().fromJsoup(jsoupDoc);
-
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             logger.fine("comecei a gerar o pdf");
             PdfRendererBuilder builder = new PdfRendererBuilder();
             builder.useHttpStreamImplementation(new DownloadExterno());
             builder.useFastMode();
-            builder.withW3cDocument(dom, null);
+            builder.withHtmlContent(sHtml, null);
             builder.toStream(os);
             builder.run();
 
