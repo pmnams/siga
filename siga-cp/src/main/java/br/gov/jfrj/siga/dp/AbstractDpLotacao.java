@@ -97,11 +97,11 @@ import java.util.TreeSet;
         @NamedQuery(
                 name = "consultarPorFiltroDpLotacaoInclusiveFechadas",
                 query = "from DpLotacao lotacao"
-                        + "  where ((upper(lotacao.nomeLotacaoAI) like upper('%' || :nome || '%') or upper(lotacao.siglaLotacao) like upper('%' || :sigla || '%')) "
-                        + "	and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or lotacao.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu)"
-                        + " or ( :nome != null and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or lotacao.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu) and (upper(concat(lotacao.orgaoUsuario.acronimoOrgaoUsu, lotacao.siglaLotacao)) like upper(:nome || '%')"
-                        + " or upper(concat(lotacao.orgaoUsuario.siglaOrgaoUsu, lotacao.siglaLotacao)) like upper(:nome || '%'))))"
-                        + "	and exists (select 1 from DpLotacao lAux where lAux.idLotacaoIni = lotacao.idLotacaoIni"
+                        + " where ((upper(lotacao.nomeLotacaoAI) like upper('%' || :nome || '%') or upper(lotacao.siglaLotacao) like upper('%' || :sigla || '%')) "
+                        + "	 and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or lotacao.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu)"
+                        + "  or ( :nome != null and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or lotacao.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu) and (upper(concat(lotacao.orgaoUsuario.acronimoOrgaoUsu, lotacao.siglaLotacao)) like upper(:nome || '%')"
+                        + "  or upper(concat(lotacao.orgaoUsuario.siglaOrgaoUsu, lotacao.siglaLotacao)) like upper(:nome || '%'))))"
+                        + "	 and exists (select 1 from DpLotacao lAux where lAux.idLotacaoIni = lotacao.idLotacaoIni"
                         + "	 group by lAux.idLotacaoIni having max(lAux.dataInicioLotacao) = lotacao.dataInicioLotacao)"
                         + "  order by upper(nomeLotacaoAI)"
         ),
