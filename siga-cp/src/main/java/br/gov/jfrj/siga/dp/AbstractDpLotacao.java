@@ -75,10 +75,12 @@ import java.util.TreeSet;
                 + "  or upper(concat(lot.orgaoUsuario.siglaOrgaoUsu, lot.siglaLotacao)) like upper(:nome || '%'))))"
                 + "	 and lot.dataFimLotacao = null"),
         @NamedQuery(name = "consultarPorFiltroDpLotacaoInclusiveFechadas", query = "from DpLotacao lotacao"
-                + "  where (:idOrgaoUsu = null or :idOrgaoUsu = 0L or lotacao.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu)"
-                + "		and ((upper(lotacao.nomeLotacaoAI) like upper('%' || :nome || '%')) or (upper(lotacao.siglaLotacao) like upper('%'  || :sigla || '%')))"
-                + "		and exists (select 1 from DpLotacao lAux where lAux.idLotacaoIni = lotacao.idLotacaoIni"
-                + "			group by lAux.idLotacaoIni having max(lAux.dataInicioLotacao) = lotacao.dataInicioLotacao)"
+                + " where ((upper(lotacao.nomeLotacaoAI) like upper('%' || :nome || '%') or upper(lotacao.siglaLotacao) like upper('%' || :sigla || '%')) "
+                + "	 and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or lotacao.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu)"
+                + "  or ( :nome != null and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or lotacao.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu) and (upper(concat(lotacao.orgaoUsuario.acronimoOrgaoUsu, lotacao.siglaLotacao)) like upper(:nome || '%')"
+                + "  or upper(concat(lotacao.orgaoUsuario.siglaOrgaoUsu, lotacao.siglaLotacao)) like upper(:nome || '%'))))"
+                + "	 and exists (select 1 from DpLotacao lAux where lAux.idLotacaoIni = lotacao.idLotacaoIni"
+                + "	 group by lAux.idLotacaoIni having max(lAux.dataInicioLotacao) = lotacao.dataInicioLotacao)"
                 + "  order by upper(nomeLotacaoAI)"),
         @NamedQuery(name = "consultarQuantidadeDpLotacaoInclusiveFechadas", query = "select count(distinct lotacao.idLotacaoIni) from DpLotacao lotacao"
                 + "  where ((upper(lotacao.nomeLotacaoAI) like upper('%' || :nome || '%') or upper(lotacao.siglaLotacao) like upper('%' || :sigla || '%')) "

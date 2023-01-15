@@ -90,21 +90,15 @@ public class DpLotacaoController extends SigaSelecionavelControllerSupport<DpLot
     @Post
     @Path({"/app/lotacao/buscar", "/lotacao/buscar.action"})
     public void busca(String sigla, Long idOrgaoUsu, Integer paramoffset, String postback) throws Exception {
-        /// TODO: 23/05/2021 Rever a lógica de busca
-        if (postback == null)
+        if (Objects.isNull(postback))
             orgaoUsu = getLotaTitular().getOrgaoUsuario().getIdOrgaoUsu();
         else
             orgaoUsu = idOrgaoUsu;
 
         this.getP().setOffset(paramoffset);
 
-        if (idOrgaoUsu == null)
-            idOrgaoUsu = getLotaTitular().getOrgaoUsuario().getIdOrgaoUsu();
-
-        TypedQuery<CpOrgaoUsuario> query = dao.em().createNamedQuery("consultarIdOrgaoUsuario", CpOrgaoUsuario.class);
-        query.setParameter("idOrgaoUsu", idOrgaoUsu);
-
-        sigla = query.getSingleResult().getSiglaOrgaoUsu();
+        if (sigla == null)
+            sigla = "";
 
         super.aBuscar(sigla, postback);
 
