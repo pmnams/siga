@@ -1,13 +1,13 @@
 package br.gov.jfrj.siga.ex.logic;
 
 import br.gov.jfrj.siga.ex.ExMobil;
-import br.gov.jfrj.siga.ex.ExMobil.Pendencias;
+import br.gov.jfrj.siga.ex.bl.ExTramiteBL.Pendencias;
 import com.crivano.jlogic.Expression;
 import com.crivano.jlogic.JLogic;
 
 public class ExEstaAindaComOCadastrante implements Expression {
 
-    private ExMobil mob;
+    private final ExMobil mob;
 
     public ExEstaAindaComOCadastrante(ExMobil mob) {
         this.mob = mob;

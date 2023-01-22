@@ -3,16 +3,16 @@ package br.gov.jfrj.siga.ex.logic;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.ExMobil;
-import br.gov.jfrj.siga.ex.ExMobil.Pendencias;
 import br.gov.jfrj.siga.ex.ExMovimentacao;
+import br.gov.jfrj.siga.ex.bl.ExTramiteBL.Pendencias;
 import com.crivano.jlogic.Expression;
 import com.crivano.jlogic.JLogic;
 
 public class ExEstaPendenteDeRecebimento implements Expression {
 
     private ExMobil mob;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public ExEstaPendenteDeRecebimento(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;
@@ -38,9 +38,8 @@ public class ExEstaPendenteDeRecebimento implements Expression {
     public boolean eval() {
         // Verifica se existe recebimento pendente para titular ou lotaTitular
         Pendencias p = mob.calcularTramitesPendentes();
-        boolean f = false;
         for (ExMovimentacao tramite : p.tramitesPendentes) {
-            if (tramite.isResp(titular, lotaTitular))
+            if (tramite.isRespExato(titular, lotaTitular))
                 return true;
         }
         return false;

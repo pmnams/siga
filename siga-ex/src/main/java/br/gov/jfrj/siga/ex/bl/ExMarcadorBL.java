@@ -12,7 +12,6 @@ import br.gov.jfrj.siga.dp.CpMarcador;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.*;
-import br.gov.jfrj.siga.ex.ExMobil.Pendencias;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import br.gov.jfrj.siga.hibernate.ExDao;
@@ -585,7 +584,7 @@ public class ExMarcadorBL {
     }
 
     public void calcularMarcadoresDeTramite() {
-        Pendencias p = mob.calcularTramitesPendentes();
+        ExTramiteBL.Pendencias p = mob.calcularTramitesPendentes();
 
         Set<ExMovimentacao> enviados = new TreeSet<>(p.tramitesPendentes);
         enviados.removeAll(p.tramitesDeNotificacoesPendentes);
@@ -600,7 +599,6 @@ public class ExMarcadorBL {
                     tramite.getLotaCadastrante(),
                     null
             );
-
             acrescentarMarcaTransferencia(
                     mob.doc().isEletronico()
                             ? CpMarcadorEnum.CAIXA_DE_ENTRADA.getId()
@@ -628,7 +626,8 @@ public class ExMarcadorBL {
         recebidos.removeAll(p.recebimentosDeNotificacoesPendentes);
         for (ExMovimentacao recebimento : recebidos) {
             acrescentarMarcaTransferencia(
-                    mob.isAtendente(recebimento.getResp(), recebimento.getLotaResp())
+                    (mob.isAtendente(null, recebimento.getLotaResp()) ||
+                            (recebimento.getLotaResp() == null && mob.isAtendente(recebimento.getResp(), recebimento.getLotaResp())))
                             ? ((mob.getNumSequencia() > 1 || mob.doc().jaTransferido()) ? CpMarcadorEnum.EM_ANDAMENTO.getId()
                             : CpMarcadorEnum.ASSINADO.getId())
                             : CpMarcadorEnum.AGUARDANDO_CONCLUSAO.getId(),
@@ -644,7 +643,7 @@ public class ExMarcadorBL {
     }
 
     public void calcularMarcadoresDeNotificacao() {
-        Pendencias p = mob.calcularTramitesPendentes();
+        ExTramiteBL.Pendencias p = mob.calcularTramitesPendentes();
         for (ExMovimentacao tramite : p.tramitesDeNotificacoesPendentes) {
             acrescentarMarcaTransferencia(CpMarcadorEnum.CAIXA_DE_ENTRADA.getId(),
                     tramite.getDtIniMov(), null, tramite.getResp(), tramite.getLotaResp(), null);

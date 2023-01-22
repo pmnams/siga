@@ -102,7 +102,7 @@ public class DpLotacaoController extends SigaSelecionavelControllerSupport<DpLot
 
         super.aBuscar(sigla, postback);
 
-        result.include("param", getRequest().getParameterMap());
+       result.include("param", getRequest().getParameterMap());
         result.include("request", getRequest());
         result.include("itens", getItens());
         result.include("tamanho", getTamanho());

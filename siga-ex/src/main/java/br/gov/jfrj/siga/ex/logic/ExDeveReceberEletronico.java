@@ -9,9 +9,9 @@ import com.crivano.jlogic.*;
 
 public class ExDeveReceberEletronico extends CompositeExpressionSupport {
 
-    private ExMobil mob;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final ExMobil mob;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public ExDeveReceberEletronico(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         if (mob.isGeralDeProcesso() && mob.doc().isFinalizado())
@@ -25,11 +25,8 @@ public class ExDeveReceberEletronico extends CompositeExpressionSupport {
     // lotação
     @Override
     protected Expression create() {
-
         return And.of(
-
                 Not.of(new ExEstaEmTransitoExterno(mob)),
-
                 new ExPodeReceberEletronico(mob, titular, lotaTitular),
 
                 new Expression() {
@@ -42,13 +39,16 @@ public class ExDeveReceberEletronico extends CompositeExpressionSupport {
                     @Override
                     public boolean eval() {
                         ExMovimentacao ultMov = mob.getUltimaMovimentacaoNaoCancelada();
-                        return !(ultMov.getExTipoMovimentacao() == ExTipoDeMovimentacao.TRANSFERENCIA
-                                && ultMov.getCadastrante() != null
-                                && ultMov.getCadastrante().equivale(titular)
-                                && ultMov.getLotaResp() != null
-                                && ultMov.getLotaResp().equivale(lotaTitular));
+                        return !(
+                                ultMov.getExTipoMovimentacao() == ExTipoDeMovimentacao.TRANSFERENCIA
+                                        && ultMov.getCadastrante() != null
+                                        && ultMov.getCadastrante().equivale(titular)
+                                        && ultMov.getLotaResp() != null
+                                        && ultMov.getLotaResp().equivale(lotaTitular)
+                        );
                     }
-                });
+                }
+        );
     }
 
 }

@@ -44,6 +44,8 @@ import com.crivano.jlogic.Expression;
 import com.crivano.swaggerservlet.SwaggerUtils;
 import org.hibernate.annotations.BatchSize;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.io.Serializable;
@@ -64,6 +66,7 @@ import static java.util.Objects.nonNull;
 
 @Entity
 @BatchSize(size = 500)
+@Access(AccessType.FIELD)
 @Table(name = "siga.ex_movimentacao")
 public class ExMovimentacao extends AbstractExMovimentacao implements
         Serializable, Comparable<ExMovimentacao> {
@@ -1338,13 +1341,13 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
     }
 
     public boolean isResp(DpPessoa titular) {
-        return Utils.equivale(getResp(),titular)
-                || Utils.equivale(getDestinoFinal(),titular);
+        return Utils.equivale(getResp(), titular)
+                || Utils.equivale(getDestinoFinal(), titular);
     }
 
     public boolean isResp(DpLotacao lotaTitular) {
         return Utils.equivale(getLotaResp(), lotaTitular)
-                || Utils.equivale(getLotaDestinoFinal(),lotaTitular);
+                || Utils.equivale(getLotaDestinoFinal(), lotaTitular);
     }
 
     public boolean isResp(DpPessoa titular, DpLotacao lotaTitular) {
@@ -1353,6 +1356,13 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
 
     public boolean isRespPreferencialmentePelaLotacao(DpPessoa titular, DpLotacao lotaTitular) {
         return getLotaResp() != null ? isResp(lotaTitular) : isResp(titular);
+    }
+
+    public boolean isRespExato(DpPessoa titular, DpLotacao lotaTitular) {
+        return (getResp() == null && Utils.equivale(getLotaResp(), lotaTitular))
+                || Utils.equivale(getResp(), titular)
+                || (getDestinoFinal() == null && Utils.equivale(getLotaDestinoFinal(), lotaTitular))
+                || Utils.equivale(getDestinoFinal(), titular);
     }
 
     public boolean isMovimentacaoDePosse() {

@@ -28,24 +28,43 @@ public class ExPodeConcluir extends CompositeExpressionSupport {
                         new ExEMobilVia(mob),
                         new ExEMobilUltimoVolume(mob)
                 ),
-                Not.of(new ExEstaSemEfeito(mob.doc())),
-                Not.of(new ExTemAnexosNaoAssinados(mob)),
-                Not.of(new ExTemDespachosNaoAssinados(mob)),
-                Not.of(new ExTemAnexosNaoAssinados(mob.doc().getMobilGeral())),
-                Not.of(new ExTemDespachosNaoAssinados(mob.doc().getMobilGeral())),
-                Not.of(new ExEstaPendenteDeAssinatura(mob.doc())),
-                Not.of(new ExEstaSobrestado(mob)),
-                Not.of(new ExEstaJuntado(mob)),
-                Not.of(new ExEstaEmTransito(mob, titular, lotaTitular)),
                 Or.of(
                         And.of(
-                                Not.of(new ExEstaArquivado(mob)),
                                 new ExEstaEmTramiteParalelo(mob),
                                 new ExPodeMovimentar(mob, titular, lotaTitular)
                         ),
                         new ExEstaNotificado(mob, titular, lotaTitular)
                 ),
-                new ExPodeMovimentarPorConfiguracao(ExTipoDeMovimentacao.CONCLUSAO, titular, lotaTitular)
+                Not.of(new ExEstaSemEfeito(mob.doc())),
+                Not.of(
+                        Or.of(
+                                new ExTemAnexosNaoAssinados(mob),
+                                new ExTemDespachosNaoAssinados(mob),
+                                new ExTemAnexosNaoAssinados(mob.doc().getMobilGeral()),
+                                new ExTemDespachosNaoAssinados(mob.doc().getMobilGeral())
+                        )
+                ),
+                Not.of(new ExEstaPendenteDeAssinatura(mob.doc())),
+                Not.of(new ExEstaArquivado(mob)),
+                Not.of(new ExEstaSobrestado(mob)),
+                Not.of(new ExEstaJuntado(mob)),
+                Not.of(new ExEstaEmTransito(mob, titular, lotaTitular)),
+                new ExPodeMovimentarPorConfiguracao(ExTipoDeMovimentacao.CONCLUSAO, titular, lotaTitular),
+                NAnd.of(
+                        new ExEstaAindaComOCadastrante(mob),
+                        new ExECadastrante(mob.doc(), null, lotaTitular),
+                        new ExECadastrante(mob.doc(), titular, null)
+                ),
+                //Nato: o ideal é que existam diferentes movimentações de conclusão, para tramite paralelo e notificação,
+                // da mesma forma que existem diferentes botões para tramitar em paralelo e para notificar. Talvez os
+                // recebimentos devessem ser diferentes também. Assim, as lógicas seriam mais simples. Enquanto
+                // isso não é feito, melhor impedir a conclusão de uma notificação para um colega da equipe, quando
+                // o documento está com o titular, pois estava provocando uma conclusão do trâmite principal.
+                Not.of(new ExPodeArquivarCorrente(mob, titular, lotaTitular))
+
+//				And.of(new ExEstaPendenteDeRecebimento(mob, titular, lotaTitular),
+//						new ExPodeMovimentarPorConfiguracao(ExTipoDeMovimentacao.RECEBIMENTO, titular, lotaTitular))
+
         );
     }
 }
