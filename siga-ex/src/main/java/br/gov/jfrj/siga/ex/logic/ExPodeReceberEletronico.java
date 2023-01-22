@@ -45,25 +45,19 @@ public class ExPodeReceberEletronico extends CompositeExpressionSupport {
     protected Expression create() {
 
         return And.of(
-
                 new ExEEletronico(mob.doc()),
-
                 Or.of(
-
                         new ExEMobilVia(mob),
-
-                        new ExEMobilVolume(mob)),
-
+                        new ExEMobilVolume(mob)
+                ),
                 Not.of(new ExTemDespachosNaoAssinados(mob)),
-
                 Or.of(
-
                         And.of(
-
                                 new ExEstaEmTransitoExterno(mob),
-
-                                new ExEstaResponsavel(mob, titular, lotaTitular)),
-
-                        new ExEstaPendenteDeRecebimento(mob, titular, lotaTitular)));
+                                new ExEstaResponsavel(mob, titular, lotaTitular)
+                        ),
+                        new ExEstaPendenteDeRecebimento(mob, titular, lotaTitular)
+                )
+        );
     }
 }

@@ -1332,4 +1332,12 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
                 || Utils.equivale(getLotaDestinoFinal(), lotaTitular)
                 || Utils.equivale(getDestinoFinal(), titular);
     }
+
+    public boolean isRespExato(DpPessoa titular, DpLotacao lotaTitular) {
+        return (getResp() == null && Utils.equivale(getLotaResp(), lotaTitular))
+                || Utils.equivale(getResp(), titular)
+                || (getDestinoFinal() == null && Utils.equivale(getLotaDestinoFinal(), lotaTitular))
+                || Utils.equivale(getDestinoFinal(), titular);
+    }
+
 }
