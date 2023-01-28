@@ -153,6 +153,12 @@ public class Stamp {
             mask.makeMask();
             mask.setInverted(true);
 
+            //Configurções do carimbo de pagina
+            int carimboVariante = Prop.getInt("carimbo.pagina.variante");
+            boolean carimboTransparente = Prop.getBool("carimbo.pagina.fundo.transparente", false);
+            int carimboPagX = Prop.getInt("carimbo.pagina.x");
+            int carimboPagY = Prop.getInt("carimbo.pagina.y");
+
             while (i < n) {
                 i++;
                 // watermark under the existing page
@@ -323,11 +329,11 @@ public class Stamp {
                         // Raio do circulo interno
                         float radius = 18f;
 
-                        if (SigaMessages.isSigaSP()) {
+                        if (carimboVariante == 1) {
                             // tamanho fonte, número
-                            textHeight = 12;
+                            textHeight = 10;
                             // Raio do circulo interno
-                            radius = 12f;
+                            radius = 11f;
                             // não exibe órgão
                             orgaoUsu = "";
                         }
@@ -340,16 +346,33 @@ public class Stamp {
                                 + 2 * TEXT_TO_CIRCLE_INTERSPACE;
 
                         // Centro do circulo
-                        float xCenter = r.getWidth() - 1.8f * (radius + circleInterspace);
-                        float yCenter = r.getHeight() - 1.8f * (radius + circleInterspace);
+                        int circleRadius = Math.round((radius + circleInterspace) * 2) / 2;
+
+                        float xCenter = circleRadius;
+                        if (carimboPagX > 0)
+                            xCenter += carimboPagX % (r.getWidth() - circleRadius * 2 + 1);
+                        else
+                            xCenter += r.getWidth() - circleRadius * 2 + carimboPagX % (r.getWidth() - circleRadius * 2 + 1);
+
+                        float yCenter = circleRadius;
+                        if (carimboPagY > 0)
+                            yCenter += r.getHeight() - circleRadius * 2 - carimboPagY % (r.getHeight() - circleRadius * 2 + 1);
+                        else
+                            yCenter -= carimboPagY % (r.getHeight() - circleRadius * 2 + 1);
 
                         over.saveState();
-                        final PdfGState gs = new PdfGState();
+                        PdfGState gs = new PdfGState();
                         gs.setFillOpacity(1f);
                         over.setGState(gs);
                         over.setColorFill(BaseColor.BLACK);
 
                         over.saveState();
+                        if (carimboTransparente) {
+                            gs = new PdfGState();
+                            gs.setFillOpacity(0f);
+                            over.setGState(gs);
+                        }
+
                         over.setColorStroke(BaseColor.BLACK);
                         over.setLineWidth(1f);
                         over.setColorFill(BaseColor.WHITE);

@@ -1,0 +1,2 @@
+DELETE FROM ex_papel WHERE ID_PAPEL = 8;
+DELETE FROM ex_papel WHERE ID_PAPEL = 9;
