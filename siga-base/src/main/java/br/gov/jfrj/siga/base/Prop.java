@@ -33,6 +33,14 @@ public class Prop {
         return provider.getProp(nome);
     }
 
+    public static Boolean getBool(String nome, Boolean preset) {
+        try {
+            return getBool(nome);
+        } catch (Exception e) {
+            return preset;
+        }
+    }
+
     public static Boolean getBool(String nome) {
         String p = Prop.get(nome);
         if (p == null)

@@ -194,6 +194,11 @@ public class ExApiV1Servlet extends SwaggerServlet implements IPropertyProvider 
         addPublicProperty("assinatura.policy.url.path", null);
         addPublicProperty("assinatura.estampar", "false");
 
+        addPublicProperty("carimbo.pagina.variante", "0");
+        addPublicProperty("carimbo.pagina.fundo.transparente", "false");
+        addPublicProperty("carimbo.pagina.x", "522");
+        addPublicProperty("carimbo.pagina.y", "18");
+
         addRestrictedProperty("bie.lista.destinatario.publicacao", null);
         addPublicProperty("carimbo.texto.superior", "SIGA-DOC");
         addPublicProperty("classificacao.mascara.entrada",
