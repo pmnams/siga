@@ -75,7 +75,7 @@
 
     <c:set var="collapse_Expanded" scope="request" value="collapsible expanded"/>
 
-    <c:set var="siga_version" scope="request" value="1.1.9"/>
+    <c:set var="siga_version" scope="request" value="1.1.10"/>
 
     <meta name="theme-color" content="bg-primary">
     <c:set var="thead_color" value="thead-light" scope="request"/>
