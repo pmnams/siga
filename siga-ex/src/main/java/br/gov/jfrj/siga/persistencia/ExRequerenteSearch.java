@@ -13,13 +13,13 @@ import javax.persistence.criteria.Root;
 
 public class ExRequerenteSearch {
 	private final EntityManager em;
-	private Integer totalResults;
+	private Long totalResults;
 
 	public ExRequerenteSearch(EntityManager em) {
 		this.em = em;
 	}
 
-	public Integer getTotalResultados() {
+	public Long getTotalResultados() {
 		return this.totalResults;
 	}
 
@@ -42,9 +42,28 @@ public class ExRequerenteSearch {
 		query.setFirstResult(maxResults * page);
 		query.setMaxResults(maxResults);
 
-		List<ExRequerenteDoc> requerentes = query.getResultList();
-		this.totalResults = requerentes.size();
+		this.totalResults = count(ref);
 
-		return requerentes;
+		return query.getResultList();
 	}
+
+	private Long count(String ref) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+
+		CriteriaQuery<Long> q = cb.createQuery(Long.class);
+		Root<ExRequerenteDoc> r = q.from(ExRequerenteDoc.class);
+		q.select(cb.count(r));
+
+		if(ref != null && ref.isEmpty())
+			q.where(cb.or(
+					cb.like(r.get("nomeRequerente").as(String.class), "%" + ref + "%"),
+					cb.like(r.get("cpfRequerente").as(String.class), "%" + ref + "%")
+			));
+		q.orderBy(cb.asc(r.get("nomeRequerente")));
+
+		TypedQuery<Long> query = em.createQuery(q);
+
+		return query.getSingleResult();
+	}
+
 }

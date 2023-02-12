@@ -41,7 +41,6 @@ public class ExRequerenteController extends ExController {
 	@Get("/app/requerente/listar")
 	public void listar(String nome, String cpfPesquisa, Integer tamanho, Integer page) {
 		String ref = "";
-		List<ExRequerenteDoc> requerentes;
 
 		if (nome != null)
 			ref += nome;
@@ -57,15 +56,10 @@ public class ExRequerenteController extends ExController {
 		if (page == null)
 			page = 0;
 
-		if (ref.isEmpty()) {
-			requerentes = dao().listarTodos(ExRequerenteDoc.class, null);
-		} else {
-			ExRequerenteSearch busca = new ExRequerenteSearch(ExDao.getInstance().em());
-			requerentes = busca.search(page, tamanho, ref);
-		}
+		ExRequerenteSearch busca = new ExRequerenteSearch(ExDao.getInstance().em());
 
-		result.include("itens", requerentes);
-		result.include("tamanho", tamanho);
+		result.include("itens", busca.search(page, tamanho, ref));
+		result.include("totalItens", busca.getTotalResultados());
 		result.include("nome", nome);
 		result.include("cpfPesquisa", cpfPesquisa);
 	}
@@ -150,7 +144,7 @@ public class ExRequerenteController extends ExController {
 			ContextoPersistencia.commit();
 		} catch (final Exception e) {
 			ExDao.rollbackTransacao();
-			throw new AplicacaoException("Erro na exclusão do requerente", 0, e);
+			throw new AplicacaoException("Erro ao salvar o requerente", 0, e);
 		}
 		result.redirectTo(ExRequerenteController.class).listar("", "", 0, 0);
 	}
@@ -212,7 +206,7 @@ public class ExRequerenteController extends ExController {
 
 		ExRequerenteSearch busca = new ExRequerenteSearch(ExDao.getInstance().em());
 		List<ExRequerenteDoc> requerentes = busca.search(page, numItens, ref);
-		int resultados = busca.getTotalResultados();
+		Long resultados = busca.getTotalResultados();
 
 		result.include("requerentes", requerentes);
 		result.include("numResultados", resultados);

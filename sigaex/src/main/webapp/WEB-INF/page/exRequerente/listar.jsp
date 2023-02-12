@@ -7,11 +7,14 @@
 <script type="text/javascript">
 function sbmt(page) {
 	const search = new URLSearchParams(location.search);
+
+	let pageId = (page / 10).toString();
+
 	if(!search.get('page'))
-		search.append('page', page)
+		search.append('page', pageId)
 	else
-		search.set('page', page);
-	location.search = us.toString();
+		search.set('page', pageId);
+	location.search = search.toString();
 }
 function validarCPF(Objcpf){
 	var strCPF = Objcpf.replace(".","").replace(".","").replace("-","").replace("/","");
@@ -98,7 +101,7 @@ function cpf_mask(v){
 				</tr>
 			</thead>
 			<tbody>
-				<siga:paginador maxItens="15" maxIndices="10" totalItens="${tamanho}"
+				<siga:paginador maxItens="10" maxIndices="10" totalItens="${totalItens}"
 					itens="${itens}" var="requerente">
 					<tr>
 						<td align="left">${requerente.nomeRequerente}</td>
