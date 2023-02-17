@@ -30,7 +30,7 @@ public class ExRequerenteSearch {
 		Root<ExRequerenteDoc> r = q.from(ExRequerenteDoc.class);
 		q.select(r);
 
-		if(ref != null && ref.isEmpty())
+		if(ref != null && !ref.isEmpty())
 			q.where(cb.or(
 				cb.like(r.get("nomeRequerente").as(String.class), "%" + ref + "%"),
 				cb.like(r.get("cpfRequerente").as(String.class), "%" + ref + "%")
@@ -54,7 +54,7 @@ public class ExRequerenteSearch {
 		Root<ExRequerenteDoc> r = q.from(ExRequerenteDoc.class);
 		q.select(cb.count(r));
 
-		if(ref != null && ref.isEmpty())
+		if(ref != null && !ref.isEmpty())
 			q.where(cb.or(
 					cb.like(r.get("nomeRequerente").as(String.class), "%" + ref + "%"),
 					cb.like(r.get("cpfRequerente").as(String.class), "%" + ref + "%")

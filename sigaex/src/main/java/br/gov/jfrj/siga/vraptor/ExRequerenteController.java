@@ -153,19 +153,17 @@ public class ExRequerenteController extends ExController {
 	public void remover(Long id) {
 		if (id != null) {
 			try {
-				dao();
-				ExDao.iniciarTransacao();
+				ContextoPersistencia.begin();
 				ExRequerenteDoc requerente = daoRequerente(id);
 				dao().excluir(requerente);
-				dao();
-				ExDao.commitTransacao();
+				ContextoPersistencia.commit();
 			} catch (final Exception e) {
-				dao();
-				ExDao.rollbackTransacao();
+				ContextoPersistencia.em().getTransaction().rollback();
 				throw new AplicacaoException("Erro na exclusão do requerente", 0, e);
 			}
 		} else
 			throw new AplicacaoException("ID não informada");
+
 		result.redirectTo(ExRequerenteController.class).listar("", "", 0, 0);
 	}
 
@@ -204,15 +202,16 @@ public class ExRequerenteController extends ExController {
 		if (page == null)
 			page = 0;
 
-		ExRequerenteSearch busca = new ExRequerenteSearch(ExDao.getInstance().em());
-		List<ExRequerenteDoc> requerentes = busca.search(page, numItens, ref);
-		Long resultados = busca.getTotalResultados();
+		if (ref != null) {
+			ref = ref.replace(".", "").replace("-", "").replace("/", "");
+		}
 
-		result.include("requerentes", requerentes);
-		result.include("numResultados", resultados);
-		result.include("paginaAtual", resultados);
-		result.include("numItens", numItens);
-		result.include("totalPages", Math.round( (float) resultados / numItens));
+		ExRequerenteSearch busca = new ExRequerenteSearch(ExDao.getInstance().em());
+
+
+		result.include("requerentes", busca.search(page, numItens, ref));
+		result.include("numResultados", busca.getTotalResultados());
+		result.include("paginaAtual", page);
 	}
 
 	private ExRequerenteDoc daoRequerente(long id) {
