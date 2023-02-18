@@ -8,12 +8,16 @@
 
 <script>
     function sbmt(page) {
+        console.log(2)
         const search = new URLSearchParams(location.search);
-        if (!search.get('page'))
-            search.append('page', page)
+
+        let pageId = (page / 10).toString();
+
+        if(!search.get('page'))
+            search.append('page', pageId)
         else
-            search.set('page', page);
-        location.search = us.toString();
+            search.set('page', pageId);
+        location.search = search.toString();
     }
 
     const requerentes = {};
@@ -25,7 +29,7 @@
         <div class="row">
             <span>Nome ou CPF/CNPJ</span>
             <div class="input-group mb-2">
-                <input style="cursor: pointer" type="text" class="form-control" onkeypress="buscar(event)"
+                <input style="cursor: pointer" type="text" class="form-control" onkeyup="buscar(event)"
                        placeholder="Busca" id="ref">
                 <div class="input-group-append">
                     <span class="input-group-text" onclick="buscar();">Buscar</span>

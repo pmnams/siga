@@ -5,55 +5,55 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <script type="text/javascript">
-function sbmt(page) {
-	const search = new URLSearchParams(location.search);
+	function sbmt(page) {
+		const search = new URLSearchParams(location.search);
 
-	let pageId = (page / 10).toString();
+		let pageId = (page / 10).toString();
 
-	if(!search.get('page'))
-		search.append('page', pageId)
-	else
-		search.set('page', pageId);
-	location.search = search.toString();
-}
-function validarCPF(Objcpf){
-	var strCPF = Objcpf.replace(".","").replace(".","").replace("-","").replace("/","");
-    var Soma;
-    var Resto;
-    Soma = 0;
-	
-    for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
-    Resto = (Soma * 10) % 11;
-	
-    if ((Resto == 10) || (Resto == 11))  Resto = 0;
-    if (Resto != parseInt(strCPF.substring(9, 10)) ) {
-    	
-    	alert('CPF Inválido!');
-        return false;
+		if(!search.get('page'))
+			search.append('page', pageId)
+		else
+			search.set('page', pageId);
+		location.search = search.toString();
 	}
-    Soma = 0;
-    for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
-    Resto = (Soma * 10) % 11;
+	function validarCPF(Objcpf){
+		var strCPF = Objcpf.replace(".","").replace(".","").replace("-","").replace("/","");
+		var Soma;
+		var Resto;
+		Soma = 0;
 
-    if ((Resto == 10) || (Resto == 11))  Resto = 0;
-    if (Resto != parseInt(strCPF.substring(10, 11) ) ) {
-    	
-    	alert('CPF Inválido!');
-    	return false;
-    }
-    return true;
-         
-}
-function cpf_mask(v){
-	v=v.replace(/\D/g,"");
-	v=v.replace(/(\d{3})(\d)/,"$1.$2");
-	v=v.replace(/(\{3})(\d)/,"$1.$2");
-	v=v.replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+		for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+		Resto = (Soma * 10) % 11;
 
-	if(v.length == 14) {
-    	validarCPF(v);
-    }
-	return v;
+		if ((Resto == 10) || (Resto == 11))  Resto = 0;
+		if (Resto != parseInt(strCPF.substring(9, 10)) ) {
+
+			alert('CPF Inválido!');
+			return false;
+		}
+		Soma = 0;
+		for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+		Resto = (Soma * 10) % 11;
+
+		if ((Resto == 10) || (Resto == 11))  Resto = 0;
+		if (Resto != parseInt(strCPF.substring(10, 11) ) ) {
+
+			alert('CPF Inválido!');
+			return false;
+		}
+		return true;
+
+	}
+	function cpf_mask(v){
+		v=v.replace(/\D/g,"");
+		v=v.replace(/(\d{3})(\d)/,"$1.$2");
+		v=v.replace(/(\{3})(\d)/,"$1.$2");
+		v=v.replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+
+		if(v.length == 14) {
+			validarCPF(v);
+		}
+		return v;
 	}
 </script>
 
