@@ -83,7 +83,7 @@
 								<artifactItem>
 									<groupId>${project.groupId}</groupId>
 									<artifactId>${project.artifactId}</artifactId>
-									<version>${project.version}</version>
+									<version>${revision}</version>
 									<type>${project.packaging}</type>
 								</artifactItem>
 							</artifactItems>
@@ -101,7 +101,7 @@
 					<archive>
 						<manifestEntries>
 							<Build-Time>${maven.build.timestamp}</Build-Time>
-							<Build-Label>${project.version}</Build-Label>
+							<Build-Label>${revision}</Build-Label>
 						</manifestEntries>
 					</archive>
 				</configuration>

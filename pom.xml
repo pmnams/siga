@@ -5,8 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>siga</groupId>
     <artifactId>siga-doc</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+
+        <revision>1.2.0-beta.2</revision>
+    </properties>
+
     <modules>
         <module>siga-base</module>
         <module>siga-ws</module>
@@ -29,13 +38,6 @@
         <module>siga-oidc</module>
         <module>siga-integracao</module>
     </modules>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <siga.versao>develop</siga.versao>
-        <siga.version>${project.version}</siga.version>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
-    </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -74,7 +76,7 @@
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>siga-cp</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>bcmail-jdk14</artifactId>
@@ -89,17 +91,17 @@
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>siga-base</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>siga-ws</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>siga-rel</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>bcprov-jdk15on</artifactId>
@@ -126,62 +128,62 @@
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>siga-sinc-lib</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>siga-ext</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>siga-vraptor-module</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>siga-vraptor-module-old</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>siga-jwt</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>siga-ldap</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>siga-ex</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>sigaex</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>siga-wf</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>sigawf</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>siga-oidc</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>siga</groupId>
                 <artifactId>siga-integracao</artifactId>
-                <version>${siga.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -523,8 +525,6 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
-                    <!--                    <compilerArgument>-Xlint:unchecked</compilerArgument>-->
-                    <!--                    <compilerArgument>-Xlint:deprecation</compilerArgument>-->
                 </configuration>
             </plugin>
             <plugin>

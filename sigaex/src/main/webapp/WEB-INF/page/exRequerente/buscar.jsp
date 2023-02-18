@@ -102,7 +102,7 @@
                 if (parent.setEntrevista)
                     parent.setEntrevista(requerente)
                 else
-                    parent.retorna_requerenteDoc(requerente.id, requerente.cadastro, requerente.nomeRequerente)
+                    parent.retorna_requerenteDoc(requerente.id, requerente.cadastro, requerente.nomeRequerente)v
 
             }
 

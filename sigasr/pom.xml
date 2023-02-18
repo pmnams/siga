@@ -4,7 +4,7 @@
     <parent>
         <artifactId>siga-doc</artifactId>
         <groupId>siga</groupId>
-        <version>1.2-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>sigasr</artifactId>
@@ -32,7 +32,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>siga-rel</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>siga</groupId>
@@ -187,7 +187,7 @@
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}</version>
+                                    <version>${revision}</version>
                                     <type>${project.packaging}</type>
                                 </artifactItem>
                             </artifactItems>
