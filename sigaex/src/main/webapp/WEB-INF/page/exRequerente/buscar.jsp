@@ -98,12 +98,10 @@
             }
 
             function requerenteOnClick(requerente) {
-
                 if (parent.setEntrevista)
                     parent.setEntrevista(requerente)
                 else
-                    parent.retorna_requerenteDoc(requerente.id, requerente.cadastro, requerente.nomeRequerente)v
-
+                    parent.retorna_requerenteDoc(requerente.id, requerente.cadastro, requerente.nomeRequerente)
             }
 
         </script>
