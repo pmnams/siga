@@ -1582,12 +1582,11 @@ public class CpDao extends ModeloDao {
         return id;
     }
 
-    @SuppressWarnings("unchecked")
     public List<CpIdentidade> consultaIdentidadesCadastrante(final String nmUsuario, boolean fAtiva)
             throws AplicacaoException {
         try {
-            final Query qry = em()
-                    .createNamedQuery(fAtiva ? "consultarIdentidadeCadastranteAtiva" : "consultarIdentidadeCadastrante");
+            final TypedQuery<CpIdentidade> qry = em()
+                    .createNamedQuery(fAtiva ? "consultarIdentidadeCadastranteAtiva" : "consultarIdentidadeCadastrante", CpIdentidade.class);
             if (Pattern.matches("\\d+", nmUsuario)) {
                 qry.setParameter("cpf", Long.valueOf(nmUsuario));
                 qry.setParameter("nmUsuario", null);
@@ -1600,21 +1599,12 @@ public class CpDao extends ModeloDao {
 
             /* Constantes para Evitar Parse Oracle */
             qry.setParameter("cpfZero", 0L);
-            if (fAtiva) {
-                qry.setParameter("sfp1", "1");
-                qry.setParameter("sfp2", "2");
-                qry.setParameter("sfp4", "4");
-                qry.setParameter("sfp12", "12");
-                qry.setParameter("sfp22", "22");
-                qry.setParameter("sfp31", "31");
-                qry.setParameter("sfp36", "36");
-            }
 
             // Cache was disabled because it would interfere with the
             // "change password" action.
 //			qry.setHint("org.hibernate.cacheable", true);
 //			qry.setHint("org.hibernate.cacheRegion", CACHE_QUERY_SECONDS);
-            final List<CpIdentidade> lista = (List<CpIdentidade>) qry.getResultList();
+            final List<CpIdentidade> lista = qry.getResultList();
             if (lista.size() == 0) {
                 throw new AplicacaoException("Nao foi possivel localizar a identidade do usuario '" + nmUsuario + "'.");
             }
@@ -1625,30 +1615,19 @@ public class CpDao extends ModeloDao {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public List<CpIdentidade> consultaIdentidadesPorCpf(final String nmUsuario) throws AplicacaoException {
         try {
-            final Query qry = em().createNamedQuery("consultarIdentidadeCadastranteAtiva");
+            final TypedQuery<CpIdentidade> qry = em().createNamedQuery("consultarIdentidadeCadastranteAtiva", CpIdentidade.class);
 
             qry.setParameter("cpf", Long.valueOf(nmUsuario));
             qry.setParameter("nmUsuario", null);
             qry.setParameter("sesbPessoa", null);
-
-            /* Constantes para Evitar Parse Oracle */
-            qry.setParameter("cpfZero", Long.valueOf(0));
-            qry.setParameter("sfp1", "1");
-            qry.setParameter("sfp2", "2");
-            qry.setParameter("sfp4", "4");
-            qry.setParameter("sfp12", "12");
-            qry.setParameter("sfp22", "22");
-            qry.setParameter("sfp31", "31");
-            qry.setParameter("sfp36", "36");
+            qry.setParameter("cpfZero", 0L);
 
             qry.setHint("org.hibernate.cacheable", true);
             qry.setHint("org.hibernate.cacheRegion", CACHE_QUERY_SECONDS);
-            final List<CpIdentidade> lista = (List<CpIdentidade>) qry.getResultList();
 
-            return lista;
+            return qry.getResultList();
         } catch (Throwable e) {
             throw new AplicacaoException(
                     "Ocorreu um erro tentando localizar a identidade do usuario '" + nmUsuario + "'.", 0, e);

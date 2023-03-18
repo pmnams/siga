@@ -561,12 +561,15 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
             DpCargoDaoFiltro cargo = new DpCargoDaoFiltro();
             cargo.setNome("");
             cargo.setIdOrgaoUsu(idOrgaoUsu);
-            List<DpCargo> lista = new ArrayList<>();
+
             DpCargo c = new DpCargo();
             c.setId(0L);
             c.setDescricao("Selecione");
+
+            List<DpCargo> lista = new ArrayList<>();
             lista.add(c);
             lista.addAll(CpDao.getInstance().consultarPorFiltro(cargo));
+
             result.include("listaCargo", lista);
         }
 
@@ -605,6 +608,15 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
             List<CpUF> ufList = dao().consultarUF();
             result.include("ufList", ufList);
         }
+
+        if (Objects.nonNull(id)) {
+            result.include(
+                    "temPermissaoParaEditarMatricula",
+                    Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(getTitular(), getTitular().getLotacao(), "SIGA;GI;CAD_PESSOA;ALT_MATRICULA")
+            );
+        }
+        else
+            result.include("temPermissaoParaEditarMatricula", true);
 
         if (paramoffset == null) {
             result.use(Results.page()).forwardTo("/WEB-INF/page/dpPessoa/edita.jsp");

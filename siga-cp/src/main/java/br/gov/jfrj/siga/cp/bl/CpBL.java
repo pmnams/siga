@@ -1260,8 +1260,18 @@ public class CpBL {
             }
         }
 
-        int i = CpDao.getInstance().consultarQtdePorEmailIgualCpfDiferente(Texto.removerEspacosExtra(email).trim().replace(" ", ""),
-                Long.parseLong(cpf.replace("-", "").replace(".", "").trim()), pessoaAnt.getIdPessoaIni() != null ? pessoaAnt.getIdPessoaIni() : 0);
+        int i = CpDao.getInstance().consultarQtdePorEmailIgualCpfDiferente(
+                Texto.removerEspacosExtra(email)
+                        .trim()
+                        .replace(" ", ""),
+                Long.parseLong(
+                        cpf.replace("-", "")
+                                .replace(".", "")
+                                .trim()
+                ),
+                (Objects.nonNull(pessoaAnt) && pessoaAnt.getIdPessoaIni() != null)? pessoaAnt.getIdPessoaIni() : 0
+        );
+
         if (i > 0) {
             throw new AplicacaoException("E-mail informado está cadastrado para outro CPF");
         }
@@ -1273,10 +1283,8 @@ public class CpBL {
         pessoa.setSituacaoFuncionalPessoa(SituacaoFuncionalEnum.APENAS_ATIVOS.getValor()[0]);
         pessoa.setNomeExibicao(nomeExibicao);
 
-        if (dtNascimento != null && !"".equals(dtNascimento)) {
-            Date dtNasc = new Date();
-            dtNasc = SigaCalendar.converteStringEmData(dtNascimento);
-
+        Date dtNasc = SigaCalendar.converteStringEmData(dtNascimento);
+        if (Objects.nonNull(dtNasc)) {
             Calendar hj = Calendar.getInstance();
             Calendar dtNasci = new GregorianCalendar();
             dtNasci.setTime(dtNasc);
@@ -1289,10 +1297,8 @@ public class CpBL {
             pessoa.setDataNascimento(null);
         }
 
-        if (dataExpedicaoIdentidade != null && !"".equals(dataExpedicaoIdentidade)) {
-            Date dtExp = new Date();
-            dtExp = SigaCalendar.converteStringEmData(dataExpedicaoIdentidade);
-
+        Date dtExp = SigaCalendar.converteStringEmData(dataExpedicaoIdentidade);
+        if (Objects.nonNull(dtExp)) {
             Calendar hj = Calendar.getInstance();
             Calendar dtExpId = new GregorianCalendar();
             dtExpId.setTime(dtExp);
@@ -1394,10 +1400,10 @@ public class CpBL {
                 }
 
                 CpIdentidade ident = null;
-                if (!pessoa.getOrgaoUsuario().equivale(pessoaAnt.getOrgaoUsuario())) {
+                if (!pessoa.getOrgaoUsuario().equivale(pessoaAnt.getOrgaoUsuario()) || alteracaoMatricula) {
                     ident = new CpIdentidade();
                     CpIdentidade identAnt;
-                    identAnt = CpDao.getInstance().consultaIdentidadeCadastrante(pessoaAnt.getSesbPessoa() + pessoaAnt.getMatricula(), !alteracaoMatricula);
+                    identAnt = CpDao.getInstance().consultaIdentidadeCadastrante(pessoaAnt.getSesbPessoa() + pessoaAnt.getMatricula(), true);
                     PropertyUtils.copyProperties(ident, identAnt);
                     ident.setCpOrgaoUsuario(pessoa.getOrgaoUsuario());
                     ident.setNmLoginIdentidade(pessoa.getSesbPessoa() + pessoa.getMatricula());
@@ -1482,7 +1488,7 @@ public class CpBL {
                 }
             }
 
-            if (enviarEmail != null && idOrgaoUsu != null && cpf != null && lista != null && lista.size() == 0) {
+            if (enviarEmail != null && lista.size() == 0) {
                 Cp.getInstance().getBL().criarIdentidade(pessoa.getSesbPessoa() + pessoa.getMatricula(),
                         pessoa.getCpfFormatado(), identidadeCadastrante, null, new String[1], Boolean.FALSE);
             }
