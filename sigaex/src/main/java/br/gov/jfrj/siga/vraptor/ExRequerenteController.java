@@ -1,9 +1,6 @@
 package br.gov.jfrj.siga.vraptor;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -17,6 +14,7 @@ import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Result;
 import br.gov.jfrj.siga.base.AplicacaoException;
 import br.gov.jfrj.siga.base.SigaCalendar;
+import br.gov.jfrj.siga.dp.CpLocalidade;
 import br.gov.jfrj.siga.dp.dao.CpDao;
 import br.gov.jfrj.siga.ex.ExRequerenteDoc;
 import br.gov.jfrj.siga.hibernate.ExDao;
@@ -189,6 +187,14 @@ public class ExRequerenteController extends ExController {
 			result.include("nacionalidade", requerente.getNacionalidadeRequerente());
 			result.include("estadoCivil", requerente.getEstadoCivil());
 			result.include("nmConjugue", requerente.getNomeConjugue());
+		} else {
+			CpLocalidade localidade = getLotaTitular().getLocalidade();
+
+			if (Objects.nonNull(localidade)) {
+				result.include("cidade", localidade.getDescricao() + " - " + localidade.getUF().getSigla());
+			}
+
+			result.include("nacionalidade", "Brasileiro");
 		}
 
 		result.include("request", getRequest());
