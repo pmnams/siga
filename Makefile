@@ -1,15 +1,15 @@
 #!make
 
 IMAGENAME=siga-full
-REPO=brunocasas
-verssion=latest
+REPO=pmna
+version=latest
 
 .PHONY: help build push all
 
 help:
 	    @echo "Makefile arguments:"
 	    @echo ""
-	    @echo "verssion - Image Version"
+	    @echo "version - Image Version"
 	    @echo ""
 	    @echo "Makefile commands:"
 	    @echo "build"
@@ -18,7 +18,7 @@ help:
 
 .DEFAULT_GOAL := build
 
-IMAGEFULLNAME=${REPO}/${IMAGENAME}:${verssion}
+IMAGEFULLNAME=${REPO}/${IMAGENAME}:${version}
 
 start-dev-tls: export BASE_PATH = $(shell pwd)
 start-dev-tls:
@@ -47,4 +47,3 @@ build:
 
 push:
 	@docker push ${IMAGEFULLNAME}
-
