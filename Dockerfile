@@ -1,4 +1,4 @@
-FROM brunocasas/siga-base:latest
+FROM pmna/siga-base:latest
 
 COPY infra/config/base/siga-skel/configs "${SIGA_DIR}/configs"
 COPY infra/config/base/siga-skel/props "${SIGA_DIR}/props"
