@@ -48,7 +48,7 @@ public class ExRequerenteDoc extends AbstractExRequerenteDoc implements Selecion
 
 	@Override
 	public String getSigla() {
-		return "";
+		return getCpfRequerente();
 	}
 
 	@Override
