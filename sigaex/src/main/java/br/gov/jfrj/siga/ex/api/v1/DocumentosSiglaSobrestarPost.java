@@ -20,10 +20,11 @@ public class DocumentosSiglaSobrestarPost implements IDocumentosSiglaSobrestarPo
 
         ExMobil mob = ctx.buscarEValidarMobil(req.sigla, req, resp, "Documento a Sobrestar");
 
-        Ex.getInstance().getComp().afirmar(
-                "O documento " + mob.getSigla() + " não pode ser sobrestado por "
-                        + titular.getSiglaCompleta() + "/" + lotaTitular.getSiglaCompleta(),
-                ExPodeSobrestar.class, titular, lotaTitular, mob);
+        Ex.getInstance().getComp()
+                .afirmar(
+                        "O documento " + mob.getSigla() + " não pode ser sobrestado por " + titular.getSiglaCompleta()
+                                + "/" + lotaTitular.getSiglaCompleta(),
+                        ExPodeSobrestar.class, titular, lotaTitular, mob);
 
         ctx.assertAcesso(mob, titular, lotaTitular);
 

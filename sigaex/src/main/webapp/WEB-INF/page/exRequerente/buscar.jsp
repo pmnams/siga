@@ -5,6 +5,9 @@
 <%@ taglib uri="http://localhost/jeetags" prefix="siga" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
+<%--@elvariable id="ref" type="String"--%>
+<%--@elvariable id="numResultados" type="int"--%>
+<%--@elvariable id="requerentes" type="br.gov.jfrj.siga.ex.ExRequerenteDoc"--%>
 
 <script>
     function sbmt(page) {
@@ -13,7 +16,7 @@
 
         let pageId = (page / 10).toString();
 
-        if(!search.get('page'))
+        if (!search.get('page'))
             search.append('page', pageId)
         else
             search.set('page', pageId);
@@ -27,10 +30,10 @@
     <!-- main content -->
     <main class="card-body" style="max-height: 100%">
         <div class="row">
-            <span>Nome ou CPF/CNPJ</span>
+            <label for="ref">Nome ou CPF/CNPJ</label>
             <div class="input-group mb-2">
                 <input style="cursor: pointer" type="text" class="form-control" onkeyup="buscar(event)"
-                       placeholder="Busca" id="ref">
+                       placeholder="Busca" id="ref" value="${ref}">
                 <div class="input-group-append">
                     <span class="input-group-text" onclick="buscar();">Buscar</span>
                 </div>
@@ -55,6 +58,7 @@
                     <tr>
                         <script class="temp">
                             requerentes["${requerente.id}"] = {
+                                id: "${requerente.id}",
                                 nomeRequerente: "${requerente.nomeRequerente}",
                                 email: "${requerente.emailRequerente}",
                                 tipo: "${requerente.tipoRequerente}",
@@ -77,7 +81,7 @@
                             </c:if>
                         </script>
                         <td><a
-                                href="javascript: parent.setEntrevista(requerentes['${requerente.id}']);">${requerente.nomeRequerente}</a>
+                                href="javascript: requerenteOnClick(requerentes['${requerente.id}']);">${requerente.nomeRequerente}</a>
                         </td>
                         <td>${requerente.cpfFormatado}</td>
                         <td>${requerente.emailRequerente}</td>
@@ -95,6 +99,14 @@
                 let value = document.getElementById('ref').value;
                 location.replace('/sigaex/app/requerente/buscar?ref=' + value);
             }
+
+            function requerenteOnClick(requerente) {
+                if (parent.setEntrevista)
+                    parent.setEntrevista(requerente)
+                else
+                    parent.retorna_requerenteDoc(requerente.id, requerente.cadastro, requerente.nomeRequerente)
+            }
+
         </script>
     </main>
 </siga:pagina>

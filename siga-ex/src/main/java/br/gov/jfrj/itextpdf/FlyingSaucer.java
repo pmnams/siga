@@ -134,15 +134,12 @@ public class FlyingSaucer implements ConversorHtml {
 //		docBuilder.setEntityResolver(new DummyEntityResolver());
 //		Document dom = docBuilder.parse(new ByteArrayInputStream(sHtml.getBytes(StandardCharsets.UTF_8)));
 
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(sHtml);
-        org.w3c.dom.Document dom = new W3CDom().fromJsoup(jsoupDoc);
-
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             logger.fine("comecei a gerar o pdf");
             PdfRendererBuilder builder = new PdfRendererBuilder();
             builder.useHttpStreamImplementation(new DownloadExterno());
             builder.useFastMode();
-            builder.withW3cDocument(dom, null);
+            builder.withHtmlContent(sHtml, null);
             builder.toStream(os);
             builder.run();
 
@@ -304,6 +301,12 @@ public class FlyingSaucer implements ConversorHtml {
         // completa sempre terá atributos para a primeira página: ":first".
         String strEstilosPadrao = null;
         String padrao = SwaggerUtils.convertStreamToString(FlyingSaucer.class.getResourceAsStream("pagina.html"));
+
+        Pattern MY_PATTERN = Pattern.compile("<!-- size: (?<format>[^;]+); -->");
+        Matcher m = MY_PATTERN.matcher(html);
+        while (m.find()) {
+            padrao = padrao.replace("size: A4 portrait;", "size: " + m.group("format") + ";");
+        }
 
         Extraido estilosPadrao = extrair(padrao, "<style>", "</style>", "");
         if (estilosPadrao != null) {

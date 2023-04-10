@@ -38,6 +38,10 @@ public abstract class ExArquivo extends Objeto {
 
     public abstract String getAssinantesCompleto();
 
+    public String getVinculosCompleto() {
+        return "";
+    }
+
     public abstract Set<ExMovimentacao> getAssinaturasDigitais();
 
     /**
@@ -147,7 +151,7 @@ public abstract class ExArquivo extends Objeto {
      * um código gerado.
      */
     public String getMensagem() {
-        String sMensagem = "";
+        String sMensagem = getVinculosCompleto();
         if (isAssinadoDigitalmente()) {
             sMensagem += getAssinantesCompleto();
             sMensagem += "Documento Nº: " + getSiglaAssinatura()

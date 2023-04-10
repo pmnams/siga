@@ -205,7 +205,7 @@
                                         <option value="DECISAO">Decisão</option>
                                         <option value="EMAIL">E-mail</option>
                                         <option value="EXECUTAR">Executar</option>
-                                        <option value="SUBPROCEDIMENTO">Criar Subprocedimento</option>
+                                        <option value="SUBPROCEDIMENTO">Iniciar Procedimento</option>
                                         <option value="CRIAR_DOCUMENTO">Criar Documento</option>
                                         <optgroup label="{{getPrincipalNome()}}"
                                                   ng-if="data.workflow.tipoDePrincipal != 'NENHUM'">

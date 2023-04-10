@@ -26,9 +26,9 @@ info:
     <li>Clique novamente no authorize e cole no campo do <i>Bearer</i> o token.
     </li></ul>"
 basePath: /siga/api/v1
-schemes: [http,https]
-consumes: [application/json,application/x-www-form-urlencoded]
-produces: [application/json]
+schemes: [ http,https ]
+consumes: [ application/json,application/x-www-form-urlencoded ]
+produces: [ application/json ]
 
 tags:
   - name: auth
@@ -39,7 +39,7 @@ tags:
     description: API para Criação, Troca e Reset de PIN
   - name: utils
     description: Utilitários
-    
+
 securityDefinitions:
   Basic:
     type: basic
@@ -124,7 +124,7 @@ parameters:
     in: query
     description: Texto a ser pesquisado
     required: false
-    type: string    
+    type: string
   cpf:
     name: cpf
     in: query
@@ -136,25 +136,25 @@ parameters:
     in: query
     description: Identificador da Pessoa Inicial
     required: false
-    type: string    
+    type: string
   idPessoa:
     name: idPessoa
     in: query
     description: Identificador da Pessoa (id)
     required: false
-    type: string    
+    type: string
   idLotacao:
     name: idLotacao
     in: query
     description: Identificador da Lotação (id)
     required: false
-    type: string         
+    type: string
   idLotacaoIni:
     name: idLotacaoIni
     in: query
     description: Identificador da Lotação Inicial
     required: false
-    type: string            
+    type: string
   idOrgao:
     name: idOrgao
     in: query
@@ -179,7 +179,7 @@ parameters:
     description: Identificador da UF (id)
     required: false
     type: string
-    
+
   siglaOrgao:
     name: siglaOrgao
     in: formData
@@ -205,7 +205,7 @@ parameters:
     required: false
     type: string
   nome:
-    name: nome 
+    name: nome
     in: formData
     description: Nome
     required: false
@@ -230,7 +230,7 @@ parameters:
     format: email
     type: string
   rg:
-    name: rg 
+    name: rg
     in: formData
     description: Número do RG com ou sem traços ou pontos
     required: false
@@ -242,13 +242,13 @@ parameters:
     required: false
     type: string
   rgUf:
-    name: rgUf 
+    name: rgUf
     in: formData
     description: UF do RG (Estado). Sigla com dois caracteres.
     required: false
     type: string
   rgDataExpedicao:
-    name: rgDataExpedicao 
+    name: rgDataExpedicao
     in: formData
     description: Data de expedição do RG no formato dd/mm/aaaa
     required: false
@@ -284,7 +284,68 @@ parameters:
     description: Sigla do órgão
     required: false
     type: string
-    
+  substituicaoId:
+    name: substituicaoId
+    in: formData
+    description: Id da substituição para ser efetivada
+    required: false
+    type: string
+  estilo:
+    name: estilo
+    in: query
+    description: Informa se deseja agrupar
+    required: false
+    type: string
+    default: Agrupados
+    enum:
+      - Agrupados
+  tipoMarca:
+    name: tipoMarca
+    in: query
+    description: Informa se deseja filtrar por um tipo de marca
+    required: false
+    type: string
+    default:
+    enum:
+      - SIGA_EX
+      - SIGA_WF
+      - SIGA_SR
+      - SIGA_GC
+  idMarcadoresQuery:
+    name: idMarcadores
+    in: query
+    description: Identificadores iniciais dos Marcadores separados por vírgula
+    required: true
+    type: string
+  idGrupoQuery:
+    name: idGrupo
+    in: query
+    description: Identificador do Grupo
+    required: false
+    type: string
+  filtroPessoaLotacao:
+    name: filtroPessoaLotacao
+    in: query
+    description: Informa se deseja filtrar documentos por pessoa ou lotação
+    required: false
+    type: string
+    default: Pessoa e Lotacao
+    enum:
+      - Pessoa e Lotacao
+      - Pessoa
+      - Lotacao
+  itensPorPaginaQuery:
+    name: itensPorPagina
+    in: query
+    description: Número de itens por página
+    required: true
+    type: string
+  paginaQuery:
+    name: pagina
+    in: query
+    description: Número da página
+    required: true
+    type: string
 
 ################################################################################
 #                                           Paths                              #
@@ -293,10 +354,10 @@ paths:
   /autenticar:
     post:
       summary: Recebe login e senha e gera um token JWT para ser usado nos outros métodos da API
-      tags: [auth]
+      tags: [ auth ]
       security:
-        - Basic: []
-      parameters: []
+        - Basic: [ ]
+      parameters: [ ]
       responses:
         200:
           description: Successful response
@@ -319,9 +380,9 @@ paths:
         <li><b>id=</b> Pesquisa a Pessoa atual da Pessoa com determinado id inicial.</li>
         <li><b>texto=</b> Pesquisa as Pessoas cuja Matrícula ou nome contém uma determinada palavra.</li>
         <li><b>cpf=</b> Pesquisa as Pessoas cadastradas com determinado CPF</li></ul>"
-      tags: [cadastro]
+      tags: [ cadastro ]
       security:
-        - Bearer: []
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/idPessoaIni"
         - $ref: "#/parameters/texto"
@@ -343,20 +404,20 @@ paths:
         404:
           description: Nenhuma Pessoa foi encontrada para os parâmetros informados.
           schema:
-            $ref: "#/definitions/Error"                
+            $ref: "#/definitions/Error"
         500:
           description: Error ocurred
           schema:
             $ref: "#/definitions/Error"
-    
+
     post:
-      consumes: ["application/x-www-form-urlencoded"]
+      consumes: [ "application/x-www-form-urlencoded" ]
       summary: "Inclusão de pessoas"
       description: "Inclui uma pessoa no cadastro de pessoas e cria a identidade para a mesma. 
         Acesso restrito para usuários autorizados."
-      tags: [cadastro]
+      tags: [ cadastro ]
       security:
-        - Bearer: []
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/siglaOrgao"
         - $ref: "#/parameters/idCargoIni"
@@ -393,15 +454,15 @@ paths:
         500:
           description: Error ocurred
           schema:
-            $ref: "#/definitions/Error"            
+            $ref: "#/definitions/Error"
 
   /pessoas/{sigla}:
     get:
       summary: "Pesquisa de pessoa por sigla"
-      description: "Retorna a pessoa correspondente a sigla pesquisada" 
-      tags: [cadastro]
+      description: "Retorna a pessoa correspondente a sigla pesquisada"
+      tags: [ cadastro ]
       security:
-        - Bearer: []
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/sigla"
       responses:
@@ -418,7 +479,7 @@ paths:
         404:
           description: Nenhuma Pessoa foi encontrada para a sigla informada.
           schema:
-            $ref: "#/definitions/Error"                
+            $ref: "#/definitions/Error"
         500:
           description: Error ocurred
           schema:
@@ -426,10 +487,10 @@ paths:
 
   /pin:
     post:
-      consumes: ["application/x-www-form-urlencoded"]
-      tags: [PIN]
+      consumes: [ "application/x-www-form-urlencoded" ]
+      tags: [ PIN ]
       security:
-        - Bearer: []      
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/pin"
       summary: Criação de PIN para Assinatura e Autenticação de Documentos e Segundo Fator de Autenticação.
@@ -445,13 +506,13 @@ paths:
           description: Error ocurred
           schema:
             $ref: "#/definitions/Error"
-            
+
   /pin/trocar:
     post:
-      consumes: ["application/x-www-form-urlencoded"]
-      tags: [PIN]
+      consumes: [ "application/x-www-form-urlencoded" ]
+      tags: [ PIN ]
       security:
-        - Bearer: []      
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/pinAtual"
         - $ref: "#/parameters/pin"
@@ -471,10 +532,10 @@ paths:
 
   /pin/reset:
     post:
-      consumes: ["application/x-www-form-urlencoded"]
-      tags: [PIN]
+      consumes: [ "application/x-www-form-urlencoded" ]
+      tags: [ PIN ]
       security:
-        - Bearer: []      
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/tokenPin"
         - $ref: "#/parameters/pin"
@@ -490,14 +551,14 @@ paths:
         500:
           description: Error ocurred
           schema:
-            $ref: "#/definitions/Error"  
-            
+            $ref: "#/definitions/Error"
+
   /pin/gerar-token-reset:
     post:
-      consumes: ["application/x-www-form-urlencoded"]
-      tags: [PIN]
+      consumes: [ "application/x-www-form-urlencoded" ]
+      tags: [ PIN ]
       security:
-        - Bearer: []      
+        - Bearer: [ ]
       summary: Gera Token e Envia para Email cadastrado para Reset de PIN.
       responses:
         200:
@@ -510,9 +571,9 @@ paths:
         500:
           description: Error ocurred
           schema:
-            $ref: "#/definitions/Error"           
-            
-  
+            $ref: "#/definitions/Error"
+
+
   /lotacoes:
     get:
       summary: "Pesquisa de lotações"
@@ -522,9 +583,9 @@ paths:
         <li><b>siglaOrgaoQuery=</b>Pesquisa as lotações do órgão especificado.</li>
         <li><b>idLotacaoIni=</b>Pesquisa a Lotação Atual da Lotação Inicial solicitada.</li>
         <li><b>texto=</b>Pesquisa as lotacoes cuja sigla ou nome contém uma determinada palavra.</li></ul>"
-      tags: [cadastro]
+      tags: [ cadastro ]
       security:
-        - Bearer: []
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/siglaOrgaoQuery"
         - $ref: "#/parameters/texto"
@@ -542,16 +603,16 @@ paths:
         500:
           description: Error ocurred
           schema:
-            $ref: "#/definitions/Error"            
-  
+            $ref: "#/definitions/Error"
+
     post:
-      consumes: ["application/x-www-form-urlencoded"]
+      consumes: [ "application/x-www-form-urlencoded" ]
       summary: "Inclusão de lotação"
       description: "Inclui uma lotação no cadastro de lotações. 
         Acesso restrito à usuários autorizados."
-      tags: [cadastro]
+      tags: [ cadastro ]
       security:
-        - Bearer: []
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/siglaOrgao"
         - $ref: "#/parameters/nome"
@@ -584,15 +645,15 @@ paths:
         500:
           description: Error ocurred
           schema:
-            $ref: "#/definitions/Error"            
+            $ref: "#/definitions/Error"
 
   /lotacoes/{sigla}:
     get:
       summary: "Pesquisa de lotacoes por sigla"
-      description: "Retorna a lotacao correspondente a sigla pesquisda" 
-      tags: [cadastro]
+      description: "Retorna a lotacao correspondente a sigla pesquisda"
+      tags: [ cadastro ]
       security:
-        - Bearer: []
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/sigla"
       responses:
@@ -609,7 +670,7 @@ paths:
         404:
           description: Nenhuma lotação foi encontrada para a sigla informada.
           schema:
-            $ref: "#/definitions/Error"                
+            $ref: "#/definitions/Error"
         500:
           description: Error ocurred
           schema:
@@ -619,9 +680,9 @@ paths:
     get:
       summary: "Pesquisa de órgãos"
       description: "Retorna uma lista de órgãos."
-      tags: [cadastro]
+      tags: [ cadastro ]
       security:
-        - Bearer: []
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/idOrgao"
         - $ref: "#/parameters/texto"
@@ -638,15 +699,15 @@ paths:
         500:
           description: Error ocurred
           schema:
-            $ref: "#/definitions/Error"        
-  
+            $ref: "#/definitions/Error"
+
   /orgaos/{sigla}:
     get:
       summary: "Pesquisa de órgão por sigla"
-      description: "Retorna o órgão correspondente a sigla pesquisada" 
-      tags: [cadastro]
+      description: "Retorna o órgão correspondente a sigla pesquisada"
+      tags: [ cadastro ]
       security:
-        - Bearer: []
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/sigla"
       responses:
@@ -663,7 +724,7 @@ paths:
         404:
           description: Nenhum Órgão foi encontrado para a sigla informada.
           schema:
-            $ref: "#/definitions/Error"                
+            $ref: "#/definitions/Error"
         500:
           description: Error ocurred
           schema:
@@ -672,10 +733,10 @@ paths:
   /cargos/{id}:
     get:
       summary: "Pesquisa de cargo por id"
-      description: "Retorna o cargo correspondente ao id pesquisado" 
-      tags: [cadastro]
+      description: "Retorna o cargo correspondente ao id pesquisado"
+      tags: [ cadastro ]
       security:
-        - Bearer: []
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/id"
       responses:
@@ -692,7 +753,7 @@ paths:
         404:
           description: Nenhum cargo foi encontrado para os parâmetros informados.
           schema:
-            $ref: "#/definitions/Error"                
+            $ref: "#/definitions/Error"
         500:
           description: Error ocurred
           schema:
@@ -703,10 +764,10 @@ paths:
     get:
       summary: "Pesquisa de cargos por id do órgão e nome do cargo"
       description: "Retorna uma lista de cargos correspondente ao id do órgão e nome do cargo pesquisados. Se não for informado o nome do cargo, retorna todos do órgão.
-        Não é permitida a consulta de cargos de outro órgão que não seja o do usuário logado." 
-      tags: [cadastro]
+        Não é permitida a consulta de cargos de outro órgão que não seja o do usuário logado."
+      tags: [ cadastro ]
       security:
-        - Bearer: []
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/idOrgao"
         - $ref: "#/parameters/nomeCargo"
@@ -727,7 +788,7 @@ paths:
         404:
           description: Nenhum cargo foi encontrado para os parâmetros informados.
           schema:
-            $ref: "#/definitions/Error"                
+            $ref: "#/definitions/Error"
         500:
           description: Error ocurred
           schema:
@@ -736,10 +797,10 @@ paths:
   /funcoes/{id}:
     get:
       summary: "Pesquisa de função de confiança por id"
-      description: "Retorna a função de confiança correspondente ao id pesquisado" 
-      tags: [cadastro]
+      description: "Retorna a função de confiança correspondente ao id pesquisado"
+      tags: [ cadastro ]
       security:
-        - Bearer: []
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/id"
       responses:
@@ -756,7 +817,7 @@ paths:
         404:
           description: Nenhuma função de confiança foi encontrada para os parâmetros informados.
           schema:
-            $ref: "#/definitions/Error"                
+            $ref: "#/definitions/Error"
         500:
           description: Error ocurred
           schema:
@@ -765,10 +826,10 @@ paths:
   /funcoes:
     get:
       summary: "Pesquisa de funções de confiança por id do órgão e nome do cargo"
-      description: "Retorna uma lista de funções de confiança correspondentes ao id do órgão e nome pesquisados. Se não for informado o nome, retorna todos do órgão." 
-      tags: [cadastro]
+      description: "Retorna uma lista de funções de confiança correspondentes ao id do órgão e nome pesquisados. Se não for informado o nome, retorna todos do órgão."
+      tags: [ cadastro ]
       security:
-        - Bearer: []
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/idOrgao"
         - $ref: "#/parameters/nomeFuncaoConfianca"
@@ -789,7 +850,7 @@ paths:
         404:
           description: Nenhuma função de confiança foi encontrada para os parâmetros informados.
           schema:
-            $ref: "#/definitions/Error"                
+            $ref: "#/definitions/Error"
         500:
           description: Error ocurred
           schema:
@@ -798,10 +859,10 @@ paths:
   /localidades/{id}:
     get:
       summary: "Pesquisa de localidade por id"
-      description: "Retorna a localidade correspondente ao id pesquisado" 
-      tags: [cadastro]
+      description: "Retorna a localidade correspondente ao id pesquisado"
+      tags: [ cadastro ]
       security:
-        - Bearer: []
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/id"
       responses:
@@ -814,7 +875,7 @@ paths:
         404:
           description: Nenhuma localidade foi encontrada para os parâmetros informados.
           schema:
-            $ref: "#/definitions/Error"                
+            $ref: "#/definitions/Error"
         500:
           description: Error ocurred
           schema:
@@ -823,10 +884,10 @@ paths:
   /localidades:
     get:
       summary: "Pesquisa de localidades"
-      description: "Retorna a lista de localidades por UF ou nome." 
-      tags: [cadastro]
+      description: "Retorna a lista de localidades por UF ou nome."
+      tags: [ cadastro ]
       security:
-        - Bearer: []
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/idUf"
         - $ref: "#/parameters/texto"
@@ -843,7 +904,7 @@ paths:
         404:
           description: Nenhuma localidade foi encontrada para os parâmetros informados.
           schema:
-            $ref: "#/definitions/Error"                
+            $ref: "#/definitions/Error"
         500:
           description: Error ocurred
           schema:
@@ -852,10 +913,10 @@ paths:
   /ufs:
     get:
       summary: "Pesquisa de UFs"
-      description: "Retorna a lista de UFs." 
-      tags: [cadastro]
+      description: "Retorna a lista de UFs."
+      tags: [ cadastro ]
       security:
-        - Bearer: []
+        - Bearer: [ ]
       responses:
         200:
           description: Successful response
@@ -871,13 +932,66 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
+
+  /painel/quadro:
+    get:
+      summary: Listar a quantidade de documentos
+      tags: [ painel ]
+      security:
+        - Bearer: [ ]
+      parameters:
+        - $ref: "#/parameters/estilo"
+        - $ref: "#/parameters/tipoMarca"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              list:
+                type: array
+                items:
+                  $ref: "#/definitions/PainelQuadroItem"
+        500:
+          description: Error ocurred
+          schema:
+            $ref: "#/definitions/Error"
+
+  /painel/lista:
+    get:
+      summary: Listar elementos por filtro
+      tags: [ painel ]
+      security:
+        - Bearer: [ ]
+      parameters:
+        - $ref: "#/parameters/idMarcadoresQuery"
+        - $ref: "#/parameters/filtroPessoaLotacao"
+        - $ref: "#/parameters/tipoMarca"
+        - $ref: "#/parameters/itensPorPaginaQuery"
+        - $ref: "#/parameters/paginaQuery"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              list:
+                type: array
+                items:
+                  $ref: "#/definitions/PainelListaItem"
+        500:
+          description: Error ocurred
+          schema:
+            $ref: "#/definitions/Error"
+
+
   /acessos:
     get:
       description: Listar os últimos acessos
-      tags: [utils]
+      tags: [ utils ]
       security:
-        - Bearer: []      
-      parameters: []
+        - Bearer: [ ]
+      parameters: [ ]
       responses:
         200:
           description: Successful response
@@ -892,13 +1006,13 @@ paths:
           description: Error ocurred
           schema:
             $ref: "#/definitions/Error"
-            
+
   /notificacoes:
     get:
       description: Listar as notificações para determinado Usuário
-      tags: [utils]
+      tags: [ utils ]
       security:
-        - Bearer: []      
+        - Bearer: [ ]
       parameters:
         - $ref: "#/parameters/sigla"
       responses:
@@ -914,8 +1028,40 @@ paths:
         500:
           description: Error ocurred
           schema:
-            $ref: "#/definitions/Error"            
+            $ref: "#/definitions/Error"
 
+  /usuario:
+    get:
+      tags: [ utils ]
+      security:
+        - Bearer: [ ]
+      parameters: [ ]
+      description: Enviar sugestões
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              usuario:
+                $ref: "#/definitions/Usuario"
+
+  /usuario/substituir:
+    post:
+      tags: [ utils ]
+      security:
+        - Bearer: [ ]
+      parameters:
+        - $ref: "#/parameters/substituicaoId"
+      description: Enviar sugestões
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
 
 ################################################################################
 #                                     Definitions                              #
@@ -957,16 +1103,16 @@ definitions:
         type: string
         description: Id da pessoa
       idPessoaIni:
-        type: string        
+        type: string
         description: Id inicial da pessoa
       sigla:
         type: string
         description: Sigla da pessoa
       nome:
-        type: string        
+        type: string
         description: Nome da pessoa
       siglaLotacao:
-        type: string          
+        type: string
         description: Sigla da lotação da pessoa
       isExternaPessoa:
         type: boolean
@@ -977,7 +1123,7 @@ definitions:
         $ref: "#/definitions/Cargo"
       funcaoConfianca:
         $ref: "#/definitions/FuncaoConfianca"
-  
+
   Orgao:
     type: object
     description: Dados do Órgão da pessoa para perfil de acesso
@@ -1001,7 +1147,7 @@ definitions:
         description: Id da lotação
       idLotacaoIni:
         type: string
-        description: Id inicial da lotação 
+        description: Id inicial da lotação
       sigla:
         type: string
         description: Sigla completa da Lotação (com o órgão)
@@ -1020,13 +1166,13 @@ definitions:
       idLotacao:
         type: string
       idLotacaoIni:
-        type: string        
+        type: string
       sigla:
         type: string
       nome:
         type: string
       orgao:
-        type: string        
+        type: string
 
   Cargo:
     type: object
@@ -1044,7 +1190,7 @@ definitions:
       sigla:
         type: string
         description: Sigla do Cargo
-      nome: 
+      nome:
         type: string
         description: Nome do Cargo
 
@@ -1064,7 +1210,7 @@ definitions:
       sigla:
         type: string
         description: Sigla da função de confiança
-      nome: 
+      nome:
         type: string
         description: Nome da função de confiança
       idpai:
@@ -1078,7 +1224,7 @@ definitions:
       idLocalidade:
         type: string
         description: Id da localidade
-      nome: 
+      nome:
         type: string
         description: Nome da localidade
       uf:
@@ -1091,7 +1237,7 @@ definitions:
       idUf:
         type: string
         description: Id da UF
-      nomeUf: 
+      nomeUf:
         type: string
         description: Nome da UF
 
@@ -1104,7 +1250,7 @@ definitions:
         format: date-time
       ip:
         type: string
-        
+
   Notificacao:
     type: object
     description: Dados de Notificacao
@@ -1121,18 +1267,224 @@ definitions:
       resumo:
         type: string
         description: Resumo da Notificação
-      conteudo: 
+      conteudo:
         type: string
-        description: Conteúdo da Notificação     
-      dataInicio: 
-        type: string
-        format: date-time
-        description: Data de Início da Notificação    
-      dataTermino: 
+        description: Conteúdo da Notificação
+      dataInicio:
         type: string
         format: date-time
-        description: Data de Início de Término da Notificação  
-      sempreMostrar: 
+        description: Data de Início da Notificação
+      dataTermino:
+        type: string
+        format: date-time
+        description: Data de Início de Término da Notificação
+      sempreMostrar:
         type: boolean
         description: true se notificação não for dispensável. false se notificação for dispensável
-        
+
+  Usuario:
+    description: Lista modelos disponíveis.
+    type: object
+    properties:
+      identidadeId:
+        type: string
+      cadastranteId:
+        type: string
+      cadastranteSigla:
+        type: string
+      cadastranteNome:
+        type: string
+      lotaCadastranteId:
+        type: string
+      lotaCadastranteSigla:
+        type: string
+      lotaCadastranteNome:
+        type: string
+      titularId:
+        type: string
+      titularSigla:
+        type: string
+      titularNome:
+        type: string
+      lotaTitularId:
+        type: string
+      lotaTitularSigla:
+        type: string
+      lotaTitularNome:
+        type: string
+      substituicaoId:
+        type: string
+      substituicoesPermitidas:
+        type: array
+        items:
+          $ref: "#/definitions/SubstituicaoItem"
+
+  SubstituicaoItem:
+    description: Lista modelos disponíveis.
+    type: object
+    properties:
+      substituicaoId:
+        type: string
+      substituicaoDataFim:
+        type: string
+        format: date-time
+      substituicaoDataInicio:
+        type: string
+        format: date-time
+      registroIdInicial:
+        type: string
+      registroDataFim:
+        type: string
+        format: date-time
+      registroDataInicio:
+        type: string
+        format: date-time
+      substitutoId:
+        type: string
+      substitutoSigla:
+        type: string
+      substitutoNome:
+        type: string
+      lotaSubstitutoId:
+        type: string
+      lotaSubstitutoSigla:
+        type: string
+      lotaSubstitutoNome:
+        type: string
+      titularId:
+        type: string
+      titularSigla:
+        type: string
+      titularNome:
+        type: string
+      lotaTitularId:
+        type: string
+      lotaTitularSigla:
+        type: string
+      lotaTitularNome:
+        type: string
+
+  PainelQuadroItem:
+    description: Lista quantidade de documentos na mesa
+    type: object
+    properties:
+      finalidadeId:
+        type: string
+      tipoId:
+        type: string
+      tipoNome:
+        type: string
+      grupoId:
+        type: string
+      grupoNome:
+        type: string
+      marcadorEnum:
+        type: string
+      marcadorId:
+        type: string
+      marcadorNome:
+        type: string
+      marcadorIcone:
+        type: string
+      marcadorCor:
+        type: string
+      qtds:
+        type: array
+        items:
+          $ref: "#/definitions/PainelQuadroQtdItem"
+
+  PainelQuadroQtdItem:
+    description: Lista quantidade de documentos na mesa
+    type: object
+    properties:
+      tipo:
+        type: string
+      filtro:
+        type: string
+      qtd:
+        type: string
+
+  PainelListaItem:
+    description: Lista quantidade de documentos na mesa
+    type: object
+    properties:
+      marcaId:
+        type: string
+      marcaTipo:
+        type: string
+      marcaTexto:
+        type: string
+      marcaIcone:
+        type: string
+      dataIni:
+        type: string
+        format: date-time
+      dataFim:
+        type: string
+        format: date-time
+      moduloId:
+        type: string
+      refId:
+        type: string
+      movId:
+        type: string
+      tipo:
+        type: string
+      codigo:
+        type: string
+      sigla:
+        type: string
+      descricao:
+        type: string
+      origem:
+        type: string
+      ultimaAnotacao:
+        type: string
+      marcas:
+        type: array
+        items:
+          $ref: "#/definitions/Marca"
+      acoes:
+        type: array
+        items:
+          $ref: "#/definitions/Acao"
+
+  Marca:
+    description: Etiquetas relacionadas a um elemento
+    type: object
+    properties:
+      pessoa:
+        type: string
+      lotacao:
+        type: string
+      nome:
+        type: string
+      icone:
+        type: string
+      titulo:
+        type: string
+      marcaId:
+        type: string
+      inicio:
+        type: string
+        format: date-time
+      termino:
+        type: string
+        format: date-time
+      daPessoa:
+        type: boolean
+      deOutraPessoa:
+        type: boolean
+      daLotacao:
+        type: boolean
+
+  Acao:
+    description: Ação que pode ser realizada a um elemento
+    type: object
+    properties:
+      nome:
+        type: string
+      icone:
+        type: string
+      ativa:
+        type: boolean

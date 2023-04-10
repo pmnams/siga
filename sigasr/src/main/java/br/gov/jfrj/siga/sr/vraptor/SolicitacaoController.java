@@ -1,31 +1,6 @@
 package br.gov.jfrj.siga.sr.vraptor;
 
-import static br.gov.jfrj.siga.sr.util.SrSigaPermissaoPerfil.SALVAR_SOLICITACAO_AO_ABRIR;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.servlet.http.HttpServletRequest;
-
-import org.hibernate.Hibernate;
-import org.hibernate.LazyInitializationException;
-
-import com.google.gson.Gson;
-
-import br.com.caelum.vraptor.Controller;
-import br.com.caelum.vraptor.Get;
-import br.com.caelum.vraptor.Path;
-import br.com.caelum.vraptor.Post;
-import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.*;
 import br.com.caelum.vraptor.observer.download.ByteArrayDownload;
 import br.com.caelum.vraptor.observer.download.Download;
 import br.com.caelum.vraptor.validator.Validator;
@@ -44,30 +19,8 @@ import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.dp.dao.CpDao;
 import br.gov.jfrj.siga.model.ContextoPersistencia;
-import br.gov.jfrj.siga.sr.model.SrAcao;
-import br.gov.jfrj.siga.sr.model.SrArquivo;
-import br.gov.jfrj.siga.sr.model.SrAtributoSolicitacao;
-import br.gov.jfrj.siga.sr.model.SrAtributoSolicitacaoMap;
-import br.gov.jfrj.siga.sr.model.SrConfiguracao;
-import br.gov.jfrj.siga.sr.model.SrConfiguracaoBL;
-import br.gov.jfrj.siga.sr.model.SrConfiguracaoCache;
-import br.gov.jfrj.siga.sr.model.SrEtapaSolicitacao;
-import br.gov.jfrj.siga.sr.model.SrFormaAcompanhamento;
-import br.gov.jfrj.siga.sr.model.SrItemConfiguracao;
-import br.gov.jfrj.siga.sr.model.SrLista;
-import br.gov.jfrj.siga.sr.model.SrMarca;
-import br.gov.jfrj.siga.sr.model.SrMeioComunicacao;
-import br.gov.jfrj.siga.sr.model.SrMovimentacao;
-import br.gov.jfrj.siga.sr.model.SrPendencia;
-import br.gov.jfrj.siga.sr.model.SrPrioridade;
-import br.gov.jfrj.siga.sr.model.SrPrioridadeSolicitacao;
-import br.gov.jfrj.siga.sr.model.SrSolicitacao;
+import br.gov.jfrj.siga.sr.model.*;
 import br.gov.jfrj.siga.sr.model.SrSolicitacao.SrTarefa;
-import br.gov.jfrj.siga.sr.model.SrTipoMotivoEscalonamento;
-import br.gov.jfrj.siga.sr.model.SrTipoMotivoFechamento;
-import br.gov.jfrj.siga.sr.model.SrTipoMotivoPendencia;
-import br.gov.jfrj.siga.sr.model.SrTipoMovimentacao;
-import br.gov.jfrj.siga.sr.model.SrTipoPermissaoLista;
 import br.gov.jfrj.siga.sr.model.enm.SrTipoDeConfiguracao;
 import br.gov.jfrj.siga.sr.model.vo.SrListaVO;
 import br.gov.jfrj.siga.sr.model.vo.SrSolicitacaoListaVO;
@@ -78,7 +31,19 @@ import br.gov.jfrj.siga.uteis.PessoaLotaFuncCargoSelecaoHelper;
 import br.gov.jfrj.siga.vraptor.SigaObjects;
 import br.gov.jfrj.siga.vraptor.SigaTransacionalInterceptor;
 import br.gov.jfrj.siga.vraptor.Transacional;
+import com.google.gson.Gson;
 import edu.emory.mathcs.backport.java.util.Arrays;
+import org.hibernate.Hibernate;
+import org.hibernate.LazyInitializationException;
+
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static br.gov.jfrj.siga.sr.util.SrSigaPermissaoPerfil.SALVAR_SOLICITACAO_AO_ABRIR;
 
 @Controller
 @Path("/app/solicitacao")
@@ -574,6 +539,9 @@ public class SolicitacaoController extends SrController {
         if (filtro.getItemConfiguracao() != null && filtro.getItemConfiguracao().getIdItemConfiguracao() != null) {
             filtro.setItemConfiguracao(
                     SrItemConfiguracao.AR.findById(filtro.getItemConfiguracao().getIdItemConfiguracao()));
+        }
+        if (filtro.getAtributoSolicitacao() != null && filtro.getAtributoSolicitacao().getAtributo() != null && filtro.getAtributoSolicitacao().getAtributo().getId() != null) {
+            filtro.getAtributoSolicitacao().setAtributo(SrAtributo.AR.findById(filtro.getAtributoSolicitacao().getAtributo().getId()));
         }
         if (filtro.getAcao() != null && filtro.getAcao().getIdAcao() != null) {
             filtro.setAcao(SrAcao.AR.findById(filtro.getAcao().getIdAcao()));

@@ -416,8 +416,8 @@ app
                     }
                     return;
                 }
-                $scope.preenchimentosCache[url] = { tarefas: [t] };
-                $http({ url: url, method: "GET" }).then(
+                $scope.preenchimentosCache[url] = {tarefas: [t]};
+                $http({url: url, method: "GET"}).then(
                     function (response) {
                         $scope.preenchimentosCache[url].value = response.data.list;
                         for (var i = 0; i < $scope.preenchimentosCache[url].tarefas.length; i++)

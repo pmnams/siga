@@ -42,59 +42,39 @@ public class ExPodeJuntar extends CompositeExpressionSupport {
      * <li>Móbil não pode estar em algum arquivo</li>
      * <li>Não pode haver configuração impeditiva</li>
      * </ul>
-     *
      */
     @Override
     protected Expression create() {
-
         return And.of(
-
                 new ExEMobilVia(mob),
-
                 Not.of(new ExEstaPendenteDeAnexacao(mob)),
-
                 Not.of(new ExEMobilCancelado(mob)),
-
                 Not.of(new ExEstaEncerrado(mob)),
-
                 Not.of(new ExEstaEmTransito(mob, titular, lotaTitular)),
-
                 Or.of(
-
                         And.of(
-
                                 new ExTemMobilPai(mob.doc()),
-
-                                new ExESubscritorOuCossignatario(mob.doc(), titular)),
-
+                                new ExESubscritorOuCossignatario(mob.doc(), titular)
+                        ),
                         And.of(
-
                                 new CpNaoENulo(docPai, "documento onde foi autuado"),
-
-                                new ExEMobilAutuado(docPai, mob)),
-
+                                new ExEMobilAutuado(docPai, mob)
+                        ),
                         new ExPodeMovimentar(mob, titular, lotaTitular)),
-
                 Or.of(
-
                         Not.of(new ExEstaPendenteDeAssinatura(mob.doc())),
-
-                        new ExEInternoCapturado(mob.doc())),
-
+                        new ExEInternoCapturado(mob.doc())
+                ),
                 Not.of(new ExEstaJuntado(mob)),
-
                 Not.of(new ExEstaApensado(mob)),
-
                 Not.of(new ExEstaArquivado(mob)),
-
                 Not.of(new ExEstaSobrestado(mob)),
-
                 Not.of(new ExEstaSemEfeito(mob.doc())),
-
                 Not.of(new ExEstaEmTramiteParalelo(mob)),
-
-                new ExPodePorConfiguracao(titular, lotaTitular).withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
-                        .withExTpMov(ExTipoDeMovimentacao.JUNTADA).withExMod(mob.doc().getExModelo()));
-
+                new ExPodePorConfiguracao(titular, lotaTitular)
+                        .withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
+                        .withExTpMov(ExTipoDeMovimentacao.JUNTADA)
+                        .withExMod(mob.doc().getExModelo())
+        );
     }
 }

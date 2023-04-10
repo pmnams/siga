@@ -476,7 +476,7 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
                 DpFuncaoConfiancaDaoFiltro funcao = new DpFuncaoConfiancaDaoFiltro();
                 funcao.setNome("");
                 funcao.setIdOrgaoUsu(ou.getId());
-                List<DpFuncaoConfianca> listaFuncao = new ArrayList<DpFuncaoConfianca>();
+                List<DpFuncaoConfianca> listaFuncao = new ArrayList<>();
                 DpFuncaoConfianca f = new DpFuncaoConfianca();
                 f.setNomeFuncao("Selecione");
                 f.setIdFuncao(0L);
@@ -489,7 +489,13 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
             }
         }
         List<CpOrgaoUsuario> list = new ArrayList<>();
-        if ("ZZ".equals(getTitular().getOrgaoUsuario().getSigla())) {
+        if ("ZZ".equals(getTitular().getOrgaoUsuario().getSigla())
+                || (id != null && Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(
+                getTitular(),
+                getLotaTitular(),
+                "SIGA:Sistema Integrado de Gestão Administrativa;GI:Módulo de Gestão de Identidade;CAD_PESSOA:Cadastrar Pessoa;ALT:Alterar Órgão Cadastro Pessoa"
+        ))
+        ) {
             list = dao().listarOrgaosUsuarios();
 
             List<CpOrgaoUsuario> list1 = new ArrayList<>();
@@ -527,9 +533,16 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
         result.include("cpfPesquisa", cpfPesquisa);
         setItemPagina(15);
         result.include("currentPageNumber", calculaPaginaAtual(paramoffset));
-        List<CpOrgaoUsuario> list = new ArrayList<CpOrgaoUsuario>();
-        if ("ZZ".equals(getTitular().getOrgaoUsuario().getSigla())) {
-            List<CpOrgaoUsuario> list1 = new ArrayList<CpOrgaoUsuario>();
+        List<CpOrgaoUsuario> list = new ArrayList<>();
+
+        if ("ZZ".equals(getTitular().getOrgaoUsuario().getSigla())
+                || (id != null && Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(
+                getTitular(),
+                getLotaTitular(),
+                "SIGA:Sistema Integrado de Gestão Administrativa;GI:Módulo de Gestão de Identidade;CAD_PESSOA:Cadastrar Pessoa;ALT:Alterar Órgão Cadastro Pessoa"
+        ))
+        ) {
+            List<CpOrgaoUsuario> list1 = new ArrayList<>();
             list = dao().consultaCpOrgaoUsuario();
 
             for (CpOrgaoUsuario cpOrgaoUsuario : list) {
@@ -548,12 +561,15 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
             DpCargoDaoFiltro cargo = new DpCargoDaoFiltro();
             cargo.setNome("");
             cargo.setIdOrgaoUsu(idOrgaoUsu);
-            List<DpCargo> lista = new ArrayList<>();
+
             DpCargo c = new DpCargo();
             c.setId(0L);
             c.setDescricao("Selecione");
+
+            List<DpCargo> lista = new ArrayList<>();
             lista.add(c);
             lista.addAll(CpDao.getInstance().consultarPorFiltro(cargo));
+
             result.include("listaCargo", lista);
         }
 
@@ -592,6 +608,15 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
             List<CpUF> ufList = dao().consultarUF();
             result.include("ufList", ufList);
         }
+
+        if (Objects.nonNull(id)) {
+            result.include(
+                    "temPermissaoParaEditarMatricula",
+                    Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(getTitular(), getTitular().getLotacao(), "SIGA;GI;CAD_PESSOA;ALT_MATRICULA")
+            );
+        }
+        else
+            result.include("temPermissaoParaEditarMatricula", true);
 
         if (paramoffset == null) {
             result.use(Results.page()).forwardTo("/WEB-INF/page/dpPessoa/edita.jsp");

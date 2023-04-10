@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import com.aryjr.nheengatu.pdf.HTML2PDFParser;
 import com.aryjr.nheengatu.pdf.PDFDocument;
@@ -39,13 +40,13 @@ public class Nheengatu implements ConversorHtml {
 	public byte[] converter(String sHtml, byte output) throws Exception {
 		// TODO Auto-generated method stub
 		try (ByteArrayOutputStream bo = new ByteArrayOutputStream()) {
-		parser.parse(new ByteArrayInputStream(sHtml.getBytes("utf-8")),
-				extract(sHtml, "<!-- INICIO PRIMEIRO CABECALHO",
-						"FIM PRIMEIRO CABECALHO -->"), extract(sHtml,
-						"<!-- INICIO PRIMEIRO RODAPE",
-						"FIM PRIMEIRO RODAPE -->"), extract(sHtml,
-						"<!-- INICIO CABECALHO", "FIM CABECALHO -->"), extract(
-						sHtml, "<!-- INICIO RODAPE", "FIM RODAPE -->"));
+		parser.parse(
+				new ByteArrayInputStream(sHtml.getBytes(StandardCharsets.UTF_8)),
+				extract(sHtml, "<!-- INICIO PRIMEIRO CABECALHO", "FIM PRIMEIRO CABECALHO -->"),
+				extract(sHtml, "<!-- INICIO PRIMEIRO RODAPE", "FIM PRIMEIRO RODAPE -->"),
+				extract(sHtml, "<!-- INICIO CABECALHO", "FIM CABECALHO -->"),
+				extract(sHtml, "<!-- INICIO RODAPE", "FIM RODAPE -->")
+		);
 
 		
 		

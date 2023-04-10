@@ -52,7 +52,6 @@ import java.util.*;
  * Classe que representa o DAO do sistema de workflow.
  */
 @Specializes
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class WfDao extends CpDao implements com.crivano.jflow.Dao<WfProcedimento> {
 
     public static final String CACHE_WF = "wf";
@@ -84,7 +83,13 @@ public class WfDao extends CpDao implements com.crivano.jflow.Dao<WfProcedimento
         CriteriaQuery<WfDefinicaoDeProcedimento> q = cb().createQuery(WfDefinicaoDeProcedimento.class);
         Root<WfDefinicaoDeProcedimento> c = q.from(WfDefinicaoDeProcedimento.class);
         q.select(c);
-        q.where(cb().like(c.get("nome"), nome + "%"), cb().equal(c.get("hisAtivo"), 1));
+        if (nome != null)
+            nome = nome.replace(' ', '%');
+        else
+            nome = "";
+
+        q.where(cb().like(c.get("nome"), "%" + nome + "%"), cb().equal(c.get("hisAtivo"), 1));
+
         try {
             return em().createQuery(q).getResultList();
         } catch (Exception ex) {
@@ -211,6 +216,16 @@ public class WfDao extends CpDao implements com.crivano.jflow.Dao<WfProcedimento
         result.stream().forEach(i -> l.add(i));
         l.sort(null);
         return l;
+    }
+
+    public List<WfProcedimento> consultarProcedimentosAtivosPorDiagrama(WfDefinicaoDeProcedimento pd) {
+        String sql = "select p from WfProcedimento p join p.definicaoDeProcedimento pd where pd.hisIdIni = :idIni and p.status not in ('FINISHED', 'INACTIVE')";
+        TypedQuery<WfProcedimento> query = ContextoPersistencia.em().createQuery(sql, WfProcedimento.class);
+        query.setParameter("idIni", pd.getHisIdIni());
+
+        List<WfProcedimento> result = query.getResultList();
+        result.sort(null);
+        return result;
     }
 
     public List<WfResponsavel> consultarResponsaveisPorDefinicaoDeResponsavel(WfDefinicaoDeResponsavel dr) {

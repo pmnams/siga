@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -32,6 +32,7 @@ import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import br.gov.jfrj.siga.ex.util.BIE.ModeloBIE;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import freemarker.ext.dom.NodeModel;
+import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.InputSource;
 
 import java.io.StringReader;
@@ -578,6 +579,12 @@ public class FuncoesEL {
         return string1.replaceAll("/", "/<br>");
     }
 
+    public static String formatarMemo(String frase) {
+        if (frase == null || frase.trim().isEmpty())
+            return "";
+        return frase.replaceAll("\n", "<br/>");
+    }
+
     public static String stringParaMinusculaNomes(String string) {
         String strSplit[] = string.split(" ");
         String stringFinal = "";
@@ -883,16 +890,18 @@ public class FuncoesEL {
 
     public static String webservice(String url, String corpo, Integer timeout) {
         try {
-            HashMap<String, String> headers = new HashMap<String, String>();
-            headers.put("Content-Type", "text/xml;charset=UTF-8");
+            HashMap<String, String> headers = new HashMap<>();
+
+            if (StringUtils.isNotEmpty(corpo))
+                headers.put("Content-Type", "text/xml;charset=UTF-8");
+
             String auth = (String) resource("/siga.freemarker.webservice.password");
+
             if (auth != null)
                 headers.put("Authorization", auth);
-            // String s = ConexaoHTTP.get(url, headers, timeout, corpo);
-            // //Reescrito para utilizar o SigaTTP
+
             SigaHTTP sigaHTTP = new SigaHTTP();
-            String s = sigaHTTP.getNaWeb(url, headers, timeout, corpo);
-            return s;
+            return sigaHTTP.getNaWeb(url, headers, timeout, corpo);
         } catch (Exception e) {
             return "";
         }

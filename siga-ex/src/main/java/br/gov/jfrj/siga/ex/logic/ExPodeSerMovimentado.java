@@ -1,15 +1,10 @@
 package br.gov.jfrj.siga.ex.logic;
 
-import com.crivano.jlogic.And;
-import com.crivano.jlogic.CompositeExpressionSupport;
-import com.crivano.jlogic.Expression;
-import com.crivano.jlogic.Not;
-import com.crivano.jlogic.Or;
-
 import br.gov.jfrj.siga.cp.logic.CpNaoENulo;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.ExMobil;
+import com.crivano.jlogic.*;
 
 public class ExPodeSerMovimentado extends CompositeExpressionSupport {
 
@@ -28,6 +23,9 @@ public class ExPodeSerMovimentado extends CompositeExpressionSupport {
                         break;
                     }
                 }
+
+                if (this.mob.isGeral())
+                    this.mob = this.mob.doc().getPrimeiraVia();
             }
         }
     }
@@ -39,17 +37,15 @@ public class ExPodeSerMovimentado extends CompositeExpressionSupport {
     @Override
     protected Expression create() {
         return And.of(
-
                 new CpNaoENulo(mob, "via ou volume"),
-
                 Not.of(new ExEstaSemEfeito(mob.doc())),
-
-                Or.of(new ExEMobilVia(mob), new ExEMobilVolume(mob)),
-
+                Or.of(
+                        new ExEMobilVia(mob),
+                        new ExEMobilVolume(mob)
+                ),
                 new ExEstaFinalizado(mob.doc()),
-
                 Not.of(new ExEMobilCancelado(mob)),
-
-                Not.of(new ExEstaEmTransitoExterno(mob)));
+                Not.of(new ExEstaEmTransitoExterno(mob))
+        );
     }
-};
+}

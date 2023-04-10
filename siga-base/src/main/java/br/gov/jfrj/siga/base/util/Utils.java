@@ -111,4 +111,14 @@ public class Utils {
         return o1 != null && o1.equals(o2);
     }
 
+    public static int comparar(Comparable o1, Comparable o2) {
+        if (o1 == null && o2 == null)
+            return 0;
+        if (o1 != null && o2 != null)
+            return o1.compareTo(o2);
+        if (o1 != null && o2 == null)
+            return 1;
+        return -1;
+    }
+
 }

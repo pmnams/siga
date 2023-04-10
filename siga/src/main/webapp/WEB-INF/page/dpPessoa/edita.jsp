@@ -231,7 +231,7 @@
 						<div class="col-md-2">
 							<div class="form-group">
 								<label for="nmMatricula">N° Matricula</label>
-								<input type="number" id="nmMatricula" name="nmMatricula" value="${nmMatricula}" class="form-control" ${temPermissaoParaEditarMatricula ? '' : 'readonly' } />
+								<input type="number" id="nmMatricula" name="nmMatricula" value="${nmMatricula}" class="form-control" ${temPermissaoParaEditarMatricula ? '' : 'readonly' } min="0"/>
 							</div>
 						</div>
 					</div>

@@ -7,7 +7,7 @@ import com.crivano.jlogic.JLogic;
 
 public class ExEstaAindaComOCadastrante implements Expression {
 
-    private ExMobil mob;
+    private final ExMobil mob;
 
     public ExEstaAindaComOCadastrante(ExMobil mob) {
         this.mob = mob;

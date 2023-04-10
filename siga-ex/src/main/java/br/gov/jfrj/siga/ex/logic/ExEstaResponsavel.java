@@ -39,7 +39,7 @@ public class ExEstaResponsavel implements Expression {
 
     @Override
     public String explain(boolean result) {
-        return titular.getSiglaCompleta() + "/" + lotaTitular.getSiglaCompleta() + (result ? "" : JLogic.NOT)
+        return (titular != null ? titular.getSiglaCompleta() + "/" : "") + lotaTitular.getSiglaCompleta() + (result ? "" : JLogic.NOT)
                 + " é responsável por " + mob.getCodigo();
     }
 }

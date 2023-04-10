@@ -38,21 +38,24 @@ import org.mvel2.templates.CompiledTemplate;
 import org.mvel2.templates.TemplateCompiler;
 import org.mvel2.templates.TemplateRuntime;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SigaLibsEL {
-    private static String month[] = new String[]{"Jan", "Fev", "Mar", "Abr",
+    private static final String[] month = new String[]{"Jan", "Fev", "Mar", "Abr",
             "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"};
+
+    private static String versao = null;
 
     public static String concat(final String s, final String s2) {
         return s + s2;
@@ -108,10 +111,12 @@ public class SigaLibsEL {
         }
         return lAnterior.get(Calendar.DAY_OF_MONTH) + "/"
                 + month[lAnterior.get(Calendar.MONTH)] + " ("
-                + Long.toString(l) + " dia" + (l == 1L ? "" : "s") + ")";
+                + l + " dia" + (l == 1L ? "" : "s") + ")";
     }
 
     public static String esperaSimples(Date dt) {
+        if (dt == null)
+            return null;
         SigaCalendar c = new SigaCalendar();
         SigaCalendar lAnterior = new SigaCalendar(dt.getTime());
         // long l = -c.diffDayPeriods(lAnterior);
@@ -122,7 +127,7 @@ public class SigaLibsEL {
                         + (lAnterior.get(Calendar.MINUTE) < 10 ? "0" : "")
                         + lAnterior.get(Calendar.MINUTE);
         }
-        return Long.toString(l) + " dia" + (l == 1L ? "" : "s");
+        return l + " dia" + (l == 1L ? "" : "s");
     }
 
     public static String intervalo(Date dtIni, Date dtFim) {
@@ -133,7 +138,7 @@ public class SigaLibsEL {
         if (l == 0) {
             return lIni.diffHHMMSS(lFim);
         }
-        return Long.toString(l) + " dia" + (l == 1L ? "" : "s");
+        return l + " dia" + (l == 1L ? "" : "s");
     }
 
     /*
@@ -196,7 +201,6 @@ public class SigaLibsEL {
         Matcher m = p1.matcher(html);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
-            String all = m.group();
             String begin = m.group(1);
             String style = m.group(2);
             Matcher m2 = p2.matcher(style);
@@ -224,7 +228,6 @@ public class SigaLibsEL {
         StringBuffer sb2 = new StringBuffer();
         String style = "font-size:" + tamanho + ";";
         while (m3.find()) {
-            String all = m3.group();
             String begin = m3.group(1);
             String end = m3.group(2);
             if (!end.contains("style=")) {
@@ -272,16 +275,19 @@ public class SigaLibsEL {
 
     public static Boolean podeUtilizarServicoPorConfiguracao(DpPessoa titular,
                                                              DpLotacao lotaTitular, Integer idServico) throws Exception {
-        Boolean b = Cp
+        return Cp
                 .getInstance()
                 .getConf()
                 .podePorConfiguracao(
                         titular,
                         lotaTitular,
-                        dao().consultar(idServico.longValue(), CpServico.class,
-                                false),
-                        CpTipoDeConfiguracao.UTILIZAR_SERVICO);
-        return b;
+                        dao().consultar(
+                                idServico.longValue(),
+                                CpServico.class,
+                                false
+                        ),
+                        CpTipoDeConfiguracao.UTILIZAR_SERVICO
+                );
     }
 
     public static Boolean podePorConfiguracao(DpPessoa titular,
@@ -296,23 +302,15 @@ public class SigaLibsEL {
                 .podePorConfiguracao(titular, lotaTitular, CpTipoDeConfiguracao.EXIBIR_REGRA_DE_NEGOCIO_EM_BOTOES);
     }
 
-    // public static Boolean podeUtilizarServicoPorConfiguracao(DpPessoa
-    // titular,
-    // DpLotacao lotaTitular, String siglaServico) throws Exception {
-    // CpServico srv = new CpServico();
-    // srv.setSiglaServico(siglaServico);
-    // return Cp.getInstance().getConf().podePorConfiguracao(titular,
-    // lotaTitular, dao().consultarPorSigla(srv),
-    // CpTipoDeConfiguracao.UTILIZAR_SERVICO);
-    // }
-
-    public static Boolean podeUtilizarServicoPorConfiguracao(DpPessoa titular,
-                                                             DpLotacao lotaTitular, String servicoPath) throws Exception {
+    public static Boolean podeUtilizarServicoPorConfiguracao(DpPessoa titular, DpLotacao lotaTitular, String servicoPath) throws Exception {
         return Cp
                 .getInstance()
                 .getConf()
-                .podeUtilizarServicoPorConfiguracao(titular, lotaTitular,
-                        servicoPath);
+                .podeUtilizarServicoPorConfiguracao(
+                        titular,
+                        lotaTitular,
+                        servicoPath
+                );
     }
 
     public static Boolean podeGerirAlgumGrupo(DpPessoa titular,
@@ -328,15 +326,14 @@ public class SigaLibsEL {
 
     static LoadingCache<String, String> cache = CacheBuilder.newBuilder().maximumSize(1000)
             .expireAfterWrite(5, TimeUnit.MINUTES).build(new CacheLoader<String, String>() {
-                public String load(String source) throws Exception {
+                public String load(String source) {
                     Long idOrgaoUsu = Long.valueOf(source.split("-")[1]);
                     ProcessadorFreemarkerSimples p = new ProcessadorFreemarkerSimples();
-                    Map attrs = new HashMap();
+                    Map<String, Object> attrs = new HashMap<>();
                     attrs.put("nmMod", "macro complementoHEAD");
                     attrs.put("template", "[@complementoHEAD/]");
                     try {
-                        String s = p.processarModelo(CpDao.getInstance().consultarOrgaoUsuarioPorId(idOrgaoUsu), attrs, null).trim();
-                        return s;
+                        return p.processarModelo(CpDao.getInstance().consultarOrgaoUsuarioPorId(idOrgaoUsu), attrs, null).trim();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -374,11 +371,9 @@ public class SigaLibsEL {
         expression = expression.replaceFirst("^([a-zA-Z0-9]+)(?:$|(?:\\.|\\[)?.*$)", "isdef $1 ? $0 : null");
         CompiledTemplate template = TemplateCompiler
                 .compileTemplate("${" + expression + "}");
-        Map vars = new HashMap();
-        vars.putAll((Map) root);
+        Map vars = new HashMap((Map) root);
 
-        Object output = TemplateRuntime.execute(template, vars);
-        return output;
+        return TemplateRuntime.execute(template, vars);
     }
 
     public static String pluralize(Integer count, String singular, String plural) {
@@ -392,11 +387,11 @@ public class SigaLibsEL {
 //	public static Object evaluate(String expression, Object root) throws Exception {
 //		Object expr = Ognl.parseExpression(expression);
 //
-//	    OgnlContext ctx = new OgnlContext(); 
-//	    
+//	    OgnlContext ctx = new OgnlContext();
+//
 //	    Map vars = new HashMap();
 //		vars.putAll((Map) root);
-//		
+//
 //	    Object output = Ognl.getValue(expr, ctx, vars);
 //		return output;
 //	}
@@ -411,7 +406,7 @@ public class SigaLibsEL {
 //		      add(new BeanELResolver());
 //		    }
 //		  }
-//		
+//
 //		  return new ELContext(resolver);
 //		}
 
@@ -419,7 +414,7 @@ public class SigaLibsEL {
 //	public static Object evaluate(String expression, Object root) throws Exception {
 //		Map vars = new HashMap();
 //		vars.putAll((Map) root);
-//		
+//
 //		ELResolver elResolver = new ELResolver(vars);
 //	    final VariableMapper variableMapper = new DemoVariableMapper();
 //	    final DemoFunctionMapper functionMapper = new DemoFunctionMapper();
@@ -430,7 +425,7 @@ public class SigaLibsEL {
 //	    compositeELResolver.add(new ListELResolver());
 //	    compositeELResolver.add(new BeanELResolver());
 //	    compositeELResolver.add(new MapELResolver());
-//	    
+//
 //	    ELContext context = new ELContext() {
 //	      @Override
 //	      public ELResolver getELResolver() {
@@ -445,11 +440,11 @@ public class SigaLibsEL {
 //	        return variableMapper;
 //	      }
 //	    };
-//		
+//
 //		Object expr = Ognl.parseExpression(expression);
 //
 //	    OgnlContext ctx = new OgnlContext();
-//	    
+//
 //	    Object output = Ognl.getValue(expr, ctx, vars);
 //		return output;
 //	}
@@ -475,4 +470,32 @@ public class SigaLibsEL {
     public static boolean podeUtilizarSegundoFatorPin(final DpPessoa cadastrante, final DpLotacao lotacaoCadastrante) throws Exception {
         return Cp.getInstance().getConf().podePorConfiguracao(cadastrante, lotacaoCadastrante, CpTipoDeConfiguracao.SEGUNDO_FATOR_PIN);
     }
+
+    public static String getMesaVersao(DpPessoa titular, DpLotacao lotaTitular) {
+        String mesaVersao = Prop.get("/siga.mesa.versao");
+        if (Cp.getInstance()
+                .getConf()
+                .podeUtilizarServicoPorConfiguracao(titular, lotaTitular,
+                        "SIGA:Sistema Integrado de Gestão Administrativa;DOC:Módulo de Documentos;MESA2:Mesa Versão 2;BETA:Utilizar versão beta"))
+            mesaVersao = "2";
+        return mesaVersao;
+    }
+
+    public static String sigaVersao() {
+        if (Objects.nonNull(versao))
+            return versao;
+
+        ClassLoader cl = SigaLibsEL.class.getClassLoader();
+        try (InputStream is = cl.getResourceAsStream("/META-INF/VERSION.MF")) {
+            Manifest manifest = new Manifest(is);
+            Attributes attr = manifest.getMainAttributes();
+
+            versao = attr.getValue("Siga-Versao");
+
+            return versao;
+        } catch (IOException e) {
+            return "-";
+        }
+    }
+
 }

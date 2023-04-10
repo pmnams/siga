@@ -395,9 +395,14 @@ public class MascaraUtil {
 	 * @return - número de níveis da máscara;
 	 */
 	public int getTotalDeNiveisDaMascara(){
-		if (true) return 4;
+		//if (true) return 4;
 		Pattern pe = Pattern.compile(getMascaraEntrada());
-		Matcher me = pe.matcher(formatar(StringUtils.repeat("1", getMascaraExibicao().length())));
+
+		String mascara = getMascaraExibicao();
+		if (mascara == null || mascara.length() == 0)
+			mascara = getMascaraSaida();
+
+		Matcher me = pe.matcher(formatar(StringUtils.repeat("1", mascara.length())));
 		int result = 0;
 		if(me.find()){
 			for (int i = 1; i<=me.groupCount(); i++) {

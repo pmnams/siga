@@ -1,6 +1,7 @@
 <%@ tag body-content="empty" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://localhost/functiontag" prefix="f" %>
+<%@ taglib uri="http://localhost/jeetags" prefix="siga" %>
 
 <%@ attribute name="assinar" required="false" %>
 <%@ attribute name="emLote" required="false" %>
@@ -21,6 +22,7 @@
 <%@ attribute name="juntarFixo" required="false" %>
 <%@ attribute name="tramitarAtivo" required="false" %>
 <%@ attribute name="tramitarFixo" required="false" %>
+<%@ attribute name="tramitarExplicacao" required="false" %>
 <%@ attribute name="exibirNoProtocoloAtivo" required="false" %>
 <%@ attribute name="exibirNoProtocoloFixo" required="false" %>
 
@@ -66,7 +68,8 @@
                     <div class="custom-control custom-radio">
                         <input class="custom-control-input" type="radio"
                                accesskey="c" name="radioProviderAssinatura" id="ad_password_0"
-                               <c:if test="${SenhaChecked}">checked</c:if> />
+                               <c:if test="${SenhaChecked}">checked</c:if>
+                               onclick="setUserLocalStorage('tipo-assinatura', 'senha')"/>
                         <label class="custom-control-label" for="ad_password_0">Senha</label>
 
                     </div>
@@ -79,7 +82,7 @@
                                accesskey="p" name="radioProviderAssinatura" id="ad_pin_0"
                                <c:if test="${PinChecked}">checked</c:if>
                                <c:if test="${empty identidadeCadastrante.pinIdentidade}">disabled</c:if>
-                               identidadeCadastrante/>
+                               identidadeCadastrante onclick="setUserLocalStorage('tipo-assinatura', 'pin')"/>
                         <label class="custom-control-label" for="ad_pin_0">PIN</label>
                         <c:if test="${empty identidadeCadastrante.pinIdentidade}">
                             <small class="text-muted"> - Clique <strong><a
@@ -94,10 +97,32 @@
                     <div class="custom-control custom-radio">
                         <input class="custom-control-input" type="radio"
                                accesskey="d" name="radioProviderAssinatura" id="ad_certificado_0"
-                               <c:if test="${CertificadoChecked}">checked</c:if> />
+                               <c:if test="${CertificadoChecked}">checked</c:if>
+                               onclick="setUserLocalStorage('tipo-assinatura', 'certificado-digital')"/>
                         <label class="custom-control-label" for="ad_certificado_0">Certificado Digital</label>
                     </div>
                 </c:if>
+
+                <script>
+                    $(document).ready(function () {
+                        var tipoAssinatura = getUserLocalStorage('tipo-assinatura');
+                        var i = undefined;
+
+                        switch (tipoAssinatura) {
+                            case 'certificado-digital':
+                                i = $('#ad_certificado_0');
+                                break;
+                            case 'senha':
+                                i = $('#ad_password_0');
+                                break;
+                            case 'pin':
+                                i = $('#ad_pin_0');
+                                break;
+                        }
+                        if (i && !i.prop('checked') && !i.prop('disabled'))
+                            i.prop('checked', true);
+                    });
+                </script>
             </div>
 
             <div class="col">
@@ -120,7 +145,8 @@
                                id="ad_tramitar_0"
                                <c:if test="${tramitarAtivo}">checked</c:if>
                                <c:if test="${tramitarFixo}">disabled</c:if> /> <label
-                            class="form-check-label" for="ad_tramitar_0">Tramitar</label>
+                            class="form-check-label" for="ad_tramitar_0" <siga:tooltip title="Tramitar Automaticamente"
+                                                                                       explicacao="${tramitarExplicacao}"/> >Tramitar</label>
                     </div>
                     <c:set var="exibirOpcoes" scope="request" value="d-block"/>
                 </c:if>

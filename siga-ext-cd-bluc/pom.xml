@@ -29,7 +29,7 @@
 								<artifactItem>
 									<groupId>${project.groupId}</groupId>
 									<artifactId>${project.artifactId}</artifactId>
-									<version>${project.version}</version>
+									<version>${revision}</version>
 									<type>${project.packaging}</type>
 								</artifactItem>
 							</artifactItems>

@@ -39,18 +39,15 @@ import javax.persistence.Table;
 public class ExPapel extends AbstractExPapel {
 
     final static public long PAPEL_GESTOR = 1;
-
     final static public long PAPEL_INTERESSADO = 2;
-
     final static public long PAPEL_FISCAL_ADMINISTRATIVO = 3;
-
     final static public long PAPEL_FISCAL_TECNICO = 4;
-
     final static public long PAPEL_LIQUIDANTE = 5;
-
     final static public long PAPEL_AUTORIZADOR = 6;
-
     final static public long PAPEL_REVISOR = 7;
+    final static public long PAPEL_AUTORIZADO_COSSIG = 8;
+
+    final static public long PAPEL_AUTORIZADO = 9;
 
     public String getComoNomeDeVariavel() {
         String s = getDescPapel().trim().toLowerCase();

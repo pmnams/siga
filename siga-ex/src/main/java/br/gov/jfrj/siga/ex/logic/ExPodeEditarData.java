@@ -9,18 +9,13 @@ import com.crivano.jlogic.Expression;
 
 public class ExPodeEditarData extends CompositeExpressionSupport {
 
-    private ExModelo mod;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final ExModelo mod;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     /**
      * Retorna se é possível editar a data de um documento, conforme configuração
      * específica.
-     *
-     * @param titular
-     * @param lotaTitular
-     * @param mod
-     * @return
      */
     public ExPodeEditarData(ExModelo mod, DpPessoa titular, DpLotacao lotaTitular) {
         this.mod = mod;
@@ -30,7 +25,14 @@ public class ExPodeEditarData extends CompositeExpressionSupport {
 
     @Override
     protected Expression create() {
-        return new ExPodePorConfiguracao(titular, lotaTitular).withExMod(mod).withExFormaDoc(mod.getExFormaDocumento())
+        ExPodePorConfiguracao exp = new ExPodePorConfiguracao(titular, lotaTitular)
                 .withIdTpConf(ExTipoDeConfiguracao.EDITAR_DATA);
+
+        if (mod != null)
+            exp.withExMod(mod)
+                    .withExFormaDoc(mod.getExFormaDocumento());
+
+        return exp;
     }
+
 }

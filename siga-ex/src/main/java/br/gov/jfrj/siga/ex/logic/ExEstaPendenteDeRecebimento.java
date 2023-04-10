@@ -3,8 +3,8 @@ package br.gov.jfrj.siga.ex.logic;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.ExMobil;
-import br.gov.jfrj.siga.ex.bl.ExTramiteBL.Pendencias;
 import br.gov.jfrj.siga.ex.ExMovimentacao;
+import br.gov.jfrj.siga.ex.bl.ExTramiteBL.Pendencias;
 import com.crivano.jlogic.Expression;
 import com.crivano.jlogic.JLogic;
 

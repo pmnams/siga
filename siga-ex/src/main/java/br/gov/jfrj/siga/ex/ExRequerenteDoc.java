@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.swing.text.MaskFormatter;
 
+import br.gov.jfrj.siga.model.Selecionavel;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.search.annotations.Indexed;
 
@@ -19,7 +20,7 @@ import org.hibernate.search.annotations.Indexed;
 @Cacheable
 @BatchSize(size = 500)
 @Table(name = "siga.ex_requerente")
-public class ExRequerenteDoc extends AbstractExRequerenteDoc {
+public class ExRequerenteDoc extends AbstractExRequerenteDoc implements Selecionavel {
 
 	private static final long serialVersionUID = -1981963049721664626L;
 	
@@ -43,5 +44,20 @@ public class ExRequerenteDoc extends AbstractExRequerenteDoc {
 
 		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 		return df.format(data);
+	}
+
+	@Override
+	public String getSigla() {
+		return getCpfRequerente();
+	}
+
+	@Override
+	public void setSigla(String sigla) {
+
+	}
+
+	@Override
+	public String getDescricao() {
+		return this.getNomeRequerente();
 	}
 }

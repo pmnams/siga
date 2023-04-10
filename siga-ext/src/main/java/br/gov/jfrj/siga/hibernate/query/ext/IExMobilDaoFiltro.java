@@ -23,142 +23,148 @@ import java.util.List;
 
 public interface IExMobilDaoFiltro {
 
-    public abstract void setSigla(final String nome);
+    void setSigla(final String nome);
 
-    public abstract Long getAnoEmissao();
+    Long getAnoEmissao();
 
-    public abstract Long getClassificacaoSelId();
+    Long getClassificacaoSelId();
 
-    public abstract String getDescrDocumento();
+    String getDescrDocumento();
 
-    public abstract Long getDestinatarioSelId();
+    Long getDestinatarioSelId();
 
-    public abstract Long getIdFormaDoc();
+    Long getIdFormaDoc();
 
-    public abstract Integer getIdTpDoc();
+    Integer getIdTpDoc();
 
-    public abstract Long getLotacaoDestinatarioSelId();
+    Long getLotacaoDestinatarioSelId();
 
-    public abstract String getNmDestinatario();
+    String getNmDestinatario();
 
-    public abstract String getNmSubscritorExt();
+    String getNmSubscritorExt();
 
-    public abstract Long getNumExpediente();
+    Long getNumExpediente();
 
-    public abstract String getNumExtDoc();
+    String getNumExtDoc();
 
-    public abstract Long getOrgaoExternoDestinatarioSelId();
+    Long getOrgaoExternoDestinatarioSelId();
 
-    public abstract Long getSubscritorSelId();
+    Long getSubscritorSelId();
 
-    public abstract Long getUltMovIdEstadoDoc();
+    Long getRequerenteDocSelId();
 
-    public abstract Long getUltMovLotaRespSelId();
+    Long getUltMovIdEstadoDoc();
 
-    public abstract Long getUltMovRespSelId();
+    Long getUltMovLotaRespSelId();
 
-    public abstract void setAnoEmissao(final Long anoEmissao);
+    Long getUltMovRespSelId();
 
-    public abstract void setClassificacaoSelId(final Long classificacaoSelId);
+    void setAnoEmissao(final Long anoEmissao);
 
-    public abstract void setDescrDocumento(final String descrDocumento);
+    void setClassificacaoSelId(final Long classificacaoSelId);
 
-    public abstract String getFullText();
+    void setDescrDocumento(final String descrDocumento);
 
-    public abstract void setFullText(String fullText);
+    String getFullText();
 
-    public abstract void setDestinatarioSelId(final Long destinatarioSelId);
+    void setFullText(String fullText);
 
-    public abstract void setIdFormaDoc(final Long idFormaDoc);
+    void setDestinatarioSelId(final Long destinatarioSelId);
 
-    public abstract void setIdTpDoc(final Integer idTpDoc);
+    void setIdFormaDoc(final Long idFormaDoc);
 
-    public abstract void setLotacaoDestinatarioSelId(
+    void setIdTpDoc(final Integer idTpDoc);
+
+    void setLotacaoDestinatarioSelId(
             final Long lotacaoDestinatarioSelId);
 
-    public abstract void setNmDestinatario(final String nmDestinatario);
+    void setNmDestinatario(final String nmDestinatario);
 
-    public abstract void setNmSubscritorExt(final String nmSubscritorExt);
+    void setNmSubscritorExt(final String nmSubscritorExt);
 
-    public abstract void setNumExpediente(final Long numExpediente);
+    void setNumExpediente(final Long numExpediente);
 
-    public abstract void setNumExtDoc(final String numExtDoc);
+    void setNumExtDoc(final String numExtDoc);
 
-    public abstract void setOrgaoExternoDestinatarioSelId(
+    void setOrgaoExternoDestinatarioSelId(
             final Long orgaoExternoDestinatarioSelId);
 
-    public abstract void setSubscritorSelId(final Long subscritorSelId);
+    void setSubscritorSelId(final Long subscritorSelId);
 
-    public abstract void setUltMovIdEstadoDoc(final Long ultMovIdEstadoDoc);
+    void setRequerenteDocSelId(final Long requerenteDocSelId);
 
-    public abstract void setUltMovLotaRespSelId(final Long ultMovLotaRespSelId);
+    void setUltMovIdEstadoDoc(final Long ultMovIdEstadoDoc);
 
-    public abstract void setUltMovRespSelId(final Long ultMovRespSelId);
+    void setUltMovLotaRespSelId(final Long ultMovLotaRespSelId);
 
-    public abstract Long getId();
+    void setUltMovRespSelId(final Long ultMovRespSelId);
 
-    public abstract Integer getNumSequencia();
+    Long getId();
 
-    public abstract void setNumSequencia(final Integer numSequencia);
+    Integer getNumSequencia();
 
-    public abstract Long getIdDoc();
+    void setNumSequencia(final Integer numSequencia);
 
-    public abstract void setIdDoc(final Long idDoc);
+    Long getIdDoc();
 
-    public abstract Long getOrgaoExternoSelId();
+    void setIdDoc(final Long idDoc);
 
-    public abstract void setOrgaoExternoSelId(final Long orgaoExternoSelId);
+    Long getOrgaoExternoSelId();
 
-    public abstract Date getDtDoc();
+    void setOrgaoExternoSelId(final Long orgaoExternoSelId);
 
-    public abstract void setDtDoc(final Date dtDoc);
+    Date getDtDoc();
 
-    public abstract String getNumAntigoDoc();
+    void setDtDoc(final Date dtDoc);
 
-    public abstract void setNumAntigoDoc(String numAntigoDoc);
+    String getNumAntigoDoc();
 
-    public abstract Long getLotacaoCadastranteAtualId();
+    void setNumAntigoDoc(String numAntigoDoc);
 
-    public abstract void setLotacaoCadastranteAtualId(
+    Long getLotacaoCadastranteAtualId();
+
+    void setLotacaoCadastranteAtualId(
             Long lotacaoCadastranteAtualId);
 
-    public abstract Long getIdOrgaoUsu();
+    Long getIdOrgaoUsu();
 
-    public abstract void setIdOrgaoUsu(Long idOrgaoUsu);
+    void setIdOrgaoUsu(Long idOrgaoUsu);
 
-    public abstract Long getCadastranteSelId();
+    Long getCadastranteSelId();
 
-    public abstract void setCadastranteSelId(Long cadastranteSelId);
+    void setCadastranteSelId(Long cadastranteSelId);
 
-    public abstract Long getLotaCadastranteSelId();
+    Long getLotaCadastranteSelId();
 
-    public abstract void setLotaCadastranteSelId(Long lotaCadastranteSelId);
+    void setLotaCadastranteSelId(Long lotaCadastranteSelId);
 
-    public abstract Date getDtDocFinal();
+    Date getDtDocFinal();
 
-    public abstract void setDtDocFinal(Date dtDocFinal);
+    void setDtDocFinal(Date dtDocFinal);
 
-    public abstract Long getIdTipoMobil();
+    Long getIdTipoMobil();
 
-    public abstract void setIdTipoMobil(Long idTipoMobil);
+    void setIdTipoMobil(Long idTipoMobil);
 
-    public abstract Long getIdTipoFormaDoc();
+    Long getIdTipoFormaDoc();
 
-    public abstract void setIdTipoFormaDoc(Long idTipoFormaDoc);
+    void setIdTipoFormaDoc(Long idTipoFormaDoc);
 
-    public abstract Long getIdMod();
+    Long getIdMod();
 
-    public abstract void setIdMod(Long idMod);
+    void setIdMod(Long idMod);
 
-    public abstract void setOrdem(Integer ordem);
+    void setOrdem(Integer ordem);
 
-    public abstract Integer getOrdem();
+    Integer getOrdem();
 
-    public abstract boolean buscarPorCamposMarca();
+    boolean buscarPorCamposMarca();
 
-    public abstract boolean buscarPorCamposDoc();
+    boolean buscarPorCamposDoc();
 
-    public abstract List<Long> getListaIdDoc();
+    List<Long> getListaIdDoc();
 
-    public abstract void setListaIdDoc(final List<Long> lista);
+    void setListaIdDoc(final List<Long> lista);
+
+
 }

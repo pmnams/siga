@@ -3,11 +3,9 @@ package br.gov.jfrj.siga.ex.util;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.ExDocumento;
 import br.gov.jfrj.siga.ex.ExMobil;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeVinculo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ExGraphRelacaoDocs extends ExGraph {
 
@@ -54,28 +52,57 @@ public class ExGraphRelacaoDocs extends ExGraph {
             this.mob1 = mob1;
             this.mob2 = mob2;
             this.tipo = tipo;
-            if (tipo.equals("vinculacao")) {
-                setTooltip("Vincula&ccedil;&atilde;o");
-                setEstilo(ESTILO_TRACEJADO);
-                setCor("gray");
-                setDirected(false);
-            } else if (tipo.equals("juntada")) {
-                setTooltip("Juntada");
-                setEstilo(ESTILO_TRACEJADO);
-                setDirected(true).setAoContrario(true);
-            } else if (tipo.equals("apensacao")) {
-                setTooltip("Apensa&ccedil;&atilde;o");
-                setEstilo(ESTILO_TRACEJADO);
-                setDirected(true).setAoContrario(true);
-            } else if (tipo.equals("paternidade")) {
-                setTooltip(mob2.doc().isProcesso() ? "Subprocesso"
-                        : "Documento filho");
-                setDirected(false);
+            switch (tipo) {
+                case "vinculacao":
+                    setTooltip("Vincula&ccedil;&atilde;o");
+                    setEstilo(ESTILO_TRACEJADO);
+                    setCor("gray");
+                    setDirected(false);
+                    break;
+                case "alteracao":
+                    setTooltip("Alteração");
+                    setEstilo(ESTILO_TRACEJADO);
+                    setCor("blue");
+                    setLabel("Altera");
+                    setDirected(true);
+                    setAoContrario(true);
+                    break;
+                case "revogacao":
+                    setTooltip("Revogação");
+                    setEstilo(ESTILO_TRACEJADO);
+                    setCor("orange");
+                    setLabel("Revoga");
+                    setDirected(true);
+                    setAoContrario(true);
+                    break;
+                case "cancelamento":
+                    setTooltip("Cancelamento");
+                    setEstilo(ESTILO_TRACEJADO);
+                    setCor("red");
+                    setLabel("Cancela");
+                    setDirected(true);
+                    setAoContrario(true);
+                    break;
+                case "juntada":
+                    setTooltip("Juntada");
+                    setEstilo(ESTILO_TRACEJADO);
+                    setDirected(true).setAoContrario(true);
+                    break;
+                case "apensacao":
+                    setTooltip("Apensa&ccedil;&atilde;o");
+                    setEstilo(ESTILO_TRACEJADO);
+                    setDirected(true).setAoContrario(true);
+                    break;
+                case "paternidade":
+                    setTooltip(mob2.doc().isProcesso() ? "Subprocesso"
+                            : "Documento filho");
+                    setDirected(false);
+                    break;
             }
         }
     }
 
-    private ExMobil mobBase;
+    private final ExMobil mobBase;
 
     public List<NodoMob> getNodosExcetoMobBase() {
         List<NodoMob> listaFinal = new ArrayList<NodoMob>();
@@ -105,9 +132,27 @@ public class ExGraphRelacaoDocs extends ExGraph {
         }
 
         // Vinculações
-        for (ExMobil vinculado : mobBase.getVinculados()) {
+        for (ExMobil vinculado : mobBase.getVinculados(ExTipoDeVinculo.RELACIONAMENTO)) {
             adicionar(new NodoMob(vinculado, pessVendo, mobBase.doc()));
             adicionar(new TransicaoMob(mobBase, vinculado, "vinculacao"));
+        }
+
+        // Alterações
+        for (ExMobil vinculado : mobBase.getVinculados(ExTipoDeVinculo.ALTERACAO)) {
+            adicionar(new NodoMob(vinculado, pessVendo, mobBase.doc()));
+            adicionar(new TransicaoMob(mobBase, vinculado, "alteracao"));
+        }
+
+        // Cancelamentos
+        for (ExMobil vinculado : mobBase.getVinculados(ExTipoDeVinculo.CANCELAMENTO)) {
+            adicionar(new NodoMob(vinculado, pessVendo, mobBase.doc()));
+            adicionar(new TransicaoMob(mobBase, vinculado, "cancelamento"));
+        }
+
+        // Revogações
+        for (ExMobil vinculado : mobBase.getVinculados(ExTipoDeVinculo.REVOGACAO)) {
+            adicionar(new NodoMob(vinculado, pessVendo, mobBase.doc()));
+            adicionar(new TransicaoMob(mobBase, vinculado, "revogacao"));
         }
 
         // Juntadas
@@ -167,40 +212,81 @@ public class ExGraphRelacaoDocs extends ExGraph {
     }
 
     public Map<String, List<ExMobil>> getAsMap() {
-        Map<String, List<ExMobil>> mapa = new HashMap<String, List<ExMobil>>();
+        Map<String, List<ExMobil>> mapa = new TreeMap<>();
         String cat = "";
         ExMobil mobilAAdicionar = null;
         for (Transicao t : getTransicoes()) {
             TransicaoMob tMob = (TransicaoMob) t;
-            if (tMob.tipo.equals("vinculacao")) {
-                cat = "Veja também";
-                mobilAAdicionar = tMob.mob2;
-            } else if (tMob.tipo.equals("juntada")) {
-                cat = "Juntado ao documento";
-                mobilAAdicionar = tMob.mob1;
-            } else if (tMob.tipo.equals("apensacao"))
-                if (tMob.mob1.equals(mobBase)) {
-                    cat = "Documentos Apensados";
+            switch (tMob.tipo) {
+                case "vinculacao":
+                    cat = "Veja também";
                     mobilAAdicionar = tMob.mob2;
-                } else {
-                    cat = "Apensado ao Documento";
-                    mobilAAdicionar = tMob.mob1;
-                }
-            else if (tMob.tipo.equals("paternidade"))
-                if (tMob.mob1.equals(mobBase)) {
-                    cat = "Subprocessos";
+                    break;
+                case "alteracao":
+                    cat = "Alterado por";
                     mobilAAdicionar = tMob.mob2;
-                } else {
-                    cat = "Documento pai";
+                    break;
+                case "revogacao":
+                    cat = "Revogado por";
+                    mobilAAdicionar = tMob.mob2;
+                    break;
+                case "cancelamento":
+                    cat = "Cancelado por";
+                    mobilAAdicionar = tMob.mob2;
+                    break;
+                case "juntada":
+                    cat = "Juntado ao documento";
                     mobilAAdicionar = tMob.mob1;
-                }
-
-            if (mapa.get(cat) == null) {
-                mapa.put(cat, new ArrayList<ExMobil>());
+                    break;
+                case "apensacao":
+                    if (tMob.mob1.equals(mobBase)) {
+                        cat = "Documentos Apensados";
+                        mobilAAdicionar = tMob.mob2;
+                    } else {
+                        cat = "Apensado ao Documento";
+                        mobilAAdicionar = tMob.mob1;
+                    }
+                    break;
+                case "paternidade":
+                    if (tMob.mob1.equals(mobBase)) {
+                        cat = "Subprocessos";
+                        mobilAAdicionar = tMob.mob2;
+                    } else {
+                        cat = "Documento pai";
+                        mobilAAdicionar = tMob.mob1;
+                    }
+                    break;
             }
-            mapa.get(cat).add(mobilAAdicionar);
+
+            mapa.computeIfAbsent(cat, k -> new ArrayList<>()).add(mobilAAdicionar);
         }
         return mapa;
+    }
+
+    public Map<String, List<ExMobil>> getPrincipaisAsMap() {
+        Map<String, List<ExMobil>> mapa = getAsMap();
+        Set<String> toRemove = new HashSet<>();
+        for (String key : mapa.keySet())
+            if (!isPrincipal(key))
+                toRemove.add(key);
+        toRemove.forEach(mapa::remove);
+        return mapa;
+    }
+
+    public Map<String, List<ExMobil>> getSecundariosAsMap() {
+        Map<String, List<ExMobil>> mapa = getAsMap();
+        Set<String> toRemove = new HashSet<>();
+        for (String key : mapa.keySet())
+            if (isPrincipal(key))
+                toRemove.add(key);
+        toRemove.forEach(mapa::remove);
+        return mapa;
+    }
+
+    private boolean isPrincipal(String key) {
+        return key.equals("Alterado por")
+                || key.equals("Revogado por")
+                || key.equals("Cancelado por");
     }
 
 }

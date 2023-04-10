@@ -164,6 +164,7 @@ public class MascaraClassificacaoTest extends TestCase {
 	}
 
 	public void testBuscaDeFilhos() {
+
 		MascaraUtil m = MascaraUtil.getInstance();
 		/*TESTE MÁSCARA DE BUSCA DE FILHOS*/ 
 		m.setMascaraEntrada(MASK_IN_1);
