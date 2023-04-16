@@ -32,10 +32,10 @@
         <div class="row">
             <label for="ref">Nome ou CPF/CNPJ</label>
             <div class="input-group mb-2">
-                <input style="cursor: pointer" type="text" class="form-control" onkeyup="buscar(event)"
+                <input type="text" class="form-control" onkeyup="buscar(event)"
                        placeholder="Busca" id="ref" value="${ref}">
                 <div class="input-group-append">
-                    <span class="input-group-text" onclick="buscar();">Buscar</span>
+                    <span class="input-group-text" style="cursor: pointer" onclick="buscar();">Buscar</span>
                 </div>
             </div>
         </div>

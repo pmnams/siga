@@ -866,4 +866,15 @@ public class ExMobilVO extends ExVO {
                 || pendenciaProximoModelo != null;
     }
 
+    public List<ExDocumentoVO> getExpedientesFilhosNaoCancelados() {
+        return expedientesFilhosNaoCancelados;
+    }
+
+    public List<ExMobilVO> getApensos() {
+        return apensos;
+    }
+
+    public List<ExDocumentoVO> getProcessosFilhosNaoCancelados() {
+        return processosFilhosNaoCancelados;
+    }
 }
