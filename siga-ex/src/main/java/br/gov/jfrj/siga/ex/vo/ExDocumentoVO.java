@@ -1074,6 +1074,26 @@ public class ExDocumentoVO extends ExVO {
         return nmNivelAcesso;
     }
 
+    public String getPaiSigla() {
+        return paiSigla;
+    }
+
+    public String getSiglaCurtaSubProcesso() {
+        if (doc.isProcesso() && doc.getExMobilPai() != null) {
+            try {
+                return sigla.substring(sigla.length() - 3, sigla.length());
+            } catch (Exception e) {
+                return sigla;
+            }
+        }
+
+        return "";
+    }
+
+    public String getTipoDocumento() {
+        return tipoDocumento;
+    }
+
     public String getSigla() {
         return sigla;
     }
@@ -1141,6 +1161,10 @@ public class ExDocumentoVO extends ExVO {
 
     public String getOutrosMobsLabel() {
         return outrosMobsLabel;
+    }
+
+    public String getNomeCompleto() {
+        return nomeCompleto;
     }
 
     public ExGraphTramitacao getDotTramitacao() {
@@ -1213,6 +1237,38 @@ public class ExDocumentoVO extends ExVO {
 
     public void setPrincipalCompacto(String principalCompacto) {
         this.principalCompacto = principalCompacto;
+    }
+
+    public Map<ExMobil, Set<ExMarca>> getMarcasPorMobil() {
+        return marcasPorMobil;
+    }
+
+    public void setMarcasPorMobil(Map<ExMobil, Set<ExMarca>> marcasPorMobil) {
+        this.marcasPorMobil = marcasPorMobil;
+    }
+
+    public void setCossignatarios(Map<ExMovimentacaoVO, Boolean> cossignatarios) {
+        this.cossignatarios = cossignatarios;
+    }
+
+    public String getOriginalOrgao() {
+        return originalOrgao;
+    }
+
+    public void setPodeAnexarArquivoAuxiliar(boolean podeAnexar) {
+        this.podeAnexarArquivoAuxiliar = podeAnexar;
+    }
+
+    public String getDtLimiteDemandaJudicial() {
+        return dtLimiteDemandaJudicial;
+    }
+
+    public void setMarcasDoMobil(Set<ExMarca> marcasDoMobil) {
+        this.marcasDoMobil = marcasDoMobil;
+    }
+
+    public void setMarcasDeSistemaPorMobil(Map<ExMobil, Set<ExMarca>> marcasDeSistemaPorMobil) {
+        this.marcasDeSistemaPorMobil = marcasDeSistemaPorMobil;
     }
 
 }

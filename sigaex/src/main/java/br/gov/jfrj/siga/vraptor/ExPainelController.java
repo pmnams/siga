@@ -67,6 +67,7 @@ public class ExPainelController extends ExController {
         assertAcesso("");
         boolean postback = param("postback") != null;
 
+        result.include("documentoRefSel", documentoRefSel);
         if (documentoRefSel.getSigla() == null) {
             if (postback) {
                 result.include("mensagemCabec", "Informe o número do documento.");
@@ -74,11 +75,11 @@ public class ExPainelController extends ExController {
             }
             return;
         }
-        result.include("documentoRefSel", documentoRefSel);
+
         final ExDocumentoDTO exDocumentoDTO = new ExDocumentoDTO();
         exDocumentoDTO.setSigla(documentoRefSel.getSigla());
 
-        ExDocumentoVO docVO = null;
+        ExDocumentoVO docVO;
         try {
             buscarDocumento(false, exDocumentoDTO);
             // Verifica se algum doc juntado está sem a descrição
@@ -128,8 +129,7 @@ public class ExPainelController extends ExController {
             result.include("msgCabecClass", "alert-danger");
             return;
         } catch (Exception e) {
-            if (exDocumentoDTO != null
-                    && exDocumentoDTO.getDoc() != null
+            if (exDocumentoDTO.getDoc() != null
                     && exDocumentoDTO.getDoc().isFinalizado()
                     && exDocumentoDTO.getDoc().getExMobilSet().size() <= 1) {
                 result.include("erroDocLink", "corrigeDocSemMobil?documentoRefSel.sigla=" + documentoRefSel.getSigla());
@@ -295,7 +295,7 @@ public class ExPainelController extends ExController {
                 && exDocumentoDto.getSigla().length() != 0) {
             final ExMobilDaoFiltro filter = new ExMobilDaoFiltro();
             filter.setSigla(exDocumentoDto.getSigla());
-            exDocumentoDto.setMob((ExMobil) dao().consultarPorSigla(filter));
+            exDocumentoDto.setMob(dao().consultarPorSigla(filter));
             if (exDocumentoDto.getMob() != null) {
                 exDocumentoDto.setDoc(exDocumentoDto.getMob().getExDocumento());
             }

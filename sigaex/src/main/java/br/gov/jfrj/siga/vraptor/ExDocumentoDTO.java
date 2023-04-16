@@ -258,10 +258,10 @@ public class ExDocumentoDTO {
         ultMovCadastranteSel = new DpPessoaSelecao();
         ultMovLotaSubscritorSel = new DpLotacaoSelecao();
         ultMovLotaCadastranteSel = new DpLotacaoSelecao();
-        paramsEntrevista = new TreeMap<String, String>();
+        paramsEntrevista = new TreeMap<>();
         cpOrgaoSel = new CpOrgaoSelecao();
         setEletronico(0);
-        results = new LinkedList<ExDocumento>();
+        results = new LinkedList<>();
     }
 
     public boolean isCriandoAnexo() {

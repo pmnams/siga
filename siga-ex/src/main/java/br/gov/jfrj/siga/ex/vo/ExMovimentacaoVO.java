@@ -672,6 +672,10 @@ public class ExMovimentacaoVO extends ExVO {
         return "";
     }
 
+    public Object getDtRegMovDDMMYYHHMMSS() {
+        return dtRegMovDDMMYYHHMMSS;
+    }
+
     public Object getDtRegMovDDMMYY() {
         return dtRegMovDDMMYYHHMMSS.substring(0, 8);
     }
