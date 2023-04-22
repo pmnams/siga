@@ -47,7 +47,7 @@
                     src="/siga/javascript/pivottable/pivot.min.js"></script>
             <script type="text/javascript"
                     src="/siga/javascript/pivottable/gchart_renderers.js"></script>
-            <script>
+            <script type="text/javascript">
                 var data = [
                     <c:forEach var="documento" items="${itens}">
                     {
@@ -289,9 +289,8 @@
 
                         <td width="6%">${documento[0].nmMod}</td>
 
-                        <c:set var="acessivel" value=""/>
                         <c:set var="acessivel"
-                               value="${f:testaCompetencia('acessarDocumento',titular,lotaTitular,documento[1])}"/>
+                               value="${f:testaCompetencia('acessarDocumento', titular, lotaTitular,documento[1])}"/>
                         <c:if test="${formOrigem eq 'lista'}">
                             <c:set var="acessivel" value="true"/>
                         </c:if>

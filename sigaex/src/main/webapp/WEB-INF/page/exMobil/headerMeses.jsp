@@ -5,15 +5,22 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://localhost/customtag" prefix="tags" %>
 <%@ taglib uri="http://localhost/functiontag" prefix="f" %>
-<c:set var="pesquisaLimitadaPorData" scope="session"
-       value="${f:podeUtilizarServicoPorConfiguracao(titular,lotaTitular,'SIGA:Sistema Integrado de Gestão Administrativa;DOC:Módulo de Documentos;PESQ:Pesquisar;DTLIMITADA: Pesquisar somente com data limitada ')}"/>
+
+<%--@elvariable id="titular" type="br.gov.jfrj.siga.dp.DpPessoa"--%>
+<%--@elvariable id="lotaTitular" type="br.gov.jfrj.siga.dp.DpLotacao"--%>
+<%--@elvariable id="pesquisaLimitadaPorData" type="java.lang.Boolean"--%>
+
+<c:if test="${empty pesquisaLimitadaPorData}">
+    <c:set var="pesquisaLimitadaPorData" scope="session"
+           value="${f:podeUtilizarServicoPorConfiguracao(titular,lotaTitular,'SIGA:Sistema Integrado de Gestão Administrativa;DOC:Módulo de Documentos;PESQ:Pesquisar;DTLIMITADA: Pesquisar somente com data limitada ')}"/>
+</c:if>
 <c:set var="podePesquisarDescricao" scope="session"
        value="${f:podeUtilizarServicoPorConfiguracao(titular,lotaTitular,'SIGA:Sistema Integrado de Gestão Administrativa;DOC:Módulo de Documentos;PESQ:Pesquisar;PESQDESCR:Pesquisar descrição')}"/>
 <c:set var="podePesquisarDescricaoLimitada" scope="session"
        value="${f:podeUtilizarServicoPorConfiguracao(titular,lotaTitular,'SIGA:Sistema Integrado de Gestão Administrativa;DOC:Módulo de Documentos;PESQ:Pesquisar;PESQDESCR:Pesquisar descrição;LIMITADA:Pesquisar descrição só se informar outros filtros')}"/>
 <c:set var="limiteDias" scope="session" value="${f:resource('/siga.pesquisa.limite.dias')}"/>
 <input type="hidden" id="limiteDias" name="limiteDias" value="${f:resource('/siga.pesquisa.limite.dias')}"/>
-<script type="text/javascript" language="Javascript1.1">
+<script type="text/javascript">
 	window.onload = function() {
 		var dt = document.getElementById('dtDocFinalString');
 		if (dt == null)
