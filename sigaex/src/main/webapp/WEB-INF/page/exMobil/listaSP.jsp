@@ -287,15 +287,12 @@
                                             test="${f:mostraDescricaoConfidencial(documento[0], titular, lotaTitular) eq true}">
                                         <c:set var="estilo" value="confidencial"/>
                                     </c:if>
+                                    <c:set var="desc" value="${f:descricaoSePuderAcessar(documento[0], titular, lotaTitular)}"/>
                                     <td class="${estilo}" width="38%">
-                                        <c:choose>
-                                            <c:when test="${siga_cliente == 'GOVSP'}">
-                                                ${documento[0].descrDocumento }
-                                            </c:when>
-                                            <c:otherwise>
-                                                ${f:descricaoSePuderAcessar(documento[0], titular, lotaTitular)}
-                                            </c:otherwise>
-                                        </c:choose>
+                                        <c:if test="${desc != 'CONFIDENCIAL' and not empty documento[0].requerenteDoc}">
+                                            Requerente: ${documento[0].requerenteDoc.nomeRequerente} /
+                                        </c:if>
+                                            ${desc}
                                     </td>
                                     <c:if test="${visualizacao == 1}">
                                         <td class="${estilo}" width="38%">

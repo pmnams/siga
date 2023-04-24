@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<%@ page language="java" contentType="text/html; charset=UTF-8"
+<%@ page contentType="text/html; charset=UTF-8"
          buffer="64kb" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -8,6 +8,13 @@
 <%@ taglib uri="http://jsptags.com/tags/navigation/pager" prefix="pg" %>
 <%@ taglib uri="http://localhost/functiontag" prefix="f" %>
 <%@ taglib tagdir="/WEB-INF/tags/mod" prefix="mod" %>
+
+<%--@elvariable id="primeiraVez" type="java.lang.String"--%>
+<%--@elvariable id="apenasRefresh" type="java.lang.Integer"--%>
+<%--@elvariable id="titular" type="br.gov.jfrj.siga.dp.DpPessoa"--%>
+<%--@elvariable id="lotaTitular" type="br.gov.jfrj.siga.dp.DpLotacao"--%>
+<%--@elvariable id="popup" type="java.lang.Boolean"--%>
+<%--@elvariable id="pesquisaLimitadaPorData" type="java.lang.Boolean"--%>
 
 <siga:pagina titulo="Lista de Expedientes" popup="${popup}">
     <script type="text/ecmascript" >
@@ -75,6 +82,8 @@
     <div id="inicio" class="container-fluid content mb-3">
         <h5 id="pesqTitle">Pesquisar Documentos</h5>
         <c:set var="formOrigem" value="lista" scope="request"/>
+        <c:set var="pesquisaLimitadaPorData" scope="session"
+               value="${f:podeUtilizarServicoPorConfiguracao(titular,lotaTitular,'SIGA:Sistema Integrado de Gestão Administrativa;DOC:Módulo de Documentos;PESQ:Pesquisar;DTLIMITADA: Pesquisar somente com data limitada ')}"/>
         <c:if
                 test="${((empty primeiraVez) or (primeiraVez != 'sim')) and ((empty apenasRefresh) or (apenasRefresh != 1)) and !pesquisaLimitadaPorData}">
             <jsp:include page="./lista.jsp"/>
@@ -87,16 +96,14 @@
                         <form id="listar" name="listar"
                               onsubmit="javascript: return limpaCampos()" action="listar"
                               method="get" class="form100">
-                            <input type="hidden" name="popup" value="${popup}"/> <input
-                                type="hidden" name="propriedade" value="${propriedade}"/> <input
-                                type="hidden" name="postback" value="1"/> <input type="hidden"
-                                                                                 name="apenasRefresh" value="0"/> <input
-                                type="hidden"
-                                name="paramoffset" value="0"/> <input type="hidden"
-                                                                      name="p.offset" value="0"/> <input type="hidden"
-                                                                                                         id="limiteDias"
-                                                                                                         name="limiteDias"
-                                                                                                         value="${f:resource('/siga.pesquisa.limite.dias')}"/>
+                            <input type="hidden" name="popup" value="${popup}"/>
+                            <input type="hidden" name="propriedade" value="${propriedade}"/>
+                            <input type="hidden" name="postback" value="1"/>
+                            <input type="hidden" name="apenasRefresh" value="0"/>
+                            <input type="hidden" name="paramoffset" value="0"/>
+                            <input type="hidden" name="p.offset" value="0"/>
+                            <input type="hidden" id="limiteDias" name="limiteDias" value="${f:resource('/siga.pesquisa.limite.dias')}"/>
+
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="ultMovIdEstadoDoc">Situação</label> <select
@@ -453,10 +460,7 @@
                     </div>
                 </div>
             </div>
-            <!-- 		</div> -->
-            <!-- 	</div> -->
-            <c:if
-                    test="${((empty primeiraVez) or (primeiraVez != 'sim')) and ((empty apenasRefresh) or (apenasRefresh != 1)) and pesquisaLimitadaPorData}">
+            <c:if test="${((empty primeiraVez) or (primeiraVez != 'sim')) and ((empty apenasRefresh) or (apenasRefresh != 1)) and pesquisaLimitadaPorData}">
                 <div id="pesqResult" class="mx-3">
                     <jsp:include page="./listaSP.jsp"/>
                     <script>

@@ -632,12 +632,6 @@ public class ExMovimentacaoController extends ExController {
         }
         afTramite.explicacao = AcaoVO.Helper.produzirExplicacao(podeTramitarPosAssinatura, podeTramitar);
 
-        if (Prop.isGovSP()
-                && (doc.getDtFinalizacao() != null && !DateUtils.isToday(doc.getDtFinalizacao()))
-                && doc.getMobilGeral().getMovsNaoCanceladas(ExTipoDeMovimentacao.ASSINATURA_COM_SENHA).isEmpty()
-                && doc.getMobilGeral().getMovsNaoCanceladas(ExTipoDeMovimentacao.ASSINATURA_DIGITAL_DOCUMENTO).isEmpty()) {
-            Ex.getInstance().getBL().gravar(getCadastrante(), getTitular(), getLotaTitular(), doc);
-        }
         result.include("sigla", sigla);
         result.include("doc", doc);
         result.include("titular", this.getTitular());
@@ -647,7 +641,7 @@ public class ExMovimentacaoController extends ExController {
         result.include("voltarAtivo", true);
         result.include("juntarAtivo", doc.getPai() != null && afJuntada.ativo ? true : null);
         result.include("juntarFixo", doc.getPai() != null && afJuntada.fixo ? false : null);
-        result.include("tramitarAtivo", Prop.isGovSP() ? "" : afTramite.ativo);
+        result.include("tramitarAtivo", afTramite.ativo);
         result.include("tramitarFixo", afTramite.fixo);
         result.include("tramitarExplicacao", afTramite.explicacao);
     }

@@ -362,16 +362,28 @@ public enum ExTipoDeConfiguracao implements ITipoDeConfiguracao {
                     CpSituacaoDeConfiguracaoEnum.NAO_PODE},
             CpSituacaoDeConfiguracaoEnum.PODE, true),
     //
-    TRAMITE_AUTOMATICO(38, "Trâmite Automático",
+    TRAMITE_AUTOMATICO(
+            38,
+            "Trâmite Automático",
             "Esta configuração indica se haverá a opção de \"Tramitar\" automaticamente no momento da assinatura do documento. Também configura o trâmite automático no caso da assinatura em lote.",
-            new Enum[]{CpParamCfg.PESSOA, CpParamCfg.LOTACAO, CpParamCfg.TIPO_DE_LOTACAO, CpParamCfg.CARGO,
+            new Enum[]{
+                    CpParamCfg.PESSOA, CpParamCfg.LOTACAO, CpParamCfg.TIPO_DE_LOTACAO, CpParamCfg.CARGO,
                     CpParamCfg.FUNCAO, CpParamCfg.ORGAO, ExParamCfg.CLASSIFICACAO, ExParamCfg.TIPO_DOCUMENTO,
                     ExParamCfg.TIPO_FORMA_DOCUMENTO, ExParamCfg.FORMA_DOCUMENTO, ExParamCfg.MODELO,
-                    ExParamCfg.NIVEL_DE_ACESSO},
+                    ExParamCfg.NIVEL_DE_ACESSO
+            },
             new Enum[]{CpParamCfg.SITUACAO},
-            new CpSituacaoDeConfiguracaoEnum[]{CpSituacaoDeConfiguracaoEnum.PODE,
-                    CpSituacaoDeConfiguracaoEnum.NAO_PODE, CpSituacaoDeConfiguracaoEnum.DEFAULT},
-            CpSituacaoDeConfiguracaoEnum.DEFAULT, true),
+            new CpSituacaoDeConfiguracaoEnum[]{
+                    CpSituacaoDeConfiguracaoEnum.PODE,
+                    CpSituacaoDeConfiguracaoEnum.NAO_PODE,
+                    CpSituacaoDeConfiguracaoEnum.OBRIGATORIO,
+                    CpSituacaoDeConfiguracaoEnum.DEFAULT,
+                    CpSituacaoDeConfiguracaoEnum.NAO_DEFAULT
+
+            },
+            CpSituacaoDeConfiguracaoEnum.DEFAULT,
+            true
+    ),
     //
     UTILIZAR_EXTENSAO_CONVERSOR_HTML(33, "Utilizar Extensão de Conversor HTML",
             "Certa feita foi acrescentada ao Siga-Doc a possibilidade de utilizar um conversor chamado PD4ML para transformar HTML em PDF. Esta configuração servia para configurar quais os modelos que utilizariam o PD4ML. Seu uso não é mais recomendado pois esse componente está desatualizado.",
