@@ -287,15 +287,12 @@
                                             test="${f:mostraDescricaoConfidencial(documento[0], titular, lotaTitular) eq true}">
                                         <c:set var="estilo" value="confidencial"/>
                                     </c:if>
+                                    <c:set var="desc" value="${f:descricaoSePuderAcessar(documento[0], titular, lotaTitular)}"/>
                                     <td class="${estilo}" width="38%">
-                                        <c:choose>
-                                            <c:when test="${siga_cliente == 'GOVSP'}">
-                                                ${documento[0].descrDocumento }
-                                            </c:when>
-                                            <c:otherwise>
-                                                ${f:descricaoSePuderAcessar(documento[0], titular, lotaTitular)}
-                                            </c:otherwise>
-                                        </c:choose>
+                                        <c:if test="${desc != 'CONFIDENCIAL' and not empty documento[0].requerenteDoc}">
+                                            Requerente: ${documento[0].requerenteDoc.nomeRequerente} /
+                                        </c:if>
+                                            ${desc}
                                     </td>
                                     <c:if test="${visualizacao == 1}">
                                         <td class="${estilo}" width="38%">
@@ -304,7 +301,9 @@
                                     </c:if>
                                     <td class="tramitacoes fa-fw" style="min-width: 120px;">
                                         <c:choose>
-                                            <c:when test="${docTemTramitacoes}"><c:set var="link"
+                                            <c:when test="${not empty documento[1].getMovimentacoesPorNome('TRANSFERENCIA', false)}">
+                                                <%-- Tem Tramitação? --%>
+                                                <c:set var="link"
                                                        value="${pageContext.request.contextPath}/app/expediente/doc/exibirMovimentacoesTramitacao?idMobil=${documento[1].idMobil}&docCancelado=false"/>
                                                 <c:set var="title" value="Ver Histórico de Tramitação"/>
                                                 <c:set var="classDisabled" value=""/>
@@ -312,6 +311,7 @@
                                                    title="${title}" href="${link}">
                                                 </a>
                                             </c:when>
+
                                             <c:when test="${(documento[1].exTipoMobil.idTipoMobil == 1) and (documento[2].cpMarcador.idMarcador == 32)}">
                                                 <%-- É a via principal? Ela foi cancelada (sem efeito)? --%>
                                                 <c:set var="docTemTramitacoes" value="${false }"/>
@@ -323,17 +323,16 @@
                                                 </c:forEach>
 
                                                 <c:choose>
-                                                    <c:when test="${docTemTramitacoes}">
+                                                    <c:when test="${docTemTramitacoes}"><c:set var="link"
+                                                                                               value="${pageContext.request.contextPath}/app/expediente/doc/exibirMovimentacoesTramitacao?idMobil=${documento[1].idMobil}&docCancelado=true"/>
+                                                        <c:set var="title" value="Ver Histórico de Tramitação"/>
+                                                        <c:set var="classDisabled" value=""/>
                                                         <a class="fa fa-search btn btn-default btn-sm xrp-label ${classDisabled}"
                                                            title="${title}" href="${link}">
                                                         </a>
-
-                                                        <c:set var="link"
-                                                               value="${pageContext.request.contextPath}/app/expediente/doc/exibirMovimentacoesTramitacao?idMobil=${documento[1].idMobil}&docCancelado=true"/>
-                                                        <c:set var="title" value="Ver Histórico de Tramitação"/>
-                                                        <c:set var="classDisabled" value=""/>
                                                     </c:when>
                                                 </c:choose>
+
                                             </c:when>
                                         </c:choose>
                                     </td>

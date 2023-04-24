@@ -39,6 +39,8 @@
 
         function invalid(event) {
             $("#alertFiltros").show();
+            $('#containerResult').remove();
+            $('#alertNaoEncontrado').remove();
         }
 
         function submit(event) {
@@ -61,6 +63,7 @@
         }
 
         $(document).ready(function () {
+            $("#alertFiltros").hide();
             frm.onsubmit = submit;
 
             $("#alertFiltros").hide();
@@ -73,7 +76,7 @@
 
     <!-- main content -->
     <div class="container-fluid pt-3">
-        <div id="alertFiltros" class="alert alert-warning" role="alert">
+        <div id="alertFiltros" class="alert alert-warning" role="alert" style="display: none;">
             Obrigatório informar o <strong>Nome ou <fmt:message key="usuario.matricula"/></strong> e/ou
             <strong><fmt:message key="usuario.lotacao"/></strong> para realizar a pesquisa.
         </div>
@@ -84,7 +87,7 @@
             </div>
             <div class="card-body">
                 <form name="frm" id="frm" action="${request.contextPath}/app/pessoa/buscar" class="form100"
-                      method="POST" onsubmit="sbmt()">
+                      method="POST">
                     <input type="hidden" name="propriedade" value="${param.propriedade}"/>
                     <input type="hidden" name="postback" value="1"/>
                     <input type="hidden" name="paramoffset" value="0"/>
@@ -197,4 +200,5 @@
     <script type="text/javascript" src="/siga/javascript/select2/select2.min.js"></script>
     <script type="text/javascript" src="/siga/javascript/select2/i18n/pt-BR.js"></script>
     <script type="text/javascript" src="/siga/javascript/siga.select2.js"></script>
+    <script type="text/javascript" src="/siga/javascript/select2/select2-dropdownPosition.js"></script>
 </siga:pagina>

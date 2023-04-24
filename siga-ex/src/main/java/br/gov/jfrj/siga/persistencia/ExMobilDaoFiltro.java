@@ -122,6 +122,8 @@ public class ExMobilDaoFiltro extends DaoFiltroSelecionavel implements
 
     private Long subscritorSelId;
 
+    private Long requerenteDocSelId;
+
     private Long cadastranteSelId;
 
     private Long lotaCadastranteSelId;
@@ -202,6 +204,10 @@ public class ExMobilDaoFiltro extends DaoFiltroSelecionavel implements
         return subscritorSelId;
     }
 
+    public Long getRequerenteDocSelId() {
+        return requerenteDocSelId;
+    }
+
     public Long getUltMovIdEstadoDoc() {
         return ultMovIdEstadoDoc;
     }
@@ -273,6 +279,10 @@ public class ExMobilDaoFiltro extends DaoFiltroSelecionavel implements
 
     public void setSubscritorSelId(final Long subscritorSelId) {
         this.subscritorSelId = subscritorSelId;
+    }
+
+    public void setRequerenteDocSelId(final Long requerenteDocSelId) {
+        this.requerenteDocSelId = requerenteDocSelId;
     }
 
     public void setUltMovIdEstadoDoc(final Long ultMovIdEstadoDoc) {

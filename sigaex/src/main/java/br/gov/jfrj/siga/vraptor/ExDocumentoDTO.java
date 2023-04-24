@@ -237,6 +237,10 @@ public class ExDocumentoDTO {
 
     private List<ExNivelAcesso> listaNivelAcesso;
 
+    private boolean podeIncluirSubscrArvoreDocs;
+
+    private ExRequerenteDocSelecao requerenteDocSel;
+
     public ExDocumentoDTO() {
         classificacaoSel = new ExClassificacaoSelecao();
         destinatarioSel = new DpPessoaSelecao();
@@ -254,10 +258,10 @@ public class ExDocumentoDTO {
         ultMovCadastranteSel = new DpPessoaSelecao();
         ultMovLotaSubscritorSel = new DpLotacaoSelecao();
         ultMovLotaCadastranteSel = new DpLotacaoSelecao();
-        paramsEntrevista = new TreeMap<String, String>();
+        paramsEntrevista = new TreeMap<>();
         cpOrgaoSel = new CpOrgaoSelecao();
         setEletronico(0);
-        results = new LinkedList<ExDocumento>();
+        results = new LinkedList<>();
     }
 
     public boolean isCriandoAnexo() {
@@ -1036,6 +1040,22 @@ public class ExDocumentoDTO {
 
     public String getDtPrazoAssinatura() {
         return dtPrazoAssinaturaString;
+    }
+
+    public boolean isPodeIncluirSubscrArvoreDocs() {
+        return podeIncluirSubscrArvoreDocs;
+    }
+
+    public void setPodeIncluirSubscrArvoreDocs(boolean podeIncluirSubscrArvoreDocs) {
+        this.podeIncluirSubscrArvoreDocs = podeIncluirSubscrArvoreDocs;
+    }
+
+    public ExRequerenteDocSelecao getRequerenteDocSel() {
+        return requerenteDocSel;
+    }
+
+    public void setRequerenteDocSel(ExRequerenteDocSelecao requerenteDocSel) {
+        this.requerenteDocSel = requerenteDocSel;
     }
 
 }

@@ -27,6 +27,8 @@ import br.gov.jfrj.siga.cp.CpIdentidade;
 import br.gov.jfrj.siga.cp.converter.ITipoDeMovimentacaoConverter;
 import br.gov.jfrj.siga.cp.model.enm.ITipoDeMovimentacao;
 import br.gov.jfrj.siga.dp.*;
+import br.gov.jfrj.siga.ex.converter.ExTipoDeVinculoConverter;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeVinculo;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
@@ -286,7 +288,9 @@ public abstract class AbstractExMovimentacao extends ExArquivo implements Serial
     @Column(name = "id_tp_mov", nullable = false)
     private ITipoDeMovimentacao exTipoMovimentacao;
 
-    // private Long idTpMov;
+    @Convert(converter = ExTipoDeVinculoConverter.class)
+    @Column(name = "TP_VINCULO")
+    private ExTipoDeVinculo tipoDeVinculo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_lota_cadastrante")
@@ -800,6 +804,14 @@ public abstract class AbstractExMovimentacao extends ExArquivo implements Serial
                 return true;
         }
         return false;
+    }
+
+    public ExTipoDeVinculo getTipoDeVinculo() {
+        return tipoDeVinculo;
+    }
+
+    public void setTipoDeVinculo(ExTipoDeVinculo tipoDeVinculo) {
+        this.tipoDeVinculo = tipoDeVinculo;
     }
 
 }

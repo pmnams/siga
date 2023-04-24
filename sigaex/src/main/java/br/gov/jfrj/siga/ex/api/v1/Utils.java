@@ -36,31 +36,6 @@ public class Utils {
         return Prop.get("/siga.jwt.secret");
     }
 
-    /**
-     * Remove os acentos da string
-     *
-     * @param acentuado - String acentuada
-     * @return String sem acentos
-     */
-    public static String removeAcento(String acentuado) {
-        if (acentuado == null)
-            return null;
-        String temp = new String(acentuado);
-        temp = temp.replaceAll("[ÃÂÁÀ]", "A");
-        temp = temp.replaceAll("[ÉÈÊ]", "E");
-        temp = temp.replaceAll("[ÍÌÎ]", "I");
-        temp = temp.replaceAll("[ÕÔÓÒ]", "O");
-        temp = temp.replaceAll("[ÛÚÙÜ]", "U");
-        temp = temp.replaceAll("[Ç]", "C");
-        temp = temp.replaceAll("[ãâáà]", "a");
-        temp = temp.replaceAll("[éèê]", "e");
-        temp = temp.replaceAll("[íìî]", "i");
-        temp = temp.replaceAll("[õôóò]", "o");
-        temp = temp.replaceAll("[ûúùü]", "u");
-        temp = temp.replaceAll("[ç]", "c");
-        return temp;
-    }
-
     public static String removePontuacao(String s) {
         if (s == null)
             return null;

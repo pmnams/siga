@@ -41,9 +41,12 @@ public interface IExApiV1 {
     }
 
     public static class QuadroItem implements ISwaggerModel {
+        public String finalidadeId;
+        public String tipoId;
+        public String tipoNome;
         public String grupoId;
         public String grupoNome;
-        public String finalidadeId;
+        public String marcadorEnum;
         public String marcadorId;
         public String marcadorNome;
         public String marcadorIcone;
@@ -68,6 +71,26 @@ public interface IExApiV1 {
         public Date marcaData;
         public String marcaResponsavel;
         public String marcaLotaResponsavel;
+    }
+
+    public static class PainelListaItem implements ISwaggerModel {
+        public String marcaId;
+        public String marcaTipo;
+        public String marcaTexto;
+        public String marcaIcone;
+        public Date dataIni;
+        public Date dataFim;
+        public String moduloId;
+        public String refId;
+        public String movId;
+        public String tipo;
+        public String codigo;
+        public String sigla;
+        public String descricao;
+        public String origem;
+        public String ultimaAnotacao;
+        public List<Marca> marcas = new ArrayList<>();
+        public List<Acao> acoes = new ArrayList<>();
     }
 
     public static class Marca implements ISwaggerModel {
@@ -668,6 +691,7 @@ public interface IExApiV1 {
     public interface IQuadroGet extends ISwaggerMethod {
         public static class Request implements ISwaggerRequest {
             public String filtroExpedienteProcesso;
+            public String estilo;
         }
 
         public static class Response implements ISwaggerResponse {
@@ -691,9 +715,23 @@ public interface IExApiV1 {
         public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;
     }
 
+    public interface IPainelListaGet extends ISwaggerMethod {
+        public static class Request implements ISwaggerRequest {
+            public String idMarcas;
+        }
+
+        public static class Response implements ISwaggerResponse {
+            public List<PainelListaItem> list = new ArrayList<>();
+        }
+
+        public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;
+    }
+
     public interface IDocumentosSiglaGet extends ISwaggerMethod {
         public static class Request implements ISwaggerRequest {
             public String sigla;
+            public Boolean completo;
+            public Boolean auditar;
         }
 
         public static class Response implements ISwaggerResponse, ISwaggerResponseFile {
@@ -1334,6 +1372,18 @@ public interface IExApiV1 {
         public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;
     }
 
+    public interface IDadosEstaticosGet extends ISwaggerMethod {
+        public static class Request implements ISwaggerRequest {
+        }
+
+        public static class Response implements ISwaggerResponse {
+            public String enumsAsJson;
+            public String tabelasAsJson;
+        }
+
+        public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;
+    }
+
     public interface ISugestaoPost extends ISwaggerMethod {
         public static class Request implements ISwaggerRequest {
             public String nome;
@@ -1363,36 +1413,6 @@ public interface IExApiV1 {
 
         public static class Response implements ISwaggerResponse {
             public List<DocumentoPesq> list = new ArrayList<>();
-        }
-
-        public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;
-    }
-
-    public interface INumeracaoExpedientePost extends ISwaggerMethod {
-        public static class Request implements ISwaggerRequest {
-            public String siglaorgao;
-            public String formadoc;
-            public String tiposequencia;
-            public String anoemissao;
-        }
-
-        public static class Response implements ISwaggerResponse {
-            public String sigladoc;
-        }
-
-        public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;
-    }
-
-    public interface INumeracaoGenericaPost extends ISwaggerMethod {
-        public static class Request implements ISwaggerRequest {
-            public String tiposequencia;
-            public String anoemissao;
-            public String zerarinicioano;
-        }
-
-        public static class Response implements ISwaggerResponse {
-            public String sequenciagenerica;
-            public String digitoverificador;
         }
 
         public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;
@@ -1459,6 +1479,119 @@ public interface IExApiV1 {
 
         public static class Response implements ISwaggerResponse {
             public String sigladoc;
+        }
+
+        public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;
+    }
+
+    public interface IDocumentosLocalizarMaisRecenteGet extends ISwaggerMethod {
+        public static class Request implements ISwaggerRequest {
+            public String modelo;
+            public String ano;
+            public String lotaSubscritor;
+            public String marcador;
+        }
+
+        public static class Response implements ISwaggerResponse, ISwaggerResponseFile {
+            public String contenttype = "application/json";
+            public String contentdisposition = "attachment";
+            public Long contentlength;
+            public InputStream inputstream;
+            public Map<String, List<String>> headerFields;
+
+            public String getContenttype() {
+                return contenttype;
+            }
+
+            public void setContenttype(String contenttype) {
+                this.contenttype = contenttype;
+            }
+
+            public String getContentdisposition() {
+                return contentdisposition;
+            }
+
+            public void setContentdisposition(String contentdisposition) {
+                this.contentdisposition = contentdisposition;
+            }
+
+            public Long getContentlength() {
+                return contentlength;
+            }
+
+            public void setContentlength(Long contentlength) {
+                this.contentlength = contentlength;
+            }
+
+            public InputStream getInputstream() {
+                return inputstream;
+            }
+
+            public void setInputstream(InputStream inputstream) {
+                this.inputstream = inputstream;
+            }
+
+            public Map<String, List<String>> getHeaderFields() {
+                return headerFields;
+            }
+
+            public void setHeaderFields(Map<String, List<String>> headerFields) {
+                this.headerFields = headerFields;
+            }
+
+        }
+
+        public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;
+    }
+
+    public interface IDocumentosSiglaGerarLinkPublicoPost extends ISwaggerMethod {
+        public static class Request implements ISwaggerRequest {
+            public String sigla;
+        }
+
+        public static class Response implements ISwaggerResponse {
+            public String link;
+        }
+
+        public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;
+    }
+
+    public interface IDocumentosSiglaLinkPublicoGet extends ISwaggerMethod {
+        public static class Request implements ISwaggerRequest {
+            public String sigla;
+        }
+
+        public static class Response implements ISwaggerResponse {
+            public String link;
+        }
+
+        public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;
+    }
+
+    public interface INumeracaoExpedientePost extends ISwaggerMethod {
+        public static class Request implements ISwaggerRequest {
+            public String siglaorgao;
+            public String formadoc;
+            public String anoemissao;
+        }
+
+        public static class Response implements ISwaggerResponse {
+            public String sigladoc;
+        }
+
+        public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;
+    }
+
+    public interface INumeracaoGenericaPost extends ISwaggerMethod {
+        public static class Request implements ISwaggerRequest {
+            public String tiposequencia;
+            public String anoemissao;
+            public String zerarinicioano;
+        }
+
+        public static class Response implements ISwaggerResponse {
+            public String sequenciagenerica;
+            public String digitoverificador;
         }
 
         public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception;

@@ -32,24 +32,23 @@ import java.util.TreeSet;
  * behavior of this class by editing the class, {@link ExMobil()}.
  */
 @MappedSuperclass
-@NamedNativeQueries({
-        @NamedNativeQuery(name = "consultarMobilNoPeriodoLento", query = "select id_mobil " + "from"
-                + "    SIGA.ex_movimentacao m," + "    (select id_lotacao from corporativo.dp_lotacao where id_lotacao_ini ="
-                + "(select id_lotacao_ini  from corporativo.dp_lotacao where id_lotacao = :idLotacao)) " + "l " + "where "
-                + "    (m.dt_ini_mov >= to_date(:dataInicial,'dd/mm/yyyy') and "
-                + "m.dt_ini_mov <= to_date(:dataFinal,'dd/mm/yyyy'))" + "    and m.id_lota_resp = l.id_lotacao "
-                + "union select m3.id_mobil " + "from " + "    SIGA.ex_movimentacao m3,"
-                + "    (select id_lotacao from corporativo.dp_lotacao where id_lotacao_ini = "
-                + "(select id_lotacao_ini  from corporativo.dp_lotacao where id_lotacao = :idLotacao)) " + "L2, "
-                + "    (select max(id_mov) id_mov" + "    from" + "        SIGA.ex_movimentacao m2," + "        "
-                + "        (select id_mobil" + "        from" + "            SIGA.ex_movimentacao m,"
-                + "            (select id_lotacao from corporativo.dp_lotacao where "
-                + "id_lotacao_ini = (select id_lotacao_ini  from corporativo.dp_lotacao where " + "id_lotacao = :idLotacao)) L "
-                + "        where " + "            m.id_lota_resp = l.id_lotacao"
-                + "            and (M.DT_INI_MOV <= to_date(:dataInicial,'DD/MM/YYYY'))) mob" + "    where"
-                + "        m2.id_mobil = mob.id_mobil" + "        and (M2.DT_INI_MOV <= to_date(:dataInicial,'DD/MM/YYYY'))"
-                + "    group by m2.id_mobil) max_mov " + "where" + "    m3.id_mov = max_mov.id_mov"
-                + "    and m3.id_lota_resp = l2.id_lotacao"),
+@NamedNativeQueries({@NamedNativeQuery(name = "consultarMobilNoPeriodoLento", query = "select id_mobil " + "from"
+        + "    SIGA.ex_movimentacao m," + "    (select id_lotacao from corporativo.dp_lotacao where id_lotacao_ini ="
+        + "(select id_lotacao_ini  from corporativo.dp_lotacao where id_lotacao = :idLotacao)) " + "l " + "where "
+        + "    (m.dt_ini_mov >= to_date(:dataInicial,'dd/mm/yyyy') and "
+        + "m.dt_ini_mov <= to_date(:dataFinal,'dd/mm/yyyy'))" + "    and m.id_lota_resp = l.id_lotacao "
+        + "union select m3.id_mobil " + "from " + "    SIGA.ex_movimentacao m3,"
+        + "    (select id_lotacao from corporativo.dp_lotacao where id_lotacao_ini = "
+        + "(select id_lotacao_ini  from corporativo.dp_lotacao where id_lotacao = :idLotacao)) " + "L2, "
+        + "    (select max(id_mov) id_mov" + "    from" + "        SIGA.ex_movimentacao m2," + "        "
+        + "        (select id_mobil" + "        from" + "            SIGA.ex_movimentacao m,"
+        + "            (select id_lotacao from corporativo.dp_lotacao where "
+        + "id_lotacao_ini = (select id_lotacao_ini  from corporativo.dp_lotacao where " + "id_lotacao = :idLotacao)) L "
+        + "        where " + "            m.id_lota_resp = l.id_lotacao"
+        + "            and (M.DT_INI_MOV <= to_date(:dataInicial,'DD/MM/YYYY'))) mob" + "    where"
+        + "        m2.id_mobil = mob.id_mobil" + "        and (M2.DT_INI_MOV <= to_date(:dataInicial,'DD/MM/YYYY'))"
+        + "    group by m2.id_mobil) max_mov " + "where" + "    m3.id_mov = max_mov.id_mov"
+        + "    and m3.id_lota_resp = l2.id_lotacao"),
         @NamedNativeQuery(name = "consultarMobilNoPeriodo", query = "select " + "	("
                 + "		(select sigla_orgao_usu from corporativo.cp_orgao_usuario where id_orgao_usu = doc.id_orgao_usu)"
                 + "		|| '-' || "
@@ -134,6 +133,17 @@ public abstract class AbstractExMobil extends Objeto implements Serializable {
     @SortNatural
     private SortedSet<ExMarca> exMarcaSet;
 
+    @Column(name = "DNM_SIGLA", length = 40)
+    private String dnmSigla;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_ULT_MOV")
+    private ExMovimentacao ultimaMovimentacaoNaoCancelada;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "DNM_DT_ULT_MOV", length = 19)
+    private java.util.Date dnmDtUltMov;
+
     public java.lang.Long getIdMobil() {
         return idMobil;
     }
@@ -212,6 +222,30 @@ public abstract class AbstractExMobil extends Objeto implements Serializable {
 
     public void setDnmNumPrimeiraPagina(Integer dnmNumPrimeiraPagina) {
         this.dnmNumPrimeiraPagina = dnmNumPrimeiraPagina;
+    }
+
+    public String getDnmSigla() {
+        return dnmSigla;
+    }
+
+    public void setDnmSigla(String sigla) {
+        this.dnmSigla = sigla;
+    }
+
+    public ExMovimentacao getUltimaMovimentacaoNaoCancelada() {
+        return ultimaMovimentacaoNaoCancelada;
+    }
+
+    public void setUltimaMovimentacaoNaoCancelada(ExMovimentacao exMovimentacao) {
+        this.ultimaMovimentacaoNaoCancelada = exMovimentacao;
+    }
+
+    public java.util.Date getDnmDataUltimaMovimentacaoNaoCancelada() {
+        return this.dnmDtUltMov;
+    }
+
+    public void setDnmDataUltimaMovimentacaoNaoCancelada(java.util.Date dnmDtUltMov) {
+        this.dnmDtUltMov = dnmDtUltMov;
     }
 
 }

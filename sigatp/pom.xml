@@ -6,7 +6,7 @@
     <parent>
         <artifactId>siga-doc</artifactId>
         <groupId>siga</groupId>
-        <version>1.2-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>sigatp</artifactId>
@@ -40,7 +40,7 @@
         <!-- Demais dependencias -->
         <dependency>
             <groupId>siga</groupId>
-            <artifactId>siga-vraptor-module-old</artifactId>
+            <artifactId>siga-vraptor-module</artifactId>
         </dependency>
 
         <!-- DEPENDENCIAS PARA VRAPTORE JSP -->
@@ -119,7 +119,7 @@
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}</version>
+                                    <version>${revision}</version>
                                     <type>${project.packaging}</type>
                                 </artifactItem>
                             </artifactItems>

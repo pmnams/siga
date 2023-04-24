@@ -42,6 +42,9 @@ public class DocumentosGet implements IDocumentosGet {
 	@Override
 	public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception {
 		final ExMobilApiBuilder builder = new ExMobilApiBuilder();
+		titular = ctx.getTitular();
+		lotaTitular = titular.getLotacao();
+
 		Date dtIni = null;
 		Date dtFim = null;
 		Long qtdMaxima = req.qtdmax;
@@ -82,9 +85,9 @@ public class DocumentosGet implements IDocumentosGet {
 			}
 		}
 		Long idLota = req.idlotacao;
-		if (req.idlotacao == null)
+		if (idLota == null)
 			idLota = lotaTitular.getIdInicial();
-		if (req.idlotacao != null && !req.idlotacao.equals(lotaTitular.getIdInicial()))
+		if (idLota != null && !idLota.equals(lotaTitular.getIdInicial()))
 			throw new SwaggerException("Usuário não autorizado a pesquisar documentos de outra lotação.", 400, null,
 					req, resp, null);
 
@@ -93,7 +96,7 @@ public class DocumentosGet implements IDocumentosGet {
 					400, null, req, resp, null);
 
 		builder.setOffset(req.offset).setQtdMax(qtdMaxima).setOrdenacao(req.ordenacao)
-				.setMarcador(marcador != null ? Long.valueOf(marcador.getIdInicial()) : null)
+				.setMarcador(marcador != null ? marcador.getIdInicial() : null)
 				.setGrupoMarcador(CpMarcadorGrupoEnum.getByNome(req.grupomarcador)).setDtDocIni(dtIni)
 				.setDtDocFim(dtFim).setIdCadastrante(req.idpessoa).setIdLotaCadastrante(idLota);
 
@@ -163,7 +166,7 @@ public class DocumentosGet implements IDocumentosGet {
 		d.dtinimarca = df.format(mar.getDtIniMarca());
 		d.descricaomarcador = marcador.getDescrMarcador();
 		d.nomegrupomarcador = marcador.getIdGrupo().getNome();
-		Ex.getInstance().getBL();
+
 		d.descricaodocumento = (Prop.isGovSP() ? doc.getDescrDocumento()
 				: ExBL.descricaoSePuderAcessar(doc, this.titular, this.lotaTitular));
 		if (doc.getDtDoc() != null)

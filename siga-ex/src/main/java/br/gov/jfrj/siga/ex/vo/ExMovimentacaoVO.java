@@ -40,8 +40,8 @@ import java.net.URLEncoder;
 import java.util.*;
 
 public class ExMovimentacaoVO extends ExVO {
-    private static final transient String JWT_FIXED_HEADER = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.";
-    private static final transient String JWT_FIXED_HEADER_REPLACEMENT = "!";
+    private static final String JWT_FIXED_HEADER = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.";
+    private static final String JWT_FIXED_HEADER_REPLACEMENT = "!";
 
     transient ExMovimentacao mov;
 
@@ -56,7 +56,6 @@ public class ExMovimentacaoVO extends ExVO {
     Map<String, ExParteVO> parte = new TreeMap<>();
     Date dtIniMov;
     String dtRegMovDDMMYYHHMMSS;
-    String dtFimMovDDMMYYHHMMSS;
     String descrTipoMovimentacao;
     long idMov;
     int duracaoSpan;
@@ -88,6 +87,10 @@ public class ExMovimentacaoVO extends ExVO {
         this.dtRegMovDDMMYYHHMMSS = mov.getDtRegMovDDMMYYHHMMSS();
         this.tempoRelativo = Data.calcularTempoRelativo(mov.getDtIniMov());
         this.descrTipoMovimentacao = mov.getDescrTipoMovimentacao();
+
+        if (mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.REFERENCIA && mov.getTipoDeVinculo() != null)
+            this.descrTipoMovimentacao = mov.getTipoDeVinculo().getDescr();
+
         this.cancelada = mov.getExMovimentacaoCanceladora() != null;
         this.lotaCadastranteSigla = mov.getLotaCadastrante() != null ? mov.getLotaCadastrante().getSigla() : null;
         this.exTipoMovimentacaoSigla = mov.getExTipoMovimentacao().getDescr();
@@ -185,11 +188,6 @@ public class ExMovimentacaoVO extends ExVO {
                         .exp(new ExPodeCancelarMarcacao(mov, titular, lotaTitular)).build());
         }
 
-        if (exTipoMovimentacao == ExTipoDeMovimentacao.REFERENCIA) {
-            addAcao(AcaoVO.builder().nome("Cancelar").nameSpace("/app/expediente/mov").acao("cancelar").params("sigla", mov.mob().getCodigoCompacto()).params("id", mov.getIdMov().toString())
-                    .exp(new ExPodeCancelarVinculacao(mov, titular, lotaTitular)).build());
-        }
-
         if (exTipoMovimentacao == ExTipoDeMovimentacao.ANEXACAO_DE_ARQUIVO_AUXILIAR) {
             addAcao(AcaoVO.builder().nome(mov.getNmArqMov()).icone(getIcon()).nameSpace("/app/arquivo").acao("exibir").params("sigla", mov.mob().getCodigoCompacto()).params("id", mov.getIdMov().toString())
                     .params("arquivo", mov.getReferencia())
@@ -206,7 +204,7 @@ public class ExMovimentacaoVO extends ExVO {
                     sApp = "powerpoint";
                     sNome = "PowerPoint";
                 }
-                String token = getWebdavJwtToken(mov, cadastrante, titular, lotaTitular, pwd);
+                String token = getWebdavJwtToken(mov, cadastrante, titular, lotaTitular);
 
                 addAcao(AcaoVO.builder().nome("Editar no " + sNome).nameSpace(sApp
                         + ":ofe|u|__scheme__://__serverName__:__serverPort____contextPath__/webdav/" + token).acao(mov.getNmArqMov()).exp(new CpPodeSempre()).build());
@@ -222,31 +220,61 @@ public class ExMovimentacaoVO extends ExVO {
             // nome do arquivo.
             // <c:url var='anexo' value='/anexo/${mov.idMov}/${mov.nmArqMov}' />
             // tipo="${mov.conteudoTpMov}" />
-            addAcao(AcaoVO.builder().nome(mov.getNmArqMov()).nameSpace("/app/arquivo").acao("exibir").params("sigla", mov.mob().getCodigoCompacto()).params("id", mov.getIdMov().toString())
-                    .params("arquivo", mov.getReferenciaPDF())
-                    .exp(new CpNaoENulo(mov.getNmArqMov(), "nome do arquivo")).build());
+            addAcao(
+                    AcaoVO.builder()
+                            .nome(mov.getNmArqMov())
+                            .nameSpace("/app/arquivo")
+                            .acao("exibir").params("sigla", mov.mob().getCodigoCompacto())
+                            .params("id", mov.getIdMov().toString())
+                            .params("arquivo", mov.getReferenciaPDF())
+                            .params("popup", "true")
+                            .exp(new CpNaoENulo(mov.getNmArqMov(), "nome do arquivo"))
+                            .build()
+            );
 
             if (exTipoMovimentacao == ExTipoDeMovimentacao.INCLUSAO_DE_COSIGNATARIO) {
-                addAcao(AcaoVO.builder().nome("Excluir").nameSpace("/app/expediente/mov").acao("excluir").params("sigla", mov.mob().getCodigoCompacto()).params("id", mov.getIdMov().toString())
-                        .exp(new ExPodeExcluirCossignatario(mov, titular, lotaTitular)).build());
+                addAcao(
+                        AcaoVO.builder()
+                                .nome("Excluir")
+                                .nameSpace("/app/expediente/mov")
+                                .acao("excluir")
+                                .params("sigla", mov.mob().getCodigoCompacto())
+                                .params("id", mov.getIdMov().toString())
+                                .exp(new ExPodeExcluirCossignatario(mov, titular, lotaTitular))
+                                .build()
+                );
             }
 
             if (exTipoMovimentacao == ExTipoDeMovimentacao.ANEXACAO) {
                 if (!mov.isCancelada() && !mov.mob().doc().isSemEfeito() && !mov.mob().isEmTransito(titular, lotaTitular)) {
-                    addAcao(AcaoVO.builder().nome("Excluir").nameSpace("/app/expediente/mov").acao("excluir").params("sigla", mov.mob().getCodigoCompacto()).params("id", mov.getIdMov().toString())
-                            .exp(new ExPodeExcluirAnexo(mov.mob(), mov, titular, lotaTitular)).build());
+                    addAcao(AcaoVO.builder().nome("Excluir")
+                            .nameSpace("/app/expediente/mov")
+                            .acao("excluir")
+                            .params("sigla", mov.mob().getCodigoCompacto())
+                            .params("id", mov.getIdMov().toString())
+                            .exp(new ExPodeExcluirAnexo(mov.mob(), mov, titular, lotaTitular))
+                            .build()
+                    );
 
-                    addAcao(AcaoVO.builder().nome("Cancelar").nameSpace("/app/expediente/mov").acao("cancelar").params("sigla", mov.mob().getCodigoCompacto()).params("id", mov.getIdMov().toString())
+                    addAcao(AcaoVO.builder()
+                            .nome("Cancelar")
+                            .nameSpace("/app/expediente/mov")
+                            .acao("cancelar")
+                            .params("sigla", mov.mob().getCodigoCompacto())
+                            .params("id", mov.getIdMov().toString())
                             .params("popup", "true")
-                            .exp(new ExPodeCancelarAnexo(mov.mob(), mov, titular, lotaTitular)).build());
+                            .exp(new ExPodeCancelarAnexo(mov.mob(), mov, titular, lotaTitular))
+                            .build()
+                    );
 
-                    addAcao(AcaoVO.builder().nome("Assinar/Autenticar").nameSpace("/app/expediente/mov").acao("exibir").params("sigla", mov.mob().getCodigoCompacto()).params("id", mov.getIdMov().toString())
+                    addAcao(AcaoVO.builder().nome("Assinar/Autenticar")
+                            .nameSpace("/app/expediente/mov")
+                            .acao("exibir")
+                            .params("sigla", mov.mob().getCodigoCompacto())
+                            .params("id", mov.getIdMov().toString())
                             .params("popup", "true")
-                            .exp(new CpPodeSempre()).build());
-
-//					addAcao(AcaoVO.builder().nome("Autenticar").icone("script_key").nameSpace("/app/expediente/mov").acao("autenticar_mov").params("sigla", mov.mob().getCodigoCompacto()).params("id", mov.getIdMov().toString())
-//							.params("popup", "true").params("autenticando", "true")
-//							.exp(new ExPodeAutenticarMovimentacao(mov, titular, lotaTitular)).build());
+                            .exp(new CpPodeSempre()).build()
+                    );
                 }
             }
 
@@ -438,12 +466,37 @@ public class ExMovimentacaoVO extends ExVO {
         if (exTipoMovimentacao == ExTipoDeMovimentacao.REFERENCIA) {
             descricao = null;
             if (originadaAqui) {
-                addAcao(AcaoVO.builder().nome(mov.getExMobilRef().getSigla()).nameSpace("/app/expediente/doc").acao("exibir").params("sigla", mov.getExMobilRef().getSigla())
-                        .exp(new CpPodeSempre()).pre("Ver também: ").pos(" Descrição: " + mov.getExMobilRef().getExDocumento().getDescrDocumento()).build());
+                addAcao(AcaoVO.builder()
+                        .nome(mov.getExMobilRef().getSigla())
+                        .nameSpace("/app/expediente/doc")
+                        .acao("exibir")
+                        .params("sigla", mov.getExMobilRef().getSigla())
+                        .exp(new CpPodeSempre())
+                        .pre(mov.getTipoDeVinculo().getAcao() + ": ")
+                        .pos(" Descrição: " + mov.getExMobilRef().getExDocumento().getDescrDocumento())
+                        .build()
+                );
             } else {
-                addAcao(AcaoVO.builder().nome(mov.getExMobil().getSigla()).nameSpace("/app/expediente/doc").acao("exibir").params("sigla", mov.getExMobil().getSigla())
-                        .exp(new CpPodeSempre()).pre("Ver também: ").pos(" Descrição: " + mov.getExMobilRef().getExDocumento().getDescrDocumento()).build());
+                addAcao(AcaoVO.builder()
+                        .nome(mov.getExMobil().getSigla())
+                        .nameSpace("/app/expediente/doc")
+                        .acao("exibir")
+                        .params("sigla", mov.getExMobil().getSigla())
+                        .exp(new CpPodeSempre())
+                        .pre("Ver também: ")
+                        .pos(" Descrição: " + mov.getExMobilRef().getExDocumento().getDescrDocumento())
+                        .build()
+                );
             }
+
+            addAcao(AcaoVO.builder()
+                    .nome("Cancelar")
+                    .nameSpace("/app/expediente/mov")
+                    .acao("cancelar").params("sigla", mov.mob().getCodigoCompacto())
+                    .params("id", mov.getIdMov().toString())
+                    .exp(new ExPodeCancelarVinculacao(mov, titular, lotaTitular))
+                    .build()
+            );
         }
 
         if (exTipoMovimentacao == ExTipoDeMovimentacao.INCLUSAO_EM_EDITAL_DE_ELIMINACAO) {
@@ -627,10 +680,6 @@ public class ExMovimentacaoVO extends ExVO {
         return dtRegMovDDMMYYHHMMSS.substring(0, 8);
     }
 
-    public Object getDtFimMovDDMMYYHHMMSS() {
-        return dtFimMovDDMMYYHHMMSS;
-    }
-
     public long getIdMov() {
         return idMov;
     }
@@ -656,28 +705,12 @@ public class ExMovimentacaoVO extends ExVO {
         return cancelada;
     }
 
-    public boolean isDesabilitada() {
-        return desabilitada;
-    }
-
-    public boolean isOriginadaAqui() {
-        return originadaAqui;
-    }
-
     public void setClasse(String classe) {
         this.classe = classe;
     }
 
-    public void setDesabilitada(boolean desabilitada) {
-        this.desabilitada = desabilitada;
-    }
-
     public void setMov(ExMovimentacao mov) {
         this.mov = mov;
-    }
-
-    public void setOriginadaAqui(boolean originadaAqui) {
-        this.originadaAqui = originadaAqui;
     }
 
     @Override
@@ -686,28 +719,12 @@ public class ExMovimentacaoVO extends ExVO {
                 + "[" + getAcoes() + "] " + getDisabled();
     }
 
-    public int getDuracaoSpan() {
-        return duracaoSpan;
-    }
-
-    public void setDuracaoSpan(int duracaoSpan) {
-        this.duracaoSpan = duracaoSpan;
-    }
-
     public String getDuracao() {
         return duracao;
     }
 
     public void setDuracao(String duracao) {
         this.duracao = duracao;
-    }
-
-    public int getDuracaoSpanExibirCompleto() {
-        return duracaoSpanExibirCompleto;
-    }
-
-    public void setDuracaoSpanExibirCompleto(int duracaoSpanExibirCompleto) {
-        this.duracaoSpanExibirCompleto = duracaoSpanExibirCompleto;
     }
 
     private String mimeType() {
@@ -761,50 +778,24 @@ public class ExMovimentacaoVO extends ExVO {
         return pwd;
     }
 
-    // public static Algorithm getWebdavJwtAlgorithm(String pwd) {
-    // Algorithm algorithm;
-    // try {
-    // algorithm = Algorithm.HMAC256(pwd);
-    // } catch (IllegalArgumentException | UnsupportedEncodingException e) {
-    // throw new AplicacaoException("Erro criando algoritmo", 0, e);
-    // }
-    // return algorithm;
-    // }
-
     private static String getWebdavJwtToken(ExMovimentacao mov, DpPessoa cadastrante, DpPessoa titular,
-                                            DpLotacao lotaTitular, String pwd) {
+                                            DpLotacao lotaTitular) {
         String token;
 
         final JWTSigner signer = new JWTSigner(getWebdavPassword());
         final HashMap<String, Object> claims = new HashMap<>();
 
-        // final long iat = System.currentTimeMillis() / 1000L; // issued at
-        // claim
-        // final long exp = iat + 48 * 60 * 60L; // token expires in 48 hours
-        // claims.put("exp", exp);
-        // claims.put("iat", iat);
+        claims.put(
+                "d",
+                mov.mob().getReferencia()
+                        + "|" + cadastrante.getSiglaCompleta()
+                        + "|"
+                        + titular.getSiglaCompleta()
+                        + "|"
+                        + lotaTitular.getSiglaCompleta()
+        );
 
-        // Nato: tive que colocar tudo em uma string só para reduzir o tamanho
-        // do JWT, pois o Word tem uma limitação no tamanho máximo da URL.
-        claims.put("d", mov.mob().getReferencia() + "|" + cadastrante.getSiglaCompleta() + "|"
-                + titular.getSiglaCompleta() + "|" + lotaTitular.getSiglaCompleta());
-        // claims.put("mob", mov.mob().getReferencia());
-        // claims.put("cad",cadastrante.getSiglaCompleta());
-        // claims.put("tit",titular.getSiglaCompleta());
-        // claims.put("lot",lotaTitular.getSiglaCompleta());
         token = signer.sign(claims);
-
-        // Date agora = new Date();
-        // Date expiraEm = new Date(agora.getTime() + 1000*60*60*48);
-        // Builder jwtBuilder = JWT.create();
-        // jwtBuilder.withIssuedAt(agora)
-        // .withExpiresAt(expiraEm)
-        // .withClaim("mob",mov.mob().getReferencia())
-        // .withClaim("cad",cadastrante.getSiglaCompleta())
-        // .withClaim("tit",titular.getSiglaCompleta())
-        // .withClaim("lot",lotaTitular.getSiglaCompleta());
-        //
-        // token = jwtBuilder.sign(getWebdavJwtAlgorithm(pwd));
 
         return token.replace(JWT_FIXED_HEADER, JWT_FIXED_HEADER_REPLACEMENT).replace(".", "~");
     }
@@ -823,10 +814,6 @@ public class ExMovimentacaoVO extends ExVO {
         } catch (Exception e) {
             throw new AplicacaoException("Erro ao verificar token JWT", 0, e);
         }
-        // Algorithm algorithm = getWebdavJwtAlgorithm(getWebdavPassword());
-        // JWTVerifier verificador = JWT.require(algorithm).build();
-        // DecodedJWT jwt = verificador.verify(token.replace("$", "."));
-        // return jwt;
     }
 
     public String getTempoRelativo() {
@@ -840,4 +827,5 @@ public class ExMovimentacaoVO extends ExVO {
     public void setSubscritor(String subscritor) {
         this.subscritor = subscritor;
     }
+
 }

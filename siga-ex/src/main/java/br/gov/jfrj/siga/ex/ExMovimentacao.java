@@ -44,6 +44,8 @@ import com.crivano.jlogic.Expression;
 import com.crivano.swaggerservlet.SwaggerUtils;
 import org.hibernate.annotations.BatchSize;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.io.Serializable;
@@ -64,9 +66,21 @@ import static java.util.Objects.nonNull;
 
 @Entity
 @BatchSize(size = 500)
+@Access(AccessType.FIELD)
 @Table(name = "siga.ex_movimentacao")
 public class ExMovimentacao extends AbstractExMovimentacao implements
         Serializable, Comparable<ExMovimentacao> {
+
+    public final static ITipoDeMovimentacao[] tpMovimentacoesDePosse = new ITipoDeMovimentacao[]{ExTipoDeMovimentacao.CRIACAO,
+            ExTipoDeMovimentacao.TRANSFERENCIA,
+            ExTipoDeMovimentacao.RECEBIMENTO,
+            ExTipoDeMovimentacao.TRAMITE_PARALELO,
+            ExTipoDeMovimentacao.NOTIFICACAO,
+            ExTipoDeMovimentacao.TRANSFERENCIA_EXTERNA,
+            ExTipoDeMovimentacao.DESPACHO_TRANSFERENCIA,
+            ExTipoDeMovimentacao.DESPACHO_TRANSFERENCIA_EXTERNA,
+            ExTipoDeMovimentacao.DESPACHO_INTERNO_TRANSFERENCIA
+    };
 
     /**
      * Simple constructor of ExMovimentacao instances.
@@ -1326,11 +1340,22 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
         return retorno + " (" + validateresp.getPolicy() + " v" + validateresp.getPolicyversion() + ")";
     }
 
-    public boolean isResp(DpPessoa titular, DpLotacao lotaTitular) {
-        return Utils.equivale(getLotaResp(), lotaTitular)
-                || Utils.equivale(getResp(), titular)
-                || Utils.equivale(getLotaDestinoFinal(), lotaTitular)
+    public boolean isResp(DpPessoa titular) {
+        return Utils.equivale(getResp(), titular)
                 || Utils.equivale(getDestinoFinal(), titular);
+    }
+
+    public boolean isResp(DpLotacao lotaTitular) {
+        return Utils.equivale(getLotaResp(), lotaTitular)
+                || Utils.equivale(getLotaDestinoFinal(), lotaTitular);
+    }
+
+    public boolean isResp(DpPessoa titular, DpLotacao lotaTitular) {
+        return isResp(titular) || isResp(lotaTitular);
+    }
+
+    public boolean isRespPreferencialmentePelaLotacao(DpPessoa titular, DpLotacao lotaTitular) {
+        return getLotaResp() != null ? isResp(lotaTitular) : isResp(titular);
     }
 
     public boolean isRespExato(DpPessoa titular, DpLotacao lotaTitular) {
@@ -1338,6 +1363,13 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
                 || Utils.equivale(getResp(), titular)
                 || (getDestinoFinal() == null && Utils.equivale(getLotaDestinoFinal(), lotaTitular))
                 || Utils.equivale(getDestinoFinal(), titular);
+    }
+
+    public boolean isMovimentacaoDePosse() {
+        if (ExTipoDeMovimentacao.hasTransferencia(this.getExTipoMovimentacao()))
+            return true;
+
+        return ExTipoDeMovimentacao.hasRecebimentoOuCriacao(this.getExTipoMovimentacao());
     }
 
 }

@@ -14,18 +14,20 @@ public class DocumentosSiglaDessobrestarPost implements IDocumentosSiglaDessobre
     @Override
     public void run(Request req, Response resp, ExApiV1Context ctx) throws Exception {
         DpPessoa cadastrante = ctx.getCadastrante();
-        DpPessoa titular = cadastrante;
         DpLotacao lotaCadastrante = cadastrante.getLotacao();
         DpLotacao lotaTitular = ctx.getLotaTitular();
 
         ExMobil mob = ctx.buscarEValidarMobil(req.sigla, req, resp, "Documento a Dessobrestar");
 
-        Ex.getInstance().getComp().afirmar("O documento " + mob.getSigla() + " não pode ser dessobrestado por "
-                + titular.getSiglaCompleta() + "/" + lotaTitular.getSiglaCompleta(), ExPodeDessobrestar.class, titular, lotaTitular, mob);
+        Ex.getInstance().getComp()
+                .afirmar(
+                        "O documento " + mob.getSigla() + " não pode ser dessobrestado por "
+                                + cadastrante.getSiglaCompleta() + "/" + lotaTitular.getSiglaCompleta(),
+                        ExPodeDessobrestar.class, cadastrante, lotaTitular, mob);
 
-        ctx.assertAcesso(mob, titular, lotaTitular);
+        ctx.assertAcesso(mob, cadastrante, lotaTitular);
 
-        Ex.getInstance().getBL().desobrestar(cadastrante, lotaCadastrante, mob, null, titular);
+        Ex.getInstance().getBL().desobrestar(cadastrante, lotaCadastrante, mob, null, cadastrante);
 
         resp.sigla = mob.doc().getCodigo();
         resp.status = "OK";

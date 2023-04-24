@@ -22,6 +22,7 @@ import br.gov.jfrj.siga.wf.model.enm.WfTipoDePrincipal;
 import br.gov.jfrj.siga.wf.model.enm.WfTipoDeVinculoComPrincipal;
 import br.gov.jfrj.siga.wf.util.NaoSerializar;
 import br.gov.jfrj.siga.wf.util.WfDefinicaoDeProcedimentoDaoFiltro;
+import br.gov.jfrj.siga.wf.util.WfTarefa;
 import br.gov.jfrj.siga.wf.util.WfUtil;
 import com.google.gson.*;
 import org.apache.axis.encoding.Base64;
@@ -43,10 +44,8 @@ public class WfDiagramaController extends WfSelecionavelController<WfDefinicaoDe
 
     private static final String VERIFICADOR_ACESSO = "FE;DEFP:Gerenciar Diagramas";
     private static final String UTF8 = "utf-8";
-
     public static String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
     public static final SimpleDateFormat isoFormatter = new SimpleDateFormat(ISO_FORMAT);
-
     public static final Gson gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
 
                 @Override
@@ -132,8 +131,6 @@ public class WfDiagramaController extends WfSelecionavelController<WfDefinicaoDe
         }
     }
 
-    private HttpServletResponse response;
-    private ServletContext context;
     private WfUtil util;
 
     /**
@@ -147,8 +144,6 @@ public class WfDiagramaController extends WfSelecionavelController<WfDefinicaoDe
     public WfDiagramaController(HttpServletRequest request, Result result, WfDao dao, SigaObjects so, EntityManager em,
                                 HttpServletResponse response, ServletContext context, WfUtil util) {
         super(request, result, dao, so, em);
-        this.response = response;
-        this.context = context;
         this.util = util;
     }
 
@@ -158,21 +153,27 @@ public class WfDiagramaController extends WfSelecionavelController<WfDefinicaoDe
             assertAcesso(VERIFICADOR_ACESSO);
             List<WfDefinicaoDeProcedimento> modelos = dao().listarAtivos(WfDefinicaoDeProcedimento.class, "nome");
             result.include("itens", modelos);
-        } catch (AplicacaoException e) {
+        } catch (Exception e) {
             throw new AplicacaoException(e.getMessage(), 0, e);
-        } catch (Exception ex) {
-            throw new AplicacaoException(ex.getMessage(), 0, ex);
         }
     }
 
     @Get("app/diagrama/exibir")
     public void exibe(final String id) throws Exception {
         assertAcesso(VERIFICADOR_ACESSO);
-        if (id != null) {
-            WfDefinicaoDeProcedimento pd = buscar(id);
-            result.include("pd", pd);
-            result.include("dot", util.getDot(pd));
+        if (id == null)
+            throw new AplicacaoException("Id não pode ser nula");
+
+        WfDefinicaoDeProcedimento pd = buscar(id);
+        result.include("pd", pd);
+        result.include("dot", util.getDot(pd));
+
+        SortedSet<WfTarefa> tis = new TreeSet<>();
+        List<WfProcedimento> pis = dao().consultarProcedimentosAtivosPorDiagrama(pd);
+        for (WfProcedimento pi : pis) {
+            tis.add(new WfTarefa(pi));
         }
+        result.include("tarefas", tis);
     }
 
     @Get("app/diagrama/documentar")
@@ -500,6 +501,10 @@ public class WfDiagramaController extends WfSelecionavelController<WfDefinicaoDe
     protected String aBuscar(String sigla, String postback) throws Exception {
         WfDefinicaoDeProcedimentoDaoFiltro flt = new WfDefinicaoDeProcedimentoDaoFiltro();
         flt.setSigla(sigla);
+
+        if (getTitular() != null)
+            flt.setOuDefault(getTitular().getOrgaoUsuario());
+
         WfDao dao = WfDao.getInstance();
         WfDefinicaoDeProcedimento pd = null;
         try {

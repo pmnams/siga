@@ -44,6 +44,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static br.gov.jfrj.siga.ex.util.ProcessadorHtml.novoHtmlPersonalizado;
 
@@ -234,6 +235,25 @@ public class Documento {
         return retorno;
     }
 
+    public static String getVinculosString(Set<ExMovimentacao> movs) {
+        List<String> als = movs.stream().map(m -> m.getExMobilRef().getSigla()).collect(Collectors.toList());
+        StringBuilder retorno = new StringBuilder();
+        if (als.size() > 0) {
+            for (int i = 0; i < als.size(); i++) {
+                String nome = als.get(i);
+                if (i > 0) {
+                    if (i == als.size() - 1) {
+                        retorno.append(" e ");
+                    } else {
+                        retorno.append(", ");
+                    }
+                }
+                retorno.append(nome);
+            }
+        }
+        return retorno.toString();
+    }
+
     public static String getAssinantesStringComMatricula(Set<ExMovimentacao> movsAssinatura, Date dtDoc) {
         ArrayList<String> als = getAssinantesStringListaComMatricula(movsAssinatura, dtDoc);
         String retorno = "";
@@ -384,11 +404,15 @@ public class Documento {
 
         int f = 0;
         long bytes = 0;
+        long garbage = 0;
+        int ansSize = ans.size();
         try {
-            for (ExArquivoNumerado an : ans) {
+            while (ans.size() > 0) {
+                ExArquivoNumerado an = ans.get(0);
+                ans.remove(0);
                 if (uuid != null)
-                    status = Status.update(uuid, "Agregando documento " + (f + 1) + "/" + ans.size(),
-                            f * 2 + 1, ans.size() * 2 + 1, bytes);
+                    status = Status.update(uuid, "Agregando documento " + (f + 1) + "/" + ansSize,
+                            f * 2 + 1, ansSize * 2 + 1, bytes);
 
                 // byte[] ab = getPdf(docvia, an.getArquivo(), an.getNumVia(),
                 // an
@@ -493,6 +517,15 @@ public class Documento {
 
                 pageOffset += n;
                 f++;
+
+                an.evict();
+                an = null;
+
+                garbage += ab.length;
+                if (garbage > 1000000) {
+                    garbage = 0;
+                    System.gc();
+                }
             }
             if (!master.isEmpty())
                 writer.setOutlines(master);
@@ -505,7 +538,7 @@ public class Documento {
             document.close();
 
             if (uuid != null)
-                status = Status.update(uuid, "PDF completo gerado", ans.size() * 2 + 1, ans.size() * 2 + 1,
+                status = Status.update(uuid, "PDF completo gerado", ansSize * 2 + 1, ansSize * 2 + 1,
                         bytes);
 
         } catch (Exception ex) {
@@ -575,11 +608,15 @@ public class Documento {
                     + (mob.getDoc().isEletronico() ? "#E2EAEE" : "#f1e9c6")
                     + ";overflow:visible;\">");
             int f = 0;
-            for (ExArquivoNumerado an : ans) {
+            int garbage = 0;
+            int ansSize = ans.size();
+            while (ans.size() > 0) {
+                ExArquivoNumerado an = ans.get(0);
+                ans.remove(0);
                 String numeracao = null;
                 if (uuid != null)
-                    status = Status.update(uuid, "Agregando documento " + (f + 1) + "/" + ans.size(),
-                            f * 2 + 1, ans.size() * 2 + 1, 0L);
+                    status = Status.update(uuid, "Agregando documento " + (f + 1) + "/" + ansSize,
+                            f * 2 + 1, ansSize * 2 + 1, 0L);
                 // if (fFirst)
                 // fFirst = false;
                 // else
@@ -642,11 +679,19 @@ public class Documento {
                 }
                 sb.append("</td></tr></table></div>");
                 f++;
+                an.evict();
+                an = null;
+
+                garbage += 1;
+                if (garbage > 20) {
+                    garbage = 0;
+                    System.gc();
+                }
             }
             sb.append("</body></html>");
 
             if (uuid != null)
-                status = Status.update(uuid, "PDF completo gerado", ans.size() * 2 + 1, ans.size() * 2 + 1, 0L);
+                status = Status.update(uuid, "HTML completo gerado", ansSize * 2 + 1, ansSize * 2 + 1, 0L);
         }
     }
 

@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Objects;
 
 ;
 
@@ -343,13 +344,12 @@ public class SigaCalendar extends GregorianCalendar {
 
 	static public Date converteStringEmData(String sDt)
 			throws AplicacaoException {
-		if (sDt.trim().length() <= 0) {
+		if (Objects.isNull(sDt) || sDt.isEmpty()) {
 			return null;
 		}
 		try {
 			final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-			Date resultado = df.parse(sDt);
-			return resultado;
+			return df.parse(sDt);
 		} catch (ParseException e) {
 			throw new AplicacaoException("Data inválida!");
 		}

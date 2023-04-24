@@ -22,29 +22,5 @@ public class MatriculaUtilsTest {
 	public void deveLancarExcecaoCasoOTamanhoDaMatriculaSejaMenorOuIgualADois() throws Exception {
 		MatriculaUtils.validaPreenchimentoMatricula( "RJ" );
 	}
-	
-	@Test( expected = AplicacaoException.class )
-	public void deveLancarExcecaoCasoAParteNumericaDaMatriculaNaoForNumerica() throws Exception {
-		MatriculaUtils.getParteNumericaDaMatricula( "RJA" );
-	}
-	
-	@Test
-	public void deveRetornarParteNumericaDaMatricula() throws Exception {
-		long parteNumericaEsperada = 13286;
-		long parteNumericaAtual = MatriculaUtils.getParteNumericaDaMatricula( "RJ13286" );
-		assertEquals( parteNumericaEsperada, parteNumericaAtual );
-	}
-	
-	@Test( expected = AplicacaoException.class )
-	public void deveLancarExcecaoCasoAParteNaoNumericaDaMatriculaSejaNumerica() throws Exception {
-		MatriculaUtils.getSiglaDoOrgaoDaMatricula( "999" );
-	}
-	
-	@Test
-	public void deveRetornarSiglaDaMatricula() throws Exception {
-		String siglaEsperada = "RJ";
-		String siglaAtual = MatriculaUtils.getSiglaDoOrgaoDaMatricula( "RJ13286" );
-		assertTrue( siglaEsperada.equals( siglaAtual ) );
-	}
 
 }

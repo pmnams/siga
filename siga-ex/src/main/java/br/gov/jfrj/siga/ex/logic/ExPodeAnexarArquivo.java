@@ -9,9 +9,9 @@ import com.crivano.jlogic.*;
 
 public class ExPodeAnexarArquivo extends CompositeExpressionSupport {
 
-    private ExMobil mob;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final ExMobil mob;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public ExPodeAnexarArquivo(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;
@@ -31,48 +31,33 @@ public class ExPodeAnexarArquivo extends CompositeExpressionSupport {
      * <li><i>podeMovimentar()</i> tem de ser verdadeiro para o móbil / usuário</li>
      * <li>Não pode haver configuração impeditiva</li>
      * </ul>
-     *
-     * @param titular
-     * @param lotaTitular
-     * @param mob
-     * @return
-     * @throws Exception
      */
     @Override
     protected Expression create() {
         return And.of(
-
                 If.of(
-
                         new ExEstaFinalizado(mob.doc()),
-
                         And.of(
-
                                 Not.of(new ExEstaEmTransito(mob, titular, lotaTitular)),
-
                                 Or.of(
-
                                         Not.of(new ExEMobilGeral(mob)),
-
                                         And.of(new ExEExterno(mob.doc()), Not.of(new ExJaTransferido(mob.doc())))),
-
                                 Not.of(new ExEstaJuntado(mob)),
-
                                 Not.of(new ExEstaArquivado(mob)),
-
                                 Not.of(new ExEstaEncerrado(mob)),
-
                                 Not.of(new ExEstaSobrestado(mob)),
-
                                 Not.of(new ExEstaSemEfeito(mob.doc())),
-
-                                new ExPodeMovimentar(mob, titular, lotaTitular)),
-
-                        And.of(new ExEMobilGeral(mob), Not.of(new ExEProcesso(mob.doc())))),
-
+                                new ExPodeMovimentar(mob, titular, lotaTitular)
+                        ),
+                        And.of(
+                                new ExEMobilGeral(mob),
+                                Not.of(new ExEProcesso(mob.doc()))
+                        )
+                ),
                 new ExPodePorConfiguracao(titular, lotaTitular)
                         .withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
                         .withExTpMov(ExTipoDeMovimentacao.ANEXACAO)
-                        .withExMod(mob.doc().getExModelo()));
+                        .withExMod(mob.doc().getExModelo())
+        );
     }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<%@ page language="java" contentType="text/html; charset=UTF-8"
+<%@ page contentType="text/html; charset=UTF-8"
          buffer="64kb" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -9,8 +9,15 @@
 <%@ taglib uri="http://localhost/functiontag" prefix="f" %>
 <%@ taglib tagdir="/WEB-INF/tags/mod" prefix="mod" %>
 
+<%--@elvariable id="primeiraVez" type="java.lang.String"--%>
+<%--@elvariable id="apenasRefresh" type="java.lang.Integer"--%>
+<%--@elvariable id="titular" type="br.gov.jfrj.siga.dp.DpPessoa"--%>
+<%--@elvariable id="lotaTitular" type="br.gov.jfrj.siga.dp.DpLotacao"--%>
+<%--@elvariable id="popup" type="java.lang.Boolean"--%>
+<%--@elvariable id="pesquisaLimitadaPorData" type="java.lang.Boolean"--%>
+
 <siga:pagina titulo="Lista de Expedientes" popup="${popup}">
-    <script type="text/javascript" language="Javascript1.1">
+    <script type="text/ecmascript" >
 		function alteraTipoDaForma(abrir) {
 			if ($('#idFormaDoc-spinner').hasClass('d-none')) {
 				$('#idFormaDoc-spinner').removeClass('d-none');
@@ -18,7 +25,7 @@
 				SetInnerHTMLFromAjaxResponse(
 						'/sigaex/app/expediente/doc/carregar_lista_formas?tipoForma='
 								+ document.getElementById('tipoForma').value
-								+ '&idFormaDoc=' + '${idFormaDoc}', document
+								+ '&amp;idFormaDoc=' + '${idFormaDoc}', document
 								.getElementById('comboFormaDiv'), null,
 								(abrir? function(){	$('#idFormaDoc').select2('open'); } : null)
 								);
@@ -33,7 +40,7 @@
 				SetInnerHTMLFromAjaxResponse(
 						'/sigaex/app/expediente/doc/carregar_lista_modelos?forma='
 								+ (idFormaDoc != null ? idFormaDoc.value : '${idFormaDoc}' )
-								+ '&idMod='	+ '${idMod}', document
+								+ '&amp;idMod='	+ '${idMod}', document
 								.getElementById('comboModeloDiv'), null,
 								(abrir? function(){	$('#idMod').select2('open');
 													podeDescricao(true);} :
@@ -75,6 +82,8 @@
     <div id="inicio" class="container-fluid content mb-3">
         <h5 id="pesqTitle">Pesquisar Documentos</h5>
         <c:set var="formOrigem" value="lista" scope="request"/>
+        <c:set var="pesquisaLimitadaPorData" scope="session"
+               value="${f:podeUtilizarServicoPorConfiguracao(titular,lotaTitular,'SIGA:Sistema Integrado de Gestão Administrativa;DOC:Módulo de Documentos;PESQ:Pesquisar;DTLIMITADA: Pesquisar somente com data limitada ')}"/>
         <c:if
                 test="${((empty primeiraVez) or (primeiraVez != 'sim')) and ((empty apenasRefresh) or (apenasRefresh != 1)) and !pesquisaLimitadaPorData}">
             <jsp:include page="./lista.jsp"/>
@@ -87,16 +96,14 @@
                         <form id="listar" name="listar"
                               onsubmit="javascript: return limpaCampos()" action="listar"
                               method="get" class="form100">
-                            <input type="hidden" name="popup" value="${popup}"/> <input
-                                type="hidden" name="propriedade" value="${propriedade}"/> <input
-                                type="hidden" name="postback" value="1"/> <input type="hidden"
-                                                                                 name="apenasRefresh" value="0"/> <input
-                                type="hidden"
-                                name="paramoffset" value="0"/> <input type="hidden"
-                                                                      name="p.offset" value="0"/> <input type="hidden"
-                                                                                                         id="limiteDias"
-                                                                                                         name="limiteDias"
-                                                                                                         value="${f:resource('/siga.pesquisa.limite.dias')}"/>
+                            <input type="hidden" name="popup" value="${popup}"/>
+                            <input type="hidden" name="propriedade" value="${propriedade}"/>
+                            <input type="hidden" name="postback" value="1"/>
+                            <input type="hidden" name="apenasRefresh" value="0"/>
+                            <input type="hidden" name="paramoffset" value="0"/>
+                            <input type="hidden" name="p.offset" value="0"/>
+                            <input type="hidden" id="limiteDias" name="limiteDias" value="${f:resource('/siga.pesquisa.limite.dias')}"/>
+
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="ultMovIdEstadoDoc">Situação</label> <select
@@ -133,7 +140,7 @@
                                     </select>
                                 </div>
                                 <c:if test="${ultMovTipoResp == 1}">
-                                    <div id="divUltMovResp" style="display:"
+                                    <div id="divUltMovResp"
                                          class="form-group col-md-4">
                                         <label for="ultMovTipoResp"><fmt:message key="tela.pesquisa.pessoa"/></label>
                                         <siga:selecao propriedade="ultMovResp" tema="simple"
@@ -153,7 +160,7 @@
                                         <siga:selecao propriedade="ultMovResp" tema="simple"
                                                       paramList="buscarFechadas=true" modulo="siga"/>
                                     </div>
-                                    <div id="divUltMovLotaResp" style="display:"
+                                    <div id="divUltMovLotaResp"
                                          class="form-group col-md-4">
                                         <label for="ultMovTipoResp"><fmt:message key="usuario.lotacao"/></label>
                                         <siga:selecao propriedade="ultMovLotaResp" tema="simple"
@@ -275,7 +282,7 @@
 
                                 <div class="form-group col-md-6" id="trOrgExterno"
                                      style="display:${idTpDoc == 3 ? '' : 'none'}">
-                                    <label for="cpOrgao">Órgão Externo</label>
+                                    <label>Órgão Externo</label>
                                     <siga:selecao propriedade="cpOrgao" modulo="siga"
                                                   titulo="Órgão Externo" tema="simple"/>
                                 </div>
@@ -291,7 +298,7 @@
 
                                 <div class="form-group col-md-3" id="trSubscritorExt"
                                      style="display:${idTpDoc == 3 or idTpDoc == 4 ? '' : 'none'}">
-                                    <label for="nmSubscritorExt"><fmt:message
+                                    <label><fmt:message
                                             key="documento.subscritor.antigo"/></label> <input
                                         class="form-control" type="text" label="Subscritor"
                                         name="nmSubscritorExt" value="${nmSubscritorExt}" size="80"/>
@@ -299,9 +306,15 @@
 
                                 <div class="form-group col-md-6" id="trSubscritor"
                                      style="display:${idTpDoc != 3 and idTpDoc != 4 ? '' : 'none'}">
-                                    <label for="subscritor"><fmt:message key="documento.subscritor"/></label>
+                                    <label><fmt:message key="documento.subscritor"/></label>
                                     <siga:selecao titulo="Subscritor:" propriedade="subscritor"
                                                   paramList="buscarFechadas=true" modulo="siga" tema="simple"/>
+                                </div>
+                                <div class="form-group col-md-6" id="trRequerente"
+                                     style="display:${idTpDoc != 3 and idTpDoc != 4 ? '' : 'none'}">
+                                    <label>Requerente:</label>
+                                    <siga:selecao titulo="Requerente:" propriedade="requerenteDoc"
+                                                  paramList="buscarFechadas=true" modulo="sigaex" tema="simple"/>
                                 </div>
                             </div>
 
@@ -319,7 +332,7 @@
                                     </select>
                                 </div>
                                 <c:if test="${tipoCadastrante == 1}">
-                                    <div id="divCadastrante" style="display:"
+                                    <div id="divCadastrante"
                                          class="form-group col-md-4">
                                         <label for="ultMovTipoResp"><fmt:message key="tela.pesquisa.pessoa"/></label>
                                         <siga:selecao propriedade="cadastrante" tema="simple"
@@ -339,7 +352,7 @@
                                         <siga:selecao propriedade="cadastrante" tema="simple"
                                                       paramList="buscarFechadas=true" modulo="siga"/>
                                     </div>
-                                    <div id="divLotaCadastrante" style="display:"
+                                    <div id="divLotaCadastrante"
                                          class="form-group col-md-4">
                                         <label for="ultMovTipoResp"><fmt:message key="usuario.lotacao"/></label>
                                         <siga:selecao propriedade="lotaCadastrante" tema="simple"
@@ -362,21 +375,21 @@
                                 <div id="divDestinatario"
                                      style="display:${tipoDestinatario == 1 ? '':'none'}"
                                      class="form-group col-md-4">
-                                    <label for="destinatario"><fmt:message key="tela.pesquisa.pessoa"/></label>
+                                    <label><fmt:message key="tela.pesquisa.pessoa"/></label>
                                     <siga:selecao propriedade="destinatario" tema="simple"
                                                   paramList="buscarFechadas=true" modulo="siga"/>
                                 </div>
                                 <div id="divLotaDestinatario"
                                      style="display: ${tipoDestinatario == 2 ? '':'none'}"
                                      class="form-group col-md-4">
-                                    <label for="lotacaoDestinatario"><fmt:message key="usuario.lotacao"/></label>
+                                    <label><fmt:message key="usuario.lotacao"/></label>
                                     <siga:selecao propriedade="lotacaoDestinatario" tema="simple"
                                                   paramList="buscarFechadas=true" modulo="siga"/>
                                 </div>
                                 <div id="divOrgaoExternoDestinatario"
                                      style="display: ${tipoDestinatario == 3 ? '':'none'}"
                                      class="form-group col-md-4">
-                                    <label for="orgaoExternoDestinatario">Órgão Externo</label>
+                                    <label>Órgão Externo</label>
                                     <siga:selecao propriedade="orgaoExternoDestinatario"
                                                   tema="simple" modulo="siga"/>
                                 </div>
@@ -401,7 +414,7 @@
 
                             <div class="form-row ${hide_only_GOVSP}">
                                 <div class="form-group col-md-6">
-                                    <label for="classificacao"><fmt:message key="tela.pesquisa.classificacao"/></label>
+                                    <label><fmt:message key="tela.pesquisa.classificacao"/></label>
                                     <siga:selecao propriedade="classificacao" modulo="sigaex" tema="simple"
                                                   urlAcao="buscar" urlSelecionar="selecionar"/>
 
@@ -442,16 +455,12 @@
                                                 onclique="sbmtAction('listar', '/sigaex/app/ferramentas/doc/listar');"
                                                 value="Administrar Documentos" cssClass="btn btn-primary"/>
                             </c:if>
-                            <input type="button" value="Voltar" onclick="javascript:history.back();"
-                                   class="btn btn-primary"/>
+                            <input type="button" value="Voltar" onclick="javascript:history.back();" class="btn btn-primary"/>
                         </form>
                     </div>
                 </div>
             </div>
-            <!-- 		</div> -->
-            <!-- 	</div> -->
-            <c:if
-                    test="${((empty primeiraVez) or (primeiraVez != 'sim')) and ((empty apenasRefresh) or (apenasRefresh != 1)) and pesquisaLimitadaPorData}">
+            <c:if test="${((empty primeiraVez) or (primeiraVez != 'sim')) and ((empty apenasRefresh) or (apenasRefresh != 1)) and pesquisaLimitadaPorData}">
                 <div id="pesqResult" class="mx-3">
                     <jsp:include page="./listaSP.jsp"/>
                     <script>

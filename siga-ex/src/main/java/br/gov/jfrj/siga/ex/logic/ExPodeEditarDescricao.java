@@ -16,7 +16,6 @@ public class ExPodeEditarDescricao extends CompositeExpressionSupport {
     /**
      * Retorna se é possível editar a descrição de um documento, conforme
      * configuração específica.
-     *
      */
     public ExPodeEditarDescricao(ExModelo mod, DpPessoa titular, DpLotacao lotaTitular) {
         this.mod = mod;
@@ -26,7 +25,14 @@ public class ExPodeEditarDescricao extends CompositeExpressionSupport {
 
     @Override
     protected Expression create() {
-        return new ExPodePorConfiguracao(titular, lotaTitular).withExMod(mod).withExFormaDoc(mod.getExFormaDocumento())
+        ExPodePorConfiguracao exp = new ExPodePorConfiguracao(titular, lotaTitular)
                 .withIdTpConf(ExTipoDeConfiguracao.EDITAR_DESCRICAO);
+
+        if (mod != null)
+            exp.withExMod(mod)
+                    .withExFormaDoc(mod.getExFormaDocumento());
+
+        return exp;
     }
+
 }

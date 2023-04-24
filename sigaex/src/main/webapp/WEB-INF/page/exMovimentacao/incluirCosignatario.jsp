@@ -24,6 +24,7 @@
     }
 
     function validate() {
+        sigaSpinner.mostrar();
         var sigaCliente = document.getElementById('sigaCliente');
         if (sigaCliente.value == 'GOVSP') {
             var personalizacao = document.getElementById('exDocumentoDTO.personalizacao');
@@ -36,6 +37,20 @@
         }
         return true;
     }
+
+    function incluirExcluirAcessoTempArvoreDocs(thisElement) {
+		var podeChamarServico = ${!listaCossignatarios.isEmpty()};
+		if (podeChamarServico) {
+			var incluirCossig = false;
+			if (thisElement.checked) {
+				incluirCossig = true;
+			}
+			window.location.href='${pageContext.request.contextPath}/app/expediente/mov/incluir_excluir_acesso_temp_arvore_docs?sigla=${sigla}&amp;incluirCossig='+incluirCossig;
+		}
+	}
+
+
+
 
 </script>
 
@@ -83,6 +98,24 @@
                                     </div>
                                 </div>
                             </div>
+                            <c:if test="${podeExibirArvoreDocsCossig}">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline mt-4">
+                                            <input type="checkbox" id="podeIncluirCossigArvoreDocs"
+                                                   name="podeIncluirCossigArvoreDocs" class="form-check-input ml-3"
+                                                   <c:if test="${podeIncluirCossigArvoreDocs}">checked</c:if>
+                                                   onclick="javascript:incluirExcluirAcessoTempArvoreDocs(this);"/>
+                                            <label class="form-check-label" for="podeIncluirCossigArvoreDocs">Acessar
+                                                Documento Completo</label>
+                                            <a class="fas fa-info-circle text-secondary ml-1" data-toggle="tooltip"
+                                               data-trigger="click" data-placement="bottom"
+                                               title='Selecionar esse campo se houver a necessidade de permitir que o(s) cossignatário(s) acesse(m) o documento completo, enquanto o mesmo estiver pendente
+																		de assinatura. Atenção: Para habilitar ou desabilitar essa função, o documento deverá estar com status "Finalizado"'></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </c:if>
                         </div>
                         <div id="div_personalizacao" style="display: none" class="row">
                             <div class="col-sm-4">
@@ -145,9 +178,9 @@
                         <td>${mov.subscritor.nomePessoa }</td>
                         <td>${mov.nmLotacao }</td>
                         <td>${mov.nmFuncao }</td>
-                        <td><c:if test="${siga_cliente != 'GOVSP'}">${mov.nmLocalidade}</c:if></td>
+                        <td>${mov.nmLocalidade}</td>
                         <td><input type="button" value="Excluir"
-                                   onclick="javascript:location.href='${pageContext.request.contextPath}/app/expediente/mov/excluir?id=${mov.idMov}&redirectURL=/app/expediente/mov/incluir_cosignatario?sigla=${sigla}'"
+                                   onclick="javascript:sigaSpinner.mostrar();location.href='${pageContext.request.contextPath}/app/expediente/mov/excluir?id=${mov.idMov}&redirectURL=/app/expediente/mov/incluir_cosignatario?sigla=${sigla}'"
                                    class="btn btn-danger"/>
                         </td>
                     </tr>

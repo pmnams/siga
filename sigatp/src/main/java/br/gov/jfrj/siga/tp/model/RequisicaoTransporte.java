@@ -48,12 +48,8 @@ import br.gov.jfrj.siga.tp.util.SigaTpException;
 import br.gov.jfrj.siga.tp.validation.annotation.Data;
 import br.gov.jfrj.siga.tp.validation.annotation.Sequence;
 import br.gov.jfrj.siga.tp.validation.annotation.UpperCase;
-import br.gov.jfrj.siga.tp.vraptor.ServicoVeiculoController;
 import br.gov.jfrj.siga.tp.vraptor.i18n.MessagesBundle;
 import br.gov.jfrj.siga.uteis.SiglaDocumentoType;
-import br.gov.jfrj.siga.vraptor.handler.Resources;
-
-
 
 @Entity
 @Audited
@@ -333,38 +329,6 @@ public class RequisicaoTransporte extends TpModel implements Comparable<Requisic
     @Override
     public int compareTo(RequisicaoTransporte o) {
         return (this.dataHoraSaidaPrevista).compareTo(o.dataHoraSaidaPrevista);
-    }
-
-    public String getDescricaoCompleta() {
-        StringBuilder saida = new StringBuilder();
-        saida.append(buscarSequence().toString());
-
-        boolean temTipoPassageiro = false;
-        for (Iterator<TipoDePassageiro> iterator = tiposDePassageiro.iterator(); iterator.hasNext();) {
-            TipoDePassageiro tipo = iterator.next();
-            if (!temTipoPassageiro) {
-                saida.append(" - ");
-                temTipoPassageiro = true;
-            } else
-                saida.append("; ");
-
-            saida.append(tipo.getDescricao());
-        }
-
-        if (servicoVeiculo != null) {
-            String caminhoUrl = Resources.getInstance().urlFor(ServicoVeiculoController.class, "buscarServico", true, servicoVeiculo.getSequence());
-
-            saida.append(" - ");
-            saida.append("Servi&ccedil;o: " + servicoVeiculo.getSequence() + " <a href=\"#\" onclick=\"javascript:window.open('/sigatp" + caminhoUrl + "');\">");
-            saida.append("<img src=\"" + IMG_LINKNOVAJANELAICON + "\" alt=\"Abrir em uma nova janela\" title=\"Abrir em uma nova janela\"></a>");
-            saida.append(" (");
-            saida.append(servicoVeiculo.getVeiculo().getDadosParaExibicao() + ")");
-        } else {
-            saida.append(" - ");
-            saida.append(itinerarios.toString());
-        }
-
-        return saida.toString();
     }
 
     public String buscarSequence() {

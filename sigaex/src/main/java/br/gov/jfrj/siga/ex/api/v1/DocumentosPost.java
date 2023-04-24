@@ -46,7 +46,7 @@ public class DocumentosPost implements IDocumentosPost {
         final Ex ex = Ex.getInstance();
         final ExBL exBL = ex.getBL();
 
-        DpPessoa cadastrante = null;
+        DpPessoa cadastrante = ctx.getCadastrante();
         ExModelo modelo = null;
         ExClassificacao classificacao = null;
         CpOrgao destinatarioOrgaoExterno = null;
@@ -57,8 +57,16 @@ public class DocumentosPost implements IDocumentosPost {
             try {
                 Ex.getInstance()
                         .getComp()
-                        .afirmar("Edição do documento " + mob.getSigla() + " não é permitida. ("
-                                + ctx.getTitular().getSigla() + "/" + ctx.getLotaTitular().getSiglaCompleta() + ")", ExPodeEditar.class, ctx.getTitular(), ctx.getLotaTitular(), mob);
+                        .afirmar("Edição do documento "
+                                        + mob.getSigla()
+                                        + " não é permitida. ("
+                                        + ctx.getTitular().getSigla()
+                                        + "/" + ctx.getLotaTitular().getSiglaCompleta() + ")",
+                                ExPodeEditar.class,
+                                ctx.getTitular(),
+                                ctx.getLotaTitular(),
+                                mob
+                        );
             } catch (Exception e) {
                 throw new SwaggerException(e.getMessage(), 403, null, req, resp, null);
             }
@@ -256,7 +264,7 @@ public class DocumentosPost implements IDocumentosPost {
                 if (nivelDefault != null) {
                     doc.setExNivelAcesso(dao().consultar(nivelDefault, ExNivelAcesso.class, false));
                 } else {
-                    if (Boolean.valueOf(System.getProperty("siga.doc.acesso.limitado"))) {
+                    if (Boolean.parseBoolean(System.getProperty("siga.doc.acesso.limitado"))) {
                         doc.setExNivelAcesso(
                                 dao().consultar(ExNivelAcesso.ID_LIMITADO_AO_ORGAO, ExNivelAcesso.class, false));
                     } else {
@@ -291,14 +299,14 @@ public class DocumentosPost implements IDocumentosPost {
                         camposModelo = camposModelo + key + "=" + URLEncoder.encode(value, "iso-8859-1") + "&";
                     }
                 }
-            } else {
-                throw new AplicacaoException("O parâmetro entrevista não foi informado.");
+
+                if (camposModelo.length() > 0)
+                    camposModelo = camposModelo.substring(0, camposModelo.length() - 1);
+
+                baos.write(camposModelo.getBytes());
+                doc.setConteudoTpDoc("application/zip");
+                doc.setConteudoBlobForm(baos.toByteArray());
             }
-            if (camposModelo.length() > 0)
-                camposModelo = camposModelo.substring(0, camposModelo.length() - 1);
-            baos.write(camposModelo.getBytes());
-            doc.setConteudoTpDoc("application/zip");
-            doc.setConteudoBlobForm(baos.toByteArray());
         }
 
         if ((doc.getExTipoDocumento().getIdTpDoc() == ExTipoDocumento.TIPO_DOCUMENTO_INTERNO_CAPTURADO
@@ -403,8 +411,8 @@ public class DocumentosPost implements IDocumentosPost {
      * @return String convertida.
      */
     static String UTF8toISO(String str) {
-        Charset utf8charset = Charset.forName("UTF-8");
-        Charset iso88591charset = Charset.forName("ISO-8859-1");
+        Charset utf8charset = StandardCharsets.UTF_8;
+        Charset iso88591charset = StandardCharsets.ISO_8859_1;
         ByteBuffer inputBuffer = ByteBuffer.wrap(str.getBytes());
         CharBuffer data = utf8charset.decode(inputBuffer);
         ByteBuffer outputBuffer = iso88591charset.encode(data);

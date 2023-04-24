@@ -420,6 +420,10 @@ public abstract class AbstractExDocumento extends ExArquivo implements
     @Column(name = "TP_PRINCIPAL")
     private ExTipoDePrincipal tipoDePrincipal;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_REQUERENTE")
+    private ExRequerenteDoc requerenteDoc;
+
     /**
      * Simple constructor of AbstractExDocumento instances.
      */
@@ -1162,4 +1166,13 @@ public abstract class AbstractExDocumento extends ExArquivo implements
     public void setTipoDePrincipal(ExTipoDePrincipal tipoDePrincipal) {
         this.tipoDePrincipal = tipoDePrincipal;
     }
+
+    public ExRequerenteDoc getRequerenteDoc() {
+        return requerenteDoc;
+    }
+
+    public void setRequerenteDoc(ExRequerenteDoc requerenteDoc) {
+        this.requerenteDoc = requerenteDoc;
+    }
+
 }

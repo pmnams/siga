@@ -4,7 +4,7 @@
     <parent>
         <artifactId>siga-doc</artifactId>
         <groupId>siga</groupId>
-        <version>1.2-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <packaging>war</packaging>
@@ -38,7 +38,7 @@
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}</version>
+                                    <version>${revision}</version>
                                     <type>${project.packaging}</type>
                                 </artifactItem>
                             </artifactItems>
@@ -169,6 +169,12 @@
         <dependency>
             <groupId>com.crivano</groupId>
             <artifactId>swaggerservlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

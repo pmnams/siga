@@ -4,6 +4,7 @@ import br.gov.jfrj.siga.cp.model.CpOrgaoSelecao;
 import br.gov.jfrj.siga.cp.model.DpLotacaoSelecao;
 import br.gov.jfrj.siga.cp.model.DpPessoaSelecao;
 import br.gov.jfrj.siga.dp.DpLotacao;
+import br.gov.jfrj.siga.ex.ExRequerenteDocSelecao;
 import br.gov.jfrj.siga.vraptor.ExClassificacaoSelecao;
 
 public final class ExMobilBuilder {
@@ -16,6 +17,7 @@ public final class ExMobilBuilder {
 	private Long idTpDoc;
 	private CpOrgaoSelecao cpOrgaoSel;
 	private DpPessoaSelecao subscritorSel;
+	private ExRequerenteDocSelecao requerenteDocSel;
 	private Integer tipoCadastrante;
 	private DpPessoaSelecao cadastranteSel;
 	private DpLotacaoSelecao lotaCadastranteSel;
@@ -45,6 +47,9 @@ public final class ExMobilBuilder {
 		}
 		if (subscritorSel == null) {
 			subscritorSel = new DpPessoaSelecao();
+		}
+		if (requerenteDocSel == null) {
+			requerenteDocSel = new ExRequerenteDocSelecao();
 		}
 		if (cadastranteSel == null) {
 			cadastranteSel = new DpPessoaSelecao();
@@ -92,6 +97,7 @@ public final class ExMobilBuilder {
 		lotacaoDestinatarioSel.buscar();
 		orgaoExternoDestinatarioSel.buscar();
 		subscritorSel.buscar();
+		requerenteDocSel.buscar();
 		ultMovLotaRespSel.buscar();
 		ultMovRespSel.buscar();
 		cadastranteSel.buscar();
@@ -128,6 +134,10 @@ public final class ExMobilBuilder {
 
 	public DpPessoaSelecao getSubscritorSel() {
 		return subscritorSel;
+	}
+
+	public ExRequerenteDocSelecao getRequerenteDocSel() {
+		return requerenteDocSel;
 	}
 
 	public Integer getTipoCadastrante() {
@@ -203,6 +213,11 @@ public final class ExMobilBuilder {
 
 	public ExMobilBuilder setSubscritorSel(DpPessoaSelecao subscritorSel) {
 		this.subscritorSel = subscritorSel;
+		return this;
+	}
+
+	public ExMobilBuilder setRequerenteDocSel(ExRequerenteDocSelecao requerenteDocSel) {
+		this.requerenteDocSel = requerenteDocSel;
 		return this;
 	}
 

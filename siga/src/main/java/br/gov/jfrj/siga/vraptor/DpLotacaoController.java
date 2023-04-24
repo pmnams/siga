@@ -124,9 +124,9 @@ public class DpLotacaoController extends SigaSelecionavelControllerSupport<DpLot
          */
 
         String paramBuscarTodosOrgaos = param("buscarTodosOrgaos");
-        boolean buscarTodosOrgaos =  paramBuscarTodosOrgaos != null ? Boolean.valueOf(paramBuscarTodosOrgaos) : false;
+        boolean buscarTodosOrgaos = paramBuscarTodosOrgaos != null ? Boolean.valueOf(paramBuscarTodosOrgaos) : false;
         flt.setIdOrgaoUsu(orgaoUsu);
-        if (flt.getIdOrgaoUsu() == null && !buscarTodosOrgaos && getLotaTitular() != null ) {
+        if (flt.getIdOrgaoUsu() == null && !buscarTodosOrgaos && getLotaTitular() != null) {
             flt.setIdOrgaoUsu(getLotaTitular().getOrgaoUsuario().getIdOrgaoUsu());
         }
 
@@ -396,9 +396,8 @@ public class DpLotacaoController extends SigaSelecionavelControllerSupport<DpLot
             dao().gravarComHistorico(lotacaoNova, lotacao, null, getIdentidadeCadastrante());
         } else {// inativar
             Integer qtdePessoa = CpDao.getInstance().pessoasPorLotacao(id, Boolean.TRUE, Boolean.FALSE).size();
-            Integer qtdeDocumentoCriadosPosse = dao().consultarQtdeDocCriadosPossePorDpLotacao(lotacao.getIdInicial());
 
-            if (qtdePessoa > 0 || qtdeDocumentoCriadosPosse > 0) {
+            if (qtdePessoa > 0 || consultarQtdeDocumentoCriadosPosse(lotacao) > 0) {
                 throw new AplicacaoException("Inativação não permitida. Existem documentos e usuários vinculados nessa "
                         + SigaMessages.getMessage("usuario.lotacao"), 0);
             } else if (dao().listarLotacoesPorPai(lotacao).size() > 0) {
@@ -556,6 +555,22 @@ public class DpLotacaoController extends SigaSelecionavelControllerSupport<DpLot
     protected List<DpLotacao> carregaLotacao(CpOrgaoUsuario orgaoUsuario) {
         CpOrgaoUsuario u = CpDao.getInstance().consultarOrgaoUsuarioPorId(orgaoUsuario.getIdOrgaoUsu());
         return (List<DpLotacao>) CpDao.getInstance().consultarLotacaoPorOrgao(u);
+    }
+
+
+    /**
+     * Consulta quantidade de documentos criados que estão em posse da lotação
+     */
+    private Integer consultarQtdeDocumentoCriadosPosse(DpLotacao lotacao) {
+
+        Integer qtdeDocumentoCriadosPosse;
+
+        if (Boolean.TRUE.equals(Prop.getBool("/siga.lotacao.inativacao.marcadores.permitidos")))
+            qtdeDocumentoCriadosPosse = dao().consultarQtdeDocCriadosPossePorDpLotacaoECpMarca(lotacao.getIdInicial());
+        else
+            qtdeDocumentoCriadosPosse = dao().consultarQtdeDocCriadosPossePorDpLotacao(lotacao.getIdInicial());
+
+        return qtdeDocumentoCriadosPosse;
     }
 
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<%@ page language="java" contentType="text/html; charset=UTF-8"
+<%@ page contentType="text/html; charset=UTF-8"
          buffer="64kb" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://localhost/customtag" prefix="tags" %>
@@ -9,23 +9,39 @@
 <%@ taglib uri="http://localhost/libstag" prefix="libs" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%@page import="br.gov.jfrj.siga.ex.ExMovimentacao" %>
-<%@page import="br.gov.jfrj.siga.ex.ExMobil" %>
+<%--@elvariable id="erroDocMsg" type="java.lang.String"--%>
+<%--@elvariable id="erroDocBtn" type="java.lang.String"--%>
+<%--@elvariable id="erroDocLink" type="java.lang.String"--%>
+<%--@elvariable id="sigla" type="java.lang.String"--%>
+<%--@elvariable id="collapse_Expanded" type="java.lang.String"--%>
+<%--@elvariable id="thead_color" type="java.lang.String"--%>
+<%--@elvariable id="docVO" type="br.gov.jfrj.siga.ex.vo.ExDocumentoVO"--%>
+<%--@elvariable id="mob" type="br.gov.jfrj.siga.ex.ExMobil"--%>
+<%--@elvariable id="titular" type="br.gov.jfrj.siga.dp.DpPessoa"--%>
+<%--@elvariable id="lotaTitular" type="br.gov.jfrj.siga.dp.DpLotacao"--%>
+<%--@elvariable id="cadastrante" type="br.gov.jfrj.siga.dp.DpLotacao"--%>
+<%--@elvariable id="popup" type="java.lang.Boolean"--%>
+<%--@elvariable id="exibirCompleto" type="java.lang.Boolean"--%>
+
+<c:if test="${f:podeUtilizarServicoPorConfiguracao(titular, lotaTitular, 'SIGA;DOC;FE;PAINEL;CORRIGEMOBIL:Corrige Documento sem Mobil de Via ou Volume')}">
+    <a class="btn btn-sm btn-primary float-right" title="${erroDocBtn}"
+       href="${erroDocLink}"
+        ${popup?'target="_blank" ':''}><i class="fas fa-file-medical mr-2"></i>${erroDocBtn}</a>
+</c:if>
 
 <siga:pagina titulo="Painel Administrativo">
-    <script type="text/javascript" language="Javascript1.1">
-function sbmtDoc() {
-	sigaSpinner.mostrar();
-    document.getElementById('btnSubmitDoc').disabled = true;
-   	frm = document.getElementById('frmDoc');
-    frm.action = 'exibir?documentoRefSel.sigla=${sigla}&amp;postback=1';
-    frm.submit();
-    document.getElementById('btnSubmitDoc').disabled = false;
-    sigaSpinner.mostrar();
-}
-
-
+    <script type="text/javascript">
+        function sbmtDoc() {
+            sigaSpinner.mostrar();
+            document.getElementById('btnSubmitDoc').disabled = true;
+            let frm = document.getElementById('frmDoc');
+            frm.action = 'exibir?documentoRefSel.sigla=${sigla}&amp;postback=1';
+            frm.submit();
+            document.getElementById('btnSubmitDoc').disabled = false;
+            sigaSpinner.mostrar();
+        }
     </script>
+
     <!-- main content bootstrap -->
     <div class="container-fluid content">
         <div class="card bg-light mb-3">
@@ -49,7 +65,7 @@ function sbmtDoc() {
                             <div class="form-group">
                                 <label>Número do Documento</label>
                                 <siga:selecao tema='simple' titulo="Sigla do Documento" propriedade="documentoRef"
-                                              urlAcao="expediente/buscar" urlSelecionar="expediente/selecionar"
+                                              urlAcao="buscar" urlSelecionar="selecionar"
                                               modulo="sigaex"/>
                             </div>
                         </div>
@@ -85,7 +101,7 @@ function sbmtDoc() {
                         <div class="col-12">
                             <a class="btn btn-sm btn-primary" title="Atualiza a situação do documento (marcas)"
                                href="${linkTo[ExDocumentoController].aAtualizarMarcasDoc()}?sigla=${docVO.sigla}&redir=/app/expediente/painel/exibir?documentoRefSel.sigla=${docVO.sigla}"
-                                ${popup?'target="_blank" ':''}><i class="fas fa-pen-square"></i> Atualizar Marcas</a>
+                                ${popup? 'target="_blank" ': ''}><i class="fas fa-pen-square"></i> Atualizar Marcas</a>
                         </div>
                     </div>
                     <div class="row">
@@ -299,6 +315,7 @@ function sbmtDoc() {
 
             <c:set var="primeiroMobil" value="${true}"/>
             <c:forEach var="m" items="${docVO.mobs}" varStatus="loop">
+
                 <c:if
                         test="${m.mob.geral or true or (((mob.geral or (mob.id == m.mob.id)) and (exibirCompleto or (m.mob.ultimaMovimentacaoNaoCancelada != null) ) ))}">
                     <div class="card bg-light mb-3">
@@ -306,14 +323,27 @@ function sbmtDoc() {
                                        id="docMobs-${m.mob.id}" collapseMode="${collapse_Expanded}">
                             <div class="d-box-content">
                                 <div class="row">
-                                    <div class="d-box-col col-md-2">
+                                    <div class="d-box-col col-md-1">
                                         <div class="text-sm font-weight-bold">IdMobil</div>
                                         <div class="">${m.mob.idMobil}</div>
                                     </div>
-                                    <div class="d-box-col col-md-3">
+                                    <div class="d-box-col col-md-1">
                                         <div class="text-sm font-weight-bold">IdTpDoc</div>
                                         <div class="">${m.mob.exTipoMobil.idTipoMobil}
                                             - ${m.mob.exTipoMobil.descTipoMobil}</div>
+                                    </div>
+                                    <div class="d-box-col col-md-2">
+                                        <div class="text-sm font-weight-bold">DnmSigla</div>
+                                        <div class="">${m.mob.dnmSigla}</div>
+                                    </div>
+                                    <div class="d-box-col col-md-3">
+                                        <div class="text-sm font-weight-bold">DnmDataUltimaMovimentacaoNaoCancelada
+                                        </div>
+                                        <div class="">${m.mob.dnmDataUltimaMovimentacaoNaoCancelada}</div>
+                                    </div>
+                                    <div class="d-box-col col-md-3">
+                                        <div class="text-sm font-weight-bold">ultimaMovimentacaoNaoCancelada</div>
+                                        <div class="">${m.mob.ultimaMovimentacaoNaoCancelada.idMov}</div>
                                     </div>
                                 </div>
                                 <div class="row">

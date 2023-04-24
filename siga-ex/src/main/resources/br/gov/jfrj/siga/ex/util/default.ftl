@@ -905,7 +905,8 @@ Descrição: Esta macro é utilizada pelo Integrador
     [/#if]
 [/#macro]
 
-[#macro documento formato="A4" orientacao="retrato" margemEsquerda="3cm" margemDireita="2cm" margemSuperior="1cm" margemInferior="2cm"]
+[#macro documento formato="A4" orientacao="portrait" margemEsquerda="3cm" margemDireita="2cm" margemSuperior="1cm" margemInferior="2cm"]
+    <!-- size: ${formato} ${orientacao}; -->
     [#if !gerar_entrevista!false || gerar_finalizacao!false || gerar_assinatura!false]
         <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
         <head>
@@ -1877,6 +1878,8 @@ Descrição: Esta macro é utilizada pelo Integrador
 
 
 
+
+
     </script>
 
     <div id="xstandard_temp" style="display:none">
@@ -2389,9 +2392,9 @@ Pede deferimento.</span><br/><br/><br/>
             <td width="100%">
                 <table width="100%" border="0" cellpadding="2">
                     <tr>
-                        <td width="100%" align="center" valign="bottom"><img src="${_pathBrasao}"
-                                                                             width="${_widthBrasao}"
-                                                                             height="${_heightBrasao}"/></td>
+                        <td width="100%" align="center" valign="bottom">
+                            <img src="${_pathBrasao}" width="${_widthBrasao}" height="${_heightBrasao}"/>
+                        </td>
                     </tr>
                     <tr>
                         <td width="100%" align="center">
@@ -2428,6 +2431,18 @@ Pede deferimento.</span><br/><br/><br/>
         <tr bgcolor="#FFFFFF">
             <td width="100%">
                 <table width="100%" border="0" cellpadding="2">
+                    [#if _brasaoTodasPaginas]
+                        [#assign heightBrasao = _heightBrasao?number]
+                        <style>
+                            @page {
+                                margin-top: ${(3 + heightBrasao / 37.80)?string.computer}cm;
+                            }
+                        </style>
+
+                        <td width="100%" align="center" valign="bottom">
+                            <img src="${_pathBrasao}" width="${_widthBrasao}" height="${_heightBrasao}"/>
+                        </td>
+                    [/#if]
                     <tr>
                         <td width="100%" align="center">
                             <p style="font-family: AvantGarde Bk BT, Arial; font-size: 11pt;">${_tituloGeral}</p>
@@ -4769,112 +4784,109 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
                     style="font-size: 15px;">********************************* FIM *********************************</span>
         </center>
 
+        [#assign idOrgaoUsu=""/]
+        [#assign acronimoOrgaoUsu=""/]
+        [#assign descricaoOrgaoUsu=""/]
+
+        [#if !mov??]
+            [#if doc.lotaCadastrante??]
+                [#assign descricaoOrgaoUsu=(doc.lotaCadastrante.orgaoUsuario.descricao)!/]
+                [#assign idOrgaoUsu=(doc.lotaCadastrante.orgaoUsuario.idOrgaoUsu)!/]
+                [#assign acronimoOrgaoUsu=(doc.lotaCadastrante.orgaoUsuario.acronimoOrgaoUsu)!/]
+            [/#if]
+        [#else]
+            [#assign descricaoOrgaoUsu=mov.lotaCadastrante.orgaoUsuario.descricao/]
+            [#assign idOrgaoUsu=mov.lotaCadastrante.orgaoUsuario.idOrgaoUsu/]
+            [#assign acronimoOrgaoUsu=mov.lotaCadastrante.orgaoUsuario.acronimoOrgaoUsu/]
+        [/#if]
+
+        <table width="96%" style="page-break-inside: avoid">
+            <tr>
+                <td width="100%" style="border: 1px solid black;">
+                    <table width="100%" align="left">
+                        <col width="15%"></col>
+                        <col width="85%"></col>
+                        <tr>
+                            <td width="15%" align="left" valign="bottom"><img
+                                        src="${_pathBrasao}" width="65" height="65"/>
+                            </td>
+                            <td>
+                                <table align="left" width="100%">
+                                    <tr>
+                                        <td width="18%" width="100%" align="left">
+                                            <p style="font-size: 11pt;">${func.resource('modelos.cabecalho.titulo')!}</p>
+                                        </td>
+                                    </tr>
+                                    [#if func.resource('siga.ex.modelos.cabecalho.subtitulo')??]
+                                        <tr>
+                                            <td width="100%" align="left">
+                                                <p style="font-size: 10pt; font-weight: bold;">${func.resource('modelos.cabecalho.subtitulo')!}</p>
+                                            </td>
+                                        </tr>
+                                    [/#if]
+                                    <tr>
+                                        <td width="100%" align="left">
+                                            <p style="font-size: 8pt;">
+                                                [#if !mov??]
+                                                    [#if doc.lotaCadastrante??]
+                                                        ${(doc.lotaCadastrante.orgaoUsuario.descricaoMaiusculas)!}
+                                                    [/#if]
+                                                [#else]
+                                                    ${(mov.lotaCadastrante.orgaoUsuario.descricaoMaiusculas)!}
+                                                [/#if]</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td width="100%" style="padding-left: 0px; margin-left: 0px;">
+                    ${templateInfosComplementaresDocumento}
+                </td>
+            </tr>
+        </table>
 
         <!-- INICIO PRIMEIRO RODAPE
-			[#assign idOrgaoUsu=""/]
-			[#assign acronimoOrgaoUsu=""/]
-			[#assign descricaoOrgaoUsu=""/]
-
-			[#if !mov??]
-				[#if doc.lotaCadastrante??]
-					[#assign descricaoOrgaoUsu=(doc.lotaCadastrante.orgaoUsuario.descricao)!/]
-					[#assign idOrgaoUsu=(doc.lotaCadastrante.orgaoUsuario.idOrgaoUsu)!/]
-					[#assign acronimoOrgaoUsu=(doc.lotaCadastrante.orgaoUsuario.acronimoOrgaoUsu)!/]
-				[/#if]
-			[#else]
-				[#assign descricaoOrgaoUsu=mov.lotaCadastrante.orgaoUsuario.descricao/]
-				[#assign idOrgaoUsu=mov.lotaCadastrante.orgaoUsuario.idOrgaoUsu/]
-				[#assign acronimoOrgaoUsu=mov.lotaCadastrante.orgaoUsuario.acronimoOrgaoUsu/]
-			[/#if]
-
-			<span align="center">
-			<table bgcolor="#000000" width="96%">
-				<tr>
-					<td width="100%">
-						<table width="100%" align="left" bgcolor="#FFFFFF">
-							<col width="15%"></col>
-							<col width="85%"></col>
-							<tr bgcolor="#FFFFFF">
-								<td width="15%" align="left" valign="bottom"><img
-									src="${_pathBrasao}" width="65" height="65" />
-								</td>
-								<td>
-									<table align="left" width="100%" bgcolor="#FFFFFF">
-										<tr>
-											<td width="18%" width="100%" align="left">
-											<p style="font-size: 11pt;">${func.resource('modelos.cabecalho.titulo')!}</p>
-											</td>
-										</tr>
-										[#if func.resource('siga.ex.modelos.cabecalho.subtitulo')??]
-											<tr>
-												<td width="100%" align="left">
-												<p style="font-size: 10pt; font-weight: bold;">${func.resource('modelos.cabecalho.subtitulo')!}</p>
-												</td>
-											</tr>
-										[/#if]
-										<tr>
-											<td width="100%" align="left">
-												<p style="font-size: 8pt;">
-												[#if !mov??]
-													[#if doc.lotaCadastrante??]
-														${(doc.lotaCadastrante.orgaoUsuario.descricaoMaiusculas)!}
-													[/#if]
-												[#else]
-													${(mov.lotaCadastrante.orgaoUsuario.descricaoMaiusculas)!}
-												[/#if]</p>
-											</td>
-										</tr>
-									</table>
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<td width="100%" style="padding-left: 0px; margin-left: 0px;">
-						${templateInfosComplementaresDocumento}
-					</td>
-				</tr>
-			</table>
-	        </span>
-		FIM PRIMEIRO RODAPE -->
-
+        FIM PRIMEIRO RODAPE -->
         <!-- INICIO RODAPE
-			<table width="100%" border="0" cellpadding="0" bgcolor="#000000">
-				<col></col>
-				<tr>
-					<td width="100%" align="right"><div id="numero_pagina" /></td>
-				</tr>
-			</table>
-		FIM RODAPE -->
+                            <table width="100%" border="0" cellpadding="0" bgcolor="#000000">
+                                <col></col>
+                                <tr>
+                                    <td width="100%" align="right"><div id="numero_pagina" /></td>
+                                </tr>
+                            </table>
+                        FIM RODAPE -->
     [/@documento]
 [/#macro]
 
 [#macro diminuirEspacamento texto=""]
     <style>
         p {
-            margin-bottom: 0px;
-            margin-top: 0px;
+            margin-bottom: 0;
+            margin-top: 0;
         }
 
         ol {
-            margin-bottom: 0px;
-            margin-top: 0px;
+            margin-bottom: 0;
+            margin-top: 0;
         }
 
         ol li {
-            margin-bottom: 0px;
-            margin-top: 0px;
+            margin-bottom: 0;
+            margin-top: 0;
         }
 
         ul {
-            margin-bottom: 0px;
-            margin-top: 0px;
+            margin-bottom: 0;
+            margin-top: 0;
         }
 
         ul li {
-            margin-bottom: 0px;
-            margin-top: 0px;
+            margin-bottom: 0;
+            margin-top: 0;
         }
     </style>
     ${texto}
@@ -4884,5 +4896,6 @@ _cargo_dest="" _orgao_dest="" _endereco_dest="" _fecho="" _tamanho_letra="" _aut
 [#assign _pathBrasaoSecundario = "contextpath/imagens/Logotipo_Prodesp_Governo_SP.png" /]
 [#assign _widthBrasao = "auto" /]
 [#assign _heightBrasao = "65" /]
+[#assign _brasaoTodasPaginas = false /]
 [#assign _tituloGeral = "PODER JUDICIÁRIO" /]
 [#assign _subtituloGeral = "JUSTIÇA FEDERAL" /]

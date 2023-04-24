@@ -85,12 +85,12 @@
                                         type="hidden" name="ad_description_0" value="${mov.obs}"/> <input
                                         type="hidden" name="ad_kind_0"
                                         value="${mov.exTipoMovimentacao.descr}"/>
-
                                 </div>
                                 <c:if test="${mostrarBotaoAssinarExterno}">
                                     <tags:assinatura_botoes assinar="true" autenticar="false"
                                                             assinarComSenha="false" autenticarComSenha="false"
                                                             assinarComSenhaPin="false" autenticarComSenhaPin="false"
+                                                            assinarCertDigital="true"
                                                             idMovimentacao="${mov.idMov}"/>
                                 </c:if>
                             </div>

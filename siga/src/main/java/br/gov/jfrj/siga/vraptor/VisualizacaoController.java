@@ -23,6 +23,7 @@ import br.gov.jfrj.siga.cp.model.DpPessoaSelecao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.dp.DpVisualizacao;
 import br.gov.jfrj.siga.dp.dao.CpDao;
+import br.gov.jfrj.siga.jee.SigaLibsEL;
 
 @Controller
 public class VisualizacaoController extends SigaController {
@@ -193,9 +194,9 @@ public class VisualizacaoController extends SigaController {
 	public void visualizacaoGravar(Long idVisualizacao) throws Exception {
 		if (idVisualizacao == null)
 			throw new AplicacaoException("Dados não informados");
-			
-		result.redirectTo(Contexto.urlBase(request) + "/sigaex/app/mesa" 
-				+ Prop.get("/siga.mesa.versao") + "?idVisualizacao="+idVisualizacao);
+
+		result.redirectTo(Contexto.urlBase(request) + "/sigaex/app/mesa"
+				+ SigaLibsEL.getMesaVersao(getTitular(), getTitular().getLotacao()) + "?idVisualizacao="+idVisualizacao);
 	}	
 	
 	

@@ -22,16 +22,14 @@ import br.gov.jfrj.siga.base.Prop;
 import br.gov.jfrj.siga.base.util.Utils;
 import br.gov.jfrj.siga.cp.model.enm.CpMarcadorEnum;
 import br.gov.jfrj.siga.cp.model.enm.ITipoDeMovimentacao;
-import br.gov.jfrj.siga.dp.CpMarca;
-import br.gov.jfrj.siga.dp.CpOrgaoUsuario;
-import br.gov.jfrj.siga.dp.DpLotacao;
-import br.gov.jfrj.siga.dp.DpPessoa;
+import br.gov.jfrj.siga.dp.*;
 import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.bl.ExParte;
 import br.gov.jfrj.siga.ex.bl.ExTramiteBL;
 import br.gov.jfrj.siga.ex.logic.ExPodeDisponibilizarNoAcompanhamentoDoProtocolo;
 import br.gov.jfrj.siga.ex.logic.ExPodeReceber;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeVinculo;
 import br.gov.jfrj.siga.ex.util.CronologiaComparator;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.model.Selecionavel;
@@ -40,9 +38,7 @@ import br.gov.jfrj.siga.persistencia.ExMobilDaoFiltro;
 import org.hibernate.annotations.BatchSize;
 import org.jboss.logging.Logger;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -50,6 +46,7 @@ import java.util.regex.Pattern;
 
 @Entity
 @BatchSize(size = 500)
+@Access(AccessType.FIELD)
 @Table(name = "siga.ex_mobil")
 public class ExMobil extends AbstractExMobil implements Serializable, Selecionavel, Comparable {
 
@@ -68,16 +65,15 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
 
         ExMovimentacao mov = null;
         ExMovimentacao penMov = null;
-        for (final Object element : movs) {
-            final ExMovimentacao movIterate = (ExMovimentacao) element;
+        for (final ExMovimentacao currentMov : movs) {
 
-            if (movIterate.getExTipoMovimentacao() != ExTipoDeMovimentacao.CANCELAMENTO_DE_MOVIMENTACAO
-                    && movIterate.getExMovimentacaoCanceladora() == null) {
-                if (mov == null && penMov == null) {
-                    mov = movIterate;
+            if (currentMov.getExTipoMovimentacao() != ExTipoDeMovimentacao.CANCELAMENTO_DE_MOVIMENTACAO
+                    && currentMov.getExMovimentacaoCanceladora() == null) {
+                if (mov == null) {
+                    mov = currentMov;
                 } else {
                     penMov = mov;
-                    mov = movIterate;
+                    mov = currentMov;
                 }
             }
         }
@@ -88,7 +84,6 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
      * Retorna as movimentações de um Mobil de acordo com um tipo específico de
      * movimentação.
      *
-     * @param tpMov
      * @return Lista de movimentações de um Mobil de acordo com um tipo
      * específico de movimentação.
      */
@@ -552,6 +547,19 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
         }
     }
 
+    /**
+     * Retorna a sigla denormalizada já calculada do mobil. Se não estiver no banco, calcula e armazena
+     *
+     * @return Sigla do mobil.
+     */
+    public String getDnmSigla() {
+        if (super.getDnmSigla() == null) {
+            setDnmSigla(getSigla());
+            return getSigla();
+        }
+        return super.getDnmSigla();
+    }
+
     /*
      * public Long getId() { if (getExDocumento() == null) return null;
      * ExMovimentacao mov = getExDocumento()
@@ -659,20 +667,26 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
      * Retorna se um móbil mob recebeu alguma movimentação de um dos tipos
      * informados que não tenha sido cancelada e também não tenha sido revertida
      * pela movimentação de reversão do tipo informado.
-     *
-     * @param tpMovs
-     * @param tpMovReversao
-     * @param mob
-     * @return
      */
     public boolean sofreuMov(ITipoDeMovimentacao[] tpMovs, ITipoDeMovimentacao[] tpMovReversao, ExMobil mob) {
-        return getUltimaMovimentacao(tpMovs, tpMovReversao, mob, false, null) != null;
+        return getUltimaMovimentacao(tpMovs, tpMovReversao, mob, false, null, false) != null;
+    }
+
+
+    /**
+     * Retorna a última movimentação não cancelada e que não seja canceladora de outra que o móbil recebeu.
+     * Verifica se já está registrada no mobil, se não estiver obtem das movs
+     *
+     * @return
+     */
+    public ExMovimentacao getUltimaMovimentacaoNaoCanceladaENaoCanceladora() {
+        if (super.getUltimaMovimentacaoNaoCancelada() != null)
+            return super.getUltimaMovimentacaoNaoCancelada();
+        return getUltimaMovimentacao(new ITipoDeMovimentacao[]{}, new ITipoDeMovimentacao[]{}, this, true, null, true);
     }
 
     /**
      * Retorna a última movimentação não cancelada que o móbil recebeu.
-     *
-     * @return
      */
     public ExMovimentacao getUltimaMovimentacaoNaoCancelada() {
         return getUltimaMovimentacaoNaoCancelada(null, null);
@@ -681,9 +695,6 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
     /**
      * Retorna a última movimentação não cancelada de um tipo específico que o
      * móbil recebeu.
-     *
-     * @param tpMov
-     * @return
      */
     public ExMovimentacao getUltimaMovimentacaoNaoCancelada(ITipoDeMovimentacao tpMov) {
         return getUltimaMovimentacaoNaoCancelada(tpMov, null);
@@ -693,25 +704,18 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
      * Retorna a última movimentação não cancelada de um tipo específico que o
      * móbil recebeu e que não tenha sido revertida pela movimentação de
      * reversão do tipo especificado.
-     *
-     * @param tpMov
-     * @param tpMovReversao
-     * @return
      */
     public ExMovimentacao getUltimaMovimentacaoNaoCancelada(ITipoDeMovimentacao tpMov, ITipoDeMovimentacao tpMovReversao) {
-        return getUltimaMovimentacao(tpMov != null ? new ITipoDeMovimentacao[]{tpMov} : new ITipoDeMovimentacao[]{}, tpMovReversao != null ? new ITipoDeMovimentacao[]{tpMovReversao} : new ITipoDeMovimentacao[]{}, this, false, null);
+        return getUltimaMovimentacao(tpMov != null ? new ITipoDeMovimentacao[]{tpMov} : new ITipoDeMovimentacao[]{}, tpMovReversao != null ? new ITipoDeMovimentacao[]{tpMovReversao} : new ITipoDeMovimentacao[]{}, this, false, null, false);
     }
 
     /**
      * Retorna a última movimentação não cancelada que o móbil recebeu, com base
      * nas informações constantes na movimentação informada como parâmetro.
-     *
-     * @param movParam
-     * @return
      */
     public ExMovimentacao getUltimaMovimentacaoNaoCancelada(ExMovimentacao movParam) {
         return getUltimaMovimentacao(new ITipoDeMovimentacao[]{movParam.getExTipoMovimentacao()}, new ITipoDeMovimentacao[]{},
-                this, false, movParam.getDtMov());
+                this, false, movParam.getDtMov(), false);
     }
 
     /**
@@ -720,17 +724,14 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
      * @return Última movimentação de um Mobil.
      */
     public ExMovimentacao getUltimaMovimentacao() {
-        return getUltimaMovimentacao(new ITipoDeMovimentacao[]{}, new ITipoDeMovimentacao[]{}, this, true, null);
+        return getUltimaMovimentacao(new ITipoDeMovimentacao[]{}, new ITipoDeMovimentacao[]{}, this, true, null, false);
     }
 
     /**
      * Retorna a última movimentação de um tipo específico que o móbil recebeu.
-     *
-     * @param tpMov
-     * @return
      */
     public ExMovimentacao getUltimaMovimentacao(ITipoDeMovimentacao tpMov) {
-        return getUltimaMovimentacao(new ITipoDeMovimentacao[]{tpMov}, new ITipoDeMovimentacao[]{}, this, true, null);
+        return getUltimaMovimentacao(new ITipoDeMovimentacao[]{tpMov}, new ITipoDeMovimentacao[]{}, this, true, null, false);
     }
 
     /**
@@ -738,15 +739,9 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
      * permitirCancelada) que o móbil mob recebeu e que seja de um dos tpMovs
      * informados, que não tenha sido revertida por uma movimentação do
      * tpMovReversao e que tenha ocorrido na data dt
-     *
-     * @param tpMovs
-     * @param mob
-     * @param permitirCancelada
-     * @param dt
-     * @return
      */
     public ExMovimentacao getUltimaMovimentacao(ITipoDeMovimentacao[] tpMovs, ITipoDeMovimentacao[] tpMovsReversao, ExMobil mob,
-                                                boolean permitirCancelada, Date dt) {
+                                                boolean permitirCancelada, Date dt, boolean permitirCanceladora) {
 
         if (mob == null)
             return null;
@@ -757,7 +752,8 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
 
         ExMovimentacao movReturn = null;
         for (ExMovimentacao mov : movSet) {
-            if (!permitirCancelada && (mov.isCancelada() || mov.isCanceladora()))
+            if ((!permitirCancelada && mov.isCancelada())
+                    || (!permitirCanceladora && mov.isCanceladora()))
                 continue;
 
             if (tpMovs.length == 0)
@@ -766,7 +762,7 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
                 for (ITipoDeMovimentacao t : tpMovs)
                     if (mov.getExTipoMovimentacao() == t)
 
-                        if (dt == null || (dt != null && mov.getDtMov().equals(dt))) {
+                        if (dt == null || (mov.getDtMov().equals(dt))) {
                             movReturn = mov;
                             break;
                         }
@@ -896,8 +892,6 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
 
     /**
      * Retorna se o móbil sofreu movimentação de eliminação.
-     *
-     * @return
      */
     public boolean isEliminado() {
 
@@ -1318,21 +1312,21 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
     /**
      * Retorna, num Set, os móbiles que tenham sido referenciados a este móbil
      * ou vice-versa.
-     *
-     * @return
      */
-    public Set<ExMobil> getVinculados() {
-        Set<ExMobil> set = new LinkedHashSet<ExMobil>();
+    public Set<ExMobil> getVinculados(ExTipoDeVinculo tipo) {
+        Set<ExMobil> set = new LinkedHashSet<>();
         for (ExMovimentacao mov : getCronologiaSet())
             if (!mov.isCancelada()) {
-                if (mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.REFERENCIA) {
-                    set.add(mov.getExMobilRef());
+                if (mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.REFERENCIA
+                        && (tipo == null || tipo == mov.getTipoDeVinculo())) {
+                    set.add(mov.getExMobilRef().doc().getMobilGeral());
                     set.add(mov.getExMobil());
                 }
             }
         set.remove(this);
         if (!isGeral())
-            set.addAll(doc().getMobilGeral().getVinculados());
+            set.addAll(doc().getMobilGeral().getVinculados(tipo));
+
         return set;
     }
 
@@ -1589,7 +1583,7 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
             if (!juntado && !juntadoAOutro)
                 meusFilhosNaoJuntados.add(docFilho);
         }
-        if (isVolume())
+        if (!isGeral())
             meusFilhosNaoJuntados.addAll(doc().getMobilGeral().getDocsFilhosNaoJuntados());
         return meusFilhosNaoJuntados;
     }
@@ -1825,10 +1819,15 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
     public SortedSet<ExMarca> getExMarcaSetAtivas() {
         SortedSet<ExMarca> finalSet = new TreeSet<ExMarca>();
         Date dt = new Date();
-        for (ExMarca m : getExMarcaSet())
-            if ((m.getDtIniMarca() == null || m.getDtIniMarca().before(dt))
-                    && (m.getDtFimMarca() == null || m.getDtFimMarca().after(dt)))
-                finalSet.add(m);
+        for (ExMarca m : getExMarcaSet()) {
+            if (!((m.getDtIniMarca() == null || m.getDtIniMarca().before(dt))
+                    && (m.getDtFimMarca() == null || m.getDtFimMarca().after(dt))))
+                continue;
+            CpMarcador marcador = ExDao.getInstance().obterAtual(m.getCpMarcador());
+            if (marcador == null || !marcador.isAtivo())
+                continue;
+            finalSet.add(m);
+        }
         return finalSet;
     }
 
@@ -2320,10 +2319,6 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
     }
 
     public DpPessoa getTitular() {
-        ExMovimentacao desentranhamento = getUltimaMovimentacaoNaoCancelada(ExTipoDeMovimentacao.CANCELAMENTO_JUNTADA);
-        if (desentranhamento != null)
-            return desentranhamento.getCadastrante();
-
         ExMovimentacao criacao = getUltimaMovimentacaoNaoCancelada(ExTipoDeMovimentacao.CRIACAO);
         if (criacao != null)
             return criacao.getCadastrante();
@@ -2332,10 +2327,6 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
     }
 
     public DpLotacao getLotaTitular() {
-        ExMovimentacao desentranhamento = getUltimaMovimentacaoNaoCancelada(ExTipoDeMovimentacao.CANCELAMENTO_JUNTADA);
-        if (desentranhamento != null)
-            return desentranhamento.getLotaCadastrante();
-
         ExMovimentacao criacao = getUltimaMovimentacaoNaoCancelada(ExTipoDeMovimentacao.CRIACAO);
         if (criacao != null)
             return criacao.getLotaCadastrante();
@@ -2347,24 +2338,31 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
         return getAtendente().size() > 1;
     }
 
+    public boolean isTitular(DpPessoa pessoa, DpLotacao lotacao) {
+        if (getLotaTitular() != null)
+            return Utils.equivale(lotacao, getLotaTitular());
+        else
+            return Utils.equivale(pessoa, getTitular());
+    }
+
     public boolean isAtendente(DpPessoa pessoa, DpLotacao lotacao) {
         Set<PessoaLotacaoParser> set = getAtendente();
-        return equivalePessoaOuLotacao(pessoa, lotacao, set);
+        return equivalePessoaOuLotacaoPreferencialmentePelaLotacao(pessoa, lotacao, set);
     }
 
     public boolean isNotificado(DpPessoa pessoa, DpLotacao lotacao) {
         Set<PessoaLotacaoParser> set = getNotificados();
-        return equivalePessoaOuLotacao(pessoa, lotacao, set);
+        return equivalePessoaOuLotacaoPreferencialmentePelaLotacao(pessoa, lotacao, set);
     }
 
     public boolean isRecebido(DpPessoa pessoa, DpLotacao lotacao) {
         Set<PessoaLotacaoParser> set = getRecebidos();
-        return equivalePessoaOuLotacao(pessoa, lotacao, set);
+        return equivalePessoaOuLotacaoPreferencialmentePelaLotacao(pessoa, lotacao, set);
     }
 
     public boolean isAReceber(DpPessoa pessoa, DpLotacao lotacao) {
         Set<PessoaLotacaoParser> set = getAReceber();
-        return equivalePessoaOuLotacao(pessoa, lotacao, set);
+        return equivalePessoaOuLotacaoPreferencialmentePelaLotacao(pessoa, lotacao, set);
     }
 
     private boolean equivalePessoaOuLotacao(DpPessoa pessoa, DpLotacao lotacao, Set<PessoaLotacaoParser> set) {
@@ -2372,6 +2370,17 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
             if (pessoa != null && Utils.equivale(pl.getPessoa(), pessoa))
                 return true;
             if (lotacao != null && Utils.equivale(pl.getLotacao(), lotacao))
+                return true;
+        }
+        return false;
+    }
+
+    private boolean equivalePessoaOuLotacaoPreferencialmentePelaLotacao(DpPessoa pessoa, DpLotacao lotacao, Set<PessoaLotacaoParser> set) {
+        for (PessoaLotacaoParser pl : set) {
+            if (pl.getLotacao() != null) {
+                if (Utils.equivale(pl.getLotacao(), lotacao))
+                    return true;
+            } else if (pl.getPessoa() != null && Utils.equivale(pl.getPessoa(), pessoa))
                 return true;
         }
         return false;
@@ -2409,7 +2418,7 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
      * @return Set de movimentações duplicadas
      */
     public java.util.Set<ExMovimentacao> getMovsDuplicadas(long intervalo, ITipoDeMovimentacao[] tpMovs) {
-        Set<ExMovimentacao> set = new TreeSet<ExMovimentacao>();
+        Set<ExMovimentacao> set = new TreeSet<>();
 
         if (getExMovimentacaoSet() == null)
             return set;
@@ -2420,6 +2429,7 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
         for (ExMovimentacao m : movs) {
             if (m.getExMovimentacaoCanceladora() != null)
                 continue;
+
             for (ExMovimentacao m2 : movs) {
                 long mResp = (m.getResp() != null ? m.getResp().getId() : 0);
                 long m2Resp = (m2.getResp() != null ? m2.getResp().getId() : 0);
@@ -2428,12 +2438,12 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
                 long mExMobilRef = (m.getExMobilRef() != null ? m.getExMobilRef().getId() : 0);
                 long m2ExMobilRef = (m2.getExMobilRef() != null ? m2.getExMobilRef().getId() : 0);
 
-                if (!m.equals(m2)
+                if (!(m.equals(m2) || Objects.equals(m.getIdMov(), m2.getIdMov()))
                         && m2.getExMovimentacaoCanceladora() == null
                         && Math.abs(m.getDtTimestamp().getTime() - m2.getDtTimestamp().getTime()) < intervalo
                         && m.getExTipoMovimentacao().equals(m2.getExTipoMovimentacao())
-                        && m.getCadastrante().equals(m2.getCadastrante())
-                        && m.getLotaCadastrante().equals(m2.getLotaCadastrante())
+                        && Objects.equals(m.getCadastrante(), m2.getCadastrante())
+                        && Objects.equals(m.getLotaCadastrante(), m2.getLotaCadastrante())
                         && mResp == m2Resp
                         && mLotaResp == m2LotaResp
                         && m.getExMobil().equals(m2.getExMobil())
@@ -2449,5 +2459,4 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
         }
         return set;
     }
-
 }

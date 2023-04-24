@@ -12,9 +12,9 @@ import com.crivano.jlogic.Not;
 
 public class ExPodeDefinirPrazoAssinatura extends CompositeExpressionSupport {
 
-    private ExMobil mob;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final ExMobil mob;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public ExPodeDefinirPrazoAssinatura(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         super();
@@ -35,33 +35,22 @@ public class ExPodeDefinirPrazoAssinatura extends CompositeExpressionSupport {
      * <li>Não pode haver configuração impeditiva</li>
      * </ul>
      *
-     * @param titular
-     * @param lotaTitular
-     * @param mob
-     * @return
-     * @throws Exception
      */
     @Override
     protected Expression create() {
         return And.of(
-
                 new ExEMobilGeral(mob),
-
                 new ExEstaFinalizado(mob.doc()),
-
                 new ExEstaPendenteDeAssinatura(mob.doc()),
-
+                Not.of(new ExEstaCancelado(mob.doc())),
                 Not.of(new ExEMobilCancelado(mob)),
-
                 Not.of(new ExEstaSemEfeito(mob.doc())),
-
                 Not.of(new ExEstaArquivado(mob)),
-
                 Not.of(new ExEstaSobrestado(mob)),
-
-                new ExPodePorConfiguracao(titular, lotaTitular).withExMod(mob.doc().getExModelo())
+                new ExPodePorConfiguracao(titular, lotaTitular)
+                        .withExMod(mob.doc().getExModelo())
                         .withExFormaDoc(mob.doc().getExFormaDocumento()).withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
-                        .withExTpMov(ExTipoDeMovimentacao.PRAZO_ASSINATURA));
-
+                        .withExTpMov(ExTipoDeMovimentacao.PRAZO_ASSINATURA)
+        );
     }
 }

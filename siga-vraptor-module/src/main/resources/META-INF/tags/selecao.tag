@@ -112,7 +112,7 @@
     }
 
     .modal-dialog {
-        height: 80%;
+        height: 90%;
     }
 
     .modal-selecao .modal-body {
@@ -264,8 +264,6 @@
         /*
         Siga.ajax(url, null, "GET", function(response){
             resposta_ajax_
-
-
 
         ${propriedade}${tipoSel}(response);
 	});	*/

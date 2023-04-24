@@ -136,7 +136,7 @@ public class AcaoVO {
 
     public static List<AcaoVO> ordena(List<AcaoVO> acoes, Comparator<AcaoVO> comparator) {
         if (comparator != null)
-            Collections.sort(acoes, comparator);
+            acoes.sort(comparator);
         return acoes;
     }
 
@@ -373,7 +373,11 @@ public class AcaoVO {
         }
 
         public static String produzirExplicacao(Expression exp, boolean f) {
-            String s = exp.explain(f).replace("_not_", " não ");
+            String s = exp.explain(f);
+            if (s == null)
+                // Provavelmente a condição mudou entre o cálculo booleano e o cálculo da explicação
+                throw new RuntimeException("Explicação não pode ser calculada");
+            s = s.replace("_not_", " não ");
             s = s.replace("_and_", "e").replace("_or_", " ou ");
             s = Texto.removerEspacosExtra(s);
             return s;

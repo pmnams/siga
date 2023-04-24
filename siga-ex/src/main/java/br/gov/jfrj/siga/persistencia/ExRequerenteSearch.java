@@ -66,4 +66,22 @@ public class ExRequerenteSearch {
 		return query.getSingleResult();
 	}
 
+	public ExRequerenteDoc getByCpf(String cpf) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+
+		CriteriaQuery<ExRequerenteDoc> q = cb.createQuery(ExRequerenteDoc.class);
+		Root<ExRequerenteDoc> r = q.from(ExRequerenteDoc.class);
+		q.select(r);
+
+		q.where(cb.equal(r.get("cpfRequerente").as(String.class), cpf));
+
+		TypedQuery<ExRequerenteDoc> query = em.createQuery(q);
+
+		try {
+			return query.getSingleResult();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 }

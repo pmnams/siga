@@ -31,10 +31,7 @@ import br.gov.jfrj.siga.cp.bl.Cp;
 import br.gov.jfrj.siga.cp.bl.CpConfiguracaoBL;
 import br.gov.jfrj.siga.cp.bl.SituacaoFuncionalEnum;
 import br.gov.jfrj.siga.cp.model.HistoricoAuditavel;
-import br.gov.jfrj.siga.cp.model.enm.CpMarcadorFinalidadeEnum;
-import br.gov.jfrj.siga.cp.model.enm.CpSituacaoDeConfiguracaoEnum;
-import br.gov.jfrj.siga.cp.model.enm.CpTipoDeConfiguracao;
-import br.gov.jfrj.siga.cp.model.enm.ITipoDeConfiguracao;
+import br.gov.jfrj.siga.cp.model.enm.*;
 import br.gov.jfrj.siga.cp.util.MatriculaUtils;
 import br.gov.jfrj.siga.dp.*;
 import br.gov.jfrj.siga.model.CarimboDeTempo;
@@ -46,6 +43,7 @@ import br.gov.jfrj.siga.model.dao.ModeloDao;
 
 import javax.persistence.FlushModeType;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.lang.reflect.InvocationTargetException;
@@ -1584,12 +1582,11 @@ public class CpDao extends ModeloDao {
         return id;
     }
 
-    @SuppressWarnings("unchecked")
     public List<CpIdentidade> consultaIdentidadesCadastrante(final String nmUsuario, boolean fAtiva)
             throws AplicacaoException {
         try {
-            final Query qry = em()
-                    .createNamedQuery(fAtiva ? "consultarIdentidadeCadastranteAtiva" : "consultarIdentidadeCadastrante");
+            final TypedQuery<CpIdentidade> qry = em()
+                    .createNamedQuery(fAtiva ? "consultarIdentidadeCadastranteAtiva" : "consultarIdentidadeCadastrante", CpIdentidade.class);
             if (Pattern.matches("\\d+", nmUsuario)) {
                 qry.setParameter("cpf", Long.valueOf(nmUsuario));
                 qry.setParameter("nmUsuario", null);
@@ -1602,21 +1599,12 @@ public class CpDao extends ModeloDao {
 
             /* Constantes para Evitar Parse Oracle */
             qry.setParameter("cpfZero", 0L);
-            if (fAtiva) {
-                qry.setParameter("sfp1", "1");
-                qry.setParameter("sfp2", "2");
-                qry.setParameter("sfp4", "4");
-                qry.setParameter("sfp12", "12");
-                qry.setParameter("sfp22", "22");
-                qry.setParameter("sfp31", "31");
-                qry.setParameter("sfp36", "36");
-            }
 
             // Cache was disabled because it would interfere with the
             // "change password" action.
 //			qry.setHint("org.hibernate.cacheable", true);
 //			qry.setHint("org.hibernate.cacheRegion", CACHE_QUERY_SECONDS);
-            final List<CpIdentidade> lista = (List<CpIdentidade>) qry.getResultList();
+            final List<CpIdentidade> lista = qry.getResultList();
             if (lista.size() == 0) {
                 throw new AplicacaoException("Nao foi possivel localizar a identidade do usuario '" + nmUsuario + "'.");
             }
@@ -1627,30 +1615,19 @@ public class CpDao extends ModeloDao {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public List<CpIdentidade> consultaIdentidadesPorCpf(final String nmUsuario) throws AplicacaoException {
         try {
-            final Query qry = em().createNamedQuery("consultarIdentidadeCadastranteAtiva");
+            final TypedQuery<CpIdentidade> qry = em().createNamedQuery("consultarIdentidadeCadastranteAtiva", CpIdentidade.class);
 
             qry.setParameter("cpf", Long.valueOf(nmUsuario));
             qry.setParameter("nmUsuario", null);
             qry.setParameter("sesbPessoa", null);
-
-            /* Constantes para Evitar Parse Oracle */
-            qry.setParameter("cpfZero", Long.valueOf(0));
-            qry.setParameter("sfp1", "1");
-            qry.setParameter("sfp2", "2");
-            qry.setParameter("sfp4", "4");
-            qry.setParameter("sfp12", "12");
-            qry.setParameter("sfp22", "22");
-            qry.setParameter("sfp31", "31");
-            qry.setParameter("sfp36", "36");
+            qry.setParameter("cpfZero", 0L);
 
             qry.setHint("org.hibernate.cacheable", true);
             qry.setHint("org.hibernate.cacheRegion", CACHE_QUERY_SECONDS);
-            final List<CpIdentidade> lista = (List<CpIdentidade>) qry.getResultList();
 
-            return lista;
+            return qry.getResultList();
         } catch (Throwable e) {
             throw new AplicacaoException(
                     "Ocorreu um erro tentando localizar a identidade do usuario '" + nmUsuario + "'.", 0, e);
@@ -1808,8 +1785,7 @@ public class CpDao extends ModeloDao {
             return ContextoPersistencia.dt();
 
         String sql = "SELECT sysdate from dual";
-        String dialect = System.getProperty("siga.hibernate.dialect");
-        if (dialect != null && dialect.contains("MySQL"))
+        if (isMySQL())
             sql = "SELECT CURRENT_TIMESTAMP";
         Query query = em().createNativeQuery(sql);
         query.setFlushMode(FlushModeType.COMMIT);
@@ -2689,6 +2665,14 @@ public class CpDao extends ModeloDao {
         return qry.getResultList();
     }
 
+    public List<CpConfiguracao> consultarCpConfiguracoesPorPessoa(long idPessoa) {
+        final Query qry = em().createNamedQuery(
+                "consultarCpConfiguracoesPorPessoa");
+        qry.setParameter("idPessoa", idPessoa);
+        qry.setHint("org.hibernate.cacheRegion", CACHE_QUERY_CONFIGURACAO);
+        return qry.getResultList();
+    }
+
     public Integer quantidadeDocumentos(DpPessoa pes) {
         try {
             Query sql = em().createNamedQuery("quantidadeDocumentos");
@@ -2707,6 +2691,24 @@ public class CpDao extends ModeloDao {
 
             sql.setParameter("idLotacao", idLotacao);
             return ((Number) sql.getSingleResult()).intValue(); //Number pq no MySQL NativeQuery retorna BigInteger e no Oracle BigDecimal
+        } catch (final NullPointerException e) {
+            return null;
+        }
+    }
+
+    public Integer consultarQtdeDocCriadosPossePorDpLotacaoECpMarca(Long idLotacao) {
+        try {
+            TypedQuery<Integer> sql = em().createNamedQuery("consultarQtdeDocCriadosPossePorDpLotacaoECpMarca", Integer.class);
+            sql.setParameter("idLotacao", idLotacao);
+            sql.setParameter(
+                    "listMarcadores",
+                    Arrays.asList(
+                            CpMarcadorEnum.RECOLHER_PARA_ARQUIVO_PERMANENTE.getId(),
+                            CpMarcadorEnum.ARQUIVADO_INTERMEDIARIO.getId(),
+                            CpMarcadorEnum.ARQUIVADO_PERMANENTE.getId()
+                    )
+            );
+            return sql.getSingleResult();
         } catch (final NullPointerException e) {
             return null;
         }
@@ -2808,7 +2810,7 @@ public class CpDao extends ModeloDao {
 
     public CpMarcador obterPastaPadraoDaLotacao(DpLotacao lotacao) {
         for (CpMarcador m : listarCpMarcadoresPorLotacao(lotacao, false))
-            if (m.getIdFinalidade() == CpMarcadorFinalidadeEnum.PASTA_PADRAO)
+            if (m.getIdFinalidade() == CpMarcadorFinalidadeEnum.PASTA_PADRAO && obterAtual(m).isAtivo())
                 return m;
         return null;
     }
@@ -2847,9 +2849,19 @@ public class CpDao extends ModeloDao {
 
         criteriaQuery.where(predicateAnd);
 
-        criteriaQuery.orderBy(criteriaBuilder.asc(cpMarcadorRoot.get("idFinalidade")),
-                criteriaBuilder.asc(cpMarcadorRoot.get("descrMarcador")));
-        return em().createQuery(criteriaQuery).getResultList().stream().filter(mar -> mar.getIdFinalidade().getIdTpMarcador() == CpTipoMarcadorEnum.TIPO_MARCADOR_GERAL || mar.getIdFinalidade().getIdTpMarcador() == CpTipoMarcadorEnum.TIPO_MARCADOR_LOTACAO).collect(Collectors.toList());
+        criteriaQuery.orderBy(
+                criteriaBuilder.asc(cpMarcadorRoot.get("idFinalidade")),
+                criteriaBuilder.asc(cpMarcadorRoot.get("descrMarcador"))
+        );
+
+        return em().createQuery(criteriaQuery)
+                .getResultList()
+                .stream()
+                .filter(mar ->
+                        mar.getIdFinalidade().getIdTpMarcador() == CpTipoMarcadorEnum.TIPO_MARCADOR_GERAL
+                                || mar.getIdFinalidade().getIdTpMarcador() == CpTipoMarcadorEnum.TIPO_MARCADOR_LOTACAO
+                )
+                .collect(Collectors.toList());
     }
 
     public List<CpMarcador> consultaCpMarcadorAtivoPorNome(String nome, DpLotacao lota) {
@@ -2859,12 +2871,23 @@ public class CpDao extends ModeloDao {
         Predicate predicateEqualNome = criteriaBuilder.equal(cpMarcadorRoot.get("descrMarcador"), nome);
         Predicate predicateNullHisDtFim = criteriaBuilder.isNull(cpMarcadorRoot.get("hisDtFim"));
 
-        Predicate predicateGeralOuLotacaoEspecifica = criteriaBuilder.or(
-                criteriaBuilder.isNull(cpMarcadorRoot.get("dpLotacaoIni")),
-                criteriaBuilder.equal(cpMarcadorRoot.get("dpLotacaoIni"), lota.getLotacaoInicial()));
+        Predicate predicateAnd;
+        Predicate predicateGeralOuLotacaoEspecifica;
+        if (lota != null) {
+            predicateGeralOuLotacaoEspecifica = criteriaBuilder.or(
+                    criteriaBuilder.isNull(cpMarcadorRoot.get("dpLotacaoIni")),
+                    criteriaBuilder.equal(cpMarcadorRoot.get("dpLotacaoIni"), lota.getLotacaoInicial())
+            );
 
-        Predicate predicateAnd = criteriaBuilder.and(predicateEqualNome,
-                predicateNullHisDtFim, predicateGeralOuLotacaoEspecifica);
+            predicateAnd = criteriaBuilder.and(
+                    predicateEqualNome,
+                    predicateNullHisDtFim,
+                    predicateGeralOuLotacaoEspecifica
+            );
+        } else {
+            predicateAnd = criteriaBuilder.and(predicateEqualNome, predicateNullHisDtFim);
+        }
+
         criteriaQuery.where(predicateAnd);
 
         criteriaQuery.orderBy(criteriaBuilder.asc(cpMarcadorRoot.get("idFinalidade")));
@@ -2907,6 +2930,90 @@ public class CpDao extends ModeloDao {
 
         query.where(predicateAnd);
         return em().createQuery(query).getResultList();
+    }
+
+    public List consultarPainelQuadro(DpPessoa pes, DpLotacao lot, CpTipoMarca tipoMarca) {
+        Query sql = em().createNamedQuery(
+                "consultarPainelQuadro");
+        Date dt = consultarDataEHoraDoServidor();
+        Date amanha = new Date(dt.getTime() + 24 * 60 * 60 * 1000L);
+        sql.setParameter("amanha", amanha, TemporalType.DATE);
+        sql.setParameter("idPessoaIni", pes.getIdPessoaIni());
+        sql.setParameter("idLotacaoIni", lot.getIdLotacaoIni());
+        sql.setParameter("idTipoMarca", tipoMarca != null ? tipoMarca.getIdTpMarca() : 0L);
+        return sql.getResultList();
+    }
+
+    public List<CpMarca> consultarPainelLista(List<Long> idMarcadorIni, DpPessoa pes, DpLotacao lot, CpTipoMarca tipoMarca, Integer itensPorPagina, Integer pagina) {
+        Query sql = em().createNamedQuery(
+                "consultarPainelLista");
+        Date dt = consultarDataEHoraDoServidor();
+        Date amanha = new Date(dt.getTime() + 24 * 60 * 60 * 1000L);
+        sql.setParameter("amanha", amanha, TemporalType.DATE);
+        sql.setParameter("idPessoaIni", pes != null ? pes.getIdPessoaIni() : null);
+        sql.setParameter("idLotacaoIni", lot != null ? lot.getIdLotacaoIni() : null);
+        sql.setParameter("idTipoMarca", tipoMarca != null ? tipoMarca.getIdTpMarca() : 0L);
+        if (idMarcadorIni.size() == 0)
+            idMarcadorIni.add(0L);
+        sql.setParameter("idMarcadorIni", idMarcadorIni);
+
+        if (itensPorPagina == null || itensPorPagina == 0)
+            itensPorPagina = 10;
+        if (itensPorPagina > 100)
+            itensPorPagina = 100;
+        if (itensPorPagina > 0)
+            sql.setMaxResults(itensPorPagina);
+
+        if (pagina == null)
+            pagina = 0;
+
+        if (pagina > 0)
+            sql.setFirstResult((pagina - 1) * itensPorPagina);
+
+        return sql.getResultList();
+    }
+
+    public Long qtdeMarcasMarcadorPessoa(DpPessoa pessoa, List<Long> marcadores) {
+        CriteriaBuilder qb = em().getCriteriaBuilder();
+        CriteriaQuery<Long> cq = qb.createQuery(Long.class);
+        Root<CpMarca> c = cq.from(CpMarca.class);
+        cq.select(qb.count(c));
+        Predicate predicateAnd;
+        Predicate predicateEqualPessoa = cb().equal(c.get("dpPessoaIni"), pessoa);
+        Predicate predicateEqualMarca = cb().and(c.get("cpMarcador").in(marcadores));
+        predicateAnd = cb().and(predicateEqualPessoa, predicateEqualMarca);
+        cq.where(predicateAnd);
+        return em().createQuery(cq).getSingleResult();
+    }
+
+    public Long qtdeMarcasMarcadorLotacao(DpLotacao lotacao, List<Long> marcadores) {
+        CriteriaBuilder qb = em().getCriteriaBuilder();
+        CriteriaQuery<Long> cq = qb.createQuery(Long.class);
+        Root<CpMarca> c = cq.from(CpMarca.class);
+        cq.select(qb.count(c));
+        Predicate predicateAnd;
+        Predicate predicateEqualLotacao = cb().equal(c.get("dpLotacaoIni"), lotacao);
+        Predicate predicateEqualMarca = cb().and(c.get("cpMarcador").in(marcadores));
+        predicateAnd = cb().and(predicateEqualLotacao, predicateEqualMarca);
+        cq.where(predicateAnd);
+        return em().createQuery(cq).getSingleResult();
+    }
+
+    public Long qtdePessoaLotacao(DpLotacao lotacao, Boolean somenteAtivas) {
+        CriteriaBuilder qb = em().getCriteriaBuilder();
+        CriteriaQuery<Long> cq = qb.createQuery(Long.class);
+        Root<DpPessoa> c = cq.from(DpPessoa.class);
+        cq.select(qb.count(c));
+        Predicate predicateAnd;
+        Predicate predicateEqualPessoa = cb().equal(c.get("lotacao"), lotacao);
+        if (somenteAtivas) {
+            Predicate predicateEqualMarca = cb().isNull(c.get("dataFimPessoa"));
+            predicateAnd = cb().and(predicateEqualPessoa, predicateEqualMarca);
+        } else {
+            predicateAnd = predicateEqualPessoa;
+        }
+        cq.where(predicateAnd);
+        return em().createQuery(cq).getSingleResult();
     }
 
 }

@@ -3,12 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>siga-doc</artifactId>
+		<version>${revision}</version>
 		<groupId>siga</groupId>
-		<version>1.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>siga-vraptor-module</artifactId>
 	<name>siga-vraptor-module</name>
-
 	<dependencies>
 
 		<dependency>
@@ -96,4 +95,23 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/VERSION.MF</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/VERSION.MF</exclude>
+				</excludes>
+			</resource>
+		</resources>
+	</build>
 </project>

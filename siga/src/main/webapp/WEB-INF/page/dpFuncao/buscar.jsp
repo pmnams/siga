@@ -33,6 +33,8 @@
 
         function invalid(event) {
             $("#alertFiltros").show();
+            $('#containerResult').remove();
+            $('#alertNaoEncontrado').remove();
         }
 
         function submit(event) {
@@ -53,6 +55,7 @@
         }
 
         $(document).ready(function () {
+            $("#alertFiltros").hide();
             frm.onsubmit = submit;
 
             $("#alertFiltros").hide();
@@ -82,7 +85,7 @@
         <input type="hidden" name="modal" value="${param['modal']}"/>
 
         <div class="container-fluid">
-            <div id="alertFiltros" class="alert alert-warning" role="alert">
+            <div id="alertFiltros" class="alert alert-warning" role="alert" style="display: none;">
                 Obrigatório informar o <strong>Nome</strong> para realizar a pesquisa.
             </div>
             <div class="card bg-light mb-3">
@@ -163,5 +166,6 @@
     <script type="text/javascript" src="/siga/javascript/select2/select2.min.js"></script>
     <script type="text/javascript" src="/siga/javascript/select2/i18n/pt-BR.js"></script>
     <script type="text/javascript" src="/siga/javascript/siga.select2.js"></script>
+    <script type="text/javascript" src="/siga/javascript/select2/select2-dropdownPosition.js"></script>
 </siga:pagina>
 		

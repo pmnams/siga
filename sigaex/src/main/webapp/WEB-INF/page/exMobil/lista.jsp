@@ -47,7 +47,7 @@
                     src="/siga/javascript/pivottable/pivot.min.js"></script>
             <script type="text/javascript"
                     src="/siga/javascript/pivottable/gchart_renderers.js"></script>
-            <script>
+            <script type="text/javascript">
                 var data = [
                     <c:forEach var="documento" items="${itens}">
                     {
@@ -289,9 +289,8 @@
 
                         <td width="6%">${documento[0].nmMod}</td>
 
-                        <c:set var="acessivel" value=""/>
                         <c:set var="acessivel"
-                               value="${f:testaCompetencia('acessarDocumento',titular,lotaTitular,documento[1])}"/>
+                               value="${f:testaCompetencia('acessarDocumento', titular, lotaTitular,documento[1])}"/>
                         <c:if test="${formOrigem eq 'lista'}">
                             <c:set var="acessivel" value="true"/>
                         </c:if>
@@ -302,8 +301,14 @@
                                         test="${f:mostraDescricaoConfidencial(documento[0], titular, lotaTitular) eq true}">
                                     <c:set var="estilo" value="confidencial"/>
                                 </c:if>
+
+                                <c:set var="desc" value="${f:descricaoSePuderAcessar(documento[0], titular, lotaTitular)}"/>
                                 <td class="${estilo}" width="38%">
-                                        ${f:descricaoSePuderAcessar(documento[0], titular, lotaTitular)}
+                                    <c:if test="${desc != 'CONFIDENCIAL' and not empty documento[0].requerenteDoc}">
+                                        Requerente: ${documento[0].requerenteDoc.nomeRequerente} /
+                                    </c:if>
+
+                                    ${desc}
                                 </td>
                                 <c:if test="${visualizacao == 1}">
                                     <td class="${estilo}" width="38%">

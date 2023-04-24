@@ -23,6 +23,7 @@ package br.gov.jfrj.siga.ex;
 
 import br.gov.jfrj.itextpdf.Documento;
 import br.gov.jfrj.siga.base.AplicacaoException;
+import br.gov.jfrj.siga.base.DateUtils;
 import br.gov.jfrj.siga.base.Prop;
 import br.gov.jfrj.siga.base.SigaMessages;
 import br.gov.jfrj.siga.base.util.Texto;
@@ -36,9 +37,11 @@ import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.bl.ExAcesso;
 import br.gov.jfrj.siga.ex.logic.ExPodeAcessarDocumento;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeVinculo;
 import br.gov.jfrj.siga.ex.util.*;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.model.CarimboDeTempo;
+import com.google.common.collect.Lists;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicUpdate;
 import org.jboss.logging.Logger;
@@ -56,12 +59,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A class that represents a row in the 'EX_DOCUMENTO' table. This class may be
  * customized as it is never re-generated after being created.
  */
-@SuppressWarnings("serial")
 @Entity
 @BatchSize(size = 500)
 @Table(name = "siga.ex_documento")
@@ -1791,16 +1794,25 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
         return getIdDoc() + "-" + Math.abs(getDescrCurta().hashCode() % 10000);
     }
 
+    public Set<ExMovimentacao> getVinculosPorTipo(ExTipoDeVinculo tipo) {
+        if (getMobilGeral() == null)
+            return new TreeSet<>();
+        return getMobilGeral()
+                .getMovsNaoCanceladas(ExTipoDeMovimentacao.REFERENCIA, true)
+                .stream()
+                .filter(i -> i.getTipoDeVinculo() == tipo)
+                .collect(Collectors.toSet());
+    }
+
     /**
      * Retorna as {@link ExMovimentacao Movimentações} de
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_ASSINATURA_DIGITAL_DOCUMENTO
      * Assinaturas Com Token} válidas.
      *
      * @return Movimentações de Assinaturas Com Token
      */
     public Set<ExMovimentacao> getAssinaturasComToken() {
         if (getMobilGeral() == null)
-            return new TreeSet<ExMovimentacao>();
+            return new TreeSet<>();
         return getMobilGeral()
                 .getMovsNaoCanceladas(
                         ExTipoDeMovimentacao.ASSINATURA_DIGITAL_DOCUMENTO);
@@ -1808,7 +1820,6 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
 
     /**
      * Retorna as {@link ExMovimentacao Movimentações} de
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_CONFERENCIA_COPIA_DOCUMENTO
      * Autenticação com token} validas.
      *
      * @return Movimentações de Autenticação com token.
@@ -1824,7 +1835,6 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
 
     /**
      * Retorna as {@link ExMovimentacao Movimentações} de
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_ASSINATURA_COM_SENHA Assinaturas
      * Com Senha} válidas.
      *
      * @return Movimentações de Assinaturas Com Senha
@@ -1846,7 +1856,6 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
 
     /**
      * Retorna as {@link ExMovimentacao Movimentações} de
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_CONFERENCIA_COPIA_COM_SENHA
      * Autenticação com senha} validas.
      *
      * @return Movimentações de Autenticação com senha.
@@ -1879,9 +1888,6 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
 
     /**
      * Retorna as {@link ExMovimentacao movimentações} de assinatura, seja
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_ASSINATURA_COM_SENHA com senha},
-     * seja com
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_ASSINATURA_DIGITAL_DOCUMENTO
      * token}, validas.
      *
      * @return As Movimentações de Assinatura.
@@ -1905,9 +1911,6 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
 
     /**
      * Retorna as {@link ExMovimentacao movimentações} de autenticação, seja
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_CONFERENCIA_COPIA_COM_SENHA com
-     * senha}, seja com
-     * {@link ExTipoMovimentacao#TIPO_MOVIMENTACAO_CONFERENCIA_COPIA_DOCUMENTO
      * token}, validas.
      *
      * @return As Movimentações de Autenticação.
@@ -2000,6 +2003,18 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
                     : "";
 
         return retorno;
+    }
+
+    public String getVinculosCompleto() {
+        StringBuilder retorno = new StringBuilder();
+        for (ExTipoDeVinculo tipo : Lists.reverse(Lists.newArrayList(ExTipoDeVinculo.values()))) {
+            if (tipo != ExTipoDeVinculo.REVOGACAO)
+                continue;
+            String s = Documento.getVinculosString(getVinculosPorTipo(tipo));
+            if (s.length() > 0)
+                retorno.append(tipo.getAcao()).append(" ").append(s).append(". ");
+        }
+        return retorno.toString();
     }
 
     private String removeAssinadosPor(Set<ExMovimentacao> listaAssinantes) {
@@ -2412,6 +2427,31 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
         return subscritores;
     }
 
+    public DpPessoa getSubscritorDiffTitularDoc() {
+        if (getSubscritor() != null && !this.getCadastrante().equivale(getSubscritor()))
+            return getSubscritor();
+        return null;
+    }
+
+    public List<DpPessoa> getListaCossigsSubscritorAssinouDocHoje() {
+        List<DpPessoa> listaSubscrCossigFinal = new ArrayList<>();
+        List<DpPessoa> listaSubscrCossig = this.getSubscritorECosignatarios();
+
+        if (!listaSubscrCossig.isEmpty()) {
+            Set<ExMovimentacao> listaMovAssinaturas = this.getAssinaturasComTokenOuSenhaERegistros();
+            for (ExMovimentacao mov : listaMovAssinaturas) {
+                if (DateUtils.isToday(mov.getData())) {
+                    for (DpPessoa pessoa : listaSubscrCossig) {
+                        if (mov.getTitular().equivale(pessoa)) {
+                            listaSubscrCossigFinal.add(pessoa);
+                        }
+                    }
+                }
+            }
+        }
+        return listaSubscrCossigFinal;
+    }
+
     /**
      * Retorna uma lista com o todos os cossignatários.
      */
@@ -2669,6 +2709,43 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
         return pais;
     }
 
+    public List<ExDocumento> getTodosOsPaisDasViasCossigsSubscritor() {
+        List<ExDocumento> pais = new ArrayList<>();
+        if (this.getExMobilPai() != null) {
+            pais = this.getExMobilPai().getDoc().getTodosOsPaisDasVias();
+            if (pais.isEmpty())
+                pais.add(this.getExMobilPai().getDoc());
+        } else {
+            pais = this.getTodosOsPaisDasVias();
+            if (pais.isEmpty())
+                pais.add(this);
+        }
+        return pais;
+    }
+
+    public boolean paiPossuiMovsVinculacaoPapel(long codigoPapel) {
+        List<ExDocumento> viasDocPai = this.getTodosOsPaisDasViasCossigsSubscritor();
+        if (viasDocPai.iterator().hasNext()) {
+            List<ExMovimentacao> movs = viasDocPai.iterator().next().getMovsVinculacaoPapelGenerico(codigoPapel);
+            for (ExMovimentacao mov : movs) {
+                ExMobil docVia = mov.getExMobilRef();
+                if (docVia.doc().getCodigo().equals(this.getCodigo()))
+                    return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
+    }
+
+    public boolean possuiMovsVinculacaoPapel(long codigoPapel) {
+        List<ExMovimentacao> movs = this.getMovsVinculacaoPapelGenerico(codigoPapel);
+        for (ExMovimentacao mov : movs) {
+            ExMobil docVia = mov.getExMobilRef();
+            if (docVia.doc().getCodigo().equals(this.getCodigo()))
+                return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
+
     public List<Object> getListaDeAcessos() {
         if (getDnmAcesso() == null || isDnmAcessoMAisAntigoQueODosPais()) {
             Ex.getInstance().getBL().atualizarDnmAcesso(this);
@@ -2734,6 +2811,37 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
                 lista.add(mov.getLotaSubscritor());
         }
         return lista.size() == 0 ? null : lista;
+    }
+
+    public boolean possuiVinculPapelRevisorCossigsSubscritor(DpPessoa dpPessoa, ExMobil mobRefMov, long codigoPapel) {
+        List<ExMovimentacao> movs = this.getMobilGeral()
+                .getMovimentacoesPorTipo(ExTipoDeMovimentacao.VINCULACAO_PAPEL, Boolean.TRUE);
+        for (ExMovimentacao mov : movs) {
+            if (mov.getExPapel().getIdPapel().equals(codigoPapel)) {
+                if (dpPessoa != null) {
+                    if (mov.getSubscritor().equivale(dpPessoa) && mov.getExMobilRef().equals(mobRefMov))
+                        return Boolean.TRUE;
+                } else {
+                    return Boolean.TRUE;
+                }
+            }
+        }
+        return Boolean.FALSE;
+    }
+
+    public List<ExMovimentacao> getMovsVinculacaoPapelGenerico(long codigoPapel) {
+        List<ExMovimentacao> movsReturn = new ArrayList<>();
+        ExMobil mobil = this.getMobilGeral();
+        if (mobil != null) {
+            List<ExMovimentacao> movs = mobil
+                    .getMovimentacoesPorTipo(ExTipoDeMovimentacao.VINCULACAO_PAPEL, Boolean.TRUE);
+            for (ExMovimentacao mov : movs) {
+                if (mov.getExPapel().getIdPapel().equals(codigoPapel)) {
+                    movsReturn.add(mov);
+                }
+            }
+        }
+        return movsReturn;
     }
 
     @Override
@@ -3042,6 +3150,10 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
 
     public ExRef getRef() {
         return new ExRef(this);
+    }
+
+    public String fragmento(String nome) {
+        return Texto.extrai(getHtml(), "<!-- fragmento:" + nome + " -->", "<!-- /fragmento:" + nome + " -->");
     }
 
 }

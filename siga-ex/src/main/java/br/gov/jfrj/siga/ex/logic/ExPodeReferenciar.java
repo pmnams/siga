@@ -5,13 +5,16 @@ import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.ExMobil;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
-import com.crivano.jlogic.*;
+import com.crivano.jlogic.And;
+import com.crivano.jlogic.CompositeExpressionSupport;
+import com.crivano.jlogic.Expression;
+import com.crivano.jlogic.Not;
 
 public class ExPodeReferenciar extends CompositeExpressionSupport {
 
-    private ExMobil mob;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final ExMobil mob;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public ExPodeReferenciar(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;
@@ -30,34 +33,21 @@ public class ExPodeReferenciar extends CompositeExpressionSupport {
      * <li>Móbil não pode ter sido eliminado</li>
      * <li>Não pode haver configuração impeditiva</li>
      * </ul>
-     *
-     * @param titular
-     * @param lotaTitular
-     * @param mob
-     * @return
-     * @throws Exception
      */
     @Override
     protected Expression create() {
-
         return And.of(
-
-                Or.of(new ExEMobilVia(mob), new ExEMobilVolume(mob)),
-
+                new ExEMobilGeral(mob),
                 Not.of(new ExEstaEmTransito(mob, titular, lotaTitular)),
-
                 new ExPodeMovimentar(mob, titular, lotaTitular),
-
                 Not.of(new ExEstaJuntado(mob)),
-
                 Not.of(new ExEstaEliminado(mob)),
-
                 Not.of(new ExEstaCancelado(mob.doc())),
-
                 Not.of(new ExEstaSemEfeito(mob.doc())),
-
-                new ExPodePorConfiguracao(titular, lotaTitular).withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
+                new ExPodePorConfiguracao(titular, lotaTitular)
+                        .withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
                         .withExTpMov(ExTipoDeMovimentacao.REFERENCIA)
-                        .withExMod(mob.doc().getExModelo()));
+                        .withExMod(mob.doc().getExModelo())
+        );
     }
 }

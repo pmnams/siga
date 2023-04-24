@@ -9,9 +9,9 @@ import com.crivano.jlogic.*;
 
 public class ExPodeFinalizar extends CompositeExpressionSupport {
 
-    private ExDocumento doc;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final ExDocumento doc;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     /**
      * Retorna se é possível finalizar o documento ao qual o móbil passado por
@@ -24,7 +24,6 @@ public class ExPodeFinalizar extends CompositeExpressionSupport {
      * nesse caso?</b></li>
      * <li>Não pode haver configuração impeditiva</li>
      * </ul>
-     *
      */
     public ExPodeFinalizar(ExDocumento doc, DpPessoa titular, DpLotacao lotaTitular) {
         this.doc = doc;
@@ -35,31 +34,21 @@ public class ExPodeFinalizar extends CompositeExpressionSupport {
     @Override
     protected Expression create() {
         return And.of(
-
                 Not.of(new ExEstaFinalizado(doc)),
-
                 Not.of(new ExLotacaoEstaFechada(lotaTitular)),
-
                 Not.of(new ExEstaPendenteDeAnexacao(doc.getMobilGeral())),
-
                 Not.of(new ExEstaPendenteDeColaboracao(doc.getMobilGeral())),
-
-                And.of(
-
-                        Not.of(new ExEInternoFolhaDeRosto(doc)),
-
-                        Not.of(new ExEExterno(doc)),
-
-                        Or.of(new ExECadastrante(doc, lotaTitular),
-
-                                new ExESubscritor(doc, titular),
-
-                                new ExETitular(doc, titular),
-
-                                new ExTemPerfil(doc, ExPapel.PAPEL_GESTOR, titular, lotaTitular),
-
-                                new ExTemPerfil(doc, ExPapel.PAPEL_REVISOR, titular, lotaTitular))),
-
-                new ExPodePorConfiguracao(titular, lotaTitular).withIdTpConf(ExTipoDeConfiguracao.FINALIZAR));
+                Or.of(
+                        new ExEInternoFolhaDeRosto(doc),
+                        new ExEExterno(doc),
+                        new ExECadastrante(doc, lotaTitular),
+                        new ExESubscritor(doc, titular),
+                        new ExETitular(doc, titular),
+                        new ExTemPerfil(doc, ExPapel.PAPEL_GESTOR, titular, lotaTitular),
+                        new ExTemPerfil(doc, ExPapel.PAPEL_REVISOR, titular, lotaTitular)
+                ),
+                new ExPodePorConfiguracao(titular, lotaTitular)
+                        .withIdTpConf(ExTipoDeConfiguracao.FINALIZAR)
+        );
     }
 }

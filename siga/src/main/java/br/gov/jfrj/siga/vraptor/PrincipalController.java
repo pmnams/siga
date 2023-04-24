@@ -12,6 +12,7 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import br.gov.jfrj.siga.jee.SigaLibsEL;
 import com.mashape.unirest.http.Unirest;
 
 import br.com.caelum.vraptor.Consumes;
@@ -55,10 +56,14 @@ public class PrincipalController extends SigaController {
 	}
 
 	@Get("app/principal")
-	public void principal(Boolean exibirAcessoAnterior, Boolean redirecionar) {
+	public void principal(Boolean exibirAcessoAnterior, Boolean redirecionar) throws Exception {
 		if (redirecionar == null || redirecionar) {
 			String paginaInicialUrl = Prop.get("/siga.pagina.inicial.url");
+
 			if (paginaInicialUrl != null) {
+				if (paginaInicialUrl.contains("/mesa"))
+					paginaInicialUrl = paginaInicialUrl.replace("/mesa2", "/mesa") + SigaLibsEL.getMesaVersao(getTitular(), getLotaTitular());
+
 				result.redirectTo(paginaInicialUrl + ((exibirAcessoAnterior != null && exibirAcessoAnterior) ? "?exibirAcessoAnterior=true" : ""));
 				return;
 			}

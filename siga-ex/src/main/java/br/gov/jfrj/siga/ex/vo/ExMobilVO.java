@@ -41,16 +41,13 @@ import java.util.List;
 
 public class ExMobilVO extends ExVO {
     transient Logger log = Logger.getLogger(ExMobilVO.class.getCanonicalName());
-
     transient ExMobil mob;
     transient List<ExMarca> marcasAtivas = new ArrayList<>();
-
     String sigla;
     boolean isGeral;
     List<ExMobilVO> apensos = new ArrayList<>();
     List<ExDocumentoVO> expedientesFilhosNaoCancelados = new ArrayList<>();
     List<ExDocumentoVO> processosFilhosNaoCancelados = new ArrayList<>();
-
     List<ExMovimentacaoVO> anexosNaoAssinados = new ArrayList<>();
     List<ExMovimentacaoVO> despachosNaoAssinados = new ArrayList<>();
     List<ExDocumentoVO> expedientesFilhosNaoJuntados = new ArrayList<>();
@@ -58,12 +55,8 @@ public class ExMobilVO extends ExVO {
     List<ExMovimentacaoVO> pendenciasDeAnexacao = new ArrayList<>();
     List<ExMovimentacaoVO> pendenciasDeColaboracao = new ArrayList<>();
     Long pendenciaProximoModelo = null;
-
     List<ExMovimentacaoVO> movs = new ArrayList<>();
     List<DuracaoVO> duracoes = new ArrayList<>();
-    Long byteCount;
-    Integer pagInicial;
-    Integer pagFinal;
     String tamanhoDeArquivo;
     Long id;
     boolean podeTramitar;
@@ -81,10 +74,6 @@ public class ExMobilVO extends ExVO {
 
     public List<ExMarca> getMarcasAtivas() {
         return this.marcasAtivas;
-    }
-
-    public void setMarcasAtivas(List<ExMarca> marcasAtivas) {
-        this.marcasAtivas = marcasAtivas;
     }
 
     public ExMobil getMob() {
@@ -118,22 +107,22 @@ public class ExMobilVO extends ExVO {
         this.marcasAtivas = new ArrayList<>();
         marcasAtivas.addAll(mob.getExMarcaSetAtivas());
 
-        marcadoresEmHtml = getMarcadoresEmHtml(marcasAtivas, titular, lotaTitular);
+        marcadoresEmHtml = getMarcadoresEmHtml(titular, lotaTitular);
         descricaoCompleta = mob.getDescricaoCompleta();
         /*
          * Markenson: O código abaixo foi comentado por questões de desempenho.
          * Deve ser estudada uma maneira mais eficiente de calcular o tamanho
          * dos PDFs
+         *
+         * byteCount, pagIni e pagFim
+         * if (mob.getExDocumento().isEletronico()){
+
+         * byteCount = mob.getByteCount();
+         * if (byteCount != null && byteCount > 0)
+         * tamanhoDeArquivo = FormataTamanhoDeArquivo
+         * .converterEmTexto(byteCount);
+         * }
          */
-
-        // byteCount, pagIni e pagFim
-        // if (mob.getExDocumento().isEletronico()){
-
-        // byteCount = mob.getByteCount();
-        // if (byteCount != null && byteCount > 0)
-        // tamanhoDeArquivo = FormataTamanhoDeArquivo
-        // .converterEmTexto(byteCount);
-        // }
 
         for (ExMobil m : mob.getApensosExcetoVolumeApensadoAoProximo()) {
             if (m.isEliminado())
@@ -149,15 +138,15 @@ public class ExMobilVO extends ExVO {
         for (ExDocumento d : mob.getExDocumentoFilhoSet()) {
             if (d.isExpediente())
                 expedientesFilhosNaoCancelados.add(new ExDocumentoVO(d,
-                        null, cadastrante, titular, lotaTitular, false, false, serializavel));
+                        null, cadastrante, titular, lotaTitular, false, false, serializavel, false));
             else
                 processosFilhosNaoCancelados.add(new ExDocumentoVO(d, null,
-                        cadastrante, titular, lotaTitular, false, false, serializavel));
+                        cadastrante, titular, lotaTitular, false, false, serializavel, false));
         }
 
         for (ExDocumento doc : mob.getDocsFilhosNaoJuntados())
             expedientesFilhosNaoJuntados.add(new ExDocumentoVO(doc, null,
-                    cadastrante, titular, lotaTitular, false, false, serializavel));
+                    cadastrante, titular, lotaTitular, false, false, serializavel, false));
 
         log.debug(mob.getExDocumento().getCodigoString()
                 + ": aExibir - mobil " + mob.getNumSequencia()
@@ -338,107 +327,337 @@ public class ExMobilVO extends ExVO {
     private void addAcoes(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
 
         if (!mob.isGeral()) {
-            addAcao(AcaoVO.builder().nome(SigaMessages.getMessage("documento.ver.dossie")).icone("folder").nameSpace("/app/expediente/doc").acao("exibirProcesso")
-                    .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeVisualizarImpressao(mob, titular, lotaTitular)).classe("once").build());
+            addAcao(AcaoVO.builder()
+                    .nome(SigaMessages.getMessage("documento.ver.dossie"))
+                    .icone("folder")
+                    .nameSpace("/app/expediente/doc")
+                    .acao("exibirProcesso")
+                    .params("sigla", mob.getCodigoCompacto())
+                    .exp(new ExPodeVisualizarImpressao(mob, titular, lotaTitular))
+                    .classe("once")
+                    .build()
+            );
 
-            addAcao(AcaoVO.builder().nome(SigaMessages.getMessage("documento.ver.impressao")).icone(SigaMessages.getMessage("icon.ver.impressao")).nameSpace("/app/arquivo").acao("exibir")
-                    .params("sigla", mob.getCodigoCompacto()).params("popup", "true").params("arquivo", mob.getReferenciaPDF()).exp(new ExPodeVisualizarImpressao(mob, titular, lotaTitular)).classe("once").build());
+            addAcao(AcaoVO.builder()
+                    .nome(SigaMessages.getMessage("documento.ver.impressao"))
+                    .icone(SigaMessages.getMessage("icon.ver.impressao"))
+                    .nameSpace("/app/arquivo")
+                    .acao("exibir")
+                    .params("sigla", mob.getCodigoCompacto())
+                    .params("popup", "true")
+                    .params("arquivo", mob.getReferenciaPDF())
+                    .exp(new ExPodeVisualizarImpressao(mob, titular, lotaTitular))
+                    .classe("once")
+                    .build()
+            );
 
-            addAcao(AcaoVO.builder().nome("Incluir _Documento").icone("page_white_add").nameSpace("/app/expediente/doc").acao("editar")
-                    .params("mobilPaiSel.sigla", mob.getCodigoCompacto()).params("criandoAnexo", "true").exp(new ExPodeIncluirDocumento(mob, titular, lotaTitular)).build());
+            addAcao(AcaoVO.builder()
+                    .nome("Incluir _Documento")
+                    .icone("page_white_add")
+                    .nameSpace("/app/expediente/doc")
+                    .acao("editar")
+                    .params("mobilPaiSel.sigla", mob.getCodigoCompacto())
+                    .params("criandoAnexo", "true")
+                    .exp(new ExPodeIncluirDocumento(mob, titular, lotaTitular))
+                    .build()
+            );
 
-            addAcao(AcaoVO.builder().nome("Ciência").icone("overlays").nameSpace("/app/expediente/mov").acao("ciencia")
-                    .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeFazerCiencia(mob, titular, lotaTitular)).classe("once").build());
+            addAcao(AcaoVO.builder()
+                    .nome("Ciência")
+                    .icone("overlays")
+                    .nameSpace("/app/expediente/mov")
+                    .acao("ciencia")
+                    .params("sigla", mob.getCodigoCompacto())
+                    .exp(new ExPodeFazerCiencia(mob, titular, lotaTitular))
+                    .classe("once")
+                    .build()
+            );
 
-            addAcao(AcaoVO.builder().nome("Assinar Anexos " + (mob.isVia() ? "da Via" : "do Volume")).icone("script_key").nameSpace("/app/expediente/mov").acao("assinarAnexos")
-                    .params("sigla", mob.getCodigoCompacto()).params("assinandoAnexosGeral", "true").exp(new ExTemAnexos(mob)).build());
+            addAcao(AcaoVO.builder()
+                    .nome("Assinar Anexos " + (mob.isVia() ? "da Via" : "do Volume"))
+                    .icone("script_key")
+                    .nameSpace("/app/expediente/mov")
+                    .acao("assinarAnexos")
+                    .params("sigla", mob.getCodigoCompacto())
+                    .params("assinandoAnexosGeral", "true")
+                    .exp(new ExTemAnexos(mob))
+                    .build()
+            );
         }
 
-        addAcao(AcaoVO.builder().nome("Desentranhar").icone("page_white_error").nameSpace("/app/expediente/mov").acao("cancelar_juntada")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeCancelarJuntada(mob, titular, lotaTitular)).classe("once siga-btn-desentranhar").build());
+        addAcao(AcaoVO.builder()
+                .nome("Desentranhar")
+                .icone("page_white_error")
+                .nameSpace("/app/expediente/mov")
+                .acao("cancelar_juntada")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeCancelarJuntada(mob, titular, lotaTitular))
+                .classe("once siga-btn-desentranhar")
+                .build()
+        );
 
-        addAcao(AcaoVO.builder().nome("Desapensar").icone("link_delete").nameSpace("/app/expediente/mov").acao("desapensar")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeDesapensar(mob, titular, lotaTitular)).classe("once").build());
+        addAcao(AcaoVO.builder()
+                .nome("Desapensar")
+                .icone("link_delete")
+                .nameSpace("/app/expediente/mov")
+                .acao("desapensar")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeDesapensar(mob, titular, lotaTitular))
+                .classe("once")
+                .build()
+        );
 
-        addAcao(AcaoVO.builder().nome("Receber").icone("email_open").nameSpace("/app/expediente/mov").acao("receber")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeReceber(mob, titular, lotaTitular)).classe("once").build());
+        addAcao(AcaoVO.builder()
+                .nome("Receber")
+                .icone("email_open")
+                .nameSpace("/app/expediente/mov")
+                .acao("receber")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeReceber(mob, titular, lotaTitular))
+                .classe("once")
+                .build()
+        );
 
-        addAcao(AcaoVO.builder().nome("_Tramitar").icone("email_go").nameSpace("/app/expediente/mov").acao("transferir")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeTransferir(mob, titular, lotaTitular)).build());
+        addAcao(AcaoVO.builder()
+                .nome("_Tramitar")
+                .icone("email_go")
+                .nameSpace("/app/expediente/mov")
+                .acao("transferir")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeTransferir(mob, titular, lotaTitular))
+                .build()
+        );
 
-        addAcao(AcaoVO.builder().nome("Tramitar em Paralelo").icone("email_go").nameSpace("/app/expediente/mov").acao("tramitar_paralelo")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeTramitarEmParalelo(mob, titular, lotaTitular)).build());
+        addAcao(AcaoVO.builder()
+                .nome("Tramitar em Paralelo")
+                .icone("email_go")
+                .nameSpace("/app/expediente/mov")
+                .acao("tramitar_paralelo")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeTramitarEmParalelo(mob, titular, lotaTitular))
+                .build()
+        );
 
-        addAcao(AcaoVO.builder().nome("Notificar").icone("email_go").nameSpace("/app/expediente/mov").acao("notificar")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeNotificar(mob, titular, lotaTitular)).build());
+        addAcao(AcaoVO.builder()
+                .nome("Notificar")
+                .icone("email_go")
+                .nameSpace("/app/expediente/mov")
+                .acao("notificar")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeNotificar(mob, titular, lotaTitular))
+                .build()
+        );
 
-        addAcao(AcaoVO.builder().nome("_Anotar").icone("note_add").acao("/app/expediente/mov/anotar")
+        addAcao(AcaoVO.builder()
+                .nome("_Anotar")
+                .icone("note_add")
+                .acao("/app/expediente/mov/anotar")
                 .descr("Insere uma pequena observação ao documento. A anotação será exibida nas movimentações do documento, podendo ser excluída a qualquer tempo pela pessoa que a criou.")
                 .params("sigla", mob.getCodigoCompacto())
                 .exp(new ExPodeAnotar(mob, titular, lotaTitular))
+                .build()
+        );
+
+        addAcao(AcaoVO.builder()
+                .nome("Definir " + SigaMessages.getMessage("documento.marca"))
+                .icone("folder_star")
+                .modal("definirMarcaModal")
+                .exp(new ExPodeMarcar(mob, titular, lotaTitular))
+                .build()
+        );
+
+        addAcao(AcaoVO.builder()
+                        .nome("Ane_xar")
+                        .icone("attach")
+                        .nameSpace("/app/expediente/mov")
+                        .acao("anexar")
+                        .params("sigla", mob.getCodigoCompacto())
+                        .exp(new ExPodeAnexarArquivo(mob, titular, lotaTitular))
+                        .build(),
+                mob.isVia() || mob.isVolume()
+        );
+
+        addAcao(AcaoVO.builder()
+                        .nome("Incluir _Cópia")
+                        .icone("page_white_copy")
+                        .nameSpace("/app/expediente/mov")
+                        .acao("copiar")
+                        .params("sigla", mob.getCodigoCompacto())
+                        .exp(new ExPodeCopiar(mob, titular, lotaTitular))
+                        .build(),
+                mob.isVia() || mob.isVolume()
+        );
+
+        addAcao(AcaoVO.builder()
+                .nome("Ar_q. Corrente")
+                .icone("box_add").nameSpace("/app/expediente/mov")
+                .acao("arquivar_corrente_gravar")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeArquivarCorrente(mob, titular, lotaTitular))
+                .classe("once siga-btn-arq-corrente")
+                .build()
+        );
+
+        addAcao(AcaoVO.builder()
+                .nome("Concluir")
+                .icone("tick").nameSpace("/app/expediente/mov")
+                .acao("concluir_gravar")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeConcluir(mob, titular, lotaTitular))
+                .post(true)
+                .classe("once")
+                .build()
+        );
+
+        addAcao(AcaoVO.builder()
+                .nome("Indicar para Guarda Permanente")
+                .icone("building_go")
+                .nameSpace("/app/expediente/mov")
+                .acao("indicar_permanente")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeIndicarPermanente(mob, titular, lotaTitular))
+                .classe("once")
+                .build()
+        );
+
+        addAcao(AcaoVO.builder()
+                .nome("Reverter Ind. Guarda Permanente")
+                .icone("building_delete")
+                .nameSpace("/app/expediente/mov")
+                .acao("reverter_indicacao_permanente")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeReverterIndicacaoPermanente(mob, titular, lotaTitular))
+                .classe("once")
+                .build()
+        );
+
+        addAcao(AcaoVO.builder()
+                .nome("Retirar de Edital de Eliminação")
+                .icone("page_red")
+                .nameSpace("/app/expediente/mov")
+                .acao("retirar_de_edital_eliminacao")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeRetirarDeEditalDeEliminacao(mob, titular, lotaTitular))
+                .classe("once")
+                .build()
+        );
+
+        addAcao(AcaoVO.builder()
+                .nome("Reclassificar")
+                .icone("table_edit")
+                .nameSpace("/app/expediente/mov")
+                .acao("reclassificar")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeReclassificar(mob, titular, lotaTitular))
+                .build()
+        );
+
+        addAcao(AcaoVO.builder()
+                .nome("Avaliar")
+                .icone("table").nameSpace("/app/expediente/mov")
+                .acao("avaliar")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeAvaliar(mob, titular, lotaTitular))
+                .build()
+        );
+
+        addAcao(AcaoVO.builder()
+                .nome("So_brestar")
+                .icone("hourglass_add")
+                .nameSpace("/app/expediente/mov")
+                .acao("sobrestar_gravar")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeSobrestar(mob, titular, lotaTitular))
+                .classe("once")
+                .build()
+        );
+
+        addAcao(AcaoVO.builder()
+                .nome("Recolher ao Arq. Permanente")
+                .icone("building_add")
+                .nameSpace("/app/expediente/mov")
+                .acao("arquivar_permanente_gravar")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeExibirBotaoDeArquivarPermanente(mob, titular, lotaTitular))
+                .classe("once")
+                .build()
+        );
+
+        addAcao(AcaoVO.builder()
+                .nome("Arq. Intermediário")
+                .icone("package_add")
+                .nameSpace("/app/expediente/mov")
+                .acao("arquivar_intermediario")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeExibirBotaoDeArquivarIntermediario(mob, titular, lotaTitular))
+                .classe("once")
                 .build());
 
-        addAcao(AcaoVO.builder().nome("Definir " + SigaMessages.getMessage("documento.marca")).icone("folder_star").modal("definirMarcaModal")
-                .exp(new ExPodeMarcar(mob, titular, lotaTitular)).build());
+        addAcao(AcaoVO.builder()
+                .nome("Desar_q. Corrente")
+                .icone("box_delete")
+                .nameSpace("/app/expediente/mov")
+                .acao("reabrir_gravar")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeDesarquivarCorrente(mob, titular, lotaTitular))
+                .classe("once")
+                .build()
+        );
 
-        if (mob.isVia() || mob.isVolume()) {
-            addAcao(AcaoVO.builder().nome("Ane_xar").icone("attach").nameSpace("/app/expediente/mov").acao("anexar")
-                    .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeAnexarArquivo(mob, titular, lotaTitular)).build());
+        addAcao(AcaoVO.builder()
+                .nome("Desarq. Intermediário")
+                .icone("package_delete")
+                .nameSpace("/app/expediente/mov")
+                .acao("desarquivar_intermediario_gravar")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeExibirBotaoDeDesarquivarIntermediario(mob, titular, lotaTitular))
+                .classe("once")
+                .build()
+        );
 
-            addAcao(AcaoVO.builder().nome("Incluir _Cópia").icone("page_white_copy").nameSpace("/app/expediente/mov").acao("copiar")
-                    .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeCopiar(mob, titular, lotaTitular)).build());
-        }
+        addAcao(AcaoVO.builder()
+                .nome("Deso_brestar")
+                .icone("hourglass_delete")
+                .nameSpace("/app/expediente/mov")
+                .acao("desobrestar_gravar")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeDessobrestar(mob, titular, lotaTitular))
+                .classe("once")
+                .build()
+        );
 
-        addAcao(AcaoVO.builder().nome("Ar_q. Corrente").icone("box_add").nameSpace("/app/expediente/mov").acao("arquivar_corrente_gravar")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeArquivarCorrente(mob, titular, lotaTitular)).classe("once siga-btn-arq-corrente").build());
+        addAcao(AcaoVO.builder()
+                .nome("_Juntar")
+                .icone("page_white_go")
+                .nameSpace("/app/expediente/mov")
+                .acao("juntar")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeJuntar(mob, titular, lotaTitular))
+                .classe("once")
+                .build()
+        );
 
-        addAcao(AcaoVO.builder().nome("Concluir").icone("tick").nameSpace("/app/expediente/mov").acao("concluir_gravar")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeConcluir(mob, titular, lotaTitular)).post(true).classe("once").build());
+        addAcao(AcaoVO.builder()
+                .nome("Apensar")
+                .icone("link_add")
+                .nameSpace("/app/expediente/mov")
+                .acao("apensar")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeApensar(mob, titular, lotaTitular))
+                .classe("once")
+                .build()
+        );
 
-        addAcao(AcaoVO.builder().nome("Indicar para Guarda Permanente").icone("building_go").nameSpace("/app/expediente/mov").acao("indicar_permanente")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeIndicarPermanente(mob, titular, lotaTitular)).classe("once").build());
-
-        addAcao(AcaoVO.builder().nome("Reverter Ind. Guarda Permanente").icone("buildinge_delete").nameSpace("/app/expediente/mov").acao("reverter_indicacao_permanente")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeReverterIndicacaoPermanente(mob, titular, lotaTitular)).classe("once").build());
-
-        addAcao(AcaoVO.builder().nome("Retirar de Edital de Eliminação").icone("page_red").nameSpace("/app/expediente/mov").acao("retirar_de_edital_eliminacao")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeRetirarDeEditalDeEliminacao(mob, titular, lotaTitular)).classe("once").build());
-
-        addAcao(AcaoVO.builder().nome("Reclassificar").icone("table_edit").nameSpace("/app/expediente/mov").acao("reclassificar")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeReclassificar(mob, titular, lotaTitular)).build());
-
-        addAcao(AcaoVO.builder().nome("Avaliar").icone("table").nameSpace("/app/expediente/mov").acao("avaliar")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeAvaliar(mob, titular, lotaTitular)).build());
-
-        addAcao(AcaoVO.builder().nome("So_brestar").icone("hourglass_add").nameSpace("/app/expediente/mov").acao("sobrestar_gravar")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeSobrestar(mob, titular, lotaTitular)).classe("once").build());
-
-        addAcao(AcaoVO.builder().nome("Recolher ao Arq. Permanente").icone("building_add").nameSpace("/app/expediente/mov").acao("arquivar_permanente_gravar")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeExibirBotaoDeArquivarPermanente(mob, titular, lotaTitular)).classe("once").build());
-
-        addAcao(AcaoVO.builder().nome("Arq. Intermediário").icone("package_add").nameSpace("/app/expediente/mov").acao("arquivar_intermediario")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeExibirBotaoDeArquivarIntermediario(mob, titular, lotaTitular)).classe("once").build());
-
-        addAcao(AcaoVO.builder().nome("Desar_q. Corrente").icone("box_delete").nameSpace("/app/expediente/mov").acao("reabrir_gravar")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeDesarquivarCorrente(mob, titular, lotaTitular)).classe("once").build());
-
-        addAcao(AcaoVO.builder().nome("Desarq. Intermediário").icone("package_delete").nameSpace("/app/expediente/mov").acao("desarquivar_intermediario_gravar")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeExibirBotaoDeDesarquivarIntermediario(mob, titular, lotaTitular)).classe("once").build());
-
-        addAcao(AcaoVO.builder().nome("Deso_brestar").icone("hourglass_delete").nameSpace("/app/expediente/mov").acao("desobrestar_gravar")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeDessobrestar(mob, titular, lotaTitular)).classe("once").build());
-
-        addAcao(AcaoVO.builder().nome("_Juntar").icone("page_white_go").nameSpace("/app/expediente/mov").acao("juntar")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeJuntar(mob, titular, lotaTitular)).classe("once").build());
-
-        addAcao(AcaoVO.builder().nome("Vi_ncular").icone("page_find").nameSpace("/app/expediente/mov").acao("referenciar")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeReferenciar(mob, titular, lotaTitular)).build());
-
-        addAcao(AcaoVO.builder().nome("Apensar").icone("link_add").nameSpace("/app/expediente/mov").acao("apensar")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeApensar(mob, titular, lotaTitular)).classe("once").build());
-
-        addAcao(AcaoVO.builder().nome("Atribuir Prazo de Assinatura").icone("date_previous").nameSpace("/app/expediente/mov").acao("definir_prazo_assinatura")
-                .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeDefinirPrazoAssinatura(mob, titular, lotaTitular)).classe("once").build());
+        addAcao(AcaoVO.builder()
+                .nome("Atribuir Prazo de Assinatura")
+                .icone("date_previous")
+                .nameSpace("/app/expediente/mov")
+                .acao("definir_prazo_assinatura")
+                .params("sigla", mob.getCodigoCompacto())
+                .exp(new ExPodeDefinirPrazoAssinatura(mob, titular, lotaTitular))
+                .classe("once")
+                .build()
+        );
 
         // Não aparece a opção de Cancelar Movimentação para documentos
         // temporários
@@ -483,7 +702,7 @@ public class ExMobilVO extends ExVO {
                 .params("sigla", mob.getCodigoCompacto()).exp(new ExPodeCancelarCiencia(mob, titular, lotaTitular)).classe("once").build());
     }
 
-    public String getMarcadoresEmHtml(List<ExMarca> marcasAtivas, DpPessoa pess, DpLotacao lota) {
+    public String getMarcadoresEmHtml(DpPessoa pess, DpLotacao lota) {
         StringBuilder sb = new StringBuilder();
 
         if (pess != null && lota != null) {
@@ -590,7 +809,7 @@ public class ExMobilVO extends ExVO {
 
     public String getDescricaoCompletaEMarcadoresEmHtml(DpPessoa pess,
                                                         DpLotacao lota) {
-        String m = getMarcadoresEmHtml(marcasAtivas, pess, lota);
+        String m = getMarcadoresEmHtml(pess, lota);
         if (m == null)
             return getMob().getDescricaoCompleta();
         return getMob().getDescricaoCompleta() + " - " + m;
@@ -598,18 +817,6 @@ public class ExMobilVO extends ExVO {
 
     public String getSigla() {
         return sigla;
-    }
-
-    public List<ExMobilVO> getApensos() {
-        return apensos;
-    }
-
-    /*
-     * public List getFilhos() { return filhos; }
-     */
-
-    public List<ExDocumentoVO> getExpedientesFilhosNaoCancelados() {
-        return expedientesFilhosNaoCancelados;
     }
 
     public List<ExMovimentacaoVO> getAnexosNaoAssinados() {
@@ -622,10 +829,6 @@ public class ExMobilVO extends ExVO {
 
     public List<ExDocumentoVO> getExpedientesFilhosNaoJuntados() {
         return expedientesFilhosNaoJuntados;
-    }
-
-    public List<ExDocumentoVO> getProcessosFilhosNaoCancelados() {
-        return processosFilhosNaoCancelados;
     }
 
     public List<ExMobilVO> getExpedientesJuntadosNaoAssinados() {
@@ -645,26 +848,6 @@ public class ExMobilVO extends ExVO {
         return getSigla() + "[" + getAcoes() + "] ";
     }
 
-    public List<DuracaoVO> getDuracoes() {
-        return duracoes;
-    }
-
-    public void setDuracoes(List<DuracaoVO> duracoes) {
-        this.duracoes = duracoes;
-    }
-
-    public Long getByteCount() {
-        return byteCount;
-    }
-
-    public Integer getPagInicial() {
-        return pagInicial;
-    }
-
-    public Integer getPagFinal() {
-        return pagFinal;
-    }
-
     public String getTamanhoDeArquivo() {
         return tamanhoDeArquivo;
     }
@@ -681,5 +864,17 @@ public class ExMobilVO extends ExVO {
                 || pendenciasDeAnexacao.size() > 0
                 || pendenciasDeColaboracao.size() > 0
                 || pendenciaProximoModelo != null;
+    }
+
+    public List<ExDocumentoVO> getExpedientesFilhosNaoCancelados() {
+        return expedientesFilhosNaoCancelados;
+    }
+
+    public List<ExMobilVO> getApensos() {
+        return apensos;
+    }
+
+    public List<ExDocumentoVO> getProcessosFilhosNaoCancelados() {
+        return processosFilhosNaoCancelados;
     }
 }

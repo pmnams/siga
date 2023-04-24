@@ -75,7 +75,7 @@
 
     <c:set var="collapse_Expanded" scope="request" value="collapsible expanded"/>
 
-    <c:set var="siga_version" scope="request" value="1.1.11"/>
+    <c:set var="siga_version" scope="request" value="${f:sigaVersao()}"/>
 
     <meta name="theme-color" content="bg-primary">
     <c:set var="thead_color" value="thead-light" scope="request"/>
@@ -345,7 +345,7 @@
                                     </c:when>
                                 </c:choose>
 							</span>
-                    <span>- v.${siga_version}</span>
+                    <span>- ${siga_version}</span>
                 </div>
             </div>
 
