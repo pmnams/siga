@@ -705,18 +705,42 @@ public class ExMovimentacaoVO extends ExVO {
         return cancelada;
     }
 
+    public boolean isDesabilitada() {
+        return desabilitada;
+    }
+
+    public boolean isOriginadaAqui() {
+        return originadaAqui;
+    }
+
     public void setClasse(String classe) {
         this.classe = classe;
+    }
+
+    public void setDesabilitada(boolean desabilitada) {
+        this.desabilitada = desabilitada;
     }
 
     public void setMov(ExMovimentacao mov) {
         this.mov = mov;
     }
 
+    public void setOriginadaAqui(boolean originadaAqui) {
+        this.originadaAqui = originadaAqui;
+    }
+
     @Override
     public String toString() {
         return getMobilVO().getSigla() + ":" + getIdMov() + " - " + getDescrTipoMovimentacao() + " - " + getDescricao()
                 + "[" + getAcoes() + "] " + getDisabled();
+    }
+
+    public int getDuracaoSpan() {
+        return duracaoSpan;
+    }
+
+    public void setDuracaoSpan(int duracaoSpan) {
+        this.duracaoSpan = duracaoSpan;
     }
 
     public String getDuracao() {
@@ -731,6 +755,14 @@ public class ExMovimentacaoVO extends ExVO {
         if (mov == null || mov.getConteudoTpMov() == null)
             return "";
         return mov.getConteudoTpMov();
+    }
+
+    public int getDuracaoSpanExibirCompleto() {
+        return duracaoSpanExibirCompleto;
+    }
+
+    public void setDuracaoSpanExibirCompleto(int duracaoSpanExibirCompleto) {
+        this.duracaoSpanExibirCompleto = duracaoSpanExibirCompleto;
     }
 
     public boolean isImage() {
@@ -827,5 +859,7 @@ public class ExMovimentacaoVO extends ExVO {
     public void setSubscritor(String subscritor) {
         this.subscritor = subscritor;
     }
+
+
 
 }
