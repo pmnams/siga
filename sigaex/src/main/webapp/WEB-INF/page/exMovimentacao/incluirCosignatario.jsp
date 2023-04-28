@@ -45,7 +45,7 @@
 			if (thisElement.checked) {
 				incluirCossig = true;
 			}
-			window.location.href='${pageContext.request.contextPath}/app/expediente/mov/incluir_excluir_acesso_temp_arvore_docs?sigla=${sigla}&amp;incluirCossig='+incluirCossig;
+			window.location.href='${pageContext.request.contextPath}/app/expediente/mov/incluir_excluir_acesso_temp_arvore_docs?sigla=${sigla}&incluirCossig='+incluirCossig;
 		}
 	}
 
