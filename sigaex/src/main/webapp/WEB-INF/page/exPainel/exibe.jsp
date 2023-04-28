@@ -35,7 +35,7 @@
             sigaSpinner.mostrar();
             document.getElementById('btnSubmitDoc').disabled = true;
             let frm = document.getElementById('frmDoc');
-            frm.action = 'exibir?documentoRefSel.sigla=${sigla}&amp;postback=1';
+            frm.action = 'exibir?documentoRefSel.sigla=${sigla}&postback=1';
             frm.submit();
             document.getElementById('btnSubmitDoc').disabled = false;
             sigaSpinner.mostrar();

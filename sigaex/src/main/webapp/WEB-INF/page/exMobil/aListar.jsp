@@ -17,18 +17,16 @@
 <%--@elvariable id="pesquisaLimitadaPorData" type="java.lang.Boolean"--%>
 
 <siga:pagina titulo="Lista de Expedientes" popup="${popup}">
-    <script type="text/ecmascript" >
+    <script type="text/javascript" >
 		function alteraTipoDaForma(abrir) {
 			if ($('#idFormaDoc-spinner').hasClass('d-none')) {
 				$('#idFormaDoc-spinner').removeClass('d-none');
 				$('#idFormaDoc').prop('disabled', 'disabled');
 				SetInnerHTMLFromAjaxResponse(
-						'/sigaex/app/expediente/doc/carregar_lista_formas?tipoForma='
-								+ document.getElementById('tipoForma').value
-								+ '&amp;idFormaDoc=' + '${idFormaDoc}', document
-								.getElementById('comboFormaDiv'), null,
-								(abrir? function(){	$('#idFormaDoc').select2('open'); } : null)
-								);
+                    '/sigaex/app/expediente/doc/carregar_lista_formas?tipoForma=' + document.getElementById('tipoForma').value + '&idFormaDoc=' + '${idFormaDoc}',
+                    document.getElementById('comboFormaDiv'),
+                    null,
+                    (abrir? () => {	$('#idFormaDoc').select2('open'); } : null));
 			}
 		}
 
@@ -38,14 +36,11 @@
 				$('#idMod').prop('disabled', 'disabled');
 				var idFormaDoc = document.getElementById('idFormaDoc');
 				SetInnerHTMLFromAjaxResponse(
-						'/sigaex/app/expediente/doc/carregar_lista_modelos?forma='
-								+ (idFormaDoc != null ? idFormaDoc.value : '${idFormaDoc}' )
-								+ '&amp;idMod='	+ '${idMod}', document
-								.getElementById('comboModeloDiv'), null,
-								(abrir? function(){	$('#idMod').select2('open');
-													podeDescricao(true);} :
-										function(){	podeDescricao(true);})
-								);
+                    '/sigaex/app/expediente/doc/carregar_lista_modelos?forma=' + (idFormaDoc != null ? idFormaDoc.value : '${idFormaDoc}' ) + '&idMod='	+ '${idMod}',
+                    document.getElementById('comboModeloDiv'),
+                    null,
+                    (abrir? () => {	$('#idMod').select2('open'); podeDescricao(true);} : () => {podeDescricao(true);})
+                );
 			}
 		}
 
@@ -84,8 +79,7 @@
         <c:set var="formOrigem" value="lista" scope="request"/>
         <c:set var="pesquisaLimitadaPorData" scope="session"
                value="${f:podeUtilizarServicoPorConfiguracao(titular,lotaTitular,'SIGA:Sistema Integrado de Gestão Administrativa;DOC:Módulo de Documentos;PESQ:Pesquisar;DTLIMITADA: Pesquisar somente com data limitada ')}"/>
-        <c:if
-                test="${((empty primeiraVez) or (primeiraVez != 'sim')) and ((empty apenasRefresh) or (apenasRefresh != 1)) and !pesquisaLimitadaPorData}">
+        <c:if test="${((empty primeiraVez) or (primeiraVez != 'sim')) and ((empty apenasRefresh) or (apenasRefresh != 1)) and !pesquisaLimitadaPorData}">
             <jsp:include page="./lista.jsp"/>
         </c:if>
         <div class="card bg-light ${pesquisaLimitadaPorData? 'sticky-top':''}">
