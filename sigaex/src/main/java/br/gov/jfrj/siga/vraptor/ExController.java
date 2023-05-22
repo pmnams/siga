@@ -176,9 +176,13 @@ public class ExController extends SigaController {
     public static boolean podeVisualizarDocumento(DpPessoa cadastrante, DpPessoa titular, Long idVisualizacao, final ExMobil mob) throws Exception {
         boolean retorno = Boolean.FALSE;
 
-        if (Cp.getInstance().getConf()
-                .podePorConfiguracao(cadastrante, cadastrante.getLotacao(), ExTipoDeConfiguracao.DELEGAR_VISUALIZACAO)) {
-            if (idVisualizacao != null && !idVisualizacao.equals(Long.valueOf(0))) {
+        if (Cp.getInstance()
+                .getConf()
+                .podePorConfiguracao(
+                        cadastrante, cadastrante.getLotacao(), ExTipoDeConfiguracao.DELEGAR_VISUALIZACAO
+                )
+        ) {
+            if (idVisualizacao != null && !idVisualizacao.equals(0L)) {
                 DpVisualizacao vis = ExDao.getInstance().consultar(idVisualizacao, DpVisualizacao.class, false);
 
                 if (vis.getDelegado().equals(titular)) {

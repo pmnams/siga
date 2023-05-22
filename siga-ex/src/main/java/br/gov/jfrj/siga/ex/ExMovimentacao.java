@@ -1022,22 +1022,22 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
         return set;
     }
 
-    public String getAssinantesComTokenString(Date dtMov) {
-        return Documento.getAssinantesString(getApenasAssinaturasComToken(), dtMov);
-    }
-
-    public String getAssinantesComSenhaString(Date dtMov) {
-        return Documento.getAssinantesString(getApenasAssinaturasComSenha(), dtMov);
-    }
-
-    public String getConferentesString(Date dtMov) {
-        return Documento.getAssinantesString(getApenasConferenciasCopia(), dtMov);
-    }
-
     public String getAssinantesCompleto() {
-        String conferentes = getConferentesString(getData());
-        String assinantesToken = getAssinantesComTokenString(getData());
-        String assinantesSenha = getAssinantesComSenhaString(getData());
+        Set<ExMovimentacao> listAux;
+        Date lastDate;
+
+        listAux = getApenasConferenciasCopia();
+        String conferentes = Documento.getAssinantesString(getApenasConferenciasCopia(), getData());
+        lastDate = checkLastMovsDates(listAux, null);
+
+        listAux = getApenasAssinaturasComToken();
+        String assinantesToken = Documento.getAssinantesString(getApenasAssinaturasComToken(), getData());
+        lastDate = checkLastMovsDates(listAux, lastDate);
+
+        listAux = getApenasAssinaturasComSenha();
+        String assinantesSenha = Documento.getAssinantesString(getApenasAssinaturasComSenha(), getData());
+        lastDate = checkLastMovsDates(listAux, lastDate);
+
         String retorno = "";
         retorno += assinantesToken.length() > 0 ? "Assinado digitalmente por "
                 + assinantesToken + ".\n" : "";
@@ -1047,7 +1047,24 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
         retorno += conferentes.length() > 0 ? "Autenticado digitalmente por "
                 + conferentes + ".\n" : "";
 
+        if (lastDate != null) {
+            final SimpleDateFormat df = new SimpleDateFormat(
+                    "dd/MM/yyyy HH:mm:ss");
+            retorno += "Data: " + df.format(lastDate) + "\n";
+        }
+
         return retorno;
+    }
+
+    private Date checkLastMovsDates(Set<ExMovimentacao> movs, Date references) {
+        if (Objects.nonNull(movs) && movs.size() > 0) {
+            ExMovimentacao mov = movs.stream().reduce((one, two) -> two).get();
+            if (Objects.isNull(references) || mov.getDtIniMov().after(references)) {
+                references = mov.getDtIniMov();
+            }
+        }
+
+        return references;
     }
 
     /**

@@ -1962,24 +1962,27 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
     }
 
     public String getAssinantesCompleto() {
+        Set<ExMovimentacao> listAux;
         String retorno = "";
-        String conferentes = Documento
-                .getAssinantesString(getAutenticacoesComToken(), getDtDoc());
-        String conferentesSenha = Documento
-                .getAssinantesString(getAutenticacoesComSenha(), getDtDoc());
-        String assinantesToken = Documento
-                .getAssinantesString(getAssinaturasComToken(), getDtDoc());
-        String assinantesSenha = Documento
-                .getAssinantesString(getAssinaturasComSenha(), getDtDoc());
-        Set<ExMovimentacao> movsAssinatura = getAssinaturasComToken();
-        movsAssinatura.addAll(getAssinaturasComSenha());
-        String assinantesPor = Documento
-                .getAssinantesPorString(getAssinaturasPor(), getDtDoc(), movsAssinatura);
+        Date lastDate;
 
-        if (Prop.isGovSP() && assinantesPor != null && !"".equals(assinantesPor)) {
-            assinantesToken = removeAssinadosPor(getAssinaturasComToken());
-            assinantesSenha = removeAssinadosPor(getAssinaturasComSenha());
-        }
+        listAux = getAutenticacoesComToken();
+        String conferentes = Documento.getAssinantesString(listAux, getDtDoc());
+        lastDate = checkLastMovsDates(listAux, null);
+
+        listAux = getAutenticacoesComSenha();
+        String conferentesSenha = Documento.getAssinantesString(listAux, getDtDoc());
+        lastDate = checkLastMovsDates(listAux, lastDate);
+
+        listAux = getAssinaturasComToken();
+        String assinantesToken = Documento.getAssinantesString(listAux, getDtDoc());
+        lastDate = checkLastMovsDates(listAux, lastDate);
+
+        listAux = getAssinaturasComSenha();
+        String assinantesSenha = Documento.getAssinantesString(listAux, getDtDoc());
+
+        String assinantesPor = Documento.getAssinantesPorString(getAssinaturasPor(), getDtDoc(), listAux);
+        lastDate = checkLastMovsDates(listAux, lastDate);
 
         if (assinantesToken.length() > 0)
             retorno = "Assinado digitalmente por " + assinantesToken + ".\n";
@@ -1993,16 +1996,29 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
                     + ".\n";
 
         if (conferentes.length() > 0)
-            retorno += conferentes.length() > 0 ? "Autenticado digitalmente por "
-                    + conferentes + ".\n"
-                    : "";
+            retorno += "Autenticado digitalmente por " + conferentes + ".\n";
 
         if (conferentesSenha.length() > 0)
-            retorno += conferentesSenha.length() > 0 ? "Autenticado com senha por "
-                    + conferentesSenha + ".\n"
-                    : "";
+            retorno += "Autenticado com senha por " + conferentesSenha + ".\n";
+
+        if (lastDate != null) {
+            final SimpleDateFormat df = new SimpleDateFormat(
+                    "dd/MM/yyyy HH:mm:ss");
+            retorno += "Data: " + df.format(lastDate) + "\n";
+        }
 
         return retorno;
+    }
+
+    private Date checkLastMovsDates(Set<ExMovimentacao> movs, Date references) {
+        if (Objects.nonNull(movs) && movs.size() > 0) {
+            ExMovimentacao mov = movs.stream().reduce((one, two) -> two).get();
+            if (Objects.isNull(references) || mov.getDtIniMov().after(references)) {
+                references = mov.getDtIniMov();
+            }
+        }
+
+        return references;
     }
 
     public String getVinculosCompleto() {
