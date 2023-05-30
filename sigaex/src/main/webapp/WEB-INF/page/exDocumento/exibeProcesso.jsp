@@ -24,6 +24,12 @@
         </script>
     </c:if>
 
+    <style>
+        .selected-doc {
+            background-color: lightgreen !important;
+        }
+    </style>
+
     <c:if test="${mob.doc.podeReordenar()}">
         <style>
             .tabela-ordenavel tbody {
@@ -315,10 +321,12 @@
                         <div class="card-body pl-1 pr-1 pt-0 pb-0  container-tabela-lista-documentos">
                             <table class="text-size-6 table table-hover table-sm table-striped m-0 mov tabela-documentos">
                                 <tbody id="${mob.doc.podeReordenar() ? 'sortable' : ''}">
+
+                                <c:set var="counter" value="0" scope="page"/>
                                 <c:forEach var="arqNumerado" items="${arqsNum}">
                                     <%--@elvariable id="tooltipResumo" type="String"--%>
 
-                                    <tr>
+                                    <tr id="line-${counter}">
                                         <td style="display: none;">
                                                 ${arqNumerado.arquivo.idDoc}
                                         </td>
@@ -338,10 +346,11 @@
                                                 </c:forEach>
                                             </c:if>
                                             <a title="${fn:substring(tooltipResumo,0,fn:length(tooltipResumo)-4)}"
-                                               href="javascript:exibir('${arqNumerado.referenciaHtml}','${arqNumerado.referenciaPDF}')">
+                                               href="javascript:exibir('${arqNumerado.referenciaHtml}','${arqNumerado.referenciaPDF}', 'line-${counter}')">
                                                     ${arqNumerado.nomeOuDescricao}
                                             </a>
                                             <c:set var="tooltipResumo" value=""/>
+                                            <c:set var="counter" value="${counter + 1}" scope="page"/>
                                         </td>
                                         <td align="center">${arqNumerado.arquivo.lotacao.sigla}</td>
                                         <c:if test="${paginacao}">
@@ -364,7 +373,7 @@
                                 </c:forEach>
                                 </tbody>
                                 <tfoot>
-                                <tr>
+                                <tr id="principal">
                                     <td>
                                         <a target="_blank"
                                            href="/sigaex/app/arquivo/exibir?arquivo=${arqsNum[0].referenciaPDFCompletoDocPrincipal}">
@@ -374,7 +383,7 @@
                                     </td>
                                     <td style="padding-left: 5pt;">
                                         <a class="js-siga-info-doc-completo"
-                                           href="javascript:exibir('${arqsNum[0].referenciaHtmlCompletoDocPrincipal}','${arqsNum[0].referenciaPDFCompletoDocPrincipal}')">COMPLETO</a>
+                                           href="javascript:exibir('${arqsNum[0].referenciaHtmlCompletoDocPrincipal}','${arqsNum[0].referenciaPDFCompletoDocPrincipal}', 'principal')">COMPLETO</a>
                                     </td>
                                     <c:if test="${paginacao}">
                                         <td align="center" style="padding-left: 5pt;"></td>
@@ -384,7 +393,7 @@
                                     </c:if>
                                 </tr>
                                 <c:if test="${!empty possuiResumo}">
-                                    <tr>
+                                    <tr id="resumo">
                                         <td></td>
                                         <td colspan="2" style="padding-left: 5pt;">
                                             <a href="javascript:exibirNoIFrame('${pageContext.request.contextPath}/app/expediente/doc/exibirResumoProcesso?sigla=${mob.sigla}')">RESUMO</a>
@@ -396,7 +405,7 @@
                                 </c:if>
 
                                 <c:if test="${podeExibirTodosOsVolumes}">
-                                    <tr>
+                                    <tr id="completo">
                                         <td>
                                             <a target="_blank"
                                                href="/sigaex/app/arquivo/exibir?arquivo=${arqsNum[0].referenciaPDFCompletoDocPrincipalVolumes}">
@@ -406,7 +415,7 @@
                                         </td>
                                         <td style="padding-left: 5pt;">
                                             <a class="js-siga-info-doc-completo"
-                                               href="javascript:exibir('${arqsNum[0].referenciaHtmlCompletoDocPrincipalVolumes}','${arqsNum[0].referenciaPDFCompletoDocPrincipalVolumes}')">TODOS
+                                               href="javascript:exibir('${arqsNum[0].referenciaHtmlCompletoDocPrincipalVolumes}','${arqsNum[0].referenciaPDFCompletoDocPrincipalVolumes}', 'completo')">TODOS
                                                 OS VOLUMES</a>
                                         </td>
                                         <c:if test="${paginacao}">
@@ -536,7 +545,7 @@
     }
 
     //Nato: convem remover as outras maneiras de chamar o resize() e deixar apenas o jquery.
-    function exibir(refHTML, refPDF) {
+    function exibir(refHTML, refPDF, lineId = null) {
         const ifr = document.getElementById('painel');
         const ifrp = document.getElementById('paipainel');
 
@@ -549,7 +558,6 @@
             ifr.removeEventListener("load", resize, false);
         else if (ifr.addEventListener)
             ifr.removeEventListener("onload", resize); // Bug fix line
-
 
         // Para TRF2 com radio buttons
         if (document.getElementById('radioHTML').checked && refHTML !== '') {
@@ -572,11 +580,19 @@
             }
             ifrp.style.border = "0px solid black";
             ifr.height = pageHeight() - 300;
-
         }
 
         htmlAtual = refHTML;
         pdfAtual = refPDF;
+
+        if (lineId) {
+            let elements = document.getElementsByClassName('selected-doc');
+            for (let element of elements) {
+                element.classList.remove('selected-doc')
+            }
+
+            document.getElementById(lineId).classList.add('selected-doc')
+        }
 
         fixlinks(refHTML, refPDF);
         $('#painel').load(function () {
@@ -587,7 +603,7 @@
     }
 
 
-    exibir(htmlAtual, pdfAtual);
+    exibir(htmlAtual, pdfAtual, 'principal');
     fixlinks(htmlAtual, pdfAtual);
     resize();
 
@@ -612,6 +628,13 @@
             ifr.height = pageHeight() - 150;
         }
         ifr.src = url;
+
+        let elements = document.getElementsByClassName('selected-doc');
+        for (let element of elements) {
+            element.classList.remove('selected-doc')
+        }
+
+        document.getElementById('resumo').classList.add('selected-doc')
     }
 
     function toggleBotaoHtmlPdf(btn) {
