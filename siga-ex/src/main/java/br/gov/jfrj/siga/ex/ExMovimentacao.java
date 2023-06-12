@@ -1050,7 +1050,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
         if (lastDate != null) {
             final SimpleDateFormat df = new SimpleDateFormat(
                     "dd/MM/yyyy HH:mm:ss");
-            retorno += "Data: " + df.format(lastDate) + "\n";
+            retorno += "Data: " + df.format(lastDate) + " - ";
         }
 
         return retorno;
