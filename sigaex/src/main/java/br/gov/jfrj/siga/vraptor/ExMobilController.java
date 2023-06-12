@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -318,9 +319,9 @@ public class ExMobilController extends
             Set<?> items = new HashSet<>(lista);
 
             InputStream inputStream = null;
-            StringBuffer texto = new StringBuffer();
-            texto.append(";Responsável pela Assinatura;;;Responsável pela situação atual" + System.lineSeparator());
-            texto.append("Número;Unidade;Usuário;Data;Unidade;Usuário;Data;Situação;Documento;Descrição" + System.lineSeparator());
+            StringBuilder texto = new StringBuilder();
+            texto.append(";Responsável pela Assinatura;;;Responsável pela situação atual").append(System.lineSeparator());
+            texto.append("Número;Unidade;Usuário;Data;Unidade;Usuário;Data;Situação;Documento;Descrição").append(System.lineSeparator());
 
 
             ExDocumento e = new ExDocumento();
@@ -334,7 +335,7 @@ public class ExMobilController extends
                 m = (ExMobil) (((Object[]) object)[1]);
                 ma = (ExMarca) (((Object[]) object)[2]);
 
-                texto.append(m.getCodigo() + ";");
+                texto.append(m.getCodigo()).append(";");
                 if (e.getLotaSubscritor() != null && e.getLotaSubscritor().getSigla() != null) {
                     texto.append(e.getLotaSubscritor().getSigla().replaceAll(";", ","));
                 }
@@ -349,10 +350,6 @@ public class ExMobilController extends
                     texto.append(e.getDtDocDDMMYY());
                 }
                 texto.append(";");
-				
-				/*if(ma.getDpLotacaoIni() != null && ma.getDpLotacaoIni().getLotacaoAtual() != null && ma.getDpLotacaoIni().getLotacaoAtual().getSigla() != null) {
-					texto.append(ma.getDpLotacaoIni().getLotacaoAtual().getSigla().replaceAll(";",","));
-				}*/
 
 
                 if (ma.getDpLotacaoIni() != null && ma.getDpLotacaoIni().getSigla() != null) {
@@ -370,7 +367,7 @@ public class ExMobilController extends
                 }
                 texto.append(";");
 
-                if (ma != null && ma.getCpMarcador() != null && ma.getCpMarcador().getDescrMarcador() != null) {
+                if (ma.getCpMarcador() != null && ma.getCpMarcador().getDescrMarcador() != null) {
                     marcadorFormatado = ma.getDescricaoMarcadorFormatadoComData().replaceAll(";", ",");
                     texto.append(marcadorFormatado);
                 }
@@ -381,12 +378,7 @@ public class ExMobilController extends
                 }
                 texto.append(";");
 
-                if (Prop.isGovSP()) {
-                    descricao = e.getDescrDocumento();
-                } else {
-                    Ex.getInstance().getBL();
-                    descricao = ExBL.descricaoSePuderAcessar(e, getTitular(), getTitular().getLotacao());
-                }
+                descricao = ExBL.descricaoSePuderAcessar(e, getTitular(), getTitular().getLotacao());
                 if (descricao != null) {
                     texto.append(descricao.replaceAll("\n", "").replaceAll("\t", "").replaceAll("\r", "").replaceAll(";", ","));
                 }
@@ -394,7 +386,7 @@ public class ExMobilController extends
                 texto.append(";");
                 texto.append(System.lineSeparator());
             }
-            inputStream = new ByteArrayInputStream(texto.toString().getBytes("ISO-8859-1"));
+            inputStream = new ByteArrayInputStream(texto.toString().getBytes(StandardCharsets.ISO_8859_1));
 
             return new InputStreamDownload(inputStream, "text/csv", "documentos.csv");
 
@@ -421,7 +413,7 @@ public class ExMobilController extends
             throw new RegraNegocioException("Pesquisa indisponível para Usuários Externos.");
         }
 
-        if (Prop.getBool("atualiza.anotacao.pesquisa"))
+        if (Boolean.TRUE.equals(Prop.getBool("atualiza.anotacao.pesquisa")))
             SigaTransacionalInterceptor.upgradeParaTransacional();
 
         Integer maxDiasPesquisa = Prop.getInt("/siga.pesquisa.limite.dias");
@@ -431,7 +423,8 @@ public class ExMobilController extends
 
         final ExMobilBuilder builder = ExMobilBuilder.novaInstancia();
 
-        builder.setPostback(postback).setUltMovTipoResp(ultMovTipoResp)
+        builder.setPostback(postback)
+                .setUltMovTipoResp(ultMovTipoResp)
                 .setUltMovRespSel(ultMovRespSel)
                 .setUltMovLotaRespSel(ultMovLotaRespSel).setOrgaoUsu(orgaoUsu)
                 .setIdTpDoc(idTpDoc).setCpOrgaoSel(cpOrgaoSel)
@@ -444,7 +437,8 @@ public class ExMobilController extends
                 .setDestinatarioSel(destinatarioSel)
                 .setLotacaoDestinatarioSel(lotacaoDestinatarioSel)
                 .setOrgaoExternoDestinatarioSel(orgaoExternoDestinatarioSel)
-                .setClassificacaoSel(classificacaoSel).setOffset(paramoffset);
+                .setClassificacaoSel(classificacaoSel)
+                .setOffset(paramoffset);
 
         builder.processar(getLotaTitular());
 
@@ -525,7 +519,7 @@ public class ExMobilController extends
         if (visualizacao == 3 || visualizacao == 4) {
             TreeMap<String, String> campos = new TreeMap<>();
             for (Object oa : this.getItens()) {
-                for (String s : ((ExDocumento)((Object[]) oa)[0]).getForm().keySet()) {
+                for (String s : ((ExDocumento) ((Object[]) oa)[0]).getForm().keySet()) {
                     String nomeCampo = preprocessarNomeCampo(s);
                     if (nomeCampo != null)
                         campos.put(s, nomeCampo);
@@ -586,15 +580,23 @@ public class ExMobilController extends
         if (flt.getListaIdDoc() != null && flt.getListaIdDoc().isEmpty())
             return;
 
-        setItens(dao().consultarPorFiltroOtimizado(flt,
-                builder.getOffset(), getItemPagina() + (Prop.isGovSP() ? 1 : 0), getTitular(),
-                getLotaTitular()));
-        if (Prop.isGovSP()) {
-            setTamanho(getItens().size());
-        } else {
-            setTamanho(dao().consultarQuantidadePorFiltroOtimizado(flt,
-                    getTitular(), getLotaTitular()));
-        }
+        setItens(dao()
+                .consultarPorFiltroOtimizado(
+                        flt,
+                        builder.getOffset(),
+                        getItemPagina(),
+                        getTitular(),
+                        getLotaTitular()
+                )
+        );
+
+        setTamanho(dao()
+                .consultarQuantidadePorFiltroOtimizado(
+                        flt,
+                        getTitular(),
+                        getLotaTitular()
+                )
+        );
     }
 
     private void validarFiltrosPesquisa(final ExMobilDaoFiltro flt) {

@@ -900,7 +900,7 @@ public class ExDocumentoController extends ExController {
         if (!Ex.getInstance().getComp().pode(ExPodeAcessarDocumento.class, getTitular(), getLotaTitular(), exDocumentoDTO.getMob())) {
 
             String msgDestinoDoc = arquivamentoAutomatico(exDocumentoDTO.getMob());
-            final boolean exibeNomeAcesso = Prop.getBool("exibe.nome.acesso");
+            final boolean exibeNomeAcesso = Boolean.TRUE.equals(Prop.getBool("exibe.nome.acesso"));
 
             String s = "";
             if (Ex.getInstance().getComp().pode(ExPodeExibirQuemTemAcessoAoDocumento.class, getTitular(), getLotaTitular(), exDocumentoDTO.getDoc().getExModelo())) {
@@ -948,8 +948,9 @@ public class ExDocumentoController extends ExController {
             }
 
             if (exDocumentoDTO.getMob().doc().isSemEfeito()) {
-                if (!exDocumentoDTO.getMob().doc().getCadastrante().equals(getTitular())
-                        && !exDocumentoDTO.getMob().doc().getSubscritor().equals(getTitular()) && !isInteressado) {
+                if (!Objects.equals(exDocumentoDTO.getMob().doc().getCadastrante(), getTitular())
+                        && !exDocumentoDTO.getMob().doc().getSubscritor().equals(getTitular())
+                        && !isInteressado) {
                     throw new AplicacaoException("Documento " + exDocumentoDTO.getMob().getSigla() + " cancelado ");
                 }
             } else if (exibeNomeAcesso) {
@@ -976,7 +977,9 @@ public class ExDocumentoController extends ExController {
         ExMobil mobArq, mobUlt = null; /* mobil a ser arquivado / ultimo mobil */
 
         if (!mob.doc().isFinalizado()) { /* doc temporário só tem o geral */
-            dest = mob.doc().getCadastrante().getPessoaAtual();
+            dest = mob.doc().getCadastrante();
+            if (dest != null)
+                dest = dest.getPessoaAtual();
             lotaDest = mob.doc().getLotaCadastrante().getLotacaoAtual();
             mobArq = mob; /*
              * mobil a ser arquivado (excluido) sempre vai ser o
@@ -985,6 +988,8 @@ public class ExDocumentoController extends ExController {
         } else {
             if (mob.doc().isProcesso()) {
                 mobUlt = mob.doc().getUltimoVolume();
+                if (mobUlt == null)
+                    return "Último volume do processo " + mob.getCodigo() + " não encontrado.";
                 mobArq = mob.doc().getMobilGeral();
             } else {
                 if (mob.isGeral()) {
@@ -1505,7 +1510,9 @@ public class ExDocumentoController extends ExController {
 
         buscarDocumento(true, exDocumentoDto);
 
-        Ex.getInstance().getBL().verificaDocumento(getTitular(), getLotaTitular(), exDocumentoDto.getDoc());
+        ExDocumento doc = exDocumentoDto.getDoc();
+
+        Ex.getInstance().getBL().verificaDocumento(getTitular(), getLotaTitular(), doc);
 
         Ex.getInstance().getComp().afirmar("Não é possível Finalizar", ExPodeFinalizar.class, getTitular(), getLotaTitular(), exDocumentoDto.getMob().doc());
 
@@ -1513,17 +1520,19 @@ public class ExDocumentoController extends ExController {
             exDocumentoDto.setMsg(Ex
                     .getInstance()
                     .getBL()
-                    .finalizar(getCadastrante(), getLotaTitular(),
-                            exDocumentoDto.getDoc()));
+                    .finalizar(
+                            getCadastrante(),
+                            getLotaTitular(),
+                            exDocumentoDto.getDoc()
+                    )
+            );
 
             if (exDocumentoDto.getDoc().getForm() != null) {
-                if (exDocumentoDto.getDoc().getForm().get("acaoFinalizar") != null
-                        && exDocumentoDto.getDoc().getForm()
-                        .get("acaoFinalizar").trim().length() > 0) {
+                if (doc.getForm().get("acaoFinalizar") != null && doc.getForm().get("acaoFinalizar").trim().length() > 0) {
                     obterMetodoPorString(
-                            exDocumentoDto.getDoc().getForm()
-                                    .get("acaoFinalizar"),
-                            exDocumentoDto.getDoc());
+                            doc.getForm().get("acaoFinalizar"),
+                            exDocumentoDto.getDoc()
+                    );
                 }
             }
 

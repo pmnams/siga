@@ -116,17 +116,10 @@
                                 </tr>
                                 </thead>
                                 <c:set var="evenorodd" value="odd"/>
+                                <%--@elvariable id="mov" type="br.gov.jfrj.siga.ex.ExMovimentacao"--%>
                                 <c:forEach var="mov" items="${movs}">
                                     <tr class="${mov.cancelada ? 'disabled' : ''}">
                                         <c:set var="dt" value="${mov.dtRegMovDDMMYYYYHHMMSS}"/>
-                                        <c:choose>
-                                            <c:when test="${dt == dtUlt}">
-                                                <c:set var="dt" value=""/>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <c:set var="dtUlt" value="${dt}"/>
-                                            </c:otherwise>
-                                        </c:choose>
                                         <td align="left">${dt}</td>
                                         <td align="left">${mov.descrTipoMovimentacao}
                                             <c:if test="${mov.exTipoMovimentacao == 'JUNTADA'}">
@@ -156,6 +149,9 @@
 													<span style="font-size: .8rem;color: #9e9e9e;"
                                                     >| documento desentranhado ${mov.exMobil}
 													</span>
+                                            </c:if>
+                                            <c:if test="${mov.exTipoMovimentacao == 'CANCELAMENTO_DE_MOVIMENTACAO' and not empty mov.descrMov}">
+                                                <span style="font-size: .8rem;color: #9e9e9e;">| ${mov.descrMov}</span>
                                             </c:if>
                                         </td>
                                         <td align="left">${mov.lotaCadastrante.sigla} </td>

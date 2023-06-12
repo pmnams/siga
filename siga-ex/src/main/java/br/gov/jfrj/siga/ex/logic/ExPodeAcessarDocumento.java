@@ -18,17 +18,6 @@ public class ExPodeAcessarDocumento extends CompositeExpressionSupport {
     private final DpPessoa titular;
     private final DpLotacao lotaTitular;
 
-    /**
-     * Retorna se é possível acessar o documento ao qual pertence o móbil passado
-     * por parâmetro, analisando <i>podeAcessarAberto()</i>,
-     * <i>podeAcessarCancelado()</i> e <i>podeAcessarPorNivel()</i>
-     *
-     * @param titular
-     * @param lotaTitular
-     * @param mob
-     * @return
-     * @throws Exception
-     */
     public ExPodeAcessarDocumento(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;
         this.titular = titular;
@@ -42,9 +31,13 @@ public class ExPodeAcessarDocumento extends CompositeExpressionSupport {
         }
 
         return Or.of(
-                And.of(new CpNaoENulo(mob.doc().getOrgaoUsuario(), "órgão usuário"),
-                        new ExPodePorConfiguracao(titular, lotaTitular).withIdTpConf(ExTipoDeConfiguracao.ACESSAR)
-                                .withOrgaoObjeto(mob.doc().getOrgaoUsuario())),
-                new ExPodeAcessarPorConsulta(mob.doc(), titular, lotaTitular));
+                And.of(
+                        new CpNaoENulo(mob.doc().getOrgaoUsuario(), "órgão usuário"),
+                        new ExPodePorConfiguracao(titular, lotaTitular)
+                                .withIdTpConf(ExTipoDeConfiguracao.ACESSAR)
+                                .withOrgaoObjeto(mob.doc().getOrgaoUsuario())
+                ),
+                new ExPodeAcessarPorConsulta(mob.doc(), titular, lotaTitular)
+        );
     }
 }
