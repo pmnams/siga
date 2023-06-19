@@ -23,6 +23,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -478,7 +479,7 @@ public class Stamp {
 
     }
 
-    public static java.awt.Image createQRCodeImage(String url) throws WriterException {
+    public static BufferedImage createQRCodeImage(String url) throws WriterException {
         QRCodeWriter barcodeWriter = new QRCodeWriter();
         BitMatrix bitMatrix =
                 barcodeWriter.encode(url, BarcodeFormat.QR_CODE, 500, 500,
