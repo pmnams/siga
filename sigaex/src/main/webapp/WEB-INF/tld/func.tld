@@ -608,4 +608,10 @@
             br.gov.jfrj.siga.dp.DpLotacao)
         </function-signature>
     </function>
+    <function>
+        <name>toBase64QrCode</name>
+        <function-class>br.gov.jfrj.siga.ex.util.FuncoesEL</function-class>
+        <function-signature>java.lang.String toBase64QrCode(java.lang.String)
+        </function-signature>
+    </function>
 </taglib>

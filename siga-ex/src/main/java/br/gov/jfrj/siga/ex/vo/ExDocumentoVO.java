@@ -739,7 +739,6 @@ public class ExDocumentoVO extends ExVO {
                 .icone("link_add")
                 .nameSpace("/app/expediente/doc")
                 .acao("editar")
-                .params("sigla", mob.getCodigoCompacto())
                 .params("mobilPaiSel.sigla", mob.getCodigoCompacto())
                 .params("idForma", Long.toString(mob.doc().getExFormaDocumento().getIdFormaDoc()))
                 .params("criandoSubprocesso", "true")
