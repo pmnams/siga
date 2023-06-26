@@ -25,7 +25,6 @@ public class ExPodeEditar extends CompositeExpressionSupport {
      * do documento ou 3) titular do documento</li>
      * <li>Não pode haver configuração impeditiva</li>
      * </ul>
-     *
      */
     public ExPodeEditar(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;
@@ -37,41 +36,32 @@ public class ExPodeEditar extends CompositeExpressionSupport {
     @Override
     protected Expression create() {
         return And.of(
-
                 If.of(
-
                         new ExEEletronico(doc),
-
                         Not.of(new ExEstaAssinadoOuAutenticadoComTokenOuSenhaERegistros(doc)),
-
-                        Not.of(new ExEstaFinalizado(doc))),
-
+                        Not.of(new ExEstaFinalizado(doc))
+                ),
                 Not.of(new ExEstaCancelado(doc)),
-
                 Not.of(new ExEstaSemEfeito(doc)),
-
                 NAnd.of(
-
                         new ExECapturado(doc),
-
-                        Not.of(new ExEstaPendenteDeAssinatura(doc))),
-
+                        Not.of(new ExEstaPendenteDeAssinatura(doc))
+                ),
                 Or.of(
-
                         new ExECadastrante(doc, lotaTitular),
-
                         new ExESubscritor(doc, titular),
-
                         new ExETitular(doc, titular),
-
                         new ExTemPerfil(doc, ExPapel.PAPEL_GESTOR, titular, lotaTitular),
-
-                        new ExTemPerfil(doc, ExPapel.PAPEL_REVISOR, titular, lotaTitular)),
-
-                new ExPodePorConfiguracao(titular, lotaTitular).withExMod(mob.doc().getExModelo())
-                        .withExFormaDoc(mob.doc().getExFormaDocumento()).withIdTpConf(ExTipoDeConfiguracao.CRIAR),
-
-                new ExPodePorConfiguracao(titular, lotaTitular).withExMod(mob.doc().getExModelo())
-                        .withExFormaDoc(mob.doc().getExFormaDocumento()).withIdTpConf(ExTipoDeConfiguracao.EDITAR));
+                        new ExTemPerfil(doc, ExPapel.PAPEL_REVISOR, titular, lotaTitular)
+                ),
+                new ExPodePorConfiguracao(titular, lotaTitular)
+                        .withExMod(mob.doc().getExModelo())
+                        .withExFormaDoc(mob.doc().getExFormaDocumento())
+                        .withIdTpConf(ExTipoDeConfiguracao.CRIAR),
+                new ExPodePorConfiguracao(titular, lotaTitular)
+                        .withExMod(mob.doc().getExModelo())
+                        .withExFormaDoc(mob.doc().getExFormaDocumento())
+                        .withIdTpConf(ExTipoDeConfiguracao.EDITAR)
+        );
     }
 }
