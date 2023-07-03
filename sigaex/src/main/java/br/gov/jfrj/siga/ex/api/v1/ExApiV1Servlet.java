@@ -229,6 +229,9 @@ public class ExApiV1Servlet extends SwaggerServlet implements IPropertyProvider 
         addPublicProperty("exibe.nome.acesso", "false");
         addPublicProperty("atualiza.anotacao.pesquisa", "false");
 
+        addPublicProperty("max.linhas.pesquisa.doc", "200000");
+        addPublicProperty("mostrar.botao.exportar.pesquisa.doc", "true");
+
         addPublicProperty("modelos.cabecalho.brasao", "contextpath/imagens/brasaoColoridoTRF2.png");
         addPublicProperty("modelos.cabecalho.brasao.width", "auto");
         addPublicProperty("modelos.cabecalho.brasao.height", "65");

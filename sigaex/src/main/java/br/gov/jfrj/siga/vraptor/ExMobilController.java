@@ -309,7 +309,8 @@ public class ExMobilController extends
 
             builder.processar(getLotaTitular());
 
-            if (getTamanho() > 200000) {
+            int tamanhoMax = Prop.getInt("max.linhas.pesquisa.doc", 200000);
+            if (getTamanho() > tamanhoMax) {
                 throw new RegraNegocioException("Numero máximo de registros para exportação excedido. Use os filtros para restringir resultado.");
             }
 
@@ -515,6 +516,7 @@ public class ExMobilController extends
         result.include("idTipoFormaDoc", idTipoFormaDoc);
         result.include("idFormaDoc", idFormaDoc);
         result.include("idMod", idMod);
+        result.include("mostrarBotaoExportar", Prop.getBool("mostrar.botao.exportar.pesquisa.doc"));
 
         if (visualizacao == 3 || visualizacao == 4) {
             TreeMap<String, String> campos = new TreeMap<>();
