@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -308,7 +309,8 @@ public class ExMobilController extends
 
             builder.processar(getLotaTitular());
 
-            if (getTamanho() > 200000) {
+            int tamanhoMax = Prop.getInt("max.linhas.pesquisa.doc", 200000);
+            if (getTamanho() > tamanhoMax) {
                 throw new RegraNegocioException("Numero máximo de registros para exportação excedido. Use os filtros para restringir resultado.");
             }
 
@@ -319,8 +321,8 @@ public class ExMobilController extends
 
             InputStream inputStream = null;
             StringBuilder texto = new StringBuilder();
-            texto.append(";Responsável pela Assinatura;;;Responsável pela situação atual" + System.lineSeparator());
-            texto.append("Número;Unidade;Usuário;Data;Unidade;Usuário;Data;Situação;Documento;Descrição" + System.lineSeparator());
+            texto.append(";Responsável pela Assinatura;;;Responsável pela situação atual").append(System.lineSeparator());
+            texto.append("Número;Unidade;Usuário;Data;Unidade;Usuário;Data;Situação;Documento;Descrição").append(System.lineSeparator());
 
 
             ExDocumento e = new ExDocumento();
@@ -334,7 +336,7 @@ public class ExMobilController extends
                 m = (ExMobil) (((Object[]) object)[1]);
                 ma = (ExMarca) (((Object[]) object)[2]);
 
-                texto.append(m.getCodigo() + ";");
+                texto.append(m.getCodigo()).append(";");
                 if (e.getLotaSubscritor() != null && e.getLotaSubscritor().getSigla() != null) {
                     texto.append(e.getLotaSubscritor().getSigla().replaceAll(";", ","));
                 }
@@ -366,7 +368,7 @@ public class ExMobilController extends
                 }
                 texto.append(";");
 
-                if (ma != null && ma.getCpMarcador() != null && ma.getCpMarcador().getDescrMarcador() != null) {
+                if (ma.getCpMarcador() != null && ma.getCpMarcador().getDescrMarcador() != null) {
                     marcadorFormatado = ma.getDescricaoMarcadorFormatadoComData().replaceAll(";", ",");
                     texto.append(marcadorFormatado);
                 }
@@ -377,12 +379,7 @@ public class ExMobilController extends
                 }
                 texto.append(";");
 
-                if (Prop.isGovSP()) {
-                    descricao = e.getDescrDocumento();
-                } else {
-                    Ex.getInstance().getBL();
-                    descricao = ExBL.descricaoSePuderAcessar(e, getTitular(), getTitular().getLotacao());
-                }
+                descricao = ExBL.descricaoSePuderAcessar(e, getTitular(), getTitular().getLotacao());
                 if (descricao != null) {
                     texto.append(descricao.replaceAll("\n", "").replaceAll("\t", "").replaceAll("\r", "").replaceAll(";", ","));
                 }
@@ -390,7 +387,7 @@ public class ExMobilController extends
                 texto.append(";");
                 texto.append(System.lineSeparator());
             }
-            inputStream = new ByteArrayInputStream(texto.toString().getBytes("ISO-8859-1"));
+            inputStream = new ByteArrayInputStream(texto.toString().getBytes(StandardCharsets.ISO_8859_1));
 
             return new InputStreamDownload(inputStream, "text/csv", "documentos.csv");
 
@@ -519,6 +516,7 @@ public class ExMobilController extends
         result.include("idTipoFormaDoc", idTipoFormaDoc);
         result.include("idFormaDoc", idFormaDoc);
         result.include("idMod", idMod);
+        result.include("mostrarBotaoExportar", Prop.getBool("mostrar.botao.exportar.pesquisa.doc"));
 
         if (visualizacao == 3 || visualizacao == 4) {
             TreeMap<String, String> campos = new TreeMap<>();

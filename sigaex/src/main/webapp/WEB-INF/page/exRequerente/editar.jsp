@@ -5,6 +5,9 @@
 
 <script type="text/javascript">
 	function validar() {
+		document.querySelector('#okButton').disabled = true;
+
+
 		/*var nmRequerente = document.getElementsByName('nmRequerente')[0].value;	
 		var dtNascimento = document.getElementsByName('dtNascimento')[0].value;
 		var cpf = document.getElementsByName('cpf')[0].value;
@@ -377,7 +380,7 @@
 					<div class="row">
 						<div class="col-sm-2">
 							<div class="form-group">
-								<button type="button" onclick="javascript: validar();"
+								<button id="okButton" type="button" onclick="javascript: validar();"
 									class="btn btn-primary">Ok</button>
 								<button type="button" onclick="javascript:history.back();"
 									class="btn btn-primary">Cancelar</button>

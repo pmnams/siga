@@ -3,6 +3,7 @@
 <%@ taglib uri="http://localhost/libstag" prefix="f"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib uri = "http://localhost/functiontag" prefix = "ex" %>
 
 <!DOCTYPE html>
 <siga:pagina titulo="Gerar Protocolo" popup="true">
@@ -22,10 +23,10 @@
 	       
 	   }
 	</style>
-	<!-- main content bootstrap -->
-	<div class="card-body">
-		<div class="row">	
 
+	<!-- main content bootstrap -->
+	<main>
+		<div class="row" style="padding: 20px">
 			<div class="col-sm-12">
 				<div class="text-center">
 					<c:set var="brasao"  value="${f:resource('/siga.relat.brasao')}"/>
@@ -45,58 +46,60 @@
 				</div>
 			</div>
 		</div>
-		<br>
-		
 		<div  style="font-size: 26px">
-		<div class="row">
-			<div class="col-sm-12">
-				<div class="p-3 mb-2 bg-dark text-white text-center"  id="bg">
-					<h4><b>Protocolo de Acompanhamento de Documento</b></h4>
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="p-3 mb-2 bg-dark text-white text-center"  id="bg">
+						<h4><b>Protocolo de Acompanhamento de Documento</b></h4>
+					</div>
+				</div>
+			</div>
+			<br>
+			<br>
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="form-group text-center">
+						<label>N&uacute;mero do Documento: <b>${sigla}</b></label>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="form-group text-center">
+						<label>Código do Protocolo: <b>${protocolo.codigo}</b></label>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="form-group text-center">
+						<label>Data/Hora: ${dataHora}</label>
+					</div>
+				</div>
+			</div>
+			<br>
+			<br>
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="form-group text-center">
+						<label><b>Aten&ccedil;&atilde;o: </b>Para consultar o andamento do seu documento acesse  </label>
+						<br/>
+						<a href="${url}" target="_blank">${url}</a>
+						<br/>
+						<img style="width:250px;height:250px;margin-top: 10px" id="base64image"
+								   src="${ex:toBase64QrCode(url)}" />
+					</div>
 				</div>
 			</div>
 		</div>
-		<br>
-		<br>
-		<div class="row">
-			<div class="col-sm-12">
-				<div class="form-group text-center">
-					<label>N&uacute;mero do Documento: <b>${sigla}</b></label>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
-				<div class="form-group text-center">
-					<label>Código do Protocolo: <b>${protocolo.codigo}</b></label>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
-				<div class="form-group text-center">
-					<label>Data/Hora: ${dataHora}</label>
-				</div>
-			</div>
-		</div>
-		<br>
-		<br>
-		<div class="row">
-			<div class="col-sm-12">
-				<div class="form-group text-center">
-					<label><b>Aten&ccedil;&atilde;o: </b>Para consultar o andamento do seu documento acesse  </label>
-					<br />
-					<a href="${url}" target="_blank">${url}</a>
-				</div>
-			</div>
-		</div>
-		
-		</div>
-		<br>
-		<br>
-		<br />
-		<div id="btn">
+		<br/>
+		<br/>
+		<div id="btn" class="text-center">
 			<button type="button" class="btn btn-primary" onclick="document.body.offsetHeight; window.print();" >Imprimir</button>
-		</div>	
-	</div>
+		</div>
+		<br/>
+		<br/>
+		<br/>
+	</main>
 	
 </siga:pagina>
