@@ -31,10 +31,20 @@ import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import br.gov.jfrj.siga.ex.util.BIE.ModeloBIE;
 import br.gov.jfrj.siga.hibernate.ExDao;
+import com.google.common.collect.ImmutableMap;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageConfig;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import freemarker.ext.dom.NodeModel;
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.InputSource;
+import sun.misc.BASE64Encoder;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
@@ -1076,6 +1086,40 @@ public class FuncoesEL {
     public static String slugify(String string, Boolean lowercase,
                                  Boolean underscore) {
         return Texto.slugify(string, lowercase, underscore);
+    }
+
+    public static String toBase64QrCode(String data) {
+        QRCodeWriter barcodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = null;
+        try {
+            bitMatrix = barcodeWriter.encode(
+                    data, BarcodeFormat.QR_CODE,
+                    500,
+                    500,
+                    ImmutableMap.of(com.google.zxing.EncodeHintType.MARGIN, 0)
+            );
+        } catch (WriterException e) {
+            throw new RuntimeException(e);
+        }
+
+        String ret;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            MatrixToImageWriter.writeToStream(
+                    bitMatrix,
+                    "PNG",
+                    bos,
+                    new MatrixToImageConfig(MatrixToImageConfig.BLACK, 16777215)
+            );
+
+            BASE64Encoder encoder = new BASE64Encoder();
+            ret = encoder.encode(bos.toByteArray());
+            ret = ret.replace(System.lineSeparator(), "");
+        } catch (IOException e) {
+            throw new RuntimeException();
+        }
+
+        return "data:image/png;base64," + ret;
     }
 
 }

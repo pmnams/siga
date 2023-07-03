@@ -108,12 +108,12 @@ public class LoadProperties {
 		parametersOIDC.setTokenEndpointAuthSigningAlg(adaptorProperties.getProperty(tokenEndpointAuthSigningAlg).trim());
 
 		parametersOIDC.setResponseType(adaptorProperties.getProperty(responseType).trim());
-		parametersOIDC.setScopeOpenId(new Boolean(adaptorProperties.getProperty(scopeOpenId).trim()));
-		parametersOIDC.setScopeEmail(new Boolean(adaptorProperties.getProperty(scopeEmail).trim()));
-		parametersOIDC.setScopeProfile(new Boolean(adaptorProperties.getProperty(scopeProfile).trim()));
-		parametersOIDC.setScopeProfile(new Boolean(adaptorProperties.getProperty(scopePhone).trim()));
-		parametersOIDC.setScopeAddress(new Boolean(adaptorProperties.getProperty(scopeAddress).trim()));
-		parametersOIDC.setScopeOfflineAccess(new Boolean(adaptorProperties.getProperty(scopeOfflineAccess).trim()));
+		parametersOIDC.setScopeOpenId(Boolean.valueOf(adaptorProperties.getProperty(scopeOpenId).trim()));
+		parametersOIDC.setScopeEmail(Boolean.valueOf(adaptorProperties.getProperty(scopeEmail).trim()));
+		parametersOIDC.setScopeProfile(Boolean.valueOf(adaptorProperties.getProperty(scopeProfile).trim()));
+		parametersOIDC.setScopeProfile(Boolean.valueOf(adaptorProperties.getProperty(scopePhone).trim()));
+		parametersOIDC.setScopeAddress(Boolean.valueOf(adaptorProperties.getProperty(scopeAddress).trim()));
+		parametersOIDC.setScopeOfflineAccess(Boolean.valueOf(adaptorProperties.getProperty(scopeOfflineAccess).trim()));
 		parametersOIDC.setPrompt(adaptorProperties.getProperty(prompt).trim());
 		parametersOIDC.setCodeChallengeMethod(adaptorProperties.getProperty(codeChallengeMethod).trim());
 

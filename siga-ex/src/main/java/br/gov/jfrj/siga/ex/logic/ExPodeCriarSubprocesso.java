@@ -11,9 +11,9 @@ import com.crivano.jlogic.Not;
 
 public class ExPodeCriarSubprocesso extends CompositeExpressionSupport {
 
-    private ExMobil mob;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final ExMobil mob;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public ExPodeCriarSubprocesso(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;
@@ -34,24 +34,20 @@ public class ExPodeCriarSubprocesso extends CompositeExpressionSupport {
      * <li>Não pode haver configuração impeditiva. Tipo de configuração: Criar
      * Documento Filho</li>
      * </ul>
-     *
-     * @param titular
-     * @param lotaTitular
-     * @param mob
-     * @return
-     * @throws Exception
      */
     @Override
     protected Expression create() {
         return And.of(
-
-                new ExEProcesso(mob.doc()), new ExEMobilGeral(mob), Not.of(new ExTemMobilPai(mob.doc())),
-
-                Not.of(new ExEstaCancelado(mob.doc())), Not.of(new ExEstaSemEfeito(mob.doc())),
-                Not.of(new ExEstaArquivado(mob)), Not.of(new ExEstaPendenteDeAssinatura(mob.doc())),
-
+                new ExEProcesso(mob.doc()),
+                new ExEMobilGeral(mob),
+                Not.of(new ExTemMobilPai(mob.doc())),
+                Not.of(new ExEstaCancelado(mob.doc())),
+                Not.of(new ExEstaSemEfeito(mob.doc())),
+                Not.of(new ExEstaArquivado(mob)),
+                Not.of(new ExEstaPendenteDeAssinatura(mob.doc())),
                 new ExPodeAcessarDocumento(mob, titular, lotaTitular),
-
-                new ExPodePorConfiguracao(titular, lotaTitular).withIdTpConf(ExTipoDeConfiguracao.CRIAR_DOC_FILHO));
+                new ExPodePorConfiguracao(titular, lotaTitular)
+                        .withIdTpConf(ExTipoDeConfiguracao.CRIAR_DOC_FILHO)
+        );
     }
 }

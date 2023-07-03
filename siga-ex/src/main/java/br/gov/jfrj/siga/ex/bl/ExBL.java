@@ -1474,7 +1474,7 @@ public class ExBL extends CpBL {
                 // Receber o móbil pai caso ele tenha sido tramitado para o cadastrante ou sua lotação
                 if (Ex.getInstance().getComp().pode(ExPodeReceber.class, cadastrante, lotaCadastrante, doc.getExMobilPai()))
                     receber(cadastrante, cadastrante, lotaCadastrante, doc.getExMobilPai(), null);
-                juntarAoDocumentoPai(cadastrante, lotaCadastrante, doc, dtMov, cadastrante, cadastrante, mov);
+                juntarAoDocumentoPai(doc.getCadastrante(), doc.getLotaCadastrante(), doc, dtMov, cadastrante, cadastrante, mov);
             }
 
             if (doc.getExMobilAutuado() != null) {
@@ -1488,14 +1488,6 @@ public class ExBL extends CpBL {
         }
 
         try {
-            if (!fPreviamenteAssinado && doc.isAssinadoPorTodosOsSignatariosComTokenOuSenha()) {
-                processarComandosEmTag(doc, "assinatura");
-            }
-        } catch (final Exception e) {
-            throw new RuntimeException("Erro ao executar procedimento pós-assinatura: " + e.getLocalizedMessage(), e);
-        }
-
-        try {
             if (tramitar == null)
                 tramitar = deveTramitarAutomaticamente(cadastrante, lotaCadastrante, doc);
             if (tramitar)
@@ -1506,7 +1498,7 @@ public class ExBL extends CpBL {
 
         try {
             if (doc.isAssinadoPorTodosOsSignatariosComTokenOuSenha())
-                removerPapel(doc, ExPapel.PAPEL_REVISOR);
+                removerPapel(doc, ExPapel.PAPEL_REVISOR, "Remoção do papel de revisor");
 
             if (getExConsTempDocCompleto().podeVisualizarTempDocComplCossigsSubscritor(cadastrante, lotaCadastrante)
                     && doc.isFinalizado()
@@ -1515,9 +1507,23 @@ public class ExBL extends CpBL {
             ) {
                 getExConsTempDocCompleto().removerCossigsSubscritorVisTempDocsComplFluxoDepoisAssinar(cadastrante, lotaCadastrante, usuarioDoToken, doc);
             }
-
         } catch (final Exception e) {
             throw new RuntimeException("Erro ao remover revisores: " + e.getLocalizedMessage(), e);
+        }
+
+        // É importante que esta seja a última operação, pois estávamos vendo um erro muito estranho
+        // do Hibernate quando ele tentava deletar pela segunda vez a mesma CpMarca do banco. O erro
+        // era Caused by: org.hibernate.StaleStateException: Batch update returned unexpected row count
+        // from update [0]; actual row count: 0; expected: 1. Acho que a explicação é que de alguma
+        // forma, a criação de um novo procedimento, que por sua vez cria um documento filho, estava
+        // alterando o documento corrente. Aí, a sessão do hibernate não refletia mais os dados gravados
+        // no banco, e a tentativa de flush esbarrava em inconsistências.
+        try {
+            if (!fPreviamenteAssinado && doc.isAssinadoPorTodosOsSignatariosComTokenOuSenha()) {
+                processarComandosEmTag(doc, "assinatura");
+            }
+        } catch (final Exception e) {
+            throw new RuntimeException("Erro ao executar procedimento pós-assinatura: " + e.getLocalizedMessage(), e);
         }
     }
 
@@ -2867,8 +2873,8 @@ public class ExBL extends CpBL {
 
             // Pega a data sem horas, minutos e segundos...
             if (doc.getDtDoc() == null) {
-                c.set(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
-                doc.setDtDoc(c.getTime());
+                final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                doc.setDtDoc(sdf.parse(sdf.format(c.getTime())));
             }
 
             if (doc.getOrgaoUsuario() == null)
@@ -3629,30 +3635,35 @@ public class ExBL extends CpBL {
         }
     }
 
-    private void removerPapel(ExDocumento doc, long idPapel) throws Exception {
+    private void removerPapel(ExDocumento doc, long idPapel, String descrMov) throws Exception {
         ExMovimentacao movCancelamento = null;
         List<ExMovimentacao> movs = doc.getMobilGeral()
                 .getMovimentacoesPorTipo(ExTipoDeMovimentacao.VINCULACAO_PAPEL, false);
-        removerPapel(doc, movs, idPapel, null, null);
+        removerPapel(doc, movs, idPapel, null, descrMov);
     }
 
     public void removerPapel(ExDocumento doc, List<ExMovimentacao> movs, long idPapel, DpPessoa cadastrante, String descrMov) throws Exception {
         ExMovimentacao movCancelamento = null;
         boolean removido = false;
+
         for (ExMovimentacao mov : movs) {
             if (mov.isCancelada() || !mov.getExPapel().getIdPapel().equals(idPapel))
                 continue;
+
             if (movCancelamento == null) {
                 Date dt = dao().consultarDataEHoraDoServidor();
                 movCancelamento = criarNovaMovimentacao(
                         ExTipoDeMovimentacao.CANCELAMENTO_DE_MOVIMENTACAO, cadastrante, null,
-                        doc.getMobilGeral(), dt, null, null, null, null, null);
+                        doc.getMobilGeral(), dt, null, null, null, null, null
+                );
                 movCancelamento.setDescrMov(descrMov);
                 movCancelamento.setExMovimentacaoRef(mov);
             }
+
             gravarMovimentacaoCancelamento(movCancelamento, mov);
             removido = true;
         }
+
         if (removido)
             concluirAlteracaoDocComRecalculoAcesso(doc);
     }
