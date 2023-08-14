@@ -4897,7 +4897,6 @@ public class ExBL extends CpBL {
      * @throws AplicacaoException
      * @throws Exception
      */
-    // Nato: retirei: final HttpServletRequest request,
     public void transferir(final CpOrgao orgaoExterno, final String obsOrgao, final DpPessoa cadastrante,
                            final DpLotacao lotaCadastrante, final ExMobil mob, final Date dtMov, final Date dtMovIni,
                            final Date dtFimMov, DpLotacao lotaResponsavel, final DpPessoa responsavel, final CpGrupoDeEmail grupo,
@@ -4912,8 +4911,6 @@ public class ExBL extends CpBL {
         final DpPessoa titularFinal = titular != null ? titular : cadastrante;
 
         SortedSet<ExMobil> set = mob.getMobilEApensosExcetoVolumeApensadoAoProximo();
-
-        Date dtUltReceb = null;
 
         // Edson: apagar isto? A verificação já é feita no for abaixo...
         if (fDespacho && mob.isApensadoAVolumeDoMesmoProcesso())
@@ -5096,7 +5093,7 @@ public class ExBL extends CpBL {
                                 cont = tpDespacho.getDescTpDespacho();
                             }
                             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                                baos.write("conteudo".getBytes("iso-8859-1"));
+                                baos.write("conteudo".getBytes(StandardCharsets.ISO_8859_1));
                                 baos.write('=');
                                 baos.write(URLEncoder.encode(cont, "iso-8859-1").getBytes());
                                 mov.setConteudoBlobForm(baos.toByteArray());
@@ -5108,7 +5105,7 @@ public class ExBL extends CpBL {
                             mov.setConteudoBlobHtmlString(strHtml);
 
                             // Gravar o Pdf
-                            final byte pdf[] = Documento.generatePdf(strHtml);
+                            final byte[] pdf = Documento.generatePdf(strHtml);
                             mov.setConteudoBlobPdf(pdf);
                             mov.setConteudoTpMov("application/zip");
                         }
@@ -5133,7 +5130,7 @@ public class ExBL extends CpBL {
 
                         // Cancelar trâmite pendente quando é para forçar para outro destino
                         Set<ExMovimentacao> movsTramitePendente = m.calcularTramitesPendentes().tramitesPendentes;
-                        if (forcarTransferencia && movsTramitePendente.size() > 0) {
+                        if (forcarTransferencia && !movsTramitePendente.isEmpty()) {
                             for (ExMovimentacao tp : movsTramitePendente)
                                 gravarMovimentacaoCancelamento(mov, tp);
                         } else {
@@ -5142,12 +5139,12 @@ public class ExBL extends CpBL {
 
                         concluirAlteracaoParcialComRecalculoAcesso(m);
 
-                        List<ExMovimentacao> listaMovimentacao = new ArrayList<ExMovimentacao>();
-                        listaMovimentacao.addAll(m.doc().getMobilGeral()
-                                .getMovsNaoCanceladas(ExTipoDeMovimentacao.RESTRINGIR_ACESSO));
+                        List<ExMovimentacao> listaMovimentacao = new ArrayList<>(
+                                m.doc().getMobilGeral().getMovsNaoCanceladas(ExTipoDeMovimentacao.RESTRINGIR_ACESSO)
+                        );
+
                         if (!listaMovimentacao.isEmpty()) {
-                            List<ExDocumento> listaDocumentos = new ArrayList<ExDocumento>();
-                            listaDocumentos.addAll(mob.getDoc().getExDocumentoFilhoSet());
+                            List<ExDocumento> listaDocumentos = new ArrayList<>(mob.getDoc().getExDocumentoFilhoSet());
 
                             for (ExDocumento exDocumento : listaDocumentos) {
                                 concluirAlteracaoParcialComRecalculoAcesso(exDocumento.getMobilGeral());

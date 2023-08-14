@@ -31,15 +31,12 @@ public class ExPodeTransferir extends CompositeExpressionSupport {
     protected Expression create() {
 
         return And.of(
-
                 new ExPodeSerTransferido(mob),
-
                 Not.of(new ExEstaEmTransito(mob, titular, lotaTitular)),
-
                 new ExPodeMovimentar(mob, titular, lotaTitular),
-
-                new ExPodePorConfiguracao(titular, lotaTitular).withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
-                        .withExTpMov(ExTipoDeMovimentacao.TRANSFERENCIA));
-
+                new ExPodePorConfiguracao(titular, lotaTitular)
+                        .withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
+                        .withExTpMov(ExTipoDeMovimentacao.TRANSFERENCIA)
+        );
     }
 }

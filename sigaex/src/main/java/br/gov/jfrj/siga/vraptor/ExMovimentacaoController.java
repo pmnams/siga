@@ -1919,17 +1919,20 @@ public class ExMovimentacaoController extends ExController {
             throw new AplicacaoException("Documento não pode ser tramitado para esta pessoa/lotação.");
         }
 
-        final ExMovimentacaoBuilder movimentacaoBuilder = ExMovimentacaoBuilder
-                .novaInstancia();
-        movimentacaoBuilder.setDtMovString(dtMovString)
-                .setSubscritorSel(subscritorSel).setMob(builder.getMob())
-                .setSubstituicao(substituicao).setTitularSel(titularSel)
+        final ExMovimentacaoBuilder movimentacaoBuilder = ExMovimentacaoBuilder.novaInstancia()
+                .setDtMovString(dtMovString)
+                .setSubscritorSel(subscritorSel)
+                .setMob(builder.getMob())
+                .setSubstituicao(substituicao)
+                .setTitularSel(titularSel)
                 .setNmFuncaoSubscritor(nmFuncaoSubscritor)
-                .setIdTpDespacho(idTpDespacho).setDescrMov(descrMov)
+                .setIdTpDespacho(idTpDespacho)
+                .setDescrMov(descrMov)
                 .setLotaResponsavelSel(lotaResponsavelSel)
                 .setResponsavelSel(responsavelSel)
                 .setDtDevolucaoMovString(dtDevolucaoMovString)
-                .setCpOrgaoSel(cpOrgaoSel).setObsOrgao(obsOrgao);
+                .setCpOrgaoSel(cpOrgaoSel)
+                .setObsOrgao(obsOrgao);
 
         ITipoDeMovimentacao tpTramite = ExTipoDeMovimentacao.getById(tipoTramite);
         final ExMovimentacao mov = movimentacaoBuilder.construir(dao());
