@@ -2348,7 +2348,22 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
     public boolean isAtendente(DpPessoa pessoa, DpLotacao lotacao) {
         Set<PessoaLotacaoParser> set = getAtendente();
 
-        set.removeIf(pl -> Objects.equals(pl.getLotacao(), lotacao) && !Objects.equals(pl.getPessoa(), pessoa));
+        for (PessoaLotacaoParser pp : set) {
+            boolean estaTranferindo = false;
+            boolean emCaixaDeEntrada = false;
+            for (ExMarca marca : getExMarcaSetAtivas()) {
+                if (marca.getCpMarcador().getId() == CpMarcadorEnum.EM_TRANSITO_ELETRONICO.getId())
+                    estaTranferindo = true;
+                else if (marca.getCpMarcador().getId() == CpMarcadorEnum.CAIXA_DE_ENTRADA.getId())
+                    emCaixaDeEntrada = true;
+            }
+
+            if (!estaTranferindo && !emCaixaDeEntrada)
+                break;
+
+            if ((Objects.nonNull(pessoa) && Objects.equals(pp.getLotacao(), lotacao)) && !Objects.equals(pp.getPessoa(), pessoa))
+                set.remove(pp);
+        }
 
         return equivalePessoaOuLotacaoPreferencialmentePelaLotacao(pessoa, lotacao, set);
     }
