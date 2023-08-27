@@ -30,6 +30,7 @@ import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.BIE.ExBoletimDoc;
 import br.gov.jfrj.siga.ex.converter.ExTipoDePrincipalConverter;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDePrincipal;
+import br.gov.jfrj.siga.storage.SigaBlob;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SortNatural;
 
@@ -37,6 +38,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.TreeSet;
 
 /**
@@ -392,7 +394,7 @@ public abstract class AbstractExDocumento extends ExArquivo implements
     @BatchSize(size = 1)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "exDocumento")
     @SortNatural
-    private java.util.SortedSet<ExMobil> exMobilSet = new TreeSet<ExMobil>();
+    private java.util.SortedSet<ExMobil> exMobilSet = new TreeSet<>();
 
     @BatchSize(size = 1)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "exDocumento")
@@ -409,9 +411,13 @@ public abstract class AbstractExDocumento extends ExArquivo implements
     @JoinColumn(name = "ID_PROTOCOLO")
     private ExProtocolo exProtocolo;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "ID_ARQ")
     private CpArquivo cpArquivo;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "ID_BLOB")
+    private SigaBlob exBlob;
 
     @Column(name = "CD_PRINCIPAL")
     private String principal;
@@ -433,9 +439,9 @@ public abstract class AbstractExDocumento extends ExArquivo implements
     /**
      * Constructor of AbstractExDocumento instances given a simple primary key.
      *
-     * @param idDoc
+     * @param idDoc - ID do documento
      */
-    public AbstractExDocumento(final java.lang.Long idDoc) {
+    public AbstractExDocumento(final Long idDoc) {
         this.setIdDoc(idDoc);
     }
 
@@ -505,7 +511,7 @@ public abstract class AbstractExDocumento extends ExArquivo implements
     /**
      * Retorna a data de finalização do documento
      *
-     * @return
+     * @return Data de finalização do documento
      */
     public Date getDtFinalizacao() {
         return dtFinalizacao;
@@ -1087,41 +1093,40 @@ public abstract class AbstractExDocumento extends ExArquivo implements
     }
 
     public byte[] getConteudoBlobDoc() {
-        if (cacheConteudoBlobDoc != null) {
+        if (Objects.nonNull(exBlob)) {
+            return exBlob.getData();
+        }
+
+        if (cacheConteudoBlobDoc != null)
             return cacheConteudoBlobDoc;
-        } else if (getCpArquivo() == null) {
-            cacheConteudoBlobDoc = conteudoBlobDoc;
-        } else {
+
+        if (Objects.nonNull(getCpArquivo())) {
             try {
                 cacheConteudoBlobDoc = getCpArquivo().getConteudo();
             } catch (Exception e) {
                 throw new AplicacaoException(e.getMessage());
             }
+        } else {
+            cacheConteudoBlobDoc = conteudoBlobDoc;
         }
+
         return cacheConteudoBlobDoc;
     }
 
     public void setConteudoBlobDoc(byte[] createBlob) {
-        cacheConteudoBlobDoc = createBlob;
-        if (this.cpArquivo == null && (conteudoBlobDoc != null || CpArquivoTipoArmazenamentoEnum.BLOB.equals(CpArquivoTipoArmazenamentoEnum.valueOf(Prop.get("/siga.armazenamento.arquivo.tipo"))))) {
-            conteudoBlobDoc = createBlob;
-        } else if (cacheConteudoBlobDoc != null) {
-            if (orgaoPermiteHcp())
-                cpArquivo = CpArquivo.updateConteudo(cpArquivo, cacheConteudoBlobDoc);
-            else
-                conteudoBlobDoc = createBlob;
-        }
+        if (exBlob == null) {
+            exBlob = new SigaBlob(createBlob);
+        } else
+            exBlob.setData(createBlob);
     }
-
 
     private boolean orgaoPermiteHcp() {
         List<String> orgaos = Prop.getList("/siga.armazenamento.orgaos");
         if ("*".equals(orgaos.get(0)))
             return true;
         final String sigla = this.orgaoUsuario != null ? this.orgaoUsuario.getSigla() : (this.getCadastrante() != null ? this.getCadastrante().getOrgaoUsuario().getSigla() : null);
-        if (orgaos != null && (orgaos.stream().anyMatch(siglaFiltro -> siglaFiltro.equals(sigla))))
-            return true;
-        return false;
+
+        return orgaos.stream().anyMatch(siglaFiltro -> siglaFiltro.equals(sigla));
     }
 
     public ExProtocolo getExProtocolo() {
@@ -1146,9 +1151,11 @@ public abstract class AbstractExDocumento extends ExArquivo implements
 
     public void setDescrDocumentoAI(java.lang.String descrDocumentoAI) {
         if (descrDocumentoAI != null)
-            this.descrDocumentoAI = Texto.removeAcentoMaiusculas(descrDocumentoAI).substring(0, descrDocumentoAI.length() < LENGTH_DESCR_DOCUMENTO_AI ? descrDocumentoAI.length() : LENGTH_DESCR_DOCUMENTO_AI);
+            this.descrDocumentoAI = Texto.removeAcentoMaiusculas(
+                    descrDocumentoAI).substring(0, Math.min(descrDocumentoAI.length(), LENGTH_DESCR_DOCUMENTO_AI)
+            );
         else
-            this.descrDocumentoAI = descrDocumentoAI;
+            this.descrDocumentoAI = null;
     }
 
     public String getPrincipal() {

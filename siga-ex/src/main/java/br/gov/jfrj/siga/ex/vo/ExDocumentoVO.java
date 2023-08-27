@@ -87,9 +87,8 @@ public class ExDocumentoVO extends ExVO {
 
     String dtFinalizacao;
     String nmArqMod;
-    String conteudoBlobHtmlString;
-    String conteudoBlobFormString;
-    Map<String, String> form;
+    //String conteudoBlobFormString;
+    //Map<String, String> form;
     String sigla;
     String fisicoOuEletronico;
     boolean fDigital;
@@ -217,17 +216,6 @@ public class ExDocumentoVO extends ExVO {
         this.dtFinalizacao = doc.getDtFinalizacaoDDMMYY();
         if (doc.getExModelo() != null)
             this.nmArqMod = doc.getExModelo().getNmArqMod();
-
-        this.conteudoBlobHtmlString = doc
-                .getConteudoBlobHtmlStringComReferencias();
-
-        byte[] conteudoBlobForm = doc.getConteudoBlobForm();
-        if (conteudoBlobForm != null) {
-            Map<String, String> map = new HashMap<>();
-            this.conteudoBlobFormString = new String(conteudoBlobForm, StandardCharsets.ISO_8859_1);
-            Utils.mapFromUrlEncodedForm(map, conteudoBlobForm);
-            this.form = map;
-        }
 
         if (doc.isEletronico()) {
             this.classe = "header_eletronico";
@@ -1033,7 +1021,7 @@ public class ExDocumentoVO extends ExVO {
     }
 
     public String getConteudoBlobHtmlString() {
-        return conteudoBlobHtmlString;
+        return doc.getConteudoBlobHtmlStringComReferencias();
     }
 
     public String getDescrDocumento() {
