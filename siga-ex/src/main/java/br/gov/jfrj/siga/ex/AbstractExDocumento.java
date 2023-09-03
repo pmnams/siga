@@ -1118,6 +1118,8 @@ public abstract class AbstractExDocumento extends ExArquivo implements
             exBlob = new SigaBlob(createBlob);
         } else
             exBlob.setData(createBlob);
+
+        conteudoBlobDoc = null;
     }
 
     private boolean orgaoPermiteHcp() {
