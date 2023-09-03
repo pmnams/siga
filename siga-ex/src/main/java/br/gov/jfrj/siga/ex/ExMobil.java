@@ -2352,7 +2352,7 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
 
     public boolean isAtendente(DpPessoa pessoa, DpLotacao lotacao) {
         Set<PessoaLotacaoParser> set = getAtendente();
-        nacessível ao usuário
+
         for (PessoaLotacaoParser pp : set) {
             boolean estaTranferindo = false;
             boolean emCaixaDeEntrada = false;
