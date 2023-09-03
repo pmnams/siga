@@ -14,13 +14,13 @@ public class ExTramiteBL {
 
     public static class Pendencias {
         // Trâmite serial, paralelo e notificações
-        public Set<ExMovimentacao> tramitesPendentes = new TreeSet<ExMovimentacao>();
+        public Set<ExMovimentacao> tramitesPendentes = new TreeSet<>();
         // Trâmite serial, paralelo e notificações recebidos e ainda não concluídos
-        public Set<ExMovimentacao> recebimentosPendentes = new TreeSet<ExMovimentacao>();
+        public Set<ExMovimentacao> recebimentosPendentes = new TreeSet<>();
         // Somente notificações
-        public Set<ExMovimentacao> tramitesDeNotificacoesPendentes = new TreeSet<ExMovimentacao>();
+        public Set<ExMovimentacao> tramitesDeNotificacoesPendentes = new TreeSet<>();
         // Somente notificações recebidas e ainda não concluídos
-        public Set<ExMovimentacao> recebimentosDeNotificacoesPendentes = new TreeSet<ExMovimentacao>();
+        public Set<ExMovimentacao> recebimentosDeNotificacoesPendentes = new TreeSet<>();
         // Indica se o cadastrante do documento deve ser incluído na lista de atendentes
         public boolean fIncluirCadastrante = true;
     }
@@ -65,7 +65,8 @@ public class ExTramiteBL {
                     || ExTipoDeMovimentacao.hasRecebimento(mov.getExTipoMovimentacao()))
                     && Utils.igual(mov.getExTipoMovimentacao(), movAnt.getExTipoMovimentacao())
                     && Utils.igual(mov.getExMobil(), movAnt.getExMobil())
-                    && Utils.igual(mov.getExMovimentacaoRef(), movAnt.getExMovimentacaoRef()))
+                    && Utils.igual(mov.getExMovimentacaoRef(), movAnt.getExMovimentacaoRef())
+            )
                 movsAExcluir.add(mov);
             else
                 movAnt = mov;
@@ -109,10 +110,8 @@ public class ExTramiteBL {
                     // normal que cancela um recebimento pendente
                     if (p.tramitesPendentes.contains(mov.getExMovimentacaoRef())
                             || p.recebimentosPendentes.contains(mov.getExMovimentacaoRef())) {
-                        if (p.tramitesPendentes.contains(mov.getExMovimentacaoRef()))
-                            p.tramitesPendentes.remove(mov.getExMovimentacaoRef());
-                        if (p.recebimentosPendentes.contains(mov.getExMovimentacaoRef()))
-                            p.recebimentosPendentes.remove(mov.getExMovimentacaoRef());
+                        p.tramitesPendentes.remove(mov.getExMovimentacaoRef());
+                        p.recebimentosPendentes.remove(mov.getExMovimentacaoRef());
                     } else {
                         // Caso a movimentação não seja localizada, remover todas as pendências
                         // pois se trata de uma situação de erro

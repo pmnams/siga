@@ -311,7 +311,7 @@ public class ExMobilController extends
 
             int tamanhoMax = Prop.getInt("max.linhas.pesquisa.doc", 200000);
             if (getTamanho() > tamanhoMax) {
-                throw new RegraNegocioException("Numero máximo de registros para exportação excedido. Use os filtros para restringir resultado.");
+                throw new RegraNegocioException("Numero máximo (" + tamanhoMax  + ") de registros para exportação excedido. Use os filtros para restringir resultado.");
             }
 
             List lista = dao().consultarPorFiltroOtimizado(flt,

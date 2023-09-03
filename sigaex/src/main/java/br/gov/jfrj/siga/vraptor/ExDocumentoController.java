@@ -911,27 +911,6 @@ public class ExDocumentoController extends ExController {
             }
             s = " " + exDocumentoDTO.getMob().doc().getExNivelAcessoAtual().getNmNivelAcesso() + " " + s;
 
-            String ERRO_INACESSIVEL_USUARIO;
-
-            if (exibeNomeAcesso) {
-                if (!getCadastrante().isUsuarioExterno()) {
-                    ERRO_INACESSIVEL_USUARIO = "Documento " + exDocumentoDTO.getMob().getSigla()
-                            + " inacessível ao usuário " + " "
-                            + getTitular().getSiglaCompleta() + "/" + getLotaTitular().getLotacaoAtual()
-                            + "." + s + msgDestinoDoc;
-                } else {
-                    ERRO_INACESSIVEL_USUARIO = "Documento " + exDocumentoDTO.getMob().getSigla()
-                            + " inacessível ao usuário " + getTitular().getSiglaCompleta() + "/"
-                            + getLotaTitular().getLotacaoAtual() + "." + s + " " + msgDestinoDoc;
-                }
-            } else {
-                ERRO_INACESSIVEL_USUARIO = "Documento " + exDocumentoDTO.getMob().getSigla()
-                        + " inacessível ao usuário " + getTitular().getSiglaCompleta() + "/"
-                        + getLotaTitular().getLotacaoAtual() + ", Publico externo exceto se for subscritor"
-                        + " , cossignatário ou tiver algum perfil associado ao documento ou ainda se documento estiver "
-                        + " passado por sua lotação. ";
-            }
-
             Map<ExPapel, List<Object>> mapa = exDocumentoDTO.getMob().doc().getPerfis();
             boolean isInteressado = false;
 
@@ -941,7 +920,7 @@ public class ExDocumentoController extends ExController {
                 if ((exPapel != null) && (exPapel.getIdPapel() == exPapel.PAPEL_INTERESSADO)) {
                     while (it.hasNext() && !isInteressado) {
                         Object item = it.next();
-                        isInteressado = item.toString().equals(getTitular().getSigla()) ? true : false;
+                        isInteressado = item.toString().equals(getTitular().getSigla());
                     }
                 }
 

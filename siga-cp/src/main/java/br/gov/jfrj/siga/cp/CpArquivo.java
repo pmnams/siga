@@ -37,6 +37,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -139,17 +140,13 @@ public class CpArquivo implements Serializable, PersistentAttributeInterceptable
 
     @PreRemove
     private void removerArquivo() {
-        switch (getTipoArmazenamento()) {
-            case HCP:
-                if (getCaminho() != null) {
-                    CpArquivoExcluir excluir = new CpArquivoExcluir();
-                    excluir.setIdArqExc(getIdArq());
-                    excluir.setCaminho(getCaminho());
-                    ContextoPersistencia.em().persist(excluir);
-                }
-                break;
-            default:
-                break;
+        if (Objects.requireNonNull(getTipoArmazenamento()) == CpArquivoTipoArmazenamentoEnum.HCP) {
+            if (getCaminho() != null) {
+                CpArquivoExcluir excluir = new CpArquivoExcluir();
+                excluir.setIdArqExc(getIdArq());
+                excluir.setCaminho(getCaminho());
+                ContextoPersistencia.em().persist(excluir);
+            }
         }
     }
 

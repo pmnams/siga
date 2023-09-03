@@ -421,11 +421,8 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
         byte[] ab = getConteudoBlobHtml();
         if (ab == null)
             return null;
-        try {
-            return new String(ab, "ISO-8859-1");
-        } catch (UnsupportedEncodingException e) {
-            return new String(ab);
-        }
+
+        return new String(ab, StandardCharsets.ISO_8859_1);
     }
 
     /**

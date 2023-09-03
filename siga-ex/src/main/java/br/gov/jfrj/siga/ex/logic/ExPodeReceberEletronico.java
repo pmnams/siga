@@ -43,7 +43,6 @@ public class ExPodeReceberEletronico extends CompositeExpressionSupport {
      */
     @Override
     protected Expression create() {
-
         return And.of(
                 new ExEEletronico(mob.doc()),
                 Or.of(
