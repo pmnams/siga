@@ -388,7 +388,7 @@ public class ExRelatorioController extends ExController {
         parametros.put("link_siga", linkHttp() + getRequest().getServerName()
                 + ":" + getRequest().getServerPort()
                 + getRequest().getContextPath()
-                + "app/expediente/doc/exibir?sigla=");
+                + "/app/expediente/doc/exibir?sigla=");
         addParametrosPersonalizadosOrgãoString(parametros);
         final RelatorioDocumentosSubordinados rel = new RelatorioDocumentosSubordinados(
                 parametros);
