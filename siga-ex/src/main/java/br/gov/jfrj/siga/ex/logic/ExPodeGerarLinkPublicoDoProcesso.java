@@ -30,7 +30,7 @@ public class ExPodeGerarLinkPublicoDoProcesso extends CompositeExpressionSupport
                 new ExPodeSerMovimentado(mob, titular, lotaTitular),
                 Not.of(new ExTemMovimentacaoNaoCanceladaDoTipo(mob, ExTipoDeMovimentacao.GERAR_LINK_PUBLICO_PROCESSO)),
                 Or.of(
-                        new ExEstaMarcadoComMarcador(
+                        new ExEstaMarcadoComMarcadorOuOGeral(
                                 mob,
                                 ExDao.getInstance().consultar(
                                         CpMarcadorEnum.COVID_19.getId(),
