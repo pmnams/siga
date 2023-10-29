@@ -14,9 +14,9 @@ import java.util.GregorianCalendar;
 
 public class ExPodeAgendarPublicacaoNoBoletim extends CompositeExpressionSupport {
 
-    private ExMobil mob;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final ExMobil mob;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public ExPodeAgendarPublicacaoNoBoletim(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;
@@ -33,9 +33,7 @@ public class ExPodeAgendarPublicacaoNoBoletim extends CompositeExpressionSupport
     protected Expression create() {
 
         return And.of(
-
                 new Expression() {
-
                     @Override
                     public boolean eval() {
                         GregorianCalendar agora = new GregorianCalendar();
@@ -49,9 +47,7 @@ public class ExPodeAgendarPublicacaoNoBoletim extends CompositeExpressionSupport
                     }
 
                 },
-
-                new ExPodeExibirBotaoDeAgendarPublicacaoNoBoletim(mob, titular, lotaTitular),
-
-                new ExPodeGerenciarPublicacaoNoBoletimPorConfiguracao(mob, titular, lotaTitular));
+                new ExPodeExibirBotaoDeAgendarPublicacaoNoBoletim(mob, titular, lotaTitular)
+        );
     }
 }

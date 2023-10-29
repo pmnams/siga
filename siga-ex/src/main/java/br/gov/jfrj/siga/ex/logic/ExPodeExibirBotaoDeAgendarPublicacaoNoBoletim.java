@@ -9,9 +9,9 @@ import com.crivano.jlogic.*;
 
 public class ExPodeExibirBotaoDeAgendarPublicacaoNoBoletim extends CompositeExpressionSupport {
 
-    private ExMobil mob;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final ExMobil mob;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public ExPodeExibirBotaoDeAgendarPublicacaoNoBoletim(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;
@@ -37,41 +37,28 @@ public class ExPodeExibirBotaoDeAgendarPublicacaoNoBoletim extends CompositeExpr
      *
      * </ul>
      *
-     * @return
-     * @throws Exception
      */
     @Override
     protected Expression create() {
 
         return And.of(
-
                 new ExEMobilGeral(mob),
-
                 new ExEstaFinalizado(mob.doc()),
-
                 Not.of(new ExEstaEliminado(mob)),
-
                 Not.of(new ExEInternoFolhaDeRosto(mob.doc())),
-
                 Or.of(
-
                         And.of(
-
                                 new ExPodeMovimentar(mob, titular, lotaTitular),
-
                                 new ExPodePorConfiguracao(titular, lotaTitular)
                                         .withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
-                                        .withExTpMov(ExTipoDeMovimentacao.REGISTRO_ASSINATURA_DOCUMENTO)
-                                        .withExMod(mob.doc().getExModelo())),
-
-                        new ExPodeGerenciarPublicacaoNoBoletimPorConfiguracao(mob, titular, lotaTitular)),
-
+                                        .withExTpMov(ExTipoDeMovimentacao.AGENDAMENTO_DE_PUBLICACAO_BOLETIM)
+                                        .withExMod(mob.doc().getExModelo())
+                        ),
+                        new ExPodeGerenciarPublicacaoNoBoletimPorConfiguracao(mob, titular, lotaTitular)
+                ),
                 Not.of(new ExEstaPublicadoNoBoletim(mob.doc())),
-
                 Not.of(new ExEstaPendenteDeAssinatura(mob.doc())),
-
                 Not.of(new ExEstaSolicitadaPublicacaoNoBoletim(mob.doc())),
-
                 Not.of(new ExEstaArquivado(mob)));
     }
 }
