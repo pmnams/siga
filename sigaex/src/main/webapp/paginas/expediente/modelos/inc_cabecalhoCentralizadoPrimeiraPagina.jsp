@@ -14,7 +14,7 @@
 				<td width="100%" align="center" valign="bottom">
 				<c:choose>
 					<c:when test="${fn:startsWith(f:resource('/siga.relat.brasao'), '/')}">
-						<img src="contextpath/imagens/${f:resource('/siga.relat.brasao')}" width="65" height="65" />
+						<img src="contextpath/${fn:substringAfter(f:resource('/siga.relat.brasao'), '/')}" width="65" height="65" />
 					</c:when>
 					<c:when test="${fn:startsWith(f:resource('/siga.relat.brasao'), 'http')}">
 						<img src="${f:resource('/siga.relat.brasao')}" width="65" height="65" />
