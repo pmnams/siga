@@ -65,7 +65,7 @@
 								CKEDITOR.config.stylesSet = 'siga_ckeditor_styles';
 								
 								CKEDITOR.stylesSet.add('siga_ckeditor_styles', [{
-								        name: 'Título',
+								        name: 'Tï¿½tulo',
 								        element: 'h1',
 								        styles: {
 								            'text-align': 'justify',
@@ -73,7 +73,7 @@
 								        }
 								    },
 								    {
-								        name: 'Subtítulo',
+								        name: 'Subtï¿½tulo',
 								        element: 'h2',
 								        styles: {
 								            'text-align': 'justify',
@@ -133,6 +133,7 @@
 								    }
 								];
 								CKEDITOR.config.extraPlugins = 'footnotes';
+								CKEDITOR.config.removePlugins = 'contextmenu,liststyle,tabletools,tableselection'
 								window.onload = function() {
 								    $("textarea.editor").each(function(index) {
 								        CKEDITOR.replace(this, {

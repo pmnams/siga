@@ -1278,13 +1278,10 @@ Descrição: Esta macro é utilizada pelo Integrador
                         [#else]
 
                             <script type="text/javascript">
-
-                                CKEDITOR.config.scayt_autoStartup = true;
-                                CKEDITOR.config.scayt_sLang = 'pt_BR';
+                                CKEDITOR.config.disableNativeSpellChecker = false;
                                 CKEDITOR.config.height = '400';
+                                CKEDITOR.config.removePlugins = 'contextmenu,liststyle,tabletools,tableselection'
                                 CKEDITOR.config.stylesSet = 'siga_ckeditor_styles';
-
-
                                 CKEDITOR.stylesSet.add('siga_ckeditor_styles', [
                                     {
                                         name: 'Título',
@@ -1310,8 +1307,8 @@ Descrição: Esta macro é utilizada pelo Integrador
                                             'text-indent': '2cm'
                                         }
                                     }]);
-                                CKEDITOR.config.toolbar = 'SigaToolbar';
 
+                                CKEDITOR.config.toolbar = 'SigaToolbar';
                                 CKEDITOR.config.toolbar_SigaToolbar =
                                     [
                                         {name: 'styles', items: ['Styles']},
@@ -1393,8 +1390,6 @@ Descrição: Esta macro é utilizada pelo Integrador
                         [#else]
                             <script type="text/javascript">
                                 CKEDITOR.config.disableNativeSpellChecker = false;
-                                CKEDITOR.config.scayt_autoStartup = false;
-                                CKEDITOR.config.scayt_sLang = 'pt_BR';
                                 CKEDITOR.config.stylesSet = 'siga_ckeditor_styles';
 
                                 if (CKEDITOR.stylesSet.get('siga_ckeditor_styles') == null) {
@@ -1437,10 +1432,8 @@ Descrição: Esta macro é utilizada pelo Integrador
                                     ]);
 
                                 }
-                                ;
 
                                 CKEDITOR.config.toolbar = 'SigaToolbar';
-
                                 CKEDITOR.config.toolbar_SigaToolbar = [{
                                     name: 'styles',
                                     items: ['Styles']
@@ -1642,6 +1635,7 @@ Descrição: Esta macro é utilizada pelo Integrador
                                     });
                                 //CKEDITOR.config.extraPlugins = ['footnotes', 'strinsert'];
                                 CKEDITOR.config.extraPlugins = ['strinsert'];
+                                CKEDITOR.config.removePlugins = 'contextmenu,liststyle,tabletools,tableselection'
 
                                 window.onload = function () {
                                     $("textarea.editor").each(function (index) {
