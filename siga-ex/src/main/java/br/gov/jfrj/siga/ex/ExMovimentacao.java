@@ -1294,7 +1294,7 @@ public class ExMovimentacao extends AbstractExMovimentacao implements
             return "OK.";
 
         final JWTVerifier verifier;
-        String pwd = Prop.get("carimbo.public.key");
+        String pwd = Prop.get("timestamp.public.key");
         if (pwd == null)
             throw new AplicacaoException("Inválido (falta propriedade sigaex.carimbo.public.key)");
 
