@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <revision>1.2.4-beta.10</revision>
+        <revision>1.2.4-beta.11</revision>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -38,6 +38,7 @@
         <module>siga-oidc</module>
         <module>siga-integracao</module>
     </modules>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
