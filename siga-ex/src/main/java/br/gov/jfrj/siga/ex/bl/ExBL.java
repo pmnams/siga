@@ -6000,20 +6000,27 @@ public class ExBL extends CpBL {
     private void acrescentarHashDeAuditoria(ExMovimentacao mov, byte[] sha256, boolean autenticar, String nome,
                                             String cpf, String json) {
         try {
-            String timestampUrl = Prop.get("carimbo.url");
+            String timestampUrl = Prop.get("timestamp.url");
             log.warn("URL_TIMESTAMP " + timestampUrl);
             if (timestampUrl == null)
                 return;
             TimestampPostRequest req = new TimestampPostRequest();
-            req.system = Prop.get("carimbo.sistema");
+            req.system = Prop.get("timestamp.sistema");
             req.sha256 = sha256;
             req.tipo = autenticar ? "auth" : "sign";
             req.nome = nome;
             req.cpf = cpf;
             req.json = json;
-            SwaggerAsyncResponse<TimestampPostResponse> resp = SwaggerCall.callAsync("obter timestamp", null, "POST",
-                            timestampUrl + "/timestamp", req, TimestampPostResponse.class)
-                    .get(HASH_TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+
+            SwaggerAsyncResponse<TimestampPostResponse> resp = SwaggerCall.callAsync(
+                    "obter timestamp",
+                    null,
+                    "POST",
+                    timestampUrl + "/timestamp",
+                    req,
+                    TimestampPostResponse.class
+            ).get(HASH_TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+
             if (resp != null && resp.getException() != null)
                 throw new RuntimeException("Exceção obtendo carimbo de tempo para a assinatura com senha",
                         resp.getException());

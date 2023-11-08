@@ -139,9 +139,9 @@ public class ExApiV1Servlet extends SwaggerServlet implements IPropertyProvider 
 
     private void defineProperties() {
         addPublicProperty("limita.acesso.documentos.por.configuracao", "true");
-        addPublicProperty("carimbo.sistema", "siga");
-        addPublicProperty("carimbo.url", null);
-        addPublicProperty("carimbo.public.key", null);
+        addPublicProperty("timestamp.sistema", "siga");
+        addPublicProperty("timestamp.url", "http://assijus:8080/assijus/api/v1");
+        addPublicProperty("timestamp.public.key", null);
 
         addPublicProperty("data.validar.assinatura.digital", "01/10/2020");
         addPublicProperty("data.validar.assinatura.com.senha", "01/10/2020");
@@ -180,7 +180,8 @@ public class ExApiV1Servlet extends SwaggerServlet implements IPropertyProvider 
         addPublicProperty("threadpool.size", "10");
 
         addPrivateProperty("assinador.externo.password", null);
-        addPrivateProperty("assinador.externo.popup.url", "https://ittrufusion.appspot.com");
+        addPrivateProperty("assinador.externo.popup.url", Prop.get("/siga.external.base.url") + "/assijus");
+
         addPublicProperty("assinatura.code.base.path", null);
         addPublicProperty("assinatura.messages.url.path", null);
         addPublicProperty("assinatura.policy.url.path", null);
