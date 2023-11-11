@@ -185,6 +185,8 @@ public class ExModeloController extends ExSelecionavelController {
 				modelo.setExNivelAcesso(dao().consultar(nivel,
 						ExNivelAcesso.class, false));
 			}
+			else
+				modelo.setExNivelAcesso(null);
 		}
 
 		final ExModelo modAntigo = buscarModeloAntigo(modelo.getIdInicial());
