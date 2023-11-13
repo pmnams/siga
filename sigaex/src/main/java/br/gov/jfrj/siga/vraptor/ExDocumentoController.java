@@ -78,13 +78,9 @@ import java.util.*;
 
 @Controller
 public class ExDocumentoController extends ExController {
-
-    private static final String ERRO_EXCLUIR_ARQUIVO = "Erro ao excluir o arquivo";
-    private static final String ERRO_GRAVAR_ARQUIVO = "Erro ao gravar o arquivo";
     private static final String URL_EXIBIR = "/app/expediente/doc/exibir?sigla={0}";
     private static final String URL_EDITAR = "/app/expediente/doc/editar?sigla={0}";
     private String url = null;
-    final ExDocumentoDTO dto = new ExDocumentoDTO();
     private final static Logger log = Logger.getLogger(ExDocumentoController.class);
 
     /**

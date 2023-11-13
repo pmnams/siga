@@ -1,5 +1,6 @@
 package br.gov.jfrj.siga.ex.bl;
 
+import br.gov.jfrj.siga.dp.CpOrgaoUsuario;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.ExDocumento;
@@ -115,10 +116,12 @@ public class AcessoConsulta {
     }
 
     public static boolean ehPublicoExterno(DpPessoa titular) {
-        return (
-                (titular.getOrgaoUsuario().getIsExternoOrgaoUsu() != null && titular.getOrgaoUsuario().getIsExternoOrgaoUsu() == 1)
-                        || (titular.getLotacao() != null && titular.getLotacao().getIsExternaLotacao() != null && titular.getLotacao().getIsExternaLotacao() == 1)
-        );
+        CpOrgaoUsuario orgao = titular.getOrgaoUsuario();
+        if ((orgao != null) && (orgao.getIsExternoOrgaoUsu() == 1))
+            return true;
+
+        DpLotacao lot = titular.getLotacao();
+        return (lot != null) && (lot.getLotacaoAtual().getIsExternaLotacao() == 1);
     }
 
 }

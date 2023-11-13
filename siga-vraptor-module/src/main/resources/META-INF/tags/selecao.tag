@@ -281,8 +281,8 @@
     <div class="form-group">
         <label for="formulario_${inputNameTipoSel}_sigla"
                class="col-sm-2x col-form-label">${titulo}</label>
-    </div>
 </c:if>
+
 <c:choose>
     <c:when test="${desativar == 'sim'}">
         <c:set var="disabledTxt" value="disabled"/>
@@ -333,6 +333,10 @@
         </div>
     </c:if>
 </div>
+
+<c:if test="${tema != 'simple'}">
+    </div>
+</c:if>
 
 
 <c:if
