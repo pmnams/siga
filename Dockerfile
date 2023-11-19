@@ -1,4 +1,4 @@
-FROM pmna/siga-base:latest
+FROM pmna/siga-base:26.1
 
 COPY infra/config/base/siga-skel/configs "${SIGA_DIR}/configs"
 COPY infra/config/base/siga-skel/props "${SIGA_DIR}/props"
