@@ -41,7 +41,6 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import freemarker.ext.dom.NodeModel;
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.InputSource;
-import sun.misc.BASE64Encoder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -1112,8 +1111,7 @@ public class FuncoesEL {
                     new MatrixToImageConfig(MatrixToImageConfig.BLACK, 16777215)
             );
 
-            BASE64Encoder encoder = new BASE64Encoder();
-            ret = encoder.encode(bos.toByteArray());
+            ret = Base64.getEncoder().encodeToString(bos.toByteArray());
             ret = ret.replace(System.lineSeparator(), "");
         } catch (IOException e) {
             throw new RuntimeException();

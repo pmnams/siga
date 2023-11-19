@@ -88,18 +88,17 @@
 			<artifactId>vraptor-jpa</artifactId>
 			<version>4.0.5</version>
 			<exclusions>
-				<exclusion>  <!-- declare the exclusion here -->
+				<exclusion>
 					<groupId>org.eclipse.persistence</groupId>
 					<artifactId>javax.persistence</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>br.com.caelum</groupId>
+					<artifactId>vraptor</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
 
-		<dependency>
-			<groupId>javax.enterprise</groupId>
-			<artifactId>cdi-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
@@ -107,11 +106,13 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.jboss.spec.javax.xml.ws</groupId>
 			<artifactId>jboss-jaxws-api_2.3_spec</artifactId>
 			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>javax.jws</groupId>
 			<artifactId>jsr181-api</artifactId>

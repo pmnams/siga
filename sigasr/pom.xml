@@ -27,6 +27,12 @@
             <groupId>br.com.caelum.vraptor</groupId>
             <artifactId>vraptor-freemarker</artifactId>
             <version>4.1.0-RC3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>br.com.caelum</groupId>
+                    <artifactId>vraptor</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -138,9 +144,13 @@
             <artifactId>vraptor-jpa</artifactId>
             <version>4.0.5</version>
             <exclusions>
-                <exclusion>  <!-- declare the exclusion here -->
+                <exclusion>
                     <groupId>org.eclipse.persistence</groupId>
                     <artifactId>javax.persistence</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>br.com.caelum</groupId>
+                    <artifactId>vraptor</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -148,13 +158,6 @@
         <dependency>
             <groupId>org.eclipse.birt.runtime.3_7_1</groupId>
             <artifactId>Tidy</artifactId>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/javax.enterprise/cdi-api -->
-        <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>

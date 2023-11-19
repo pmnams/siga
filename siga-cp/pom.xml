@@ -12,16 +12,9 @@
 	<artifactId>siga-cp</artifactId>
 
 	<dependencies>
-
-		<dependency>
-			<groupId>javax.enterprise</groupId>
-			<artifactId>cdi-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>org.jboss.spec.javax.servlet</groupId>
-			<artifactId>jboss-servlet-api_2.5_spec</artifactId>
+			<artifactId>jboss-servlet-api_4.0_spec</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
