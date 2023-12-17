@@ -56,6 +56,7 @@ import br.gov.jfrj.siga.model.Selecao;
 import br.gov.jfrj.siga.persistencia.ExMobilDaoFiltro;
 import br.gov.jfrj.siga.vraptor.builder.BuscaDocumentoBuilder;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 
@@ -474,6 +475,14 @@ public class ExDocumentoController extends ExController {
 
         buscarDocumentoOuNovo(true, exDocumentoDTO);
 
+        exDocumentoDTO.setListaNivelAcesso(getListaNivelAcesso(exDocumentoDTO));
+        if (exDocumentoDTO.getModelo() != null
+                && exDocumentoDTO.getModelo().getExNivelAcesso() != null) {
+            List<ExNivelAcesso> l = new ArrayList<>();
+            l.add(exDocumentoDTO.getModelo().getExNivelAcesso());
+            exDocumentoDTO.setListaNivelAcesso(l);
+        }
+
         if ((isDocNovo) || (param("exDocumentoDTO.docFilho") != null)) {
 
             if (exDocumentoDTO.getTipoDestinatario() == null)
@@ -525,7 +534,7 @@ public class ExDocumentoController extends ExController {
                 }
             }
 
-            if (exDocumentoDTO.getNivelAcesso() == null) {
+            if (exDocumentoDTO.getNivelAcesso() == null || CollectionUtils.isNotEmpty(exDocumentoDTO.getListaNivelAcesso())) {
                 final ExNivelAcesso nivelDefault = getNivelAcessoDefault(exDocumentoDTO);
                 if (nivelDefault != null) {
                     exDocumentoDTO.setNivelAcesso(nivelDefault
@@ -724,13 +733,6 @@ public class ExDocumentoController extends ExController {
                     l.add(tp);
             }
             exDocumentoDTO.setTiposDocumento(l);
-        }
-        exDocumentoDTO.setListaNivelAcesso(getListaNivelAcesso(exDocumentoDTO));
-        if (exDocumentoDTO.getModelo() != null
-                && exDocumentoDTO.getModelo().getExNivelAcesso() != null) {
-            List<ExNivelAcesso> l = new ArrayList<>();
-            l.add(exDocumentoDTO.getModelo().getExNivelAcesso());
-            exDocumentoDTO.setListaNivelAcesso(l);
         }
 
         getPreenchimentos(exDocumentoDTO);
