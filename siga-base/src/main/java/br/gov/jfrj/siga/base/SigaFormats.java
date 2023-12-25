@@ -191,7 +191,7 @@ public class SigaFormats {
         else if (o instanceof Date)
             d = (Date) o;
         else if (o instanceof XMLGregorianCalendar)
-            d = ((XMLGregorianCalendar)o).toGregorianCalendar().getTime();
+            d = ((XMLGregorianCalendar) o).toGregorianCalendar().getTime();
         return d;
     }
 

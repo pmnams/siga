@@ -95,6 +95,8 @@
 		<class>br.gov.jfrj.siga.cp.converter.CpMarcadorGrupoEnumConverter</class>
 		<class>br.gov.jfrj.siga.cp.converter.CpTipoMarcadorEnumConverter</class>
 		<class>br.gov.jfrj.siga.cp.converter.CpSituacaoDeConfiguracaoEnumConverter</class>
+		<class>br.gov.jfrj.siga.storage.SigaBlob</class>
+		<class>br.gov.jfrj.siga.storage.JpaBlob</class>
 
 		<properties>
 			<property

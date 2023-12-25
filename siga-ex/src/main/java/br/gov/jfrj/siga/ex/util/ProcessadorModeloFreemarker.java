@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  *
  *     This file is part of SIGA.
@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
 public class ProcessadorModeloFreemarker implements ProcessadorModelo,
         TemplateLoader {
 
-    private Configuration cfg;
+    private final Configuration cfg;
 
     public ProcessadorModeloFreemarker() {
         super();
@@ -67,8 +67,7 @@ public class ProcessadorModeloFreemarker implements ProcessadorModelo,
     public String processarModelo(CpOrgaoUsuario ou, Map<String, Object> attrs,
                                   Map<String, Object> params) {
         // Create the root hash
-        Map<String, Object> root = new HashMap();
-        root.put("root", root);
+        Map<String, Object> root = new HashMap<>();
         root.put("func", new FuncoesEL());
         root.put("fmt", new SigaFormats());
         root.put("exbl", Ex.getInstance().getBL());
@@ -99,23 +98,39 @@ public class ProcessadorModeloFreemarker implements ProcessadorModelo,
         if (attrs.containsKey("descricaodefault"))
             root.put("gerar_descricaodefault", true);
 
-        String sTemplate = "[#compress]\n[#include \"DEFAULT\"][#include \"GERAL\"]\n";
-        if (ou != null) {
-            sTemplate += "[#include \"" + ou.getAcronimoOrgaoUsu() + "\"]";
-        }
+        StringBuilder templateCode = new StringBuilder("[#compress]\n[#include \"DEFAULT\"][#include \"GERAL\"]");
+
+        if (ou != null)
+            templateCode.append("\n[#include \"")
+                    .append(ou.getAcronimoOrgaoUsu())
+                    .append("\"]");
+
+        if (ou != null && ou.getBrasao() != null)
+            templateCode.append("\n[#assign _pathBrasao = \"/siga/public/app/orgaoUsuario/")
+                    .append(ou.getId())
+                    .append("/brasao\" /]");
+
         if (attrs.get("template") != null)
-            sTemplate += "\n" + (String) attrs.get("template");
-        sTemplate += "\n[/#compress]";
+            templateCode.append("\n")
+                    .append(attrs.get("template"));
+
+        templateCode.append("\n[/#compress]");
 
         try (
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                Writer out = new OutputStreamWriter(baos, StandardCharsets.UTF_8)) {
-            Template temp = new Template((String) attrs.get("nmMod"),
-                    new StringReader(sTemplate), cfg);
+                Writer out = new OutputStreamWriter(baos, StandardCharsets.UTF_8)
+        ) {
+            Template temp = new Template(
+                    (String) attrs.get("nmMod"),
+                    templateCode.toString(),
+                    cfg
+            );
+
             temp.process(root, out);
             out.flush();
             String processed = baos.toString(StandardCharsets.UTF_8.name());
 
+            // todo. Verificar a necessidade do reprocessamento
             // Reprocessar para substituir variáveis declaradas nos campos da entrevista
             if (root.get("gerar_documento") != null || root.get("gerar_descricao") != null) {
                 baos.reset();
@@ -143,14 +158,12 @@ public class ProcessadorModeloFreemarker implements ProcessadorModelo,
 
             return processed;
         } catch (TemplateException e) {
-            if (e.getCauseException() != null
-                    && e.getCauseException() instanceof AplicacaoException)
-                throw (AplicacaoException) e.getCauseException();
+            if (e.getCause() != null && e.getCause() instanceof AplicacaoException)
+                throw (AplicacaoException) e.getCause();
+
             throw new RuntimeException("Erro executanto template Freemarker: " + e.getMessage(), e);
         } catch (IOException e) {
             return "Erro executando template FreeMarker\n\n" + e.getMessage();
-        } finally {
-            root = null;
         }
     }
 

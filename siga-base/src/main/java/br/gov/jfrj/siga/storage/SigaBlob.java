@@ -46,17 +46,7 @@ public class SigaBlob {
     }
 
     public byte[] getData() {
-
-        if (data == null) {
-            CriteriaBuilder cb = ContextoPersistencia.em().getCriteriaBuilder();
-
-            CriteriaQuery<JpaBlob> q = cb.createQuery(JpaBlob.class);
-            Root<JpaBlob> root = q.from(JpaBlob.class);
-            q.select(root).where(cb.equal(root.get("id"), this.id));
-
-            TypedQuery<JpaBlob> query = ContextoPersistencia.em().createQuery(q);
-            data = query.getSingleResult();
-        }
+        initSource();
 
         if (data != null)
             return data.getData();
@@ -65,11 +55,28 @@ public class SigaBlob {
     }
 
     public void setData(byte[] data) {
+        initSource();
 
         if (this.data == null)
             this.data = new JpaBlob(this);
 
         this.data.setData(data);
+    }
+
+    private void initSource() {
+        if (this.data != null || this.dataIdentifier == null)
+            return;
+
+        Long JpaBlobId = Long.parseLong(this.dataIdentifier);
+
+        CriteriaBuilder cb = ContextoPersistencia.em().getCriteriaBuilder();
+
+        CriteriaQuery<JpaBlob> q = cb.createQuery(JpaBlob.class);
+        Root<JpaBlob> root = q.from(JpaBlob.class);
+        q.select(root).where(cb.equal(root.get("id"), JpaBlobId));
+
+        TypedQuery<JpaBlob> query = ContextoPersistencia.em().createQuery(q);
+        data = query.getSingleResult();
     }
 
     @PostPersist

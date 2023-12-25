@@ -1,0 +1,17 @@
+--
+-- Adiciona as tabelas necessárias para o armazenamento de blob no banco do próprio módulo
+
+CREATE TABLE siga_blob (
+    ID INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    TYPE TINYINT UNSIGNED NOT NULL,
+    DATA_IDENTIFIER VARCHAR(256)
+);
+
+CREATE TABLE siga_blob_data (
+    BLOB_ID INT UNSIGNED PRIMARY KEY,
+    DATA MEDIUMBLOB NOT NULL,
+    FOREIGN KEY (BLOB_ID) REFERENCES siga_blob(ID) ON DELETE CASCADE
+);
+
+ALTER TABLE cp_orgao_usuario ADD ID_BLOB_BRASAO INT UNSIGNED;
+ALTER TABLE cp_orgao_usuario ADD FOREIGN KEY (ID_BLOB_BRASAO) REFERENCES siga_blob(ID) ON DELETE CASCADE;
