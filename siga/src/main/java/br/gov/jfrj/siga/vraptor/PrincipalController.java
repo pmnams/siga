@@ -259,7 +259,7 @@ public class PrincipalController extends SigaController {
 		if (url == null)
 			throw new Exception("Parâmetro vizservice.url precisa ser informado");
 		
-		url = url + "/svg";
+		url = url + "/api/v1/dot";
 		corsHeaders(response);
 
 		String body = Unirest.post(url).header("Content-Type", "text/vnd.graphviz").body(dot).asString().getBody();
