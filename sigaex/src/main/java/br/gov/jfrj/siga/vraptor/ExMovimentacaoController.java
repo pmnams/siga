@@ -44,9 +44,8 @@ import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.xerces.impl.dv.util.Base64;
 import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
@@ -3053,10 +3052,10 @@ public class ExMovimentacaoController extends ExController {
                 assinaturaB64 = b64Applet;
             }
 
-            byte[] assinatura = Base64.decode(assinaturaB64);
+            byte[] assinatura = Base64.getDecoder().decode(assinaturaB64);
             Date dt = dao().consultarDataEHoraDoServidor();
 
-            byte[] certificado = Base64.decode(certificadoB64);
+            byte[] certificado = Base64.getDecoder().decode(certificadoB64);
 
             if (certificado != null && certificado.length != 0) {
                 dt = new Date(Long.parseLong(atributoAssinavelDataHora));
@@ -4420,7 +4419,7 @@ public class ExMovimentacaoController extends ExController {
             throw new AplicacaoException(e.getMessage());
         }
 
-        return Base64.encode(decoded);
+        return Base64.getEncoder().encodeToString(decoded);
     }
 
     private static byte[] hexStringToByteArray(String s) {
@@ -4718,10 +4717,10 @@ public class ExMovimentacaoController extends ExController {
             if (copia != null && copia)
                 tpMovAssinatura = ExTipoDeMovimentacao.CONFERENCIA_COPIA_DOCUMENTO;
 
-            byte[] assinatura = Base64.decode(assinaturaB64);
+            byte[] assinatura = Base64.getDecoder().decode(assinaturaB64);
             Date dt = dao().consultarDataEHoraDoServidor();
 
-            byte[] certificado = Base64.decode(certificadoB64);
+            byte[] certificado = Base64.getDecoder().decode(certificadoB64);
             if (certificado != null && certificado.length != 0)
                 dt = new Date(Long.parseLong(atributoAssinavelDataHora));
             else

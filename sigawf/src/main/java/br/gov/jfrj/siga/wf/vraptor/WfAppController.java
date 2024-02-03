@@ -24,7 +24,7 @@ import br.gov.jfrj.siga.wf.util.WfTarefa;
 import br.gov.jfrj.siga.wf.util.WfUtil;
 import com.crivano.jflow.model.enm.ProcessInstanceStatus;
 import com.crivano.jflow.model.enm.VariableEditingKind;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;

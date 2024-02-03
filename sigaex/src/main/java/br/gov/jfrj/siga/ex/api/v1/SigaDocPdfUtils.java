@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.security.MessageDigest;
+import java.util.Base64;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import br.gov.jfrj.siga.ex.logic.ExPodeAcessarDocumento;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
-import com.lowagie.text.pdf.codec.Base64;
 
 import br.gov.jfrj.itextpdf.Documento;
 import br.gov.jfrj.siga.Service;
@@ -68,7 +68,7 @@ public class SigaDocPdfUtils {
 				estampar = false;
 			}
 			if (pacoteAssinavel) {
-				certificado = Base64.decode(certificadoB64);
+				certificado = Base64.getDecoder().decode(certificadoB64);
 				completo = false;
 				estampar = false;
 			}
@@ -132,7 +132,7 @@ public class SigaDocPdfUtils {
 						throw new Exception(
 								"BluC não conseguiu produzir o pacote assinável. "
 										+ hashresp.getErrormsg());
-					byte[] sa = Base64.decode(hashresp.getHash());
+					byte[] sa = Base64.getDecoder().decode(hashresp.getHash());
 
 					return new InputStreamDownload(makeByteArrayInputStream(sa,
 							fB64), APPLICATION_OCTET_STREAM, arquivo,
@@ -165,7 +165,7 @@ public class SigaDocPdfUtils {
 				} else {
 					md.update(ab);
 				}
-				final String etag = Base64.encodeBytes(md.digest());
+				final String etag = Base64.getEncoder().encodeToString(md.digest());
 				final String ifNoneMatch = request.getHeader("If-None-Match");
 				response.setHeader("Cache-Control", "must-revalidate, "
 						+ cacheControl);
@@ -196,7 +196,7 @@ public class SigaDocPdfUtils {
 
 	private static ByteArrayInputStream makeByteArrayInputStream(
 			final byte[] content, final boolean fB64) {
-		final byte[] conteudo = (fB64 ? Base64.encodeBytes(content).getBytes()
+		final byte[] conteudo = (fB64 ? Base64.getEncoder().encode(content)
 				: content);
 		return (new ByteArrayInputStream(conteudo));
 	}

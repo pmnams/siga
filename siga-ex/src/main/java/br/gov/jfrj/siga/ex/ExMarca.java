@@ -32,7 +32,7 @@ import br.gov.jfrj.siga.base.Data;
  */
 @Entity
 @DiscriminatorValue("1")
-public class ExMarca extends AbstractExMarca implements Comparable {
+public class ExMarca extends AbstractExMarca implements Comparable<ExMarca> {
 	
 	final public static ExMarcaDoMobilComparator MARCADOR_DO_MOBIL_COMPARATOR = new ExMarcaDoMobilComparator();
 	
@@ -94,8 +94,7 @@ public class ExMarca extends AbstractExMarca implements Comparable {
 
 	}
 
-	public int compareTo(Object o) {
-		ExMarca other = (ExMarca) o;
+	public int compareTo(ExMarca other) {
 		int i = getCpMarcador().getIdMarcador().compareTo(
 				other.getCpMarcador().getIdMarcador());
 		if (i != 0)

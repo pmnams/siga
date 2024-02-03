@@ -17,7 +17,6 @@ import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import com.google.gson.*;
-import org.apache.xerces.impl.dv.util.Base64;
 import org.jboss.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,10 +33,7 @@ import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.SortedSet;
+import java.util.*;
 
 @Controller
 public class ExAssinadorExternoController extends ExController {
@@ -285,7 +281,7 @@ public class ExAssinadorExternoController extends ExController {
                     exibirNoProtocolo = true;
             }
 
-            byte[] assinatura = Base64.decode(envelope);
+            byte[] assinatura = Base64.getDecoder().decode(envelope);
             Date dt = dao().consultarDataEHoraDoServidor();
 
             if (id == null)
@@ -486,11 +482,11 @@ public class ExAssinadorExternoController extends ExController {
     private static class ByteArrayToBase64TypeAdapter implements JsonSerializer<byte[]>, JsonDeserializer<byte[]> {
         public byte[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {
-            return Base64.decode(json.getAsString());
+            return Base64.getDecoder().decode(json.getAsString());
         }
 
         public JsonElement serialize(byte[] src, Type typeOfSrc, JsonSerializationContext context) {
-            return new JsonPrimitive(Base64.encode(src));
+            return new JsonPrimitive(Base64.getEncoder().encodeToString(src));
         }
     }
 

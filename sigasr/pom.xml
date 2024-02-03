@@ -20,7 +20,6 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.3</version>
         </dependency>
 
         <dependency>
@@ -47,12 +46,7 @@
         <dependency>
             <groupId>net.objectlab.kit</groupId>
             <artifactId>datecalc-joda</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>de.jollyday</groupId>
-            <artifactId>jollyday</artifactId>
-            <version>0.4.7</version>
+            <version>1.4.8</version>
         </dependency>
         <dependency>
             <groupId>org.freemarker</groupId>
@@ -73,13 +67,11 @@
             <artifactId>backport-util-concurrent</artifactId>
             <version>3.1</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>jsp-api</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>jsptags</groupId>
             <artifactId>pager-taglib</artifactId>
@@ -88,12 +80,6 @@
         <dependency>
             <groupId>taglibs</groupId>
             <artifactId>standard</artifactId>
-            <version>1.1.2</version>
-        </dependency>
-        <!-- JSTL -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jstl</artifactId>
             <version>1.1.2</version>
         </dependency>
         <!-- FIM DEPENDENCIAS PARA VRAPTORE JSP -->
@@ -107,21 +93,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.jamonapi</groupId>
-            <artifactId>jamon</artifactId>
-            <version>2.75</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.oval</groupId>
-            <artifactId>oval</artifactId>
-            <version>1.84</version>
-        </dependency>
-        <dependency>
-            <groupId>com.thoughtworks.xstream</groupId>
-            <artifactId>xstream</artifactId>
-            <version>1.4.19</version>
-        </dependency>
-        <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
         </dependency>
@@ -130,7 +101,6 @@
             <artifactId>commons-email</artifactId>
             <version>1.5</version>
         </dependency>
-
 
         <!-- CDI -->
         <dependency>

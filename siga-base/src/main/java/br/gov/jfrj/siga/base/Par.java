@@ -2,8 +2,8 @@ package br.gov.jfrj.siga.base;
 
 import java.util.Map.Entry;
 
-public class Par<K extends Comparable, V extends Comparable> implements
-		Comparable<Par>, Entry<K, V> {
+public class Par<K extends Comparable<K>, V> implements
+		Comparable<Par<K, V>>, Entry<K, V> {
 
 	private final K key;
 	private V value;
@@ -32,7 +32,7 @@ public class Par<K extends Comparable, V extends Comparable> implements
 		return oldValue;
 	}
 
-	public int compareTo(Par o) {
+	public int compareTo(Par<K, V> o) {
 		return getKey().compareTo(o.getKey());
 	}
 

@@ -59,7 +59,7 @@ import br.gov.jfrj.siga.sinc.lib.SincronizavelSuporte;
 @Table(name = "corporativo.dp_lotacao")
 @Cache(region = CpDao.CACHE_CORPORATIVO, usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class DpLotacao extends AbstractDpLotacao implements Serializable,
-		Selecionavel, Historico, Sincronizavel, Comparable<Object>, DpConvertableEntity {
+		Selecionavel, Historico, Sincronizavel, Comparable<DpLotacao>, DpConvertableEntity {
 	
 	public static ActiveRecord<DpLotacao> AR = new ActiveRecord<>(
 			DpLotacao.class);
@@ -446,9 +446,7 @@ public class DpLotacao extends AbstractDpLotacao implements Serializable,
 		return "";
 	}
 
-	public int compareTo(Object o) {
-		DpLotacao other = (DpLotacao) o;
-
+	public int compareTo(DpLotacao other) {
 		return getNomeLotacao().compareTo(other.getNomeLotacao());
 	}
 

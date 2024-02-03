@@ -18,7 +18,7 @@
  ******************************************************************************/
 package br.gov.jfrj.siga.libs.rpc;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  * É a representação de um valor de String RPC

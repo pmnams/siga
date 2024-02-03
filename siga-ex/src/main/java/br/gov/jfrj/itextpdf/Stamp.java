@@ -4,8 +4,8 @@ import br.gov.jfrj.itextpdf.LocalizaAnotacao.LocalizaAnotacaoResultado;
 import br.gov.jfrj.siga.base.Prop;
 import br.gov.jfrj.siga.base.SigaHTTP;
 import br.gov.jfrj.siga.base.SigaMessages;
-import com.google.common.collect.ImmutableMap;
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
@@ -27,10 +27,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Stamp {
     private static final String VALIDAR_ASSINATURA_URL = "/sigaex/app/validar-assinatura?pessoa=";
@@ -481,10 +479,13 @@ public class Stamp {
 
     public static BufferedImage createQRCodeImage(String url) throws WriterException {
         QRCodeWriter barcodeWriter = new QRCodeWriter();
-        BitMatrix bitMatrix =
-                barcodeWriter.encode(url, BarcodeFormat.QR_CODE, 500, 500,
-                        ImmutableMap.of(com.google.zxing.EncodeHintType.MARGIN, 0));
-
+        BitMatrix bitMatrix = barcodeWriter.encode(
+                url,
+                BarcodeFormat.QR_CODE,
+                500, 500,
+                Collections.singletonMap(EncodeHintType.MARGIN, 0)
+        );
+        
         return MatrixToImageWriter.toBufferedImage(bitMatrix);
     }
 

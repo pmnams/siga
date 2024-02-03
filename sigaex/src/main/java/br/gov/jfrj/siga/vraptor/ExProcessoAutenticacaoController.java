@@ -26,7 +26,6 @@ import br.gov.jfrj.siga.persistencia.ExMobilDaoFiltro;
 import com.auth0.jwt.JWTSigner;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.JWTVerifyException;
-import com.lowagie.text.pdf.codec.Base64;
 import org.json.JSONObject;
 
 import javax.inject.Inject;
@@ -107,8 +106,8 @@ public class ExProcessoAutenticacaoController extends ExController {
         ExMovimentacao mov = null;
 
         if (ass != null && ass.trim().length() != 0) {
-            byte[] assinatura = Base64.decode(assinaturaB64 == null ? "" : assinaturaB64);
-            byte[] certificado = Base64.decode(certificadoB64 == null ? "" : certificadoB64);
+            byte[] assinatura = Base64.getDecoder().decode(assinaturaB64 == null ? "" : assinaturaB64);
+            byte[] certificado = Base64.getDecoder().decode(certificadoB64 == null ? "" : certificadoB64);
             Date dt = mov.getDtMov();
             if (certificado != null && certificado.length != 0)
                 dt = new Date(Long.parseLong(atributoAssinavelDataHora));
@@ -215,7 +214,7 @@ public class ExProcessoAutenticacaoController extends ExController {
             HashResponse hashresp = bluc.hash(hashreq);
             if (hashresp.getErrormsg() != null)
                 throw new Exception("BluC não conseguiu produzir o pacote assinável. " + hashresp.getErrormsg());
-            byte[] sa = Base64.decode(hashresp.getHash());
+            byte[] sa = Base64.getDecoder().decode(hashresp.getHash());;
 
             return new InputStreamDownload(makeByteArrayInputStream(sa, fB64), APPLICATION_OCTET_STREAM, null);
         }
@@ -223,7 +222,7 @@ public class ExProcessoAutenticacaoController extends ExController {
     }
 
     private ByteArrayInputStream makeByteArrayInputStream(final byte[] content, final boolean fB64) {
-        final byte[] conteudo = (fB64 ? Base64.encodeBytes(content).getBytes() : content);
+        final byte[] conteudo = (fB64 ? Base64.getEncoder().encode(content): content);
         return (new ByteArrayInputStream(conteudo));
     }
 

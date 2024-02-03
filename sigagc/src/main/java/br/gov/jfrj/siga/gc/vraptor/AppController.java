@@ -32,7 +32,7 @@ import br.gov.jfrj.siga.vraptor.Transacional;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;

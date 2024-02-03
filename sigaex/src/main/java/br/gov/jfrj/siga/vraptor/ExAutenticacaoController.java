@@ -19,7 +19,6 @@ import br.gov.jfrj.siga.ex.vo.ExDocumentoVO;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import com.auth0.jwt.JWTSigner;
 import com.auth0.jwt.JWTVerifier;
-import com.lowagie.text.pdf.codec.Base64;
 import org.json.JSONObject;
 
 import javax.inject.Inject;
@@ -105,9 +104,9 @@ public class ExAutenticacaoController extends ExController {
         }
 
         if (ass != null && ass.trim().length() != 0) {
-            byte[] assinatura = Base64.decode(assinaturaB64 == null ? ""
+            byte[] assinatura = Base64.getDecoder().decode(assinaturaB64 == null ? ""
                     : assinaturaB64);
-            byte[] certificado = Base64.decode(certificadoB64 == null ? ""
+            byte[] certificado = Base64.getDecoder().decode(certificadoB64 == null ? ""
                     : certificadoB64);
             Date dt = mov.getDtMov();
             if (certificado != null && certificado.length != 0)
@@ -221,7 +220,7 @@ public class ExAutenticacaoController extends ExController {
                 throw new Exception(
                         "BluC não conseguiu produzir o pacote assinável. "
                                 + hashresp.getErrormsg());
-            byte[] sa = Base64.decode(hashresp.getHash());
+            byte[] sa = Base64.getDecoder().decode(hashresp.getHash());
 
             return new InputStreamDownload(makeByteArrayInputStream(sa, fB64),
                     APPLICATION_OCTET_STREAM, null);
@@ -232,7 +231,7 @@ public class ExAutenticacaoController extends ExController {
 
     private ByteArrayInputStream makeByteArrayInputStream(final byte[] content,
                                                           final boolean fB64) {
-        final byte[] conteudo = (fB64 ? Base64.encodeBytes(content).getBytes()
+        final byte[] conteudo = (fB64 ? Base64.getEncoder().encode(content)
                 : content);
         return (new ByteArrayInputStream(conteudo));
     }

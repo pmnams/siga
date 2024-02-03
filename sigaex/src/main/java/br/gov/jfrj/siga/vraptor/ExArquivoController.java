@@ -49,7 +49,6 @@ import br.gov.jfrj.siga.vraptor.builder.ExDownloadRTF;
 import br.gov.jfrj.siga.vraptor.builder.ExDownloadZip;
 import br.gov.jfrj.siga.vraptor.builder.ExInputStreamDownload;
 import com.auth0.jwt.JWTVerifier;
-import com.lowagie.text.pdf.codec.Base64;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -59,6 +58,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
@@ -115,7 +115,7 @@ public class ExArquivoController extends ExController {
                 estampar = false;
             }
             if (pacoteAssinavel) {
-                certificado = Base64.decode(certificadoB64);
+                certificado = Base64.getDecoder().decode(certificadoB64);
                 completo = false;
                 estampar = false;
             }
@@ -204,7 +204,7 @@ public class ExArquivoController extends ExController {
                     if (hashresp.getErrormsg() != null)
                         throw new AplicacaoException(
                                 "BluC não conseguiu produzir o pacote assinável. " + hashresp.getErrormsg());
-                    byte[] sa = Base64.decode(hashresp.getHash());
+                    byte[] sa = Base64.getDecoder().decode(hashresp.getHash());
 
                     return new InputStreamDownload(makeByteArrayInputStream(sa, fB64), APPLICATION_OCTET_STREAM,
                             arquivo);
@@ -233,7 +233,7 @@ public class ExArquivoController extends ExController {
                 } else {
                     md.update(ab);
                 }
-                final String etag = Base64.encodeBytes(md.digest());
+                final String etag = Base64.getEncoder().encodeToString(md.digest());
                 final String ifNoneMatch = getRequest().getHeader("If-None-Match");
                 getResponse().setHeader("Cache-Control", "must-revalidate, " + cacheControl);
                 getResponse().setDateHeader("Expires", (new Date()).getTime() + 30000);
@@ -377,7 +377,7 @@ public class ExArquivoController extends ExController {
             else
                 md.update(ab);
 
-            String etag = Base64.encodeBytes(md.digest());
+            String etag = Base64.getEncoder().encodeToString(md.digest());
             String ifNoneMatch = getRequest().getHeader("If-None-Match");
             getResponse().setHeader("Cache-Control", "must-revalidate, " + getCacheControl(mob));
             getResponse().setDateHeader("Expires", 0);
@@ -432,7 +432,7 @@ public class ExArquivoController extends ExController {
     }
 
     private ByteArrayInputStream makeByteArrayInputStream(final byte[] content, final boolean fB64) {
-        final byte[] conteudo = (fB64 ? Base64.encodeBytes(content).getBytes() : content);
+        final byte[] conteudo = (fB64 ? Base64.getEncoder().encode(content): content);
         return (new ByteArrayInputStream(conteudo));
     }
 

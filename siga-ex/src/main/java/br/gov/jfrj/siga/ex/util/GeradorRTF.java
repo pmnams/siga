@@ -18,6 +18,7 @@
  ******************************************************************************/
 package br.gov.jfrj.siga.ex.util;
 
+import com.lowagie.text.*;
 import org.kxml2.io.KXmlParser;
 import org.xmlpull.v1.XmlPullParser;
 
@@ -26,11 +27,6 @@ import br.gov.jfrj.itextpdf.FOP;
 import br.gov.jfrj.siga.base.AplicacaoException;
 import br.gov.jfrj.siga.ex.ExDocumento;
 import br.gov.jfrj.siga.ex.ExMobil;
-
-import com.lowagie.text.Document;
-import com.lowagie.text.PageSize;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.TextElementArray;
 
 public class GeradorRTF {
 
@@ -57,7 +53,7 @@ public class GeradorRTF {
 
 			// insere um texto comum
 			if (parser.getEventType() == XmlPullParser.TEXT)
-				element.add(parser.getText().toUpperCase());
+				element.add(new Paragraph((parser.getText().toUpperCase())));
 
 			// Insere um parágrafo
 			if (parser.getEventType() == XmlPullParser.START_TAG)
@@ -116,23 +112,23 @@ public class GeradorRTF {
 				if (parser.getName().toUpperCase().equals("UL")
 						|| parser.getName().toUpperCase().equals("OL")
 						|| parser.getName().toUpperCase().equals("DL")) {
-					element.add("\n");
+					element.add(new Paragraph("\n"));
 				}
 
 			if (parser.getEventType() == XmlPullParser.START_TAG)
 				if (parser.getName().toUpperCase().equals("TD")) {
-					element.add("\t");
+					element.add(new Paragraph("\t"));
 					percorreProximoBloco(element, level + 1, false);
 				}
 
 			if (parser.getEventType() == XmlPullParser.START_TAG)
 				if (parser.getName().toUpperCase().equals("TR")) {
-					element.add("\n\n");
+					element.add(new Paragraph("\n\n"));
 				}
 
 			if (parser.getEventType() == XmlPullParser.START_TAG)
 				if (parser.getName().toUpperCase().equals("BR")) {
-					element.add("\n\n\t");
+					element.add(new Paragraph("\n\n\t"));
 				}
 		}
 		return element;

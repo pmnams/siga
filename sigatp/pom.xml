@@ -22,7 +22,6 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.3</version>
         </dependency>
 
         <dependency>
@@ -53,20 +52,15 @@
             <artifactId>jsp-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>jsptags</groupId>
             <artifactId>pager-taglib</artifactId>
         </dependency>
-        <!-- standard.jar -->
+
         <dependency>
             <groupId>taglibs</groupId>
             <artifactId>standard</artifactId>
-            <version>1.1.2</version>
-        </dependency>
-        <!-- JSTL -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jstl</artifactId>
             <version>1.1.2</version>
         </dependency>
 
@@ -75,17 +69,11 @@
             <artifactId>swaggerservlet</artifactId>
         </dependency>
 
-
-        <!-- FIM DEPENDENCIAS PARA VRAPTORE JSP -->
-
-
-        <!-- https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-core-asl -->
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
             <version>1.9.13</version>
         </dependency>
-
 
         <dependency>
             <groupId>org.hibernate</groupId>

@@ -41,7 +41,7 @@ import br.gov.jfrj.siga.ex.model.enm.ExTipoDeVinculo;
 import br.gov.jfrj.siga.ex.util.*;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.model.CarimboDeTempo;
-import com.google.common.collect.Lists;
+import org.apache.commons.lang3.ArrayUtils;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicUpdate;
 import org.jboss.logging.Logger;
@@ -2019,8 +2019,11 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
     }
 
     public String getVinculosCompleto() {
+        ExTipoDeVinculo[] types = ExTipoDeVinculo.values();
+        ArrayUtils.reverse(types);
+
         StringBuilder retorno = new StringBuilder();
-        for (ExTipoDeVinculo tipo : Lists.reverse(Lists.newArrayList(ExTipoDeVinculo.values()))) {
+        for (ExTipoDeVinculo tipo : types) {
             if (tipo != ExTipoDeVinculo.REVOGACAO)
                 continue;
             String s = Documento.getVinculosString(getVinculosPorTipo(tipo));

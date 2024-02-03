@@ -14,11 +14,11 @@
 			<groupId>com.brunocasas</groupId>
 			<artifactId>vraptor</artifactId>
 			<exclusions>
-				<exclusion>  <!-- declare the exclusion here -->
+				<exclusion>
 					<groupId>javassist</groupId>
 					<artifactId>javassist</artifactId>
 				</exclusion>
-				<exclusion>  <!-- declare the exclusion here -->
+				<exclusion>
 					<groupId>org.hibernate</groupId>
 					<artifactId>hibernate-core</artifactId>
 				</exclusion>
@@ -43,12 +43,6 @@
 					<artifactId>vraptor</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>		
-		
-		<dependency>
-			<groupId>br.com.caelum</groupId>
-			<artifactId>iogi</artifactId>
-			<version>1.0.0</version>
 		</dependency>
 
 		<dependency>
@@ -78,9 +72,8 @@
 		</dependency>
 
 		<dependency>
-		    <groupId>com.google.guava</groupId>
-		    <artifactId>guava</artifactId>
-		    <version>20.0</version>
+			<groupId>com.google.guava</groupId>
+			<artifactId>failureaccess</artifactId>
 		</dependency>
 		
 		<dependency>

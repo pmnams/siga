@@ -9,6 +9,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -17,7 +18,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.xerces.impl.dv.util.Base64;
 import org.jboss.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -144,7 +144,7 @@ public class ExUtilController extends ExController {
 			if (pdf == null)
 				throw new Exception("Parâmetro 'pdf' precisa ser informado.");
 
-			final byte abPdf[] = Base64.decode(pdf);
+			final byte abPdf[] = Base64.getDecoder().decode(pdf);
 			try {
 				resp.pages = Documento.getNumberOfPages(abPdf);
 				resp.size = abPdf.length;
@@ -173,11 +173,11 @@ public class ExUtilController extends ExController {
 	private static class ByteArrayToBase64TypeAdapter implements JsonSerializer<byte[]>, JsonDeserializer<byte[]> {
 		public byte[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
 				throws JsonParseException {
-			return Base64.decode(json.getAsString());
+			return Base64.getDecoder().decode(json.getAsString());
 		}
 
 		public JsonElement serialize(byte[] src, Type typeOfSrc, JsonSerializationContext context) {
-			return new JsonPrimitive(Base64.encode(src));
+			return new JsonPrimitive(Base64.getEncoder().encodeToString(src));
 		}
 	}
 

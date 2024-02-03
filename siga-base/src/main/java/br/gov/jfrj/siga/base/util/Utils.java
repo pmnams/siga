@@ -2,7 +2,7 @@ package br.gov.jfrj.siga.base.util;
 
 import br.gov.jfrj.siga.base.GZip;
 import br.gov.jfrj.siga.model.Historico;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
