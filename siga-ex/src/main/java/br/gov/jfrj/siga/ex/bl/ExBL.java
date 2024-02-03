@@ -5672,8 +5672,8 @@ public class ExBL extends CpBL {
 
     private String processarModelo(ExDocumento doc, ExMovimentacao mov, String acao, Map<String, String> formParams,
                                    CpOrgaoUsuario orgaoUsu) throws Exception {
-        Map<String, Object> attrs = new TreeMap<String, Object>();
-        Map<String, Object> params = new TreeMap<String, Object>();
+        Map<String, Object> attrs = new TreeMap<>();
+        Map<String, Object> params = new TreeMap<>();
         ProcessadorModelo p = getProcessadorModeloJsp();
 
         // System.out.println(System.currentTimeMillis() + " - INI
@@ -5802,11 +5802,8 @@ public class ExBL extends CpBL {
             ou = doc.getOrgaoUsuario();
         if (mov != null && mov.getResp() != null && mov.getResp().getOrgaoUsuario() != null)
             ou = mov.getResp().getOrgaoUsuario();
-        String s = p.processarModelo(ou, attrs, params);
 
-        // System.out.println(System.currentTimeMillis() + " - FIM
-        // processarModelo");
-        return s;
+        return p.processarModelo(ou, attrs, params);
     }
 
     private void juntarAoDocumentoPai(final DpPessoa cadastrante, final DpLotacao lotaCadastrante,
