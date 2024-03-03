@@ -1,12 +1,13 @@
 package br.gov.jfrj.siga.storage;
 
-import br.gov.jfrj.siga.model.ContextoPersistencia;
+import br.gov.jfrj.siga.base.Prop;
+import br.gov.jfrj.siga.storage.blob.BlobData;
+import br.gov.jfrj.siga.storage.manager.BlobManager;
 
+import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import java.util.Date;
 
 @Entity()
 @Table(name = "siga_blob")
@@ -17,24 +18,37 @@ public class SigaBlob {
     private Long id;
 
     @Enumerated(EnumType.ORDINAL)
-    private StorageType type = StorageType.DATABASE;
+    private StorageType type;
 
     @Column(name = "DATA_IDENTIFIER")
     private String dataIdentifier;
+
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
 
     @Transient
     private BlobData data;
 
     @Transient
     @Inject
-    private EntityManager em;
+    private BlobManager manager;
 
     public SigaBlob(byte[] data) {
+        this();
         setData(data);
     }
 
     public SigaBlob() {
-
+        try {
+            type = StorageType.valueOf(Prop.get("/storage.type"));
+        } catch (Exception e) {
+            type = StorageType.DATABASE;
+        }
     }
 
     public Long getId() {
@@ -58,36 +72,68 @@ public class SigaBlob {
         initSource();
 
         if (this.data == null)
-            this.data = new JpaBlob(this);
+            this.data = manager.fromData(this, data);
+        else
+            this.data.setData(data);
 
-        this.data.setData(data);
+        updatedAt = new Date();
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     private void initSource() {
-        if (this.data != null || this.dataIdentifier == null)
+        if (this.data != null)
             return;
 
-        Long JpaBlobId = Long.parseLong(this.dataIdentifier);
+        if (manager == null)
+            setManager(this.type);
 
-        CriteriaBuilder cb = ContextoPersistencia.em().getCriteriaBuilder();
-
-        CriteriaQuery<JpaBlob> q = cb.createQuery(JpaBlob.class);
-        Root<JpaBlob> root = q.from(JpaBlob.class);
-        q.select(root).where(cb.equal(root.get("id"), JpaBlobId));
-
-        TypedQuery<JpaBlob> query = ContextoPersistencia.em().createQuery(q);
-        data = query.getSingleResult();
+        data = manager.fromId(this.dataIdentifier);
     }
 
+    private void setManager(StorageType type) {
+        if (type == null) {
+            manager = CDI.current().select(BlobManager.class).get();
+
+            this.type = manager.getClass().getAnnotation(Manager.class).type();
+        } else
+            manager = CDI.current().select(BlobManager.class, new LiteralManager(type)).get();
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = new Date();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = new Date();
+    }
+
+    @PostUpdate
     @PostPersist
     private void postPersist() {
-        // switch (this.type) {}
-        // Atualmente apenas por DATABASE
-
         if (this.data != null) {
-            ContextoPersistencia.em().persist(this.data);
-
-            this.dataIdentifier = this.data.getId().toString();
+            try {
+                this.dataIdentifier = manager.persist(this, this.data);
+            } catch (Exception e) {
+                setManager(StorageType.DATABASE);
+                this.dataIdentifier = manager.persist(this, this.data);
+            }
         }
     }
 

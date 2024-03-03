@@ -100,7 +100,7 @@
 		<class>br.gov.jfrj.siga.cp.converter.CpTipoMarcadorEnumConverter</class>
 		<class>br.gov.jfrj.siga.cp.converter.CpSituacaoDeConfiguracaoEnumConverter</class>
 		<class>br.gov.jfrj.siga.storage.SigaBlob</class>
-		<class>br.gov.jfrj.siga.storage.JpaBlob</class>
+		<class>br.gov.jfrj.siga.storage.blob.JpaBlobData</class>
 
 		<properties>
 			<property name="hibernate.show_sql" value="false" />

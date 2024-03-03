@@ -1,10 +1,12 @@
-package br.gov.jfrj.siga.storage;
+package br.gov.jfrj.siga.storage.blob;
+
+import br.gov.jfrj.siga.storage.SigaBlob;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "siga_blob_data")
-public class JpaBlob implements BlobData {
+public class JpaBlobData implements BlobData {
 
     @Id
     @Column(name = "BLOB_ID")
@@ -18,20 +20,20 @@ public class JpaBlob implements BlobData {
     @MapsId
     private SigaBlob blob;
 
-    public JpaBlob(SigaBlob blob) {
+    public JpaBlobData(SigaBlob blob) {
         this.blob = blob;
     }
 
-    public JpaBlob() {
+    public JpaBlobData() {
 
     }
 
-    public Long getId() {
-        return id;
+    public String getId() {
+        return id.toString();
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setId(String id) {
+        this.id = Long.valueOf(id);
     }
 
     @Override

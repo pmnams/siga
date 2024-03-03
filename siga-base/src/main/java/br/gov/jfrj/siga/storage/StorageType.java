@@ -1,7 +1,8 @@
 package br.gov.jfrj.siga.storage;
 
 public enum StorageType {
-    DATABASE(1);
+    DATABASE(1),
+    SAMBA(2);
 
     public final int type;
 
