@@ -5,7 +5,7 @@ import br.gov.jfrj.siga.storage.Manager;
 import br.gov.jfrj.siga.storage.SigaBlob;
 import br.gov.jfrj.siga.storage.StorageType;
 import br.gov.jfrj.siga.storage.blob.BlobData;
-import br.gov.jfrj.siga.storage.blob.JpaBlobData;
+import br.gov.jfrj.siga.storage.blob.impl.JpaBlobData;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
@@ -17,19 +17,19 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 @ApplicationScoped
+@Manager(StorageType.DATABASE)
 @Default
-@Manager(type = StorageType.DATABASE)
 public class JpaBlobManager implements BlobManager {
 
     @Inject
     private EntityManager em;
 
     @Override
-    public BlobData fromId(String id) {
-        if (id == null)
+    public BlobData fromBlob(SigaBlob blob) {
+        if (blob.getDataIdentifier() == null)
             return null;
 
-        Long JpaBlobId = Long.parseLong(id);
+        Long JpaBlobId = Long.parseLong(blob.getDataIdentifier());
 
         CriteriaBuilder cb = ContextoPersistencia.em().getCriteriaBuilder();
         CriteriaQuery<JpaBlobData> q = cb.createQuery(JpaBlobData.class);
@@ -50,7 +50,7 @@ public class JpaBlobManager implements BlobManager {
 
     @Override
     public String persist(SigaBlob blob, BlobData data) {
-        ContextoPersistencia.em().persist(data);
+        em.persist(data);
 
         return data.getId();
     }

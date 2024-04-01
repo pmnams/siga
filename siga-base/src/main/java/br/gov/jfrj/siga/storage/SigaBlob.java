@@ -1,11 +1,11 @@
 package br.gov.jfrj.siga.storage;
 
 import br.gov.jfrj.siga.base.Prop;
+import br.gov.jfrj.siga.storage.blob.BlobCategory;
 import br.gov.jfrj.siga.storage.blob.BlobData;
 import br.gov.jfrj.siga.storage.manager.BlobManager;
 
 import javax.enterprise.inject.spi.CDI;
-import javax.inject.Inject;
 import javax.persistence.*;
 import java.util.Date;
 
@@ -23,32 +23,33 @@ public class SigaBlob {
     @Column(name = "DATA_IDENTIFIER")
     private String dataIdentifier;
 
-    @Column(name = "created_at")
+    @Column(name = "CREATED_AT")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "UPDATED_AT")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
+    @Column(name = "CATEGORY")
+    private Integer category;
 
     @Transient
     private BlobData data;
 
     @Transient
-    @Inject
     private BlobManager manager;
 
+    public SigaBlob(byte[] data, BlobCategory category) {
+        this(data);
+        this.category = category.ordinal();
+    }
+
     public SigaBlob(byte[] data) {
-        this();
         setData(data);
     }
 
     public SigaBlob() {
-        try {
-            type = StorageType.valueOf(Prop.get("/storage.type"));
-        } catch (Exception e) {
-            type = StorageType.DATABASE;
-        }
     }
 
     public Long getId() {
@@ -95,6 +96,17 @@ public class SigaBlob {
         this.updatedAt = updatedAt;
     }
 
+    public BlobCategory getCategory() {
+        if (category == null)
+            category = BlobCategory.DefaultBlobCategory.DEFAULT.value;
+
+        return BlobCategory.enumOf(category);
+    }
+
+    public void setCategory(BlobCategory category) {
+        this.category = category.getValue();
+    }
+
     private void initSource() {
         if (this.data != null)
             return;
@@ -102,21 +114,32 @@ public class SigaBlob {
         if (manager == null)
             setManager(this.type);
 
-        data = manager.fromId(this.dataIdentifier);
+        data = manager.fromBlob(this);
     }
 
     private void setManager(StorageType type) {
         if (type == null) {
-            manager = CDI.current().select(BlobManager.class).get();
-
-            this.type = manager.getClass().getAnnotation(Manager.class).type();
+            try {
+                type = StorageType.valueOf(Prop.get("/storage.type"));
+                manager = CDI.current().select(BlobManager.class, new Manager.Literal(type)).get();
+            } catch (Exception ignored) {
+                manager = CDI.current().select(BlobManager.class).get();
+                type = manager.getClass().getAnnotation(Manager.class).value();
+            }
         } else
-            manager = CDI.current().select(BlobManager.class, new LiteralManager(type)).get();
+            manager = CDI.current().select(BlobManager.class, new Manager.Literal(type)).get();
+
+        this.type = type;
+    }
+
+    public String getDataIdentifier() {
+        return dataIdentifier;
     }
 
     @PrePersist
     protected void onCreate() {
-        createdAt = new Date();
+        if (createdAt == null)
+            createdAt = new Date();
     }
 
     @PreUpdate
@@ -131,7 +154,9 @@ public class SigaBlob {
             try {
                 this.dataIdentifier = manager.persist(this, this.data);
             } catch (Exception e) {
+                e.printStackTrace();
                 setManager(StorageType.DATABASE);
+                this.data = manager.fromData(this, this.data.getData());
                 this.dataIdentifier = manager.persist(this, this.data);
             }
         }

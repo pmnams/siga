@@ -9,4 +9,6 @@ public enum StorageType {
     StorageType(int type) {
         this.type = type;
     }
+
+
 }

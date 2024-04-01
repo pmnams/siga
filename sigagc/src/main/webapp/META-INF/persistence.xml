@@ -87,7 +87,7 @@
         <class>br.gov.jfrj.siga.gc.model.GcTipoTag</class>
         <class>br.gov.jfrj.siga.gc.model.GcPapel</class>
         <class>br.gov.jfrj.siga.storage.SigaBlob</class>
-        <class>br.gov.jfrj.siga.storage.blob.JpaBlobData</class>
+        <class>br.gov.jfrj.siga.storage.blob.impl.JpaBlobData</class>
 
         <properties>
             <property name="hibernate.cache.use_query_cache" value="true"/>

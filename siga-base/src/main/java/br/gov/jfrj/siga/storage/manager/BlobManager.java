@@ -5,7 +5,7 @@ import br.gov.jfrj.siga.storage.blob.BlobData;
 
 public interface BlobManager {
 
-    BlobData fromId(String id);
+    BlobData fromBlob(SigaBlob blob);
     BlobData fromData(SigaBlob blob, byte[] Data);
     String persist(SigaBlob blob, BlobData data);
 

@@ -30,6 +30,7 @@ import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.BIE.ExBoletimDoc;
 import br.gov.jfrj.siga.ex.converter.ExTipoDePrincipalConverter;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDePrincipal;
+import br.gov.jfrj.siga.ex.storage.ExBlobCategory;
 import br.gov.jfrj.siga.storage.SigaBlob;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SortNatural;
@@ -1116,6 +1117,7 @@ public abstract class AbstractExDocumento extends ExArquivo implements
     public void setConteudoBlobDoc(byte[] createBlob) {
         if (exBlob == null) {
             exBlob = new SigaBlob(createBlob);
+            exBlob.setCategory(ExBlobCategory.DOCUMENTS);
         } else
             exBlob.setData(createBlob);
 

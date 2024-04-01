@@ -1,4 +1,6 @@
-package br.gov.jfrj.siga.storage.blob;
+package br.gov.jfrj.siga.storage.blob.impl;
+
+import br.gov.jfrj.siga.storage.blob.BlobData;
 
 public class SmbBlobData implements BlobData {
     private String id;

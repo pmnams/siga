@@ -5,20 +5,28 @@ import br.gov.jfrj.siga.base.UsuarioDeSistemaEnum;
 import br.gov.jfrj.siga.cp.model.enm.CpTipoDeConfiguracao;
 import br.gov.jfrj.siga.cp.model.enm.CpTipoDeMovimentacao;
 import br.gov.jfrj.siga.cp.util.SigaFlyway;
+import br.gov.jfrj.siga.ex.ExDocumento;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
+import br.gov.jfrj.siga.ex.storage.ExBlobCategory;
+import br.gov.jfrj.siga.storage.StorageNormalizer;
+import br.gov.jfrj.siga.storage.manager.BlobManager;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jboss.logging.Logger;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import javax.ejb.TransactionManagement;
-import javax.ejb.TransactionManagementType;
+import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
+import javax.ejb.*;
+import javax.enterprise.inject.spi.CDI;
+import javax.inject.Inject;
 import javax.naming.NamingException;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.security.Security;
+import java.sql.Time;
+import java.util.HashMap;
+import java.util.Map;
 
 @Startup
 @Singleton
@@ -27,6 +35,18 @@ public class ExStarter {
 
     private final static org.jboss.logging.Logger log = Logger.getLogger(ExStarter.class);
     public static EntityManagerFactory emf;
+    @Resource
+    private TimerService timerService;
+
+    @Schedule(dayOfWeek = "Sat")
+    private void runFileWatcher() {
+        Map<Class<?>, String[]> entities = new HashMap<>();
+
+        entities.put(ExDocumento.class, new String[]{"conteudoBlobDoc", "exBlob", "dtDoc", "" + ExBlobCategory.DOCUMENTS.value});
+
+        StorageNormalizer normalizer = CDI.current().select(StorageNormalizer.class).get();
+        normalizer.migrateFromEntitiesField(entities,14400);
+    }
 
     @PostConstruct
     public void init() {
@@ -40,6 +60,13 @@ public class ExStarter {
         emf = Persistence.createEntityManagerFactory("default");
         Service.setUsuarioDeSistema(UsuarioDeSistemaEnum.SIGA_EX);
         new MigrationThread().start();
+    }
+
+    @PreDestroy
+    private void shutdown() {
+        for (Timer timer : timerService.getTimers()) {
+            timer.cancel();
+        }
     }
 
     public static class MigrationThread extends Thread {

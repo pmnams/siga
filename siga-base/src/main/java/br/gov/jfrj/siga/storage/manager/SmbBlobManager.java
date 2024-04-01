@@ -1,73 +1,59 @@
 package br.gov.jfrj.siga.storage.manager;
 
-import br.gov.jfrj.siga.base.Prop;
 import br.gov.jfrj.siga.storage.Manager;
 import br.gov.jfrj.siga.storage.SigaBlob;
 import br.gov.jfrj.siga.storage.StorageType;
 import br.gov.jfrj.siga.storage.blob.BlobData;
-import br.gov.jfrj.siga.storage.blob.SmbBlobData;
+import br.gov.jfrj.siga.storage.blob.impl.SmbBlobData;
+import br.gov.jfrj.siga.storage.smb.SmbStorageContext;
 import com.hierynomus.msdtyp.AccessMask;
 import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.mssmb2.SMB2CreateDisposition;
 import com.hierynomus.mssmb2.SMB2CreateOptions;
 import com.hierynomus.mssmb2.SMB2ShareAccess;
-import com.hierynomus.smbj.SMBClient;
-import com.hierynomus.smbj.auth.AuthenticationContext;
-import com.hierynomus.smbj.connection.Connection;
-import com.hierynomus.smbj.session.Session;
-import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
+import com.hierynomus.smbj.utils.SmbFiles;
 
-import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
 @ApplicationScoped
-@Manager(type = StorageType.SAMBA)
+@Manager(StorageType.SAMBA)
 public class SmbBlobManager implements BlobManager {
-    private DiskShare share;
-    private final SMBClient client;
+
+    private final SmbStorageContext context;
 
     WeakReference<Set<String>> folderCheckCache = new WeakReference<>(new HashSet<>());
 
-    public SmbBlobManager() {
-        client = new SMBClient();
-        setupConnection();
+    @Inject
+    public SmbBlobManager(SmbStorageContext context) {
+        this.context = context;
     }
 
-    private void setupConnection() {
-        Prop.getList("/siga.substituto.tipos");
-        String host = Prop.get("/storage.smb.host");
-        String user = Prop.get("/storage.smb.user");
-        String pass = Prop.get("/storage.smb.password");
-        String domain = Prop.get("/storage.smb.domain");
-        String shareName = Prop.get("/storage.smb.share");
-
-        try {
-            Connection connection = client.connect(host);
-            AuthenticationContext ac = new AuthenticationContext(user, pass.toCharArray(), domain);
-            Session session = connection.authenticate(ac);
-            share = (DiskShare) session.connectShare(shareName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    @Deprecated
+    public SmbBlobManager() {
+        this(null);
     }
 
     @Override
-    public BlobData fromId(String id) {
-        if (id == null)
+    public BlobData fromBlob(SigaBlob blob) {
+        if (blob.getDataIdentifier() == null)
             return null;
 
+        String filePath = getFilePath(blob, blob.getDataIdentifier());
+
         BlobData blobData = null;
-        checkAndPrepareShare();
-        try (File f = share.openFile(
-                id,
+        try (File f = this.context.getShare().openFile(
+                filePath,
                 EnumSet.of(AccessMask.GENERIC_READ),
                 null,
                 EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
@@ -87,7 +73,7 @@ public class SmbBlobManager implements BlobManager {
 
                 blobData = new SmbBlobData();
                 blobData.setData(os.toByteArray());
-                blobData.setId(id);
+                blobData.setId(blob.getDataIdentifier());
                 return blobData;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -108,11 +94,26 @@ public class SmbBlobManager implements BlobManager {
 
     @Override
     public String persist(SigaBlob blob, BlobData data) {
-        checkAndPrepareShare();
-        String filePath = prepareAndGetFilePath(blob);
-        data.setId(filePath);
+        String id = String.valueOf(blob.getId());
+        data.setId(id);
 
-        try (File f = share.openFile(
+        String filePath = getFilePath(blob, id);
+        String folder = Paths.get(filePath).getParent().toString();
+
+        Set<String> folderCheck = folderCheckCache.get();
+        if (folderCheck == null || !folderCheck.contains(folder)) {
+            if (folderCheck == null) {
+                folderCheck = new HashSet<>();
+                folderCheckCache = new WeakReference<>(folderCheck);
+            }
+
+            if (!this.context.getShare().folderExists(folder)) {
+                SmbFiles files = new SmbFiles();
+                files.mkdirs(this.context.getShare(), folder);
+            }
+        }
+
+        try (File f = this.context.getShare().openFile(
                 filePath,
                 EnumSet.of(AccessMask.GENERIC_WRITE),
                 EnumSet.of(FileAttributes.FILE_ATTRIBUTE_COMPRESSED),
@@ -123,38 +124,21 @@ public class SmbBlobManager implements BlobManager {
             f.write(data.getData(), 0);
         }
 
-        return data.getId();
+        return id;
     }
 
-    private String prepareAndGetFilePath(SigaBlob blob) {
+    private String getFilePath(SigaBlob blob, String id) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(blob.getCreatedAt());
-        String folder = String.format("%d-%d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH));
 
-        Set<String> folderCheck = folderCheckCache.get();
-        if (folderCheck == null || !folderCheck.contains(folder)) {
-            if (folderCheck == null) {
-                folderCheck = new HashSet<>();
-                folderCheckCache = new WeakReference<>(folderCheck);
-            }
+        Path path = Paths.get(
+                context.getContextName(),
+                blob.getCategory().toString().toLowerCase(),
+                String.valueOf(calendar.get(Calendar.YEAR)),
+                String.valueOf(calendar.get(Calendar.MONTH) + 1),
+                String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + 1)
+        );
 
-            if (!share.folderExists(folder))
-                share.mkdir(folder);
-        }
-
-        return folder + "/" + blob.getId().toString() + ".bin";
-    }
-
-    private void checkAndPrepareShare() {
-        if (share.isConnected())
-            return;
-
-        client.close();
-        setupConnection();
-    }
-
-    @PreDestroy
-    void destroy() {
-        client.close();
+        return path.resolve(id + "." + context.getFileExt()).toString();
     }
 }

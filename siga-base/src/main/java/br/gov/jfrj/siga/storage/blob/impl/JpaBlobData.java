@@ -1,6 +1,7 @@
-package br.gov.jfrj.siga.storage.blob;
+package br.gov.jfrj.siga.storage.blob.impl;
 
 import br.gov.jfrj.siga.storage.SigaBlob;
+import br.gov.jfrj.siga.storage.blob.BlobData;
 
 import javax.persistence.*;
 

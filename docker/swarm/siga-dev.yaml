@@ -35,3 +35,9 @@ services:
       - target: 8080
         published: 3001
         mode: host
+
+  smb:
+    ports:
+      - target: 445
+        published: 445
+        mode: host
