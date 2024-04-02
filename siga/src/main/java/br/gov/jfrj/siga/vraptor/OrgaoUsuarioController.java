@@ -214,7 +214,6 @@ public class OrgaoUsuarioController extends SigaSelecionavelControllerSupport<Cp
             orgaoUsuario.setBrasao(null);
         }
 
-
         try {
             ContextoPersistencia.begin();
             dao().gravar(orgaoUsuario);
@@ -242,7 +241,12 @@ public class OrgaoUsuarioController extends SigaSelecionavelControllerSupport<Cp
             orgaoUsuario.setIdOrgaoUsu(orgaoId);
             orgaoUsuario = dao().consultarPorId(orgaoUsuario);
 
-            data = ByteBuffer.wrap(orgaoUsuario.getBrasaoBytes());
+
+            byte[] content = orgaoUsuario.getBrasaoBytes();
+            if (content == null)
+                return null;
+
+            data = ByteBuffer.wrap(content);
             brasaoCache.put(orgaoId, data);
         }
 

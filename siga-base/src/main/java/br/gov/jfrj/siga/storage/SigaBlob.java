@@ -162,4 +162,12 @@ public class SigaBlob {
         }
     }
 
+    @PostRemove
+    private void postRemove() {
+        if (manager == null)
+            setManager(this.type);
+
+        manager.clearData(this);
+    }
+
 }

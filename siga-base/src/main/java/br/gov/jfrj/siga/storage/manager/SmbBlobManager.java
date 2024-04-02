@@ -136,9 +136,17 @@ public class SmbBlobManager implements BlobManager {
                 blob.getCategory().toString().toLowerCase(),
                 String.valueOf(calendar.get(Calendar.YEAR)),
                 String.valueOf(calendar.get(Calendar.MONTH) + 1),
-                String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + 1)
+                String.valueOf(calendar.get(Calendar.DAY_OF_MONTH))
         );
 
         return path.resolve(id + "." + context.getFileExt()).toString();
+    }
+
+    public void clearData(SigaBlob blob) {
+        if (blob.getDataIdentifier() == null)
+            return;
+
+        String filePath = getFilePath(blob, blob.getDataIdentifier());
+        this.context.getShare().rm(filePath);
     }
 }
