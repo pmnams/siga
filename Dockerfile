@@ -1,4 +1,6 @@
-FROM pmna/siga-base:homolog
+ARG BASE_VERSION=latest
+
+FROM pmna/siga-base:$BASE_VERSION
 
 COPY infra/config/base/siga-skel/configs "${SIGA_DIR}/configs"
 COPY infra/config/base/siga-skel/props "${SIGA_DIR}/props"
