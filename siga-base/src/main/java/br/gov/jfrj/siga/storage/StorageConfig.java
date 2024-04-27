@@ -1,6 +1,5 @@
 package br.gov.jfrj.siga.storage;
 
-import br.gov.jfrj.siga.base.Prop;
 import br.gov.jfrj.siga.storage.blob.BlobCategory;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -14,7 +13,7 @@ public class StorageConfig {
         return BlobCategory.DefaultBlobCategory.class;
     }
 
-    public BlobCategory getStorageType(int code) {
+    public BlobCategory getCategoryFromCode(int code) {
         if (categories == null)
             categories = getCategoryEnumType().getEnumConstants();
 

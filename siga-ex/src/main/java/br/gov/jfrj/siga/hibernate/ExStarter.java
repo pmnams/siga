@@ -42,10 +42,10 @@ public class ExStarter {
     private void runFileWatcher() {
         Map<Class<?>, String[]> entities = new HashMap<>();
 
-        entities.put(ExDocumento.class, new String[]{"conteudoBlobDoc", "exBlob", "dtDoc", "" + ExBlobCategory.DOCUMENTS.value});
+        entities.put(ExDocumento.class, new String[]{"conteudoBlobDoc", "exBlob", "dtRegDoc", "" + ExBlobCategory.DOCUMENTS.value});
 
-        StorageNormalizer normalizer = CDI.current().select(StorageNormalizer.class).get();
-        normalizer.migrateFromEntitiesField(entities,14400);
+        StorageNormalizer normalizer = new StorageNormalizer(emf);
+        normalizer.migrateFromEntitiesField(entities,190800);
     }
 
     @PostConstruct
@@ -64,6 +64,7 @@ public class ExStarter {
 
     @PreDestroy
     private void shutdown() {
+        emf.close();
         for (Timer timer : timerService.getTimers()) {
             timer.cancel();
         }

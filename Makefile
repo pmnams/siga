@@ -45,5 +45,9 @@ build-all:
 build:
 	@docker build --rm -t ${IMAGEFULLNAME} .
 
+build-dev:
+	@docker build --rm  --build-arg="BASE_VERSION=homolog" -t pmna/siga-full:homolog .
+	@docker push pmna/siga-full:homolog
+
 push:
 	@docker push ${IMAGEFULLNAME}

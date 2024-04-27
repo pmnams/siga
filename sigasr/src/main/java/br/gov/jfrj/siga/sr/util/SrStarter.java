@@ -1,6 +1,7 @@
 package br.gov.jfrj.siga.sr.util;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.enterprise.context.ApplicationScoped;
@@ -31,6 +32,11 @@ public class SrStarter {
 
 		emf = Persistence.createEntityManagerFactory("default");
 		new MigrationThread().start();
+	}
+
+	@PreDestroy
+	private void shutdown() {
+		emf.close();
 	}
 
 	public static class MigrationThread extends Thread {

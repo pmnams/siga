@@ -1,7 +1,6 @@
 package br.gov.jfrj.siga.storage.smb;
 
 import br.gov.jfrj.siga.base.Prop;
-import br.gov.jfrj.siga.storage.SigaBlob;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.connection.Connection;
@@ -11,9 +10,6 @@ import com.hierynomus.smbj.share.DiskShare;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Calendar;
 
 @ApplicationScoped
 public class SmbStorageContext {

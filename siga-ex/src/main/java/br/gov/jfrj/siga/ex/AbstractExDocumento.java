@@ -1115,10 +1115,9 @@ public abstract class AbstractExDocumento extends ExArquivo implements
     }
 
     public void setConteudoBlobDoc(byte[] createBlob) {
-        if (exBlob == null) {
-            exBlob = new SigaBlob(createBlob);
-            exBlob.setCategory(ExBlobCategory.DOCUMENTS);
-        } else
+        if (exBlob == null)
+            exBlob = new SigaBlob(createBlob, ExBlobCategory.DOCUMENTS);
+        else
             exBlob.setData(createBlob);
 
         conteudoBlobDoc = null;

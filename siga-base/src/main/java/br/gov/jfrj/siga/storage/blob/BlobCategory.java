@@ -48,7 +48,7 @@ public interface BlobCategory {
             }
         }
 
-        return config.getStorageType(value);
+        return config.getCategoryFromCode(value);
     }
 
     int getValue();
