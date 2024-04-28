@@ -781,11 +781,7 @@ public class CpDao extends ModeloDao {
             o.setSigla(flt.getSigla().replaceFirst("-", ""));
             lotacao = consultarPorSigla(o, flt.isBuscarFechadas());
         }
-        if (lotacao == null) {
-            o.setSiglaLotacao(flt.getSigla());
-            o.setOrgaoUsuario(null);
-            return consultarPorSigla(o, flt.isBuscarFechadas());
-        }
+
         return lotacao;
     }
 
