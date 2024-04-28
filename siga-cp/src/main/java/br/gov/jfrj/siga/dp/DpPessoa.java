@@ -53,7 +53,7 @@ import java.util.regex.Pattern;
 @SqlResultSetMapping(name = "scalar", columns = @ColumnResult(name = "dt"))
 @Cache(region = CpDao.CACHE_CORPORATIVO, usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class DpPessoa extends AbstractDpPessoa implements Serializable,
-        Selecionavel, Historico, Sincronizavel, Comparable, DpConvertableEntity {
+        Selecionavel, Historico, Sincronizavel, Comparable<DpPessoa>, DpConvertableEntity {
 
     public static final ActiveRecord<DpPessoa> AR = new ActiveRecord<>(
             DpPessoa.class);
@@ -649,10 +649,9 @@ public class DpPessoa extends AbstractDpPessoa implements Serializable,
     }
 
 
-    public int compareTo(Object o) {
-        DpPessoa other = (DpPessoa) o;
-
-        return getNomePessoa().compareTo(other.getNomePessoa());
+    @Override
+    public int compareTo(DpPessoa dpPessoa) {
+        return getNomePessoa().compareTo(dpPessoa.getNomePessoa());
     }
 
     @Override

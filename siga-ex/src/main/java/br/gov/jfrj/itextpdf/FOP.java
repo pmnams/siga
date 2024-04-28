@@ -21,10 +21,7 @@ package br.gov.jfrj.itextpdf;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
-import org.apache.fop.apps.FOUserAgent;
-import org.apache.fop.apps.Fop;
-import org.apache.fop.apps.FopFactory;
-import org.apache.fop.apps.MimeConstants;
+import org.apache.fop.apps.*;
 import org.jsoup.Jsoup;
 import org.jsoup.parser.Parser;
 import org.xml.sax.SAXException;
@@ -39,6 +36,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 public class FOP implements ConversorHtml {
@@ -55,10 +53,13 @@ public class FOP implements ConversorHtml {
 
     private static Configuration CFG;
 
+    private static FopFactoryBuilder builder;
+
     static {
         try {
             DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
-            CFG = cfgBuilder.build(FOP.class.getResourceAsStream("fop-cfg.xml"));
+            builder = new FopFactoryBuilder(URI.create("/"));
+            builder.setConfiguration(cfgBuilder.build(FOP.class.getResourceAsStream("fop-cfg.xml")));
         } catch (ConfigurationException | SAXException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -68,8 +69,7 @@ public class FOP implements ConversorHtml {
     public Result obtemCanalizadorBAOSFop(ByteArrayOutputStream baos,
                                           byte outputMode) throws Exception {
 
-        FopFactory fopFactory = FopFactory.newInstance();
-        fopFactory.setUserConfig(CFG);
+        FopFactory fopFactory = builder.build();
 
         FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
 

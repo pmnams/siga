@@ -54,16 +54,6 @@
 		</plugins>
 	</build>
 
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jxr-plugin</artifactId>
-				<version>2.3</version>
-			</plugin>
-		</plugins>
-	</reporting>
-
 	<dependencies>
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
@@ -100,7 +90,7 @@
 
 		<dependency>
 			<groupId>org.jboss.spec.javax.servlet</groupId>
-			<artifactId>jboss-servlet-api_2.5_spec</artifactId>
+			<artifactId>jboss-servlet-api_4.0_spec</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
@@ -112,18 +102,6 @@
 		<dependency>
 			<groupId>org.ccil.cowan.tagsoup</groupId>
 			<artifactId>tagsoup</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-discovery</groupId>
-			<artifactId>commons-discovery</artifactId>
-			<version>0.5</version>
-		</dependency>
-
-		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -165,9 +143,13 @@
 			<artifactId>vraptor-jpa</artifactId>
 			<version>4.0.5</version>
 			<exclusions>
-				<exclusion>  <!-- declare the exclusion here -->
+				<exclusion>
 					<groupId>org.eclipse.persistence</groupId>
 					<artifactId>javax.persistence</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>br.com.caelum</groupId>
+					<artifactId>vraptor</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -183,27 +165,16 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-		<dependency>
-			<groupId>javax.enterprise</groupId>
-			<artifactId>cdi-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		
 		
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
-			<version>2.8.0</version>
-			<type>jar</type>
-			<scope>compile</scope>
+			<version>2.10.2</version>
 		</dependency>
-		
-		<!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
+
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
-			<version>2.9.9</version>
 		</dependency>
 		
 	</dependencies>

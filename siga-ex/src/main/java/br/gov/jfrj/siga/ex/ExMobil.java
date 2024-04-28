@@ -1817,9 +1817,14 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
     }
 
     public SortedSet<ExMarca> getExMarcaSetAtivas() {
-        SortedSet<ExMarca> finalSet = new TreeSet<ExMarca>();
+        SortedSet<ExMarca> finalSet = new TreeSet<>();
         Date dt = new Date();
-        for (ExMarca m : getExMarcaSet()) {
+
+        Set<ExMarca> marcas = getExMarcaSet();
+        if (Objects.isNull(marcas))
+            return finalSet;
+
+        for (ExMarca m : marcas) {
             if (!((m.getDtIniMarca() == null || m.getDtIniMarca().before(dt))
                     && (m.getDtFimMarca() == null || m.getDtFimMarca().after(dt))))
                 continue;
@@ -2347,6 +2352,24 @@ public class ExMobil extends AbstractExMobil implements Serializable, Selecionav
 
     public boolean isAtendente(DpPessoa pessoa, DpLotacao lotacao) {
         Set<PessoaLotacaoParser> set = getAtendente();
+
+        for (PessoaLotacaoParser pp : set) {
+            boolean estaTranferindo = false;
+            boolean emCaixaDeEntrada = false;
+            for (ExMarca marca : getExMarcaSetAtivas()) {
+                if (marca.getCpMarcador().getId() == CpMarcadorEnum.EM_TRANSITO_ELETRONICO.getId())
+                    estaTranferindo = true;
+                else if (marca.getCpMarcador().getId() == CpMarcadorEnum.CAIXA_DE_ENTRADA.getId())
+                    emCaixaDeEntrada = true;
+            }
+
+            if (!estaTranferindo && !emCaixaDeEntrada)
+                break;
+
+            if ((Objects.nonNull(pessoa) && Objects.equals(pp.getLotacao(), lotacao)) && !Objects.equals(pp.getPessoa(), pessoa))
+                set.remove(pp);
+        }
+
         return equivalePessoaOuLotacaoPreferencialmentePelaLotacao(pessoa, lotacao, set);
     }
 

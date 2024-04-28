@@ -1,282 +1,234 @@
-/*******************************************************************************
+/*-****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
- * 
+ *
  *     This file is part of SIGA.
- * 
+ *
  *     SIGA is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     SIGA is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with SIGA.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package br.gov.jfrj.siga.base;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import org.bouncycastle.util.encoders.Base64;
+
+import javax.mail.*;
+import javax.mail.internet.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.InternetHeaders;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-
-import org.bouncycastle.util.encoders.Base64;
+import java.util.stream.Stream;
 
 public class Correio {
-	
-	private static Logger logger = Logger.getLogger("br.gov.jfrj.siga.base.email");
 
-	public static void enviar(final String destinatario, final String assunto,
-			final String conteudo) throws Exception {
-		final String[] to = { destinatario };
+    private static final Logger logger = Logger.getLogger("br.gov.jfrj.siga.base.email");
 
-		Correio.enviar(
-				Prop.get("/siga.smtp.usuario.remetente"),
-				to, assunto, conteudo, null);
-	}
-	
-	public static void enviar(final String[] destinatarios, final String assunto,
-			final String conteudo) throws Exception {
+    public static void enviar(final String destinatario, final String assunto,
+                              final String conteudo) throws Exception {
+        final String[] to = {destinatario};
 
-		Correio.enviar(
-				Prop.get("/siga.smtp.usuario.remetente"),
-				destinatarios, assunto, conteudo, null);
-	}
-		
-	public static void enviar(String remetente,
-			final String[] destinatarios, final String assunto,
-			final String conteudo, final String conteudoHTML) throws Exception {
+        Correio.enviar(
+                Prop.get("/siga.smtp.usuario.remetente"),
+                to, assunto, conteudo, null);
+    }
 
-		if (remetente == null)
-			remetente = Prop.get("/siga.smtp.usuario.remetente");
-		
-		List<String> listaServidoresEmail = new ArrayList<>();
+    public static void enviar(final String[] destinatarios, final String assunto,
+                              final String conteudo) throws Exception {
 
-		// lista indisponivel. Tenta ler apenas 1 servidor definido.
-		String servidor = Prop.get("/siga.smtp");
-		
-		// Se não for definido um servidor, simplesmente não enviar nenhum email
-		if (servidor == null)
-			return;
-		
-		if (listaServidoresEmail == null || listaServidoresEmail.size() == 0) {
-			listaServidoresEmail = new ArrayList<String>();
-			listaServidoresEmail.add(servidor);
-		}
+        Correio.enviar(
+                Prop.get("/siga.smtp.usuario.remetente"),
+                destinatarios, assunto, conteudo, null);
+    }
 
-		boolean servidorDisponivel = false;
-		String causa = " ";
-		for (String servidorEmail : listaServidoresEmail) {
-			try {
-				enviarParaServidor(servidorEmail, remetente, destinatarios,
-						assunto, conteudo, conteudoHTML);
-				servidorDisponivel = true;
-				break;
-			} catch (Exception e) {
-				if (e.getCause() != null) {
-					causa = ", causa: " + e.getCause().getMessage();
-					logger.warning("Servidor de e-mail '" + servidorEmail
-							+ "' indisponível: " + e.getMessage() + causa);
-				}
-			}
-		}
+    public static void enviar(String remetente,
+                              final String[] destinatarios, final String assunto,
+                              final String conteudo, final String conteudoHTML) throws Exception {
 
-		if (!servidorDisponivel) {
-			throw new AplicacaoException(
-					"Não foi possível se conectar ao servidor de e-mail!");
-		}
+        if (remetente == null)
+            remetente = Prop.get("/siga.smtp.usuario.remetente");
 
-	}
+        // lista indisponivel. Tenta ler apenas 1 servidor definido.
+        String servidor = Prop.get("/siga.smtp");
 
-	private static void enviarParaServidor(final String servidorEmail,
-			String remetente, final String[] destinatarios,
-			final String assunto, final String conteudo,
-			final String conteudoHTML) throws Exception {
-		// Cria propriedades a serem usadas na sessão.
-		final Properties props = new Properties();
-		Set<String> destSet = new HashSet<String>();
-		
-		
-	
-		// Define propriedades da sessão.
-		props.put("mail.transport.protocol", "smtp");
-		props.put("mail.smtp.host", servidorEmail);
-		props.put("mail.host", servidorEmail);
-		props.put("mail.mime.charset", "UTF-8");
+        // Se não for definido um servidor, simplesmente não enviar nenhum email
+        if (servidor == null)
+            return;
+
+        List<String> listaServidoresEmail = new ArrayList<>();
+        listaServidoresEmail.add(servidor);
+
+        boolean servidorDisponivel = false;
+        String causa = "Indefinida";
+        for (String servidorEmail : listaServidoresEmail) {
+            try {
+                enviarParaServidor(servidorEmail, remetente, destinatarios,
+                        assunto, conteudo, conteudoHTML);
+                servidorDisponivel = true;
+                break;
+            } catch (Exception e) {
+                causa = e.getMessage();
+                if (e.getCause() != null) {
+                    causa = ", causa: " + e.getCause().getMessage();
+                    logger.warning("Servidor de e-mail '" + servidorEmail
+                            + "' indisponível: " + e.getMessage() + causa);
+                }
+            }
+        }
+
+        if (!servidorDisponivel) {
+            throw new AplicacaoException(
+                    "Não foi possível se conectar ao servidor de e-mail!. Causa:  " + causa);
+        }
+
+    }
+
+    private static void enviarParaServidor(final String servidorEmail,
+                                           String remetente, final String[] destinatarios,
+                                           final String assunto, final String conteudo,
+                                           final String conteudoHTML) throws Exception {
+        // Cria propriedades a serem usadas na sessão.
+        final Properties props = new Properties();
+
+        props.put("mail.smtp.auth", true);
         props.put("mail.smtp.starttls.enable", Prop.get("/siga.smtp.starttls.enable"));
+        props.put("mail.smtp.host", servidorEmail);
+        props.put("mail.smtp.port", Prop.get("/siga.smtp.porta"));
+        props.put("mail.smtp.ssl.trust", servidorEmail);
 
-		// Cria sessão. setDebug(true) é interessante pois
-		// mostra os passos do envio da mensagem e o
-		// recebimento da mensagem do servidor no console.
-		Session session = null;
-		if (Boolean.TRUE.equals(Prop.getBool("/siga.smtp.auth"))) {
-			props.put("mail.smtp.auth", "true");
-			final String usuario = Prop.get("/siga.smtp.auth.usuario");
-			final String senha = Prop.get("/siga.smtp.auth.senha");
-			session = Session.getInstance(props, new Authenticator() {
-				protected PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication(usuario, senha);
-				}
-			});
-		} else {
-			session = Session.getInstance(props);
-		}
+        // Cria sessão. setDebug(true) é interessante pois
+        // mostra os passos do envio da mensagem e o
+        // recebimento da mensagem do servidor no console.
+        Session session;
+        if (Boolean.TRUE.equals(Prop.getBool("/siga.smtp.auth"))) {
+            props.put("mail.smtp.auth", true);
+            final String usuario = Prop.get("/siga.smtp.auth.usuario");
+            final String senha = Prop.get("/siga.smtp.auth.senha");
+            session = Session.getInstance(props, new Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(usuario, senha);
+                }
+            });
+        } else {
+            session = Session.getInstance(props);
+        }
 
-		final boolean debug = false;
-		// final boolean debug = Boolean.parseBoolean(Mensagens
-		// .getString("servidor.smtp.debug"));
-		session.setDebug(debug);
-		// Cria mensagem e seta alguns valores que constituem
-		// os seus headers.
-		final MimeMessage msg = new MimeMessage(session);
+        session.setDebug(false);
+        final MimeMessage msg = new MimeMessage(session);
 
-		if (destinatarios.length == 1) {
-			if (!destinatarios[0].equals("null") && !destSet.contains(destinatarios[0]))
-				destSet.add(destinatarios[0]);
-			msg.setRecipient(Message.RecipientType.TO, new InternetAddress(
-				destinatarios[0]));
+        msg.setFrom(new InternetAddress(remetente));
 
-		} else {
-			for (String s : destinatarios) {
-				if (!s.equals("null") && !destSet.contains(s))
-					destSet.add(s);
-			}
+        final Address[] recipients = Stream.of(destinatarios)
+                .filter(email -> !email.equals("null"))
+                .map(email -> {
+                    try {
+                        return new InternetAddress(email);
+                    } catch (AddressException e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .distinct()
+                .toArray(Address[]::new);
 
-			final InternetAddress[] endereco = new InternetAddress[destSet
-					.size()];
-			int i = 0;
-			for (String email : destSet) {
-				if(!email.equals("null")){
-					endereco[i] = new InternetAddress(email);
-					i++;
-				}
-			}
-			msg.setRecipients(Message.RecipientType.TO, endereco);
-		}
-		msg.setFrom(new InternetAddress(remetente));
-		//    Se baseTeste inserir no assunto - AMBIENTE DE TESTE FAVOR DESCONSIDERAR 
-		
-		Boolean isVersionTest;
-		try {
-			isVersionTest = Prop.getBool("/siga.versao.teste");
-			
-		} catch (Exception ex) 
-		{
-			isVersionTest = false;
-		}
-		
-		
-		if (Boolean.TRUE.equals(isVersionTest)) {
-			msg.setSubject(assunto + " - AMBIENTE DE TESTE FAVOR DESCONSIDERAR", "utf-8");
-		}
-		else {
-			msg.setSubject(assunto, "utf-8");
-		}
-		
+        msg.setRecipients(Message.RecipientType.TO, recipients);
 
-		if (conteudoHTML == null) {
-			// msg.setText(conteudo);
-			msg.setSubject(assunto, "utf-8");
-			msg.setContent(conteudo, "text/plain;charset=UTF-8");
-		} else {
-			Multipart mp = new MimeMultipart("alternative");
 
-			// Add text version
-			InternetHeaders ihs = new InternetHeaders();
-			ihs.addHeader("Content-Type", "text/plain; charset=UTF-8");
-			ihs.addHeader("Content-Transfer-Encoding", "base64");
-			MimeBodyPart mb1 = new MimeBodyPart(ihs, Base64.encode(conteudo
-					.getBytes(StandardCharsets.UTF_8)));
-			mp.addBodyPart(mb1);
+        //    Se baseTeste inserir no assunto - AMBIENTE DE TESTE FAVOR DESCONSIDERAR
 
-			// Do the same with the HTML part
-			InternetHeaders ihs2 = new InternetHeaders();
-			ihs2.addHeader("Content-Type", "text/html; charset=UTF-8");
-			ihs2.addHeader("Content-Transfer-Encoding", "base64");
-			MimeBodyPart mb2 = new MimeBodyPart(ihs2,
-					Base64.encode(conteudoHTML.getBytes(StandardCharsets.UTF_8)));
-			mp.addBodyPart(mb2);
+        Boolean isVersionTest = Boolean.TRUE.equals(Prop.getBool("/siga.versao.teste"));
 
-			// Set the content for the message and transmit
-			msg.setContent(mp);
-		}
+        if (Boolean.TRUE.equals(isVersionTest)) {
+            msg.setSubject(assunto + " - AMBIENTE DE TESTE FAVOR DESCONSIDERAR", "utf-8");
+        } else {
+            msg.setSubject(assunto, "utf-8");
+        }
 
-		// Envia mensagem.
-		// Transport.send(msg);
+        if (conteudoHTML == null) {
+            msg.setSubject(assunto, "utf-8");
+            msg.setContent(conteudo, "text/plain;charset=UTF-8");
+        } else {
+            Multipart mp = new MimeMultipart("alternative");
 
-		Transport tr = new br.gov.jfrj.siga.base.SMTPTransport(session,
-				null);
-		tr.connect(servidorEmail, Prop.getInt("/siga.smtp.porta"), null, null);
-		msg.saveChanges(); // don't forget this
-		tr.sendMessage(msg, msg.getAllRecipients());
-		tr.close();
+            // Add text version
+            InternetHeaders ihs = new InternetHeaders();
+            ihs.addHeader("Content-Type", "text/plain; charset=UTF-8");
+            ihs.addHeader("Content-Transfer-Encoding", "base64");
+            MimeBodyPart mb1 = new MimeBodyPart(ihs, Base64.encode(conteudo
+                    .getBytes(StandardCharsets.UTF_8)));
+            mp.addBodyPart(mb1);
 
-		logger.log(Level.INFO,"Email enviado para " + Collections.singletonList(destSet).toString() + "[" + assunto + "]");
-		logger.log(Level.FINE, "Detalhes do e-mail enviado:"
-					+ "\nAssunto: " + assunto
-					+ "\nDe: " + remetente
-					+ "\nPara: " + Arrays.asList(destinatarios).toString()
-					+ "\nTexto: " + (conteudoHTML == null?conteudo:conteudoHTML));
-	}
+            // Do the same with the HTML part
+            InternetHeaders ihs2 = new InternetHeaders();
+            ihs2.addHeader("Content-Type", "text/html; charset=UTF-8");
+            ihs2.addHeader("Content-Transfer-Encoding", "base64");
+            MimeBodyPart mb2 = new MimeBodyPart(ihs2,
+                    Base64.encode(conteudoHTML.getBytes(StandardCharsets.UTF_8)));
+            mp.addBodyPart(mb2);
 
-	public static void enviar(String remetente, String[] destinatarios,
-			String assunto, String conteudo) throws Exception {
-		Correio.enviar(remetente, destinatarios, assunto, conteudo, null);
-	}	
-	
-	public static String obterHTMLEmailParaUsuarioExternoAssinarDocumento(String uri, String siglaDocumento, String siglaUsuario) {
+            msg.setContent(mp);
+        }
 
-		return "<html>" +
-				"<body>" +
-				"	<table>" +
-				"		<tbody>" +
-				"			<tr>" +
-				"				<td style='height: 80px; background-color: #f6f5f6; padding: 10px 20px;'>" +
-				"					<img style='padding: 10px 0px; text-align: center;' src='https://www.documentos.spsempapel.sp.gov.br/siga/imagens/logo-sem-papel-cor.png' alt='SP Sem Papel' width='108' height='50' />" +
-				"				</td>" +
-				"			</tr>" +
-				"			<tr>" +
-				"				<td style='background-color: #bbb; padding: 0 20px;'>" +
-				"					<h3 style='height: 20px;'>Governo do Estado de S&atilde;o Paulo</h3>" +
-				"				</td>" +
-				"			</tr>" +
-				"			<tr>" +
-				"				<td style='height: 310px; padding: 10px 20px;'>" +
-				"					<div>" +
-				"						<p style='color: #808080;'>Esse <a style='color: #808080;' href='" + uri + "' target='_blank'><b>link</b></a> fornece acesso ao documento nº <b>" + siglaDocumento + "</b>, do Programa SP Sem Papel, cujo usuário <b>" + siglaUsuario + "</b> é interessado.</p>" +
-				"						<p style='color: #808080;'>Para visualizar e assinar o documento, acesse o link: <a style='color: #808080;' href='" + uri + "' target='_blank'><b>" + uri + "</b></a>" +
-				"						<p style='color: #808080;'>Atenção: Esse e-mail é de uso restrito ao usuário e entidade para a qual foi endereçado. Se você não é destinatário desta mensagem, você está, por meio desta, notificado que não deverá retransmitir, imprimir, copiar, examinar, distribuir ou utilizar informação contida nesta mensagem.</p>" +
-				"					</div>" +
-				"				</td>" +
-				"			</tr>" +
-				"			<tr>" +
-				"				<td style='height: 18px; padding: 0 20px; background-color: #eaecee;'>" +
-				"					<p>" +
-				"						<span style='color: #aaa;'><b>Aten&ccedil;&atilde;o:</b> esta &eacute; uma mensagem autom&aacute;tica. Por favor n&atilde;o responda&nbsp;</span>" +
-				"					</p>" +
-				"				</td>" +
-				"			</tr>" +
-				"	 	</tbody>" +
-				"	</table>" +
-				"</body>" +
-				"</html>";
-	}	
+        // Envia mensagem.
+        Transport.send(msg);
+
+        logger.log(Level.INFO, "Email enviado para " + Collections.singletonList(recipients) + "[" + assunto + "]");
+        logger.log(Level.FINE, "Detalhes do e-mail enviado:"
+                + "\nAssunto: " + assunto
+                + "\nDe: " + remetente
+                + "\nPara: " + Arrays.asList(destinatarios)
+                + "\nTexto: " + (conteudoHTML == null ? conteudo : conteudoHTML));
+    }
+
+    public static void enviar(String remetente, String[] destinatarios,
+                              String assunto, String conteudo) throws Exception {
+        Correio.enviar(remetente, destinatarios, assunto, conteudo, null);
+    }
+
+    public static String obterHTMLEmailParaUsuarioExternoAssinarDocumento(String uri, String siglaDocumento, String siglaUsuario) {
+
+        return "<html>" +
+                "<body>" +
+                "	<table>" +
+                "		<tbody>" +
+                "			<tr>" +
+                "				<td style='height: 80px; background-color: #f6f5f6; padding: 10px 20px;'>" +
+                "					<img style='padding: 10px 0px; text-align: center;' src='https://www.documentos.spsempapel.sp.gov.br/siga/imagens/logo-sem-papel-cor.png' alt='SP Sem Papel' width='108' height='50' />" +
+                "				</td>" +
+                "			</tr>" +
+                "			<tr>" +
+                "				<td style='background-color: #bbb; padding: 0 20px;'>" +
+                "					<h3 style='height: 20px;'>Governo do Estado de S&atilde;o Paulo</h3>" +
+                "				</td>" +
+                "			</tr>" +
+                "			<tr>" +
+                "				<td style='height: 310px; padding: 10px 20px;'>" +
+                "					<div>" +
+                "						<p style='color: #808080;'>Esse <a style='color: #808080;' href='" + uri + "' target='_blank'><b>link</b></a> fornece acesso ao documento nº <b>" + siglaDocumento + "</b>, do Programa SP Sem Papel, cujo usuário <b>" + siglaUsuario + "</b> é interessado.</p>" +
+                "						<p style='color: #808080;'>Para visualizar e assinar o documento, acesse o link: <a style='color: #808080;' href='" + uri + "' target='_blank'><b>" + uri + "</b></a>" +
+                "						<p style='color: #808080;'>Atenção: Esse e-mail é de uso restrito ao usuário e entidade para a qual foi endereçado. Se você não é destinatário desta mensagem, você está, por meio desta, notificado que não deverá retransmitir, imprimir, copiar, examinar, distribuir ou utilizar informação contida nesta mensagem.</p>" +
+                "					</div>" +
+                "				</td>" +
+                "			</tr>" +
+                "			<tr>" +
+                "				<td style='height: 18px; padding: 0 20px; background-color: #eaecee;'>" +
+                "					<p>" +
+                "						<span style='color: #aaa;'><b>Aten&ccedil;&atilde;o:</b> esta &eacute; uma mensagem autom&aacute;tica. Por favor n&atilde;o responda&nbsp;</span>" +
+                "					</p>" +
+                "				</td>" +
+                "			</tr>" +
+                "	 	</tbody>" +
+                "	</table>" +
+                "</body>" +
+                "</html>";
+    }
 
 }

@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <revision>1.2.4</revision>
+        <revision>1.2.5</revision>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -38,19 +38,21 @@
         <module>siga-oidc</module>
         <module>siga-integracao</module>
     </modules>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.wildfly.bom</groupId>
-                <artifactId>wildfly-javaee8-with-tools</artifactId>
-                <version>15.0.1.Final</version>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-parent</artifactId>
+                <version>26.1.3.Final</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
             <dependency>
-                <groupId>br.com.caelum</groupId>
+                <groupId>com.brunocasas</groupId>
                 <artifactId>vraptor</artifactId>
-                <version>4.2.2</version>
+                <version>4.3.0</version>
             </dependency>
             <dependency>
                 <groupId>com.crivano</groupId>
@@ -194,18 +196,13 @@
             <dependency>
                 <groupId>org.codehaus.jettison</groupId>
                 <artifactId>jettison</artifactId>
-                <version>1.3.5</version>
+                <version>1.5.4</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>stax-api</artifactId>
                         <groupId>stax</groupId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
-                <version>2.6</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -220,47 +217,18 @@
             <dependency>
                 <groupId>commons-fileupload</groupId>
                 <artifactId>commons-fileupload</artifactId>
-                <version>1.4</version>
+                <version>1.5</version>
             </dependency>
             <dependency>
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
                 <version>1.9.4</version>
             </dependency>
-            <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>3.2.2</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.mail</groupId>
-                <artifactId>mail</artifactId>
-                <version>1.4.2</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15on</artifactId>
-                <version>1.67</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcmail-jdk15on</artifactId>
-                <version>1.50</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpkix-jdk15on</artifactId>
-                <version>1.50</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.axis</groupId>
-                <artifactId>axis</artifactId>
-                <version>1.4</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.apache.axis</groupId>-->
+<!--                <artifactId>axis</artifactId>-->
+<!--                <version>1.4</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
@@ -275,7 +243,7 @@
             <dependency>
                 <groupId>net.sf.jasperreports</groupId>
                 <artifactId>jasperreports</artifactId>
-                <version>6.12.2</version>
+                <version>6.21.0</version>
             </dependency>
             <dependency>
                 <groupId>ar.com.fdvs</groupId>
@@ -285,7 +253,7 @@
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi</artifactId>
-                <version>3.17</version>
+                <version>4.1.2</version>
             </dependency>
             <dependency>
                 <groupId>net.sf.ehcache</groupId>
@@ -309,21 +277,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>opensymphony</groupId>
-                <artifactId>oscore</artifactId>
-                <version>2.2.4</version>
-            </dependency>
-            <dependency>
-                <groupId>xerces</groupId>
-                <artifactId>xercesImpl</artifactId>
-                <version>2.12.2</version>
-            </dependency>
-            <dependency>
-                <groupId>net.sourceforge.htmlcleaner</groupId>
-                <artifactId>htmlcleaner</artifactId>
-                <version>2.2</version>
-            </dependency>
-            <dependency>
                 <groupId>net.sf.kxml</groupId>
                 <artifactId>kxml2</artifactId>
                 <version>2.2.2</version>
@@ -336,7 +289,7 @@
             <dependency>
                 <groupId>org.apache.xmlgraphics</groupId>
                 <artifactId>fop</artifactId>
-                <version>0.93</version>
+                <version>2.2</version>
             </dependency>
             <dependency>
                 <groupId>avalon-framework</groupId>
@@ -361,7 +314,7 @@
             <dependency>
                 <groupId>com.google.zxing</groupId>
                 <artifactId>javase</artifactId>
-                <version>3.3.0</version>
+                <version>3.5.2</version>
             </dependency>
             <dependency>
                 <groupId>org.ccil.cowan.tagsoup</groupId>
@@ -382,12 +335,12 @@
             <dependency>
                 <groupId>org.directwebremoting</groupId>
                 <artifactId>dwr</artifactId>
-                <version>2.0.10</version>
+                <version>2.0.11-RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.mvel</groupId>
                 <artifactId>mvel2</artifactId>
-                <version>2.2.4.Final</version>
+                <version>2.5.1.Final</version>
             </dependency>
             <dependency>
                 <groupId>info.bliki.wiki</groupId>
@@ -405,26 +358,9 @@
                 <version>3.5.3</version>
             </dependency>
             <dependency>
-                <groupId>org.jboss.spec.javax.servlet</groupId>
-                <artifactId>jboss-servlet-api_2.5_spec</artifactId>
-                <version>1.0.1.Final</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.spec.javax.servlet.jsp</groupId>
-                <artifactId>jboss-jsp-api_2.3_spec</artifactId>
-                <version>1.0.0.Beta1</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
                 <groupId>jsptags</groupId>
                 <artifactId>pager-taglib</artifactId>
                 <version>2.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>2.2.4</version>
             </dependency>
             <dependency>
                 <groupId>jstl</groupId>
@@ -468,6 +404,22 @@
             <version>2.1.3</version>
         </dependency>
         <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
+            <version>2.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
             <scope>provided</scope>
@@ -484,8 +436,8 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -500,20 +452,43 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcmail-jdk15on</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-annotations</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <repositories>
         <repository>
-            <id>jaspersoft-third-party</id>
-            <url>https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+            <id>jboss-public-repository-group</id>
+            <name>JBoss Public Repository Group</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+            <layout>default</layout>
         </repository>
     </repositories>
     <build>

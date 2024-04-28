@@ -72,10 +72,7 @@ import org.json.JSONObject;
 
 import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.reflect.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -280,7 +277,7 @@ public class ExBL extends CpBL {
 
     @SuppressWarnings("unchecked")
     public void numerarTudo(int aPartirDe) {
-        List<ExDocumento> list = new ArrayList<ExDocumento>();
+        List<ExDocumento> list = null;
         int index = 0;
 
         do {
@@ -301,9 +298,6 @@ public class ExBL extends CpBL {
                 } catch (Throwable e) {
                     System.out.println("Erro ao marcar o doc " + doc);
                     e.printStackTrace();
-                }
-                if (index % 50 == 0) {
-                    // System.gc();
                 }
                 System.out.print(doc.getIdDoc() + " ok - ");
             }
@@ -1436,6 +1430,18 @@ public class ExBL extends CpBL {
                 gravarMovimentacao(mov);
 
                 concluirAlteracaoDocComRecalculoAcesso(mov);
+
+                try {
+                    List<DpPessoa> cossignatarios = doc.getCosignatarios();
+                    for (DpPessoa cossignatario : cossignatarios) {
+                        if (Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(cossignatario, cossignatario.getLotacao(),
+                                CpServicosNotificacaoPorEmail.COSSIG.getChave()) && doc.isAssinadoPeloSubscritorComTokenOuSenha()) {
+                            enviarEmailAoCossignatario(cossignatario, cadastrante, doc.getSigla());
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("Não foi possível enviar e-mail aos cossignatários");
+                }
             } catch (final Exception e) {
                 throw new RuntimeException("Erro ao assinar documento: " + e.getLocalizedMessage(), e);
             }
@@ -1708,6 +1714,18 @@ public class ExBL extends CpBL {
 
                 gravarMovimentacao(mov);
                 concluirAlteracaoDocComRecalculoAcesso(mov);
+
+                try {
+                    List<DpPessoa> cossignatarios = doc.getCosignatarios();
+                    for (DpPessoa cossignatario : cossignatarios) {
+                        if (Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(cossignatario, cossignatario.getLotacao(),
+                                CpServicosNotificacaoPorEmail.COSSIG.getChave()) && doc.isAssinadoPeloSubscritorComTokenOuSenha()) {
+                            enviarEmailAoCossignatario(cossignatario, cadastrante, doc.getSigla());
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("Não foi possível enviar e-mail aos cossignatários");
+                }
             } catch (final Exception e) {
                 cancelarAlteracao();
                 throw new RuntimeException("Erro ao registrar assinatura: " + getRootCauseMessage(e), e);
@@ -2945,6 +2963,15 @@ public class ExBL extends CpBL {
             if (doc.getExMobilAutuado() != null)
                 juntarAoDocumentoAutuado(cadastrante, lotaCadastrante, doc, null, cadastrante);
 
+            try {
+                if (Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(doc.getSubscritor(),
+                        doc.getSubscritor().getLotacao(), CpServicosNotificacaoPorEmail.RESPASS.getChave())) {
+                    enviarEmailResponsavelPelaAssinatura(cadastrante, doc.getSubscritor(), doc.getSigla());
+                }
+            } catch (Exception e) {
+                log.error("Não foi possível enviar e-mail ao responsável pela assinatura");
+            }
+
             return s;
         } catch (final Exception e) {
             throw new RuntimeException("Erro ao finalizar o documento: " + e.getMessage(), e);
@@ -3770,18 +3797,6 @@ public class ExBL extends CpBL {
     }
 
     private void gravarMovimentacao(final ExMovimentacao mov) throws AplicacaoException, SQLException {
-        // if (mov.getNumVia() != null && mov.getNumVia() == 0)
-        // mov.setNumVia(null);
-        //
-        // if (ultMov == null)
-        // ultMov = mov.getExDocumento()
-        // .getUltimaMovimentacao(mov.getNumVia());
-        //
-        // if (ultMov != null) {
-        // ultMov.setDtFimMov(new Date());
-        // ExDao.getInstance().gravar(ultMov);
-        // }
-
         if (SigaMessages.isSigaSP()) {
             mov.setNumPaginas(mov.getContarNumeroDePaginas()); //Sempre conta a página para SP
         } else if (mov.getExTipoMovimentacao() != ExTipoDeMovimentacao.ANEXACAO_DE_ARQUIVO_AUXILIAR) {
@@ -3789,10 +3804,6 @@ public class ExBL extends CpBL {
         }
 
         dao().gravar(mov);
-
-        /*
-         * if (mov.getConteudoBlobMov() != null) movDao.gravarConteudoBlob(mov);
-         */
 
         if (mov.getExMobil().getExMovimentacaoSet() == null)
             mov.getExMobil().setExMovimentacaoSet(new TreeSet<>());
@@ -3814,28 +3825,6 @@ public class ExBL extends CpBL {
 
         if (mov.getExTipoMovimentacao() != ExTipoDeMovimentacao.CANCELAMENTO_DE_MOVIMENTACAO) {
             Notificador.notificarDestinariosEmail(mov, Notificador.TIPO_NOTIFICACAO_GRAVACAO);
-        }
-
-        if (SigaMessages.isSigaSP()) {
-            if (mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.SOLICITACAO_DE_ASSINATURA &&
-                    usuarioExternoTemQueAssinar(mov.getExDocumento(), mov.getSubscritor())) {
-                enviarEmailParaUsuarioExternoAssinarDocumento(mov.getExDocumento(), mov.getSubscritor());
-
-            } else if (mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.ASSINATURA_COM_SENHA ||
-                    mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.ASSINATURA_DIGITAL_DOCUMENTO ||
-                    mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.CONFERENCIA_COPIA_COM_SENHA ||
-                    mov.getExTipoMovimentacao() == ExTipoDeMovimentacao.CONFERENCIA_COPIA_DOCUMENTO) {
-
-                if (!mov.getExDocumento().getCosignatarios().isEmpty() &&
-                        !mov.getExDocumento().isCossignatario(mov.getSubscritor())) {
-                    for (DpPessoa cossignatario : mov.getExDocumento().getCosignatarios()) {
-                        if (usuarioExternoTemQueAssinar(mov.getExDocumento(), cossignatario)) {
-                            enviarEmailParaUsuarioExternoAssinarDocumento(mov.getExDocumento(), cossignatario);
-                        }
-                    }
-                }
-
-            }
         }
     }
 
@@ -4176,10 +4165,10 @@ public class ExBL extends CpBL {
 
     public void copiarRestringir(ExMobil mobFilho, ExMobil mobPai, DpPessoa cadastrante, DpPessoa titular, Date dtMov)
             throws AplicacaoException, SQLException {
-        List<ExMovimentacao> listFilho = new ArrayList<ExMovimentacao>();
+        List<ExMovimentacao> listFilho = new ArrayList<>();
         listFilho.addAll(mobFilho.getDoc().getMobilGeral()
                 .getMovsNaoCanceladas(ExTipoDeMovimentacao.RESTRINGIR_ACESSO));
-        List<ExMovimentacao> listPai = new ArrayList<ExMovimentacao>();
+        List<ExMovimentacao> listPai = new ArrayList<>();
         listPai.addAll(mobPai.getDoc().getMobilGeral()
                 .getMovsNaoCanceladas(ExTipoDeMovimentacao.RESTRINGIR_ACESSO));
         if (!listFilho.isEmpty() || !listPai.isEmpty()) {
@@ -4897,7 +4886,6 @@ public class ExBL extends CpBL {
      * @throws AplicacaoException
      * @throws Exception
      */
-    // Nato: retirei: final HttpServletRequest request,
     public void transferir(final CpOrgao orgaoExterno, final String obsOrgao, final DpPessoa cadastrante,
                            final DpLotacao lotaCadastrante, final ExMobil mob, final Date dtMov, final Date dtMovIni,
                            final Date dtFimMov, DpLotacao lotaResponsavel, final DpPessoa responsavel, final CpGrupoDeEmail grupo,
@@ -4912,8 +4900,6 @@ public class ExBL extends CpBL {
         final DpPessoa titularFinal = titular != null ? titular : cadastrante;
 
         SortedSet<ExMobil> set = mob.getMobilEApensosExcetoVolumeApensadoAoProximo();
-
-        Date dtUltReceb = null;
 
         // Edson: apagar isto? A verificação já é feita no for abaixo...
         if (fDespacho && mob.isApensadoAVolumeDoMesmoProcesso())
@@ -5096,7 +5082,7 @@ public class ExBL extends CpBL {
                                 cont = tpDespacho.getDescTpDespacho();
                             }
                             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                                baos.write("conteudo".getBytes("iso-8859-1"));
+                                baos.write("conteudo".getBytes(StandardCharsets.ISO_8859_1));
                                 baos.write('=');
                                 baos.write(URLEncoder.encode(cont, "iso-8859-1").getBytes());
                                 mov.setConteudoBlobForm(baos.toByteArray());
@@ -5108,7 +5094,7 @@ public class ExBL extends CpBL {
                             mov.setConteudoBlobHtmlString(strHtml);
 
                             // Gravar o Pdf
-                            final byte pdf[] = Documento.generatePdf(strHtml);
+                            final byte[] pdf = Documento.generatePdf(strHtml);
                             mov.setConteudoBlobPdf(pdf);
                             mov.setConteudoTpMov("application/zip");
                         }
@@ -5133,7 +5119,7 @@ public class ExBL extends CpBL {
 
                         // Cancelar trâmite pendente quando é para forçar para outro destino
                         Set<ExMovimentacao> movsTramitePendente = m.calcularTramitesPendentes().tramitesPendentes;
-                        if (forcarTransferencia && movsTramitePendente.size() > 0) {
+                        if (forcarTransferencia && !movsTramitePendente.isEmpty()) {
                             for (ExMovimentacao tp : movsTramitePendente)
                                 gravarMovimentacaoCancelamento(mov, tp);
                         } else {
@@ -5142,16 +5128,72 @@ public class ExBL extends CpBL {
 
                         concluirAlteracaoParcialComRecalculoAcesso(m);
 
-                        List<ExMovimentacao> listaMovimentacao = new ArrayList<ExMovimentacao>();
-                        listaMovimentacao.addAll(m.doc().getMobilGeral()
-                                .getMovsNaoCanceladas(ExTipoDeMovimentacao.RESTRINGIR_ACESSO));
+                        List<ExMovimentacao> listaMovimentacao = new ArrayList<>(
+                                m.doc().getMobilGeral().getMovsNaoCanceladas(ExTipoDeMovimentacao.RESTRINGIR_ACESSO)
+                        );
+
                         if (!listaMovimentacao.isEmpty()) {
-                            List<ExDocumento> listaDocumentos = new ArrayList<ExDocumento>();
-                            listaDocumentos.addAll(mob.getDoc().getExDocumentoFilhoSet());
+                            List<ExDocumento> listaDocumentos = new ArrayList<>(mob.getDoc().getExDocumentoFilhoSet());
 
                             for (ExDocumento exDocumento : listaDocumentos) {
                                 concluirAlteracaoParcialComRecalculoAcesso(exDocumento.getMobilGeral());
                             }
+                        }
+
+                        try {
+                            Set<ExMobil> exMobils = mov.getExDocumento().getExMobilSet();
+                            Set<DpPessoa> pessoasLota = mov.getLotaResp().getDpPessoaLotadosSet();
+                            Set<CpMarcador> marcas = new HashSet<>();
+                            StringJoiner marcasDoDoc = new StringJoiner(", ");
+
+                            if (mov.getResp() != null) {
+                                if (Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(mov.getResp(),
+                                        mov.getResp().getLotacao(), CpServicosNotificacaoPorEmail.DOCMARC.getChave())) {
+                                    for (ExMobil exMobil : exMobils) {
+                                        for (ExMarca exMarca : exMobil.getExMarcaSet()) {
+                                            if (exMarca.getCpMarcador().getIdFinalidade().getIdTpMarcador() == CpTipoMarcadorEnum.TIPO_MARCADOR_LOTACAO
+                                                    || exMarca.getCpMarcador().getIdFinalidade().getIdTpMarcador() == CpTipoMarcadorEnum.TIPO_MARCADOR_GERAL) {
+                                                marcas.add(exMarca.getCpMarcador());
+                                            }
+                                        }
+                                    }
+                                    if (marcasDoDoc.length() == 0) {
+                                        marcas.forEach(marc -> {
+                                            marcasDoDoc.add(marc.getDescrMarcador());
+                                        });
+                                    }
+                                    enviarEmailAoTramitarDocMarcado(mov.getResp(), mov.getTitular(), mov.getExDocumento().getSigla(), marcasDoDoc + "");
+                                }
+
+                                if (Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(mov.getResp(),
+                                        mov.getResp().getLotacao(), CpServicosNotificacaoPorEmail.DOCTUSU.getChave()))
+                                    enviarEmailAoTramitarDocParaUsuario(mov.getResp(), mov.getTitular(), mov.getExDocumento().getSigla());
+                            } else {
+                                for (DpPessoa pessoa : pessoasLota) {
+                                    if (Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(pessoa,
+                                            pessoa.getLotacao(), CpServicosNotificacaoPorEmail.DOCMARC.getChave())) {
+                                        for (ExMobil exMobil : exMobils) {
+                                            for (ExMarca exMarca : exMobil.getExMarcaSet()) {
+                                                if (exMarca.getCpMarcador().getIdFinalidade().getIdTpMarcador() == CpTipoMarcadorEnum.TIPO_MARCADOR_LOTACAO
+                                                        || exMarca.getCpMarcador().getIdFinalidade().getIdTpMarcador() == CpTipoMarcadorEnum.TIPO_MARCADOR_GERAL) {
+                                                    marcas.add(exMarca.getCpMarcador());
+                                                }
+                                            }
+                                        }
+                                        if (marcasDoDoc.length() == 0) {
+                                            marcas.forEach(marc -> {
+                                                marcasDoDoc.add(marc.getDescrMarcador());
+                                            });
+                                        }
+                                        enviarEmailAoTramitarDocMarcado(pessoa, mov.getTitular(), mov.getExDocumento().getSigla(), marcasDoDoc + "");
+                                    }
+                                    if (Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(pessoa,
+                                            pessoa.getLotacao(), CpServicosNotificacaoPorEmail.DOCTUN.getChave()))
+                                        enviarEmailAoTramitarDocParaUsuariosDaUnidade(mov.getLotaResp(), pessoa, mov.getExDocumento().getSigla());
+                                }
+                            }
+                        } catch (Exception e) {
+                            log.error("Não foi possível enviar e-mails referente ao processo de trâmites");
                         }
                     }
                 }
@@ -5630,8 +5672,8 @@ public class ExBL extends CpBL {
 
     private String processarModelo(ExDocumento doc, ExMovimentacao mov, String acao, Map<String, String> formParams,
                                    CpOrgaoUsuario orgaoUsu) throws Exception {
-        Map<String, Object> attrs = new TreeMap<String, Object>();
-        Map<String, Object> params = new TreeMap<String, Object>();
+        Map<String, Object> attrs = new TreeMap<>();
+        Map<String, Object> params = new TreeMap<>();
         ProcessadorModelo p = getProcessadorModeloJsp();
 
         // System.out.println(System.currentTimeMillis() + " - INI
@@ -5760,11 +5802,8 @@ public class ExBL extends CpBL {
             ou = doc.getOrgaoUsuario();
         if (mov != null && mov.getResp() != null && mov.getResp().getOrgaoUsuario() != null)
             ou = mov.getResp().getOrgaoUsuario();
-        String s = p.processarModelo(ou, attrs, params);
 
-        // System.out.println(System.currentTimeMillis() + " - FIM
-        // processarModelo");
-        return s;
+        return p.processarModelo(ou, attrs, params);
     }
 
     private void juntarAoDocumentoPai(final DpPessoa cadastrante, final DpLotacao lotaCadastrante,
@@ -5958,20 +5997,27 @@ public class ExBL extends CpBL {
     private void acrescentarHashDeAuditoria(ExMovimentacao mov, byte[] sha256, boolean autenticar, String nome,
                                             String cpf, String json) {
         try {
-            String timestampUrl = Prop.get("carimbo.url");
+            String timestampUrl = Prop.get("timestamp.url");
             log.warn("URL_TIMESTAMP " + timestampUrl);
             if (timestampUrl == null)
                 return;
             TimestampPostRequest req = new TimestampPostRequest();
-            req.system = Prop.get("carimbo.sistema");
+            req.system = Prop.get("timestamp.sistema");
             req.sha256 = sha256;
             req.tipo = autenticar ? "auth" : "sign";
             req.nome = nome;
             req.cpf = cpf;
             req.json = json;
-            SwaggerAsyncResponse<TimestampPostResponse> resp = SwaggerCall.callAsync("obter timestamp", null, "POST",
-                            timestampUrl + "/timestamp", req, TimestampPostResponse.class)
-                    .get(HASH_TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+
+            SwaggerAsyncResponse<TimestampPostResponse> resp = SwaggerCall.callAsync(
+                    "obter timestamp",
+                    null,
+                    "POST",
+                    timestampUrl + "/timestamp",
+                    req,
+                    TimestampPostResponse.class
+            ).get(HASH_TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+
             if (resp != null && resp.getException() != null)
                 throw new RuntimeException("Exceção obtendo carimbo de tempo para a assinatura com senha",
                         resp.getException());
@@ -8243,6 +8289,181 @@ public class ExBL extends CpBL {
             throw new AplicacaoException("Erro ao gravar link público do documento", ExTipoDeMovimentacao.GERAR_LINK_PUBLICO_PROCESSO.getId(), e);
         }
 
+    }
+
+    private String docTramitadoParaUsuario(DpPessoa destinatario, DpPessoa cadastrante, String siglaDoc) {
+        String conteudo = "";
+        try (BufferedReader bfr = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/templates/email/doc-tramitado-para-usuario.html"), StandardCharsets.UTF_8))) {
+            String str;
+            while ((str = bfr.readLine()) != null) {
+                conteudo += str;
+            }
+            conteudo = conteudo
+                    .replace("${url}", Prop.get("/siga.external.base.url"))
+                    .replace("${logo}", Prop.get("/siga.email.logo"))
+                    .replace("${titulo}", Prop.get("/siga.email.titulo"))
+                    .replace("${nomeDestinatario}", destinatario.getNomePessoa())
+                    .replace("${siglaDestinatario}", destinatario.getSiglaCompleta())
+                    .replace("${nomeCadastrante}", cadastrante.getNomePessoa())
+                    .replace("${siglaCadastrante}", cadastrante.getSigla())
+                    .replace("${siglaDoc}", siglaDoc);
+
+            return conteudo;
+
+        } catch (IOException e) {
+            throw new AplicacaoException("Erro ao montar e-mail para enviar ao usuário " + destinatario.getNomePessoa());
+        }
+    }
+
+    private String docMarcadoTramitadoParaUsuario(DpPessoa destinatario, DpPessoa cadastrante, String docSigla, String marcador) {
+        String conteudo = "";
+        try (BufferedReader bfr = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/templates/email/doc-marcado-tramitado-para-unidade.html"), StandardCharsets.UTF_8))) {
+            String str;
+            while ((str = bfr.readLine()) != null) {
+                conteudo += str;
+            }
+            conteudo = conteudo
+                    .replace("${url}", Prop.get("/siga.external.base.url"))
+                    .replace("${logo}", Prop.get("/siga.email.logo"))
+                    .replace("${titulo}", Prop.get("/siga.email.titulo"))
+                    .replace("${nomeDestinatario}", destinatario.getNomePessoa())
+                    .replace("${siglaDestinatario}", destinatario.getSiglaCompleta())
+                    .replace("${nomeCadastrante}", cadastrante.getNomePessoa())
+                    .replace("${siglaCadastrante}", cadastrante.getSigla())
+                    .replace("${docSigla}", docSigla)
+                    .replace("${marcador}", marcador);
+
+            return conteudo;
+
+        } catch (IOException e) {
+            throw new AplicacaoException("Erro ao montar e-mail para enviar ao usuário " + destinatario.getNomePessoa());
+        }
+    }
+
+    private String responsavelPelaAssinatura(DpPessoa destinatario, DpPessoa cadastrante, String siglaDoc) {
+        String conteudo = "";
+        try (BufferedReader bfr = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/templates/email/usuario-responsavel-pela-assinatura.html"), StandardCharsets.UTF_8))) {
+            String str;
+            while ((str = bfr.readLine()) != null) {
+                conteudo += str;
+            }
+            conteudo = conteudo
+                    .replace("${url}", Prop.get("/siga.external.base.url"))
+                    .replace("${logo}", Prop.get("/siga.email.logo"))
+                    .replace("${titulo}", Prop.get("/siga.email.titulo"))
+                    .replace("${nomeDestinatario}", destinatario.getNomePessoa())
+                    .replace("${siglaDestinatario}", destinatario.getSiglaCompleta())
+                    .replace("${nomeCadastrante}", cadastrante.getNomePessoa())
+                    .replace("${siglaCadastrante}", cadastrante.getSigla())
+                    .replace("${siglaDoc}", siglaDoc);
+
+            return conteudo;
+
+        } catch (IOException e) {
+            throw new AplicacaoException("Erro ao montar e-mail para enviar ao usuário " + destinatario.getNomePessoa());
+        }
+    }
+
+    private String incluirCossignatario(DpPessoa destinatario, DpPessoa cadastrante, String siglaDoc) {
+        String conteudo = "";
+        try (BufferedReader bfr = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/templates/email/incluido-como-cossignatario.html"), StandardCharsets.UTF_8))) {
+            String str;
+            while ((str = bfr.readLine()) != null) {
+                conteudo += str;
+            }
+            conteudo = conteudo
+                    .replace("${url}", Prop.get("/siga.external.base.url"))
+                    .replace("${logo}", Prop.get("/siga.email.logo"))
+                    .replace("${titulo}", Prop.get("/siga.email.titulo"))
+                    .replace("${nomeDestinatario}", destinatario.getNomePessoa())
+                    .replace("${siglaDestinatario}", destinatario.getSiglaCompleta())
+                    .replace("${nomeCadastrante}", cadastrante.getNomePessoa())
+                    .replace("${siglaCadastrante}", cadastrante.getSigla())
+                    .replace("${siglaDoc}", siglaDoc);
+
+            return conteudo;
+
+        } catch (IOException e) {
+            throw new AplicacaoException("Erro ao montar e-mail para enviar ao usuário " + destinatario.getNomePessoa());
+        }
+    }
+
+    private String docTramitadoParaUnidade(DpPessoa destinatario, DpLotacao lotacao, String docSigla) {
+        String conteudo = "";
+        try (BufferedReader bfr = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/templates/email/doc-tramitado-para-unidade.html"), StandardCharsets.UTF_8))) {
+            String str;
+            while ((str = bfr.readLine()) != null) {
+                conteudo += str;
+            }
+            conteudo = conteudo
+                    .replace("${url}", Prop.get("/siga.external.base.url"))
+                    .replace("${logo}", Prop.get("/siga.email.logo"))
+                    .replace("${titulo}", Prop.get("/siga.email.titulo"))
+                    .replace("${docSigla}", docSigla)
+                    .replace("${lotaDesc}", lotacao.getDescricao())
+                    .replace("${lotaSigla}", lotacao.getSigla());
+
+            return conteudo;
+
+        } catch (IOException e) {
+            throw new AplicacaoException("Erro ao montar e-mail para enviar ao usuário " + destinatario.getNomePessoa());
+        }
+    }
+
+    public void enviarEmailAoTramitarDocParaUsuario(DpPessoa pessoaDest, DpPessoa titular, String sigla) {
+        String assunto = "Documento tramitado para " + pessoaDest.getDescricao();
+        String[] destinanarios = {pessoaDest.getEmailPessoaAtual()};
+        String conteudoHTML = docTramitadoParaUsuario(pessoaDest, titular, sigla);
+        try {
+            Correio.enviar(null, destinanarios, assunto, "", conteudoHTML);
+        } catch (Exception e) {
+            throw new AplicacaoException("Ocorreu um erro durante o envio do email", 0, e);
+        }
+    }
+
+    public void enviarEmailResponsavelPelaAssinatura(DpPessoa pessoaDest, DpPessoa titular, String sigla) {
+        String assunto = "Responsável pela assinatura: " + pessoaDest.getDescricao();
+        String[] destinanarios = {pessoaDest.getEmailPessoaAtual()};
+        String conteudoHTML = responsavelPelaAssinatura(pessoaDest, titular, sigla);
+        try {
+            Correio.enviar(null, destinanarios, assunto, "", conteudoHTML);
+        } catch (Exception e) {
+            throw new AplicacaoException("Ocorreu um erro durante o envio do email", 0, e);
+        }
+    }
+
+    public void enviarEmailAoTramitarDocMarcado(DpPessoa pessoaDest, DpPessoa titular, String sigla, String marcador) {
+        String assunto = "Documento tramitado para " + pessoaDest.getDescricao();
+        String[] destinanarios = {pessoaDest.getEmailPessoaAtual()};
+        String conteudoHTML = docMarcadoTramitadoParaUsuario(pessoaDest, titular, sigla, marcador);
+        try {
+            if (!marcador.equals(""))
+                Correio.enviar(null, destinanarios, assunto, "", conteudoHTML);
+        } catch (Exception e) {
+            throw new AplicacaoException("Ocorreu um erro durante o envio do email", 0, e);
+        }
+    }
+
+    public void enviarEmailAoTramitarDocParaUsuariosDaUnidade(DpLotacao lotaDest, DpPessoa pessoa, String sigla) {
+        String assunto = "Documento tramitado para unidade " + lotaDest.getDescricao();
+        String[] destinanarios = {pessoa.getEmailPessoaAtual()};
+        String conteudoHTML = docTramitadoParaUnidade(pessoa, lotaDest, sigla);
+        try {
+            Correio.enviar(null, destinanarios, assunto, "", conteudoHTML);
+        } catch (Exception e) {
+            throw new AplicacaoException("Ocorreu um erro durante o envio do email", 0, e);
+        }
+    }
+
+    public void enviarEmailAoCossignatario(DpPessoa pessoaDest, DpPessoa titular, String sigla) {
+        String assunto = "Marcado como cossignatário, por " + pessoaDest.getDescricao();
+        String[] destinanarios = {pessoaDest.getEmailPessoaAtual()};
+        String conteudoHTML = incluirCossignatario(pessoaDest, titular, sigla);
+        try {
+            Correio.enviar(null, destinanarios, assunto, "", conteudoHTML);
+        } catch (Exception e) {
+            throw new AplicacaoException("Ocorreu um erro durante o envio do email", 0, e);
+        }
     }
 
 }

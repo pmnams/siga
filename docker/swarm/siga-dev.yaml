@@ -23,3 +23,27 @@ services:
       - target: 3306
         published: 3306
         mode: host
+
+  bluc:
+    ports:
+      - target: 8080
+        published: 3000
+        mode: host
+
+  assijus:
+    ports:
+      - target: 8080
+        published: 3001
+        mode: host
+
+  smb:
+    ports:
+      - target: 445
+        published: 445
+        mode: host
+
+  mailhog:
+    ports:
+      - target: 8025
+        published: 8025
+        mode: host

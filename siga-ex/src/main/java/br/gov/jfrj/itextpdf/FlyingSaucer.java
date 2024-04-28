@@ -139,7 +139,7 @@ public class FlyingSaucer implements ConversorHtml {
             PdfRendererBuilder builder = new PdfRendererBuilder();
             builder.useHttpStreamImplementation(new DownloadExterno());
             builder.useFastMode();
-            builder.withHtmlContent(sHtml, null);
+            builder.withHtmlContent(sHtml, Prop.get("/siga.internal.base.url"));
             builder.toStream(os);
             builder.run();
 

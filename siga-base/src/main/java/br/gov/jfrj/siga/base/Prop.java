@@ -232,7 +232,7 @@ public class Prop {
         provider.addPublicProperty("/sigagc.service.name", "GcService");
 
         provider.addPublicProperty("/blucservice.url", sigaBaseUrl + "/blucservice/api/v1");
-        provider.addPublicProperty("/vizservice.url", sigaBaseUrl + "/vizservice");
+        provider.addPublicProperty("/vizservice.url", "http://graphviz:8080");
 
         provider.addPublicProperty("/siga.sgp.bnf.url", "/siga-beneficios");
         provider.addPublicProperty("/siga.sgp.aq.url", "/sigarhaq");
@@ -306,5 +306,13 @@ public class Prop {
         provider.addPublicProperty("/siga.lotacao.inativacao.marcadores.permitidos", "false");
         // CKEditor
         provider.addPublicProperty("/ckeditor.url", get("/siga.external.base.url") + "/ckeditor/ckeditor/ckeditor.js");
+
+        // Storage
+        provider.addPublicProperty("/storage.type", "DATABASE");
+        provider.addPublicProperty("/storage.smb.host", "smb");
+        provider.addPublicProperty("/storage.smb.user", "samba");
+        provider.addPublicProperty("/storage.smb.password", "secret");
+        provider.addPublicProperty("/storage.smb.domain", "");
+        provider.addPublicProperty("/storage.smb.share", "Data");
     }
 }

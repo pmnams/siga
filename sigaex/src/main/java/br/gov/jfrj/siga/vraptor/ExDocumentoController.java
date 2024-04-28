@@ -56,6 +56,7 @@ import br.gov.jfrj.siga.model.Selecao;
 import br.gov.jfrj.siga.persistencia.ExMobilDaoFiltro;
 import br.gov.jfrj.siga.vraptor.builder.BuscaDocumentoBuilder;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 
@@ -78,13 +79,9 @@ import java.util.*;
 
 @Controller
 public class ExDocumentoController extends ExController {
-
-    private static final String ERRO_EXCLUIR_ARQUIVO = "Erro ao excluir o arquivo";
-    private static final String ERRO_GRAVAR_ARQUIVO = "Erro ao gravar o arquivo";
     private static final String URL_EXIBIR = "/app/expediente/doc/exibir?sigla={0}";
     private static final String URL_EDITAR = "/app/expediente/doc/editar?sigla={0}";
     private String url = null;
-    final ExDocumentoDTO dto = new ExDocumentoDTO();
     private final static Logger log = Logger.getLogger(ExDocumentoController.class);
 
     /**
@@ -478,6 +475,14 @@ public class ExDocumentoController extends ExController {
 
         buscarDocumentoOuNovo(true, exDocumentoDTO);
 
+        exDocumentoDTO.setListaNivelAcesso(getListaNivelAcesso(exDocumentoDTO));
+        if (exDocumentoDTO.getModelo() != null
+                && exDocumentoDTO.getModelo().getExNivelAcesso() != null) {
+            List<ExNivelAcesso> l = new ArrayList<>();
+            l.add(exDocumentoDTO.getModelo().getExNivelAcesso());
+            exDocumentoDTO.setListaNivelAcesso(l);
+        }
+
         if ((isDocNovo) || (param("exDocumentoDTO.docFilho") != null)) {
 
             if (exDocumentoDTO.getTipoDestinatario() == null)
@@ -529,13 +534,13 @@ public class ExDocumentoController extends ExController {
                 }
             }
 
-            if (exDocumentoDTO.getNivelAcesso() == null) {
+            if (exDocumentoDTO.getNivelAcesso() == null || CollectionUtils.isNotEmpty(exDocumentoDTO.getListaNivelAcesso())) {
                 final ExNivelAcesso nivelDefault = getNivelAcessoDefault(exDocumentoDTO);
                 if (nivelDefault != null) {
                     exDocumentoDTO.setNivelAcesso(nivelDefault
                             .getIdNivelAcesso());
                 } else {
-                    if (Boolean.parseBoolean(System.getProperty("siga.doc.acesso.limitado"))) {
+                    if (Boolean.TRUE.equals(Prop.getBool("doc.acesso.limitado"))) {
                         exDocumentoDTO.setNivelAcesso(ExNivelAcesso.ID_LIMITADO_AO_ORGAO);
                     } else {
                         exDocumentoDTO.setNivelAcesso(ExNivelAcesso.ID_PUBLICO);
@@ -729,13 +734,6 @@ public class ExDocumentoController extends ExController {
             }
             exDocumentoDTO.setTiposDocumento(l);
         }
-        exDocumentoDTO.setListaNivelAcesso(getListaNivelAcesso(exDocumentoDTO));
-        if (exDocumentoDTO.getModelo() != null
-                && exDocumentoDTO.getModelo().getExNivelAcesso() != null) {
-            List<ExNivelAcesso> l = new ArrayList<>();
-            l.add(exDocumentoDTO.getModelo().getExNivelAcesso());
-            exDocumentoDTO.setListaNivelAcesso(l);
-        }
 
         getPreenchimentos(exDocumentoDTO);
 
@@ -911,27 +909,6 @@ public class ExDocumentoController extends ExController {
             }
             s = " " + exDocumentoDTO.getMob().doc().getExNivelAcessoAtual().getNmNivelAcesso() + " " + s;
 
-            String ERRO_INACESSIVEL_USUARIO;
-
-            if (exibeNomeAcesso) {
-                if (!getCadastrante().isUsuarioExterno()) {
-                    ERRO_INACESSIVEL_USUARIO = "Documento " + exDocumentoDTO.getMob().getSigla()
-                            + " inacessível ao usuário " + " "
-                            + getTitular().getSiglaCompleta() + "/" + getLotaTitular().getLotacaoAtual()
-                            + "." + s + msgDestinoDoc;
-                } else {
-                    ERRO_INACESSIVEL_USUARIO = "Documento " + exDocumentoDTO.getMob().getSigla()
-                            + " inacessível ao usuário " + getTitular().getSiglaCompleta() + "/"
-                            + getLotaTitular().getLotacaoAtual() + "." + s + " " + msgDestinoDoc;
-                }
-            } else {
-                ERRO_INACESSIVEL_USUARIO = "Documento " + exDocumentoDTO.getMob().getSigla()
-                        + " inacessível ao usuário " + getTitular().getSiglaCompleta() + "/"
-                        + getLotaTitular().getLotacaoAtual() + ", Publico externo exceto se for subscritor"
-                        + " , cossignatário ou tiver algum perfil associado ao documento ou ainda se documento estiver "
-                        + " passado por sua lotação. ";
-            }
-
             Map<ExPapel, List<Object>> mapa = exDocumentoDTO.getMob().doc().getPerfis();
             boolean isInteressado = false;
 
@@ -941,7 +918,7 @@ public class ExDocumentoController extends ExController {
                 if ((exPapel != null) && (exPapel.getIdPapel() == exPapel.PAPEL_INTERESSADO)) {
                     while (it.hasNext() && !isInteressado) {
                         Object item = it.next();
-                        isInteressado = item.toString().equals(getTitular().getSigla()) ? true : false;
+                        isInteressado = item.toString().equals(getTitular().getSigla());
                     }
                 }
 

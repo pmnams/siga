@@ -1,6 +1,6 @@
 package br.gov.jfrj.siga.base.util;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import br.gov.jfrj.siga.base.AplicacaoException;
 

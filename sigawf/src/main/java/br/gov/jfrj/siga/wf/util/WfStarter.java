@@ -1,6 +1,7 @@
 package br.gov.jfrj.siga.wf.util;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.ejb.TransactionManagement;
@@ -35,6 +36,11 @@ public class WfStarter {
 		emf = Persistence.createEntityManagerFactory("default");
 		Service.setUsuarioDeSistema(UsuarioDeSistemaEnum.SIGA_WF);
 		new MigrationThread().start();
+	}
+
+	@PreDestroy
+	private void shutdown() {
+		emf.close();
 	}
 
 	public static class MigrationThread extends Thread {

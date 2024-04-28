@@ -1,23 +1,6 @@
 package br.gov.jfrj.siga.tp.vraptor;
 
-import java.util.Calendar;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import br.com.caelum.vraptor.Controller;
-import br.com.caelum.vraptor.Get;
-import br.com.caelum.vraptor.Path;
-import br.com.caelum.vraptor.Post;
-import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.*;
 import br.com.caelum.vraptor.validator.Validator;
 import br.gov.jfrj.siga.tp.auth.AutorizacaoGI;
 import br.gov.jfrj.siga.tp.exceptions.ApplicationControllerException;
@@ -26,13 +9,23 @@ import br.gov.jfrj.siga.tp.model.SelecaoDocumento;
 import br.gov.jfrj.siga.tp.model.TpDao;
 import br.gov.jfrj.siga.tp.vraptor.i18n.MessagesBundle;
 import br.gov.jfrj.siga.vraptor.SigaObjects;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Calendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 @Path("/app/documento")
 public class DocumentoController extends TpController {
-	
+
     @SuppressWarnings("unused")
-	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationController.class);
 
     @Inject
     private AutorizacaoGI autorizacaoGI;
@@ -42,23 +35,23 @@ public class DocumentoController extends TpController {
     private RequisicaoController requisicaoController;
 
     private ServicoVeiculoController servicoVeiculoController;
-	
-	/**
-	 * @deprecated CDI eyes only
-	 */
-	public DocumentoController() {
-		super();
-	}
-	
-	@Inject
-    public DocumentoController(HttpServletRequest request, Result result,  Validator validator, SigaObjects so,   EntityManager em, MissaoController missaoController,
-            RequisicaoController requisicaoController, ServicoVeiculoController servicoVeiculoController) {
+
+    /**
+     * @deprecated CDI eyes only
+     */
+    public DocumentoController() {
+        super();
+    }
+
+    @Inject
+    public DocumentoController(HttpServletRequest request, Result result, Validator validator, SigaObjects so, EntityManager em, MissaoController missaoController,
+                               RequisicaoController requisicaoController, ServicoVeiculoController servicoVeiculoController) {
         super(request, result, TpDao.getInstance(), validator, so, em);
         this.missaoController = missaoController;
         this.requisicaoController = requisicaoController;
         this.servicoVeiculoController = servicoVeiculoController;
     }
-	
+
 
     @Get
     @Post
@@ -71,7 +64,7 @@ public class DocumentoController extends TpController {
         result.include("sel", sel);
     }
 
-    @Path({ "/exibir/{sigla}", "/exibir" })
+    @Path({"/exibir/{sigla}", "/exibir"})
     public void exibir(String sigla) throws ApplicationControllerException {
 
         String[] partesDoCodigo = null;
@@ -103,7 +96,7 @@ public class DocumentoController extends TpController {
             throw new ApplicationControllerException(e);
         }
     }
-    
+
     private String montarSigla(String sigla) {
         String retorno = "";
         String siglaUpper = sigla.trim().toUpperCase();
@@ -160,5 +153,5 @@ public class DocumentoController extends TpController {
 
         return siglaUpper;
     }
-	
+
 }

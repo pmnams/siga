@@ -1,6 +1,7 @@
 package br.gov.jfrj.siga.ex.api.v1;
 
 import br.gov.jfrj.siga.base.AplicacaoException;
+import br.gov.jfrj.siga.base.Prop;
 import br.gov.jfrj.siga.base.SigaMessages;
 import br.gov.jfrj.siga.dp.CpOrgao;
 import br.gov.jfrj.siga.dp.DpLotacao;
@@ -264,7 +265,7 @@ public class DocumentosPost implements IDocumentosPost {
                 if (nivelDefault != null) {
                     doc.setExNivelAcesso(dao().consultar(nivelDefault, ExNivelAcesso.class, false));
                 } else {
-                    if (Boolean.parseBoolean(System.getProperty("siga.doc.acesso.limitado"))) {
+                    if (Boolean.TRUE.equals(Prop.getBool("doc.acesso.limitado"))) {
                         doc.setExNivelAcesso(
                                 dao().consultar(ExNivelAcesso.ID_LIMITADO_AO_ORGAO, ExNivelAcesso.class, false));
                     } else {

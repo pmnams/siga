@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*-*****************************************************************************
  * Copyright (c) 2006 - 2011 SJRJ.
  * 
  *     This file is part of SIGA.
@@ -175,8 +175,7 @@ import net.sf.jasperreports.export.SimplePdfExporterConfiguration;
 
 public abstract class RelatorioTemplate extends RelatorioRapido {
 
-	private Collection dados;
-	protected AbstractRelatorioBaseBuilder relatorio;
+    protected AbstractRelatorioBaseBuilder relatorio;
 
 	/**
 	 * Caso o relatório precise receber parâmetros, use o construtor para
@@ -198,8 +197,8 @@ public abstract class RelatorioTemplate extends RelatorioRapido {
 	public void gerar() throws Exception {
 
 		relatorio = configurarRelatorio();
-		dados = processarDados();
-		if (dados != null && dados.size() > 0) {
+        Collection<Object> dados = processarDados();
+		if (dados != null && !dados.isEmpty()) {
 			relatorio.setDados(dados);
 		} else {
 			throw new AplicacaoException("Não há dados para gerar o relatório!");
@@ -209,7 +208,7 @@ public abstract class RelatorioTemplate extends RelatorioRapido {
 
 	/**
 	 * Classe que permite o uso do Design Pattern Template Method.
-	 * 
+	 * <p>
 	 * Implemente este método para definir o desenho do relatório usando um
 	 * builder. Use a classe RelatorioRapido como builder para gerar relatórios
 	 * rápidos.<BR>
@@ -220,20 +219,17 @@ public abstract class RelatorioTemplate extends RelatorioRapido {
 	 * Exemplo:<br>
 	 * public AbstractRelatorioBaseBuilder configurarRelatorio() throws
 	 * DJBuilderException, JRException {
-	 * 
+	 * <p>
 	 * this.setTitle("Relatório de Documentos em Setores Subordinados");
 	 * this.addColuna("Setor", 0,RelatorioRapido.ESQUERDA,true);
 	 * this.addColuna("Documento", 25,RelatorioRapido.ESQUERDA,false,true);
 	 * this.addColuna("Descrição", 50,RelatorioRapido.ESQUERDA,false);
 	 * this.addColuna("Responsável", 30,RelatorioRapido.ESQUERDA,false);
 	 * this.addColuna("Situação", 30,RelatorioRapido.ESQUERDA,false);
-	 * 
+	 * <p>
 	 * return this; }
 	 * 
 	 * @return Retorna um builder de relatórios.
-	 * @throws DJBuilderException
-	 * @throws JRException
-	 * @throws ColumnBuilderException
 	 */
 	public abstract AbstractRelatorioBaseBuilder configurarRelatorio()
 			throws DJBuilderException, JRException, ColumnBuilderException;
@@ -245,17 +241,17 @@ public abstract class RelatorioTemplate extends RelatorioRapido {
 	 * CUIDADO: A coleção de dados deve ser ordenada, senão os dados vão
 	 * aparecer desordenados no relatório. Exemplo:<br>
 	 * public Collection processarDados() {
-	 * 
+	 * <p>
 	 * List<String> d = new LinkedList<String>(); Query q =
 	 * HibernateUtil.getSessao().createQuery("from ExModelo order by
 	 * exFormaDocumento.descrFormaDoc");
-	 * 
+	 * <p>
 	 * for (Iterator<ExModelo> iterator = q.list().iterator();
 	 * iterator.hasNext();) { ExModelo modelo = (ExModelo) iterator.next();
 	 * d.add(modelo.getExFormaDocumento().getDescrFormaDoc());
 	 * d.add(modelo.getNmMod()); d.add(modelo.getExClassificacao().getSigla());
 	 * d.add(modelo.getExClassCriacaoVia().getSigla()); }
-	 * 
+	 * <p>
 	 * return d; }
 	 * 
 	 * 
@@ -265,8 +261,6 @@ public abstract class RelatorioTemplate extends RelatorioRapido {
 
 	/**
 	 * Método que gera o relatório em PDF.<br>
-	 * 
-	 * @throws JRException
 	 */
 	public byte[] getRelatorioPDF() throws JRException {
 		return JasperExportManager.exportReportToPdf(relatorio

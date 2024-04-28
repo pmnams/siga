@@ -6,8 +6,9 @@ import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.ExMobil;
 import com.crivano.jlogic.*;
 
-public class ExPodeSerMovimentado extends CompositeExpressionSupport {
+import java.util.Objects;
 
+public class ExPodeSerMovimentado extends CompositeExpressionSupport {
     private ExMobil mob;
 
     public ExPodeSerMovimentado(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
@@ -36,16 +37,21 @@ public class ExPodeSerMovimentado extends CompositeExpressionSupport {
 
     @Override
     protected Expression create() {
-        return And.of(
-                new CpNaoENulo(mob, "via ou volume"),
-                Not.of(new ExEstaSemEfeito(mob.doc())),
-                Or.of(
-                        new ExEMobilVia(mob),
-                        new ExEMobilVolume(mob)
-                ),
-                new ExEstaFinalizado(mob.doc()),
-                Not.of(new ExEMobilCancelado(mob)),
-                Not.of(new ExEstaEmTransitoExterno(mob))
-        );
+
+        if (Objects.nonNull(mob))
+            return And.of(
+                    new CpNaoENulo(mob, "via ou volume"),
+                    Not.of(new ExEstaSemEfeito(mob.doc())),
+                    Or.of(
+                            new ExEMobilVia(mob),
+                            new ExEMobilVolume(mob)
+                    ),
+                    new ExEstaFinalizado(mob.doc()),
+                    Not.of(new ExEMobilCancelado(mob)),
+                    Not.of(new ExEstaEmTransitoExterno(mob))
+            );
+        else
+            return new CpNaoENulo(mob, "via ou volume");
+
     }
 }

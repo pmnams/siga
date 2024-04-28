@@ -1,21 +1,5 @@
 package br.gov.jfrj.siga.tp.vraptor;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringUtils;
-
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Result;
@@ -24,13 +8,15 @@ import br.com.caelum.vraptor.validator.Validator;
 import br.com.caelum.vraptor.view.Results;
 import br.gov.jfrj.siga.dp.CpOrgaoUsuario;
 import br.gov.jfrj.siga.tp.exceptions.RelatorioConsumoMedioException;
-import br.gov.jfrj.siga.tp.model.Abastecimento;
-import br.gov.jfrj.siga.tp.model.EstadoMissao;
-import br.gov.jfrj.siga.tp.model.Missao;
-import br.gov.jfrj.siga.tp.model.RelatorioConsumoMedio;
-import br.gov.jfrj.siga.tp.model.TpDao;
-import br.gov.jfrj.siga.tp.model.Veiculo;
+import br.gov.jfrj.siga.tp.model.*;
 import br.gov.jfrj.siga.vraptor.SigaObjects;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 @Controller
 @Path("/app/relatorioConsumoMedio")
@@ -42,15 +28,16 @@ public class RelatorioConsumoMedioController extends TpController {
     private static final String OPTION = "</option>";
     private static final String OPTION_VALUE = "<option value='";
 */
-	/**
-	 * @deprecated CDI eyes only
-	 */
-	public RelatorioConsumoMedioController() {
-		super();
-	}
-	
-	@Inject
-	public RelatorioConsumoMedioController(HttpServletRequest request, Result result,   Validator validator, SigaObjects so,  EntityManager em) {
+
+    /**
+     * @deprecated CDI eyes only
+     */
+    public RelatorioConsumoMedioController() {
+        super();
+    }
+
+    @Inject
+    public RelatorioConsumoMedioController(HttpServletRequest request, Result result, Validator validator, SigaObjects so, EntityManager em) {
         super(request, result, TpDao.getInstance(), validator, so, em);
     }
 
@@ -87,7 +74,7 @@ public class RelatorioConsumoMedioController extends TpController {
             boolean plural = StringUtils.countMatches(msgErroTratada, ",") > 1 ? true : false;
             msgErroTratada = msgErroTratada.substring(0, msgErroTratada.length() - 2);
             msgErroTratada += " deve" + (plural ? "m" : "") + " ser preenchido" + (plural ? "s" : "");
-            validator.add(new SimpleMessage("RelatorioConsumoMedio",msgErroTratada));
+            validator.add(new SimpleMessage("RelatorioConsumoMedio", msgErroTratada));
         }
         return msgErroTratada;
     }
@@ -163,13 +150,13 @@ public class RelatorioConsumoMedioController extends TpController {
 
     private void montarCombos(Veiculo veiculo) throws RelatorioConsumoMedioException {
         try {
-        	List<Veiculo> veiculos = Veiculo.listarParaConsumoMedio(getTitular().getOrgaoUsuario());
+            List<Veiculo> veiculos = Veiculo.listarParaConsumoMedio(getTitular().getOrgaoUsuario());
             result.include("veiculos", veiculos);
         } catch (Exception e) {
             throw new RelatorioConsumoMedioException(e);
         }
     }
-    
+
     public List<Abastecimento> montarCombosAbastecimento(Long idVeiculo) throws RelatorioConsumoMedioException {
         Veiculo veiculo;
         try {
@@ -182,25 +169,25 @@ public class RelatorioConsumoMedioController extends TpController {
 
     @Path("/carregarComboAbastecimentoInicial/{idVeiculo}")
     public void carregarComboAbastecimentoInicial(Long idVeiculo) throws RelatorioConsumoMedioException {
-    	StringBuffer htmlSelectAbastecimentoInicial = new StringBuffer();
-		StringBuffer htmlSelectAbastecimentoReferencia = new StringBuffer();
+        StringBuffer htmlSelectAbastecimentoInicial = new StringBuffer();
+        StringBuffer htmlSelectAbastecimentoReferencia = new StringBuffer();
         List<Abastecimento> lstAbastecimento = montarCombosAbastecimento(idVeiculo);
 
         for (Abastecimento abastecimento : lstAbastecimento) {
-			if (lstAbastecimento.indexOf(abastecimento) >= 1) {
-				htmlSelectAbastecimentoInicial.append("<option value='"+ abastecimento.getId() + "'");
-				if (lstAbastecimento.indexOf(abastecimento) == 1) {
-					htmlSelectAbastecimentoInicial.append(" selected='selected'");
-				}
-				htmlSelectAbastecimentoInicial.append(">" + abastecimento.getDadosParaExibicao());
-				htmlSelectAbastecimentoInicial.append("</option>");
-			}
-			
-			htmlSelectAbastecimentoReferencia.append("<option value='"+ abastecimento.getId() + "'");
-			htmlSelectAbastecimentoReferencia.append(">" + abastecimento.getDadosParaExibicao());
-			htmlSelectAbastecimentoReferencia.append("</option>");
+            if (lstAbastecimento.indexOf(abastecimento) >= 1) {
+                htmlSelectAbastecimentoInicial.append("<option value='" + abastecimento.getId() + "'");
+                if (lstAbastecimento.indexOf(abastecimento) == 1) {
+                    htmlSelectAbastecimentoInicial.append(" selected='selected'");
+                }
+                htmlSelectAbastecimentoInicial.append(">" + abastecimento.getDadosParaExibicao());
+                htmlSelectAbastecimentoInicial.append("</option>");
+            }
+
+            htmlSelectAbastecimentoReferencia.append("<option value='" + abastecimento.getId() + "'");
+            htmlSelectAbastecimentoReferencia.append(">" + abastecimento.getDadosParaExibicao());
+            htmlSelectAbastecimentoReferencia.append("</option>");
         }
-        
+
         String html = htmlSelectAbastecimentoInicial.toString() + "@" + htmlSelectAbastecimentoReferencia.toString();
         result.use(Results.http()).body(html);
     }

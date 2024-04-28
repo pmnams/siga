@@ -16,9 +16,6 @@ services:
       - "--entrypoints.debug.address=:8787"
       - "--entrypoints.jmx.address=:20200"
     ports:
-      - target: 9990
-        published: 9990
-        mode: host
       - target: 8787
         published: 8787
         mode: host

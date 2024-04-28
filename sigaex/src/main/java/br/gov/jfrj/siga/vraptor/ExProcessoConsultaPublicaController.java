@@ -1,6 +1,7 @@
 package br.gov.jfrj.siga.vraptor;
 
 import java.io.ByteArrayInputStream;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,6 @@ import org.json.JSONException;
 
 import com.auth0.jwt.JWTSigner;
 import com.auth0.jwt.JWTVerifier;
-import com.lowagie.text.pdf.codec.Base64;
 
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Get;
@@ -323,7 +323,7 @@ public class ExProcessoConsultaPublicaController extends ExController {
 	
 	private ByteArrayInputStream makeByteArrayInputStream(final byte[] content,	final boolean fB64) {
 		
-		final byte[] conteudo = (fB64 ? Base64.encodeBytes(content).getBytes() 	: content	);
+		final byte[] conteudo = (fB64 ? Base64.getEncoder().encode(content)	: content	);
 		
 		return (new ByteArrayInputStream(conteudo));
 	}

@@ -22,11 +22,7 @@
  */
 package com.aryjr.nheengatu.testes;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringBufferInputStream;
+import java.io.*;
 
 import com.aryjr.nheengatu.html.HTMLDocument;
 import com.aryjr.nheengatu.html.Tag;
@@ -147,7 +143,7 @@ public class TesteParagrafos {
 			return null;
 
 		final String sResult = sSource.substring(iBegin + sBegin.length(), iEnd);
-		return new StringBufferInputStream(sResult);
+		return new ByteArrayInputStream(sResult.getBytes());
 	}
 
 	private void criaDocumentoPDF(final HTMLDocument html) throws IOException {

@@ -35,7 +35,7 @@ import br.gov.jfrj.siga.gi.integracao.IntegracaoLdapViaWebService;
 import br.gov.jfrj.siga.gi.service.GiService;
 import br.gov.jfrj.siga.model.dao.ModeloDao;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.exception.ConstraintViolationException;
 
 import java.io.*;
@@ -1933,7 +1933,7 @@ public class CpBL {
                 conteudo += str;
             }
             conteudo = conteudo
-                    .replace("${url}", Prop.get("/siga.base.url"))
+                    .replace("${url}", Prop.get("/siga.external.base.url"))
                     .replace("${logo}", Prop.get("/siga.email.logo"))
                     .replace("${titulo}", Prop.get("/siga.email.titulo"))
                     .replace("${nomeUsuario}", destinatario.getNomePessoa())
@@ -2003,7 +2003,7 @@ public class CpBL {
                 conteudo += str;
             }
             conteudo = conteudo
-                    .replace("${url}", Prop.get("/siga.base.url"))
+                    .replace("${url}", Prop.get("/siga.external.base.url"))
                     .replace("${logo}", Prop.get("/siga.email.logo"))
                     .replace("${titulo}", Prop.get("/siga.email.titulo"))
                     .replace("${nomeUsuario}", destinatario.getNomePessoa())

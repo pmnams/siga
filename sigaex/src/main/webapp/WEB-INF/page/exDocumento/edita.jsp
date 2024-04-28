@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
+<%@ page contentType="text/html; charset=UTF-8"
          buffer="128kb" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -6,6 +6,10 @@
 <%@ taglib uri="http://localhost/customtag" prefix="tags" %>
 <%@ taglib uri="http://localhost/jeetags" prefix="siga" %>
 <%@ taglib uri="http://localhost/functiontag" prefix="f" %>
+
+<%--@elvariable id="mensagem" type="String"--%>
+<%--@elvariable id="exDocumentoDTO" type="br.gov.jfrj.siga.vraptor.ExDocumentoDTO"--%>
+<%--@elvariable id="ehPublicoExterno" type="boolean"--%>
 
 <siga:pagina titulo="Novo Documento">
     <link rel="stylesheet" href="/siga/javascript/hierarchy-select/hierarchy-select.css" type="text/css"
@@ -304,26 +308,53 @@
                                                               tema="simple"/>
                                             </div>
                                         </div>
-                                        <div class="col-sm-3">
-                                            <div class="form-group">
-                                                <div class="form-check form-check-inline mt-4">
-                                                    <fmt:message key="documento.help.substituto"
-                                                                 var="documento_help_substituto"/>
-                                                    <input type="checkbox" name="exDocumentoDTO.substituicao"
-                                                           class="form-check-input"
-                                                           onclick="javascript:displayTitular(this);"
-                                                           <c:if test="${exDocumentoDTO.substituicao}">checked</c:if> />
-                                                    <label class="form-check-label" for="exDocumentoDTO.substituicao">Substituto </label>
-                                                    <a class="fas fa-info-circle text-secondary ml-1  ${hide_only_TRF2}"
-                                                       data-toggle="tooltip" data-trigger="click"
-                                                       data-placement="bottom" title="${documento_help_substituto}"></a>
-                                                    <input type="checkbox" name="exDocumentoDTO.personalizacao"
-                                                           class="form-check-input ml-3"
-                                                           onclick="javascript:displayPersonalizacao(this);"
-                                                           <c:if test="${exDocumentoDTO.personalizacao}">checked</c:if> />
-                                                    <label class="form-check-label" for="exDocumentoDTO.personalizacao">Personalizar</label>
+                                        <div class="col-sm-12">
+                                            <div class="row">
+                                                <div class="col-sm-3">
+                                                    <div class="form-group">
+                                                        <div class="form-check form-check-inline">
+                                                            <fmt:message key="documento.help.substituto"
+                                                                         var="documento_help_substituto" />
+                                                            <input type="checkbox" name="exDocumentoDTO.substituicao"
+                                                                   class="form-check-input"
+                                                                   onclick="javascript:displayTitular(this);"
+                                                                   <c:if test="${exDocumentoDTO.substituicao}">checked</c:if> />
+                                                            <label class="form-check-label"
+                                                                   for="exDocumentoDTO.substituicao">Substituto </label> <a
+                                                                class="fas fa-info-circle text-secondary ml-1  ${hide_only_TRF2}"
+                                                                data-toggle="tooltip" data-trigger="click"
+                                                                data-placement="bottom"
+                                                                title="${documento_help_substituto}"></a> <input
+                                                                type="checkbox" name="exDocumentoDTO.personalizacao"
+                                                                class="form-check-input ml-3"
+                                                                onclick="javascript:displayPersonalizacao(this);"
+                                                                <c:if test="${exDocumentoDTO.personalizacao}">checked</c:if> />
+                                                            <label class="form-check-label"
+                                                                   for="exDocumentoDTO.personalizacao">Personalizar</label>
+                                                        </div>
+                                                    </div>
+
                                                 </div>
                                             </div>
+                                            <c:choose>
+                                                <c:when test="${!ehPublicoExterno && podeExibirArvoreDocsSubscr}">
+                                                    <div class="row">
+                                                        <div class="col-sm-8 ">
+                                                            <div class="form-group">
+                                                                <div class="form-check form-check-inline">
+                                                                    <input type="checkbox" name="exDocumentoDTO.podeIncluirSubscrArvoreDocs" class="form-check-input" <c:if test="${exDocumentoDTO.podeIncluirSubscrArvoreDocs}">checked</c:if>/>
+                                                                    <label class="form-check-label" for="exDocumentoDTO.podeIncluirSubscrArvoreDocs">Acessar Documento Completo</label>
+                                                                    <a class="fas fa-info-circle text-secondary ml-1" data-toggle="tooltip" data-trigger="click" data-placement="bottom"
+                                                                       title='Selecionar esse campo se houver a necessidade de permitir que o Responsável pela Assinatura acesse o documento completo, enquanto o mesmo estiver pendente
+																									de assinatura. Atenção: Para habilitar ou desabilitar essa função, o documento deverá estar com status "Finalizado"'></a>
+
+                                                                </div>
+                                                                <small class="form-text text-muted">Selecionar esse campo se houver a necessidade de permitir que o Responsável pela Assinatura acesse o documento completo.</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </c:when>
+                                            </c:choose>
                                         </div>
                                     </c:when>
                                     <c:otherwise>
@@ -343,32 +374,6 @@
                                     </c:otherwise>
                                 </c:choose>
                             </div>
-                            <c:choose>
-                                <c:when test="${!ehPublicoExterno && podeExibirArvoreDocsSubscr}">
-                                    <div class="row">
-                                        <div class="col-sm-8 "></div>
-                                        <div class="col-xs-4 ">
-                                            <div class="form-group">
-                                                <div class="form-check form-check-inline mt-1">
-                                                    <input type="checkbox"
-                                                           name="exDocumentoDTO.podeIncluirSubscrArvoreDocs"
-                                                           id="exDocumentoDTO.podeIncluirSubscrArvoreDocs"
-                                                           class="form-check-input ml-3"
-                                                           <c:if test="${exDocumentoDTO.podeIncluirSubscrArvoreDocs}">checked</c:if>/>
-                                                    <label class="form-check-label"
-                                                           for="exDocumentoDTO.podeIncluirSubscrArvoreDocs">Acessar
-                                                        Documento Completo</label>
-                                                    <a class="fas fa-info-circle text-secondary ml-1"
-                                                       data-toggle="tooltip" data-trigger="click"
-                                                       data-placement="bottom"
-                                                       title='Selecionar esse campo se houver a necessidade de permitir que o Responsável pela Assinatura acesse o documento completo, enquanto o mesmo estiver pendente
-																					de assinatura. Atenção: Para habilitar ou desabilitar essa função, o documento deverá estar com status "Finalizado"'></a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </c:when>
-                            </c:choose>
                         </c:otherwise>
                     </c:choose>
                     <input type="hidden" name="campos" value="titularSel.id"/>

@@ -1,6 +1,7 @@
 package br.gov.jfrj.siga.tp.util;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.enterprise.context.ApplicationScoped;
@@ -34,6 +35,11 @@ public class TpStarter {
 		CpTipoDeConfiguracao.mapear(CpTipoDeConfiguracao.values());
 		emf = Persistence.createEntityManagerFactory("default");
 		new MigrationThread().start();
+	}
+
+	@PreDestroy
+	private void shutdown() {
+		emf.close();
 	}
 
 	public static class MigrationThread extends Thread {

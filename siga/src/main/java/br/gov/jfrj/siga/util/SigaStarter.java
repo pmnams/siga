@@ -1,6 +1,7 @@
 package br.gov.jfrj.siga.util;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.ejb.TransactionManagement;
@@ -39,5 +40,10 @@ public class SigaStarter {
 		SigaApiV1Servlet.migrationComplete = true;
 		emf = Persistence.createEntityManagerFactory("default");
 		Service.setUsuarioDeSistema(UsuarioDeSistemaEnum.SIGA);
+	}
+
+	@PreDestroy
+	private void shutdown() {
+		emf.close();
 	}
 }

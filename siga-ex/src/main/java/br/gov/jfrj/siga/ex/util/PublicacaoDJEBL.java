@@ -25,7 +25,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -42,9 +41,9 @@ import org.apache.axis.description.ParameterDesc;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.jboss.logging.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -89,25 +88,23 @@ public class PublicacaoDJEBL {
 
 		Element retornoPublicacao = dc.getRootElement();		
 
-		List elementos = retornoPublicacao.getChildren();
-		Iterator i = elementos.iterator();
+		List<Element> elementos = retornoPublicacao.getChildren();
 
-		while (i.hasNext()) {
-			Element elemento = (Element) i.next();
-			String numeroDoDocumento = elemento.getAttributeValue("NUMDOCUMENTO");
-			String paginaDaPublicacao = elemento.getAttributeValue("PAGPUBLICACAO");
+        for (Element elemento : elementos) {
+            String numeroDoDocumento = elemento.getAttributeValue("NUMDOCUMENTO");
+            String paginaDaPublicacao = elemento.getAttributeValue("PAGPUBLICACAO");
 
-			final ExMobilDaoFiltro daoViaFiltro = new ExMobilDaoFiltro();
-			daoViaFiltro.setSigla(numeroDoDocumento);
+            final ExMobilDaoFiltro daoViaFiltro = new ExMobilDaoFiltro();
+            daoViaFiltro.setSigla(numeroDoDocumento);
 
-			final ExDao exDao = ExDao.getInstance();
+            final ExDao exDao = ExDao.getInstance();
 
-			final ExMobil docVia;
-			docVia = exDao.consultarPorSigla(daoViaFiltro);
+            final ExMobil docVia;
+            docVia = exDao.consultarPorSigla(daoViaFiltro);
 
-			if (docVia != null && !docVia.doc().isDJEPublicado())
-				Ex.getInstance().getBL().registrarDisponibilizacaoPublicacao(docVia, data, paginaDaPublicacao);
-		}
+            if (docVia != null && !docVia.doc().isDJEPublicado())
+                Ex.getInstance().getBL().registrarDisponibilizacaoPublicacao(docVia, data, paginaDaPublicacao);
+        }
 	}
 
 	public static String buscarSegundoRetorno(Date data, String tipoCaderno,
@@ -227,10 +224,10 @@ public class PublicacaoDJEBL {
 	
 	public static Map<String, String> lerXMLPublicacao(String xml) throws Exception {
 		
-		Map<String, String> atributosXML = new HashMap<String, String>();
+		Map<String, String> atributosXML = new HashMap<>();
 		StringReader st = new StringReader(xml);
 		SAXBuilder sb = new SAXBuilder();
-		Document dc = null;
+		Document dc;
 		
 		try {
 			dc = sb.build(st);
@@ -286,9 +283,9 @@ public class PublicacaoDJEBL {
 			attIdentificacao.addAttribute("", "", "CADERNO", "String", tipoMateria);
 			
 			if(movDoc.getOrgaoUsuario().getAcronimoOrgaoUsu().equals("JFRJ"))
-				attIdentificacao.addAttribute("", "", "SECAO", "String", String.valueOf("SJRJ"));
+				attIdentificacao.addAttribute("", "", "SECAO", "String", "SJRJ");
 			else if(movDoc.getOrgaoUsuario().getAcronimoOrgaoUsu().equals("JFES"))
-				attIdentificacao.addAttribute("", "", "SECAO", "String", String.valueOf("SJES"));
+				attIdentificacao.addAttribute("", "", "SECAO", "String", "SJES");
 			else
 				attIdentificacao.addAttribute("", "", "SECAO", "String", String.valueOf(movDoc.getOrgaoUsuario().getAcronimoOrgaoUsu()));
 	
@@ -328,18 +325,15 @@ public class PublicacaoDJEBL {
 				sMatricula = sMatricula + "0";
 	
 			attIdentificacao.addAttribute("", "", "MATRICULAUSUARIO", "String",
-					String.valueOf(sMatricula));
+					sMatricula);
 	
 			handler.startElement("", "", "IDENTIFICACAO", attIdentificacao);
 			handler.endElement("", "", "IDENTIFICACAO");
 	
 			AttributesImpl attsExpediente = new AttributesImpl();
 			attsExpediente.addAttribute("", "", "NUMEXPEDIENTE", "String", movDoc.getCodigo());
-	
-			if (docForm.containsKey("tituloMateria"))
-				attsExpediente.addAttribute("", "", "DESCREXPEDIENTE", "String",docForm.get("tituloMateria"));
-			else
-				attsExpediente.addAttribute("", "", "DESCREXPEDIENTE", "String",descrPublicacao);
+
+            attsExpediente.addAttribute("", "", "DESCREXPEDIENTE", "String", docForm.getOrDefault("tituloMateria", descrPublicacao));
 			handler.startElement("", "", "EXPEDIENTE", attsExpediente);
 			handler.endElement("", "", "EXPEDIENTE");
 			handler.endElement("", "", "PUBLICACAODJE");
@@ -359,8 +353,8 @@ public class PublicacaoDJEBL {
 			pess.getOrgaoUsuario().getSigla()) + pess.getMatricula().toString();
 	}
 
-	public static String obterUnidadeDocumento(ExDocumento doc) throws Exception {
-		String nomeLota, nomeLotaFinal = "";
+	public static String obterUnidadeDocumento(ExDocumento doc) {
+		String nomeLota, nomeLotaFinal;
 //		ExDocumento movDoc = mov.getExDocumento();
 		Map<String, String> docForm = doc.getForm();
 
@@ -426,7 +420,7 @@ public class PublicacaoDJEBL {
 
 	public static List<ExTpDocPublicacao> obterListaTiposMaterias(Long idMod) {
 		List<ExTpDocPublicacao> lista = ExDao.getInstance().listarExTiposDocPublicacao();
-		List<ExTpDocPublicacao> listaFinal = new ArrayList<ExTpDocPublicacao>();
+		List<ExTpDocPublicacao> listaFinal = new ArrayList<>();
 
 		for (ExTpDocPublicacao docPubl : lista) {
 			if (docPubl.getCarater() != null) {
@@ -520,7 +514,7 @@ public class PublicacaoDJEBL {
                 + movCancelamento.getLotaCadastrante().getOrgaoUsuario()
                 .getAcronimoOrgaoUsu());
 		
-		String sAcronimoOrgaoUsu = null;
+		String sAcronimoOrgaoUsu;
 		
 		if(movCancelamento.getLotaCadastrante().getOrgaoUsuario().getAcronimoOrgaoUsu().equals("JFRJ"))
 			sAcronimoOrgaoUsu = "SJRJ";

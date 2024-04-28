@@ -87,7 +87,7 @@
 						<a href="${url}" target="_blank">${url}</a>
 						<br/>
 						<img style="width:250px;height:250px;margin-top: 10px" id="base64image"
-								   src="${ex:toBase64QrCode(url)}" />
+								   src="${ex:toBase64QrCode(url)}"  alt="QrCode"/>
 					</div>
 				</div>
 			</div>

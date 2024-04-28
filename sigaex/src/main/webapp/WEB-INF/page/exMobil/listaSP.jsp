@@ -30,14 +30,18 @@
         frm.method = "GET";
     }
 </script>
-<div class="row mb-3">
-    <div class="col">
-        <button type="button" class="btn btn-outline-success" id="exportar" title="Exportar para CSV"
-                onclick="javascript:csv('listar', '/sigaex/app/expediente/doc/exportarCsv');"><i
-                class="fa fa-file-csv"></i> Exportar
-        </button>
+
+<c:if test="${mostrarBotaoExportar}">
+    <div class="row mb-3">
+        <div class="col">
+            <button type="button" class="btn btn-outline-success" id="exportar" title="Exportar para CSV"
+                    onclick="javascript:csv('listar', '/sigaex/app/expediente/doc/exportarCsv');"><i
+                    class="fa fa-file-csv"></i> Exportar
+            </button>
+        </div>
     </div>
-</div>
+</c:if>
+
 <c:if test="${not empty msgPesqErro}">
     <div id="msgPesqErro" class="alert alert-danger alert-dismissible fade show" role="alert">${msgPesqErro}</div>
 </c:if>

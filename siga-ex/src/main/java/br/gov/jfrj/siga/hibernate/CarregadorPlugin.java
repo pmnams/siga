@@ -40,11 +40,12 @@ public class CarregadorPlugin {
                 if (!url.getPath().contains("siga-ext")) {
                     iterator.remove();
                 } else {
-                    iterator.set(new URL(url.getPath().replaceAll("\\.jar.*", ".jar")));
+                    iterator.set(new URL(url.toExternalForm().replaceAll("\\.jar.*", ".jar").replace("vfs:", "file:")));
                 }
             }
             URL implDefault = Thread.currentThread().getContextClassLoader().getResource("br/gov/jfrj/siga/hibernate/ext/MontadorQuery.class");
-            list.add(new URL(implDefault.toExternalForm().toString().replaceAll("\\.jar.*", ".jar").replace("vfs:", "file:")));
+            if (implDefault != null)
+                list.add(new URL(implDefault.toExternalForm().replaceAll("\\.jar.*", ".jar").replace("vfs:", "file:")));
 
             URL[] classpath = new URL[list.size()];
             list.toArray(classpath);
@@ -79,7 +80,8 @@ public class CarregadorPlugin {
      */
     public IMontadorQuery getMontadorQueryImpl() {
         try {
-            return (IMontadorQuery) Class.forName(Prop.get("montador.query"), true, this.classloader).newInstance();
+            if (this.classloader != null)
+                return (IMontadorQuery) Class.forName(Prop.get("montador.query"), true, this.classloader).newInstance();
         } catch (Exception e) {
             log.warning("Não foi possível instanciar o MontadorQuery do plugin!");
         }
