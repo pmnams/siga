@@ -2436,12 +2436,11 @@ public class ExBL extends CpBL {
     }
 
     public void validarCancelamentoDeUltimaMovimentacao(final DpPessoa titular, final DpLotacao lotaTitular, final ExMobil mob) {
-        final ExMovimentacao exUltMovNaoCanc = mob
-                .getUltimaMovimentacaoNaoCancelada();
+        final ExMovimentacao exUltMovNaoCanc = mob.getUltimaMovimentacaoNaoCancelada();
         final ExMovimentacao exUltMov = mob.getUltimaMovimentacao();
 
         if (exUltMovNaoCanc.getExTipoMovimentacao() == ExTipoDeMovimentacao.CRIACAO
-                && exUltMovNaoCanc.getIdMov() == exUltMov.getIdMov()) {
+                && Objects.equals(exUltMovNaoCanc.getIdMov(), exUltMov.getIdMov())) {
             if (!Ex.getInstance().getComp().pode(ExPodeCancelarVia.class, titular, lotaTitular, mob)) {
                 throw new AplicacaoException("Não é possível cancelar via");
             }

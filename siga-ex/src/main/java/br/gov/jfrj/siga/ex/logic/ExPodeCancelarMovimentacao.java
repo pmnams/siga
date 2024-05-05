@@ -37,8 +37,7 @@ public class ExPodeCancelarMovimentacao extends CompositeExpressionSupport {
                 // documento está sem efeito.
                 Not.of(
                         And.of(
-                                Not.of(
-                                        new ExEMobilGeral(mob)),
+                                Not.of(new ExEMobilGeral(mob)),
                                 new ExEstaSemEfeito(mob.doc())
                         )
                 ),
@@ -74,7 +73,8 @@ public class ExPodeCancelarMovimentacao extends CompositeExpressionSupport {
                         new ExMovimentacaoEDoTipo(exUltMovNaoCanc, ExTipoDeMovimentacao.NOTIFICACAO_PUBL_BI),
                         new ExMovimentacaoEDoTipo(exUltMovNaoCanc, ExTipoDeMovimentacao.PUBLICACAO_BOLETIM),
                         new ExMovimentacaoEDoTipo(exUltMovNaoCanc, ExTipoDeMovimentacao.DISPONIBILIZACAO),
-                        new ExMovimentacaoEDoTipo(exUltMovNaoCanc, ExTipoDeMovimentacao.CRIACAO)),
+                        new ExMovimentacaoEDoTipo(exUltMovNaoCanc, ExTipoDeMovimentacao.CRIACAO)
+                ),
 
                 // Não deixa cancelar a atualização (por enquanto, só se resultar da assinatura)
                 NAnd.of(
