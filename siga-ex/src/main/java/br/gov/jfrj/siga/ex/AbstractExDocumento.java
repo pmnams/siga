@@ -1185,4 +1185,7 @@ public abstract class AbstractExDocumento extends ExArquivo implements
         this.requerenteDoc = requerenteDoc;
     }
 
+    public SigaBlob getExBlob() {
+        return exBlob;
+    }
 }

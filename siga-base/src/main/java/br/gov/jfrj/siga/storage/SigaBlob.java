@@ -136,6 +136,10 @@ public class SigaBlob {
         return dataIdentifier;
     }
 
+    public StorageType getType() {
+        return type;
+    }
+
     @PrePersist
     protected void onCreate() {
         if (createdAt == null)

@@ -305,6 +305,10 @@
                                                  title="${docVO.doc.exNivelAcesso.dscNivelAcesso}">${docVO.doc.exNivelAcesso.idNivelAcesso}
                                                 - ${docVO.doc.exNivelAcesso.nmNivelAcesso}</div>
                                         </div>
+                                        <div class="d-box-col col-md-3">
+                                            <div class="text-sm font-weight-bold">IdSigaBlob</div>
+                                            <div >${docVO.doc.exBlob.id} - ${docVO.doc.exBlob.type}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -496,11 +500,11 @@
                                                 </div>
                                                 <div class="d-box-content">
                                                     <div class="row">
-                                                        <div class="d-box-col col-md-2">
+                                                        <div class="d-box-col col-md-3">
                                                             <div class="text-sm font-weight-bold">IdDoc</div>
                                                             <div class="">${docFilho.doc.idDoc}</div>
                                                         </div>
-                                                        <div class="d-box-col col-md-4">
+                                                        <div class="d-box-col col-md-3">
                                                             <div class="text-sm font-weight-bold">DtDoc</div>
                                                             <div class="">${docFilho.doc.dtDoc != null? docFilho.doc.dtDoc : '-'}</div>
                                                         </div>
@@ -511,10 +515,14 @@
                                                         </div>
                                                     </div>
                                                     <div class="row">
-                                                        <div class="d-box-col col-12">
+                                                        <div class="d-box-col col-3">
                                                             <div class="text-sm font-weight-bold">IdMod</div>
                                                             <div class="">${docFilho.doc.exModelo.idMod}
                                                                 - ${docFilho.doc.exModelo.nmMod}</div>
+                                                        </div>
+                                                        <div class="d-box-col col-9">
+                                                            <div class="text-sm font-weight-bold">IdSigaBlob</div>
+                                                            <div >${docFilho.doc.exBlob.id} - ${docFilho.doc.exBlob.type}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -541,11 +549,11 @@
                                                     </div>
                                                     <div class="d-box-content">
                                                         <div class="row">
-                                                            <div class="d-box-col col-md-2">
+                                                            <div class="d-box-col col-md-3">
                                                                 <div class="text-sm font-weight-bold">IdDoc</div>
                                                                 <div class="">${docFilho.doc.idDoc}</div>
                                                             </div>
-                                                            <div class="d-box-col col-md-4">
+                                                            <div class="d-box-col col-md-3">
                                                                 <div class="text-sm font-weight-bold">DtDoc</div>
                                                                 <div class="">${docFilho.doc.dtDoc != null? docFilho.doc.dtDoc : '-'}</div>
                                                             </div>
@@ -556,10 +564,14 @@
                                                             </div>
                                                         </div>
                                                         <div class="row">
-                                                            <div class="d-box-col col-12">
+                                                            <div class="d-box-col col-3">
                                                                 <div class="text-sm font-weight-bold">IdMod</div>
                                                                 <div class="">${docFilho.doc.exModelo.idMod}
                                                                     - ${docFilho.doc.exModelo.nmMod}</div>
+                                                            </div>
+                                                            <div class="d-box-col col-9">
+                                                                <div class="text-sm font-weight-bold">IdSigaBlob</div>
+                                                                <div >${docFilho.doc.exBlob.id} - ${docFilho.doc.exBlob.type}</div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -586,11 +598,11 @@
                                                 </div>
                                                 <div class="d-box-content">
                                                     <div class="row">
-                                                        <div class="d-box-col col-md-2">
+                                                        <div class="d-box-col col-md-3">
                                                             <div class="text-sm font-weight-bold">IdDoc</div>
                                                             <div class="">${mobItem.mob.doc.idDoc}</div>
                                                         </div>
-                                                        <div class="d-box-col col-md-4">
+                                                        <div class="d-box-col col-md-3">
                                                             <div class="text-sm font-weight-bold">DtDoc</div>
                                                             <div class="">${mobItem.mob.doc.dtDoc != null? mobItem.mob.doc.dtDoc : '-'}</div>
                                                         </div>
@@ -601,10 +613,14 @@
                                                         </div>
                                                     </div>
                                                     <div class="row">
-                                                        <div class="d-box-col col-12">
+                                                        <div class="d-box-col col-3">
                                                             <div class="text-sm font-weight-bold">IdMod</div>
                                                             <div class="">${mobItem.mob.doc.exModelo.idMod}
                                                                 - ${mobItem.mob.doc.exModelo.nmMod}</div>
+                                                        </div>
+                                                        <div class="d-box-col col-9">
+                                                            <div class="text-sm font-weight-bold">IdSigaBlob</div>
+                                                            <div >${mobItem.mob.doc.exBlob.id} - ${mobItem.mob.doc.exBlob.type}</div>
                                                         </div>
                                                     </div>
                                                 </div>
