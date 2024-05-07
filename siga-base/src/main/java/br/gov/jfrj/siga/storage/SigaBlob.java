@@ -42,7 +42,7 @@ public class SigaBlob {
 
     public SigaBlob(byte[] data, BlobCategory category) {
         this(data);
-        this.category = category.ordinal();
+        setCategory(category);
     }
 
     public SigaBlob(byte[] data) {
