@@ -144,7 +144,7 @@ public class Correio {
 
         //    Se baseTeste inserir no assunto - AMBIENTE DE TESTE FAVOR DESCONSIDERAR
 
-        Boolean isVersionTest = Boolean.TRUE.equals(Prop.getBool("/siga.versao.teste"));
+        Boolean isVersionTest = Boolean.TRUE.equals(Prop.getBool("/siga.base.teste"));
 
         if (Boolean.TRUE.equals(isVersionTest)) {
             msg.setSubject(assunto + " - AMBIENTE DE TESTE FAVOR DESCONSIDERAR", "utf-8");
@@ -153,7 +153,6 @@ public class Correio {
         }
 
         if (conteudoHTML == null) {
-            msg.setSubject(assunto, "utf-8");
             msg.setContent(conteudo, "text/plain;charset=UTF-8");
         } else {
             Multipart mp = new MimeMultipart("alternative");

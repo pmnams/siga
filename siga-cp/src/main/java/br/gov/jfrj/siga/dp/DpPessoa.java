@@ -440,7 +440,7 @@ public class DpPessoa extends AbstractDpPessoa implements Serializable,
      */
     public List<List<String>> getLotacoes() {
 
-        if (listaLotacoes.size() == 0) {
+        if (listaLotacoes.isEmpty()) {
             List<CpIdentidade> idsCpf = CpDao.getInstance().consultaIdentidadesCadastrante(getCpfPessoa().toString(), true);
             for (CpIdentidade identCpf : idsCpf) {
                 List<String> listaUserLota = new ArrayList<String>();

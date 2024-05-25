@@ -1269,7 +1269,7 @@ public class CpBL {
                                 .replace(".", "")
                                 .trim()
                 ),
-                (Objects.nonNull(pessoaAnt) && pessoaAnt.getIdPessoaIni() != null)? pessoaAnt.getIdPessoaIni() : 0
+                (Objects.nonNull(pessoaAnt) && pessoaAnt.getIdPessoaIni() != null) ? pessoaAnt.getIdPessoaIni() : 0
         );
 
         if (i > 0) {
@@ -1588,7 +1588,7 @@ public class CpBL {
 
     public void gravarMarcador(final Long id, final DpPessoa cadastrante, final DpLotacao lotacao, final CpIdentidade identidade,
                                final String descricao, final String descrDetalhada, final CpMarcadorCorEnum idCor, final CpMarcadorIconeEnum idIcone, final CpMarcadorGrupoEnum grupoId,
-                               final CpMarcadorFinalidadeEnum idFinalidade, final String dataAtivacao) throws Exception {
+                               final CpMarcadorFinalidadeEnum idFinalidade, final String dataAtivacao) {
         if (idFinalidade == CpMarcadorFinalidadeEnum.SISTEMA)
             throw new AplicacaoException("Não é permitido o cadastro de marcadores de sistema.");
 
@@ -1612,8 +1612,8 @@ public class CpBL {
         }
         Integer qtdMaxPorUnidade = Prop.getInt("/siga.marcadores.qtd.maxima.por.unidade");
         if (idFinalidade.getIdTpMarcador() == CpTipoMarcadorEnum.TIPO_MARCADOR_LOTACAO && id == null
-                && c > qtdMaxPorUnidade)
-            throw new AplicacaoException("Atingiu o limite de " + qtdMaxPorUnidade.toString()
+                && (qtdMaxPorUnidade != null && c > qtdMaxPorUnidade))
+            throw new AplicacaoException("Atingiu o limite de " + qtdMaxPorUnidade
                     + " marcadores possíveis para " + msgLotacao);
 
         if (idFinalidade == CpMarcadorFinalidadeEnum.PASTA_PADRAO && id == null && cpp > 0)
@@ -1623,17 +1623,13 @@ public class CpBL {
         if (dataAtivacao != null)
             dtAtivacao = Data.parse(dataAtivacao);
 
-        if (listaMarcadoresLotacaoEGerais.stream()
-                .filter(mar -> mar.getDescrMarcador()
-                        .equals(descricao)).count() > 0)
-            throw new AplicacaoException("Já existe um marcador Geral ou da " + msgLotacao
-                    + " com este nome: " + descricao);
+        if (listaMarcadoresLotacaoEGerais.stream().anyMatch(mar -> mar.getDescrMarcador().equals(descricao)))
+            throw new AplicacaoException("Já existe um marcador Geral ou da " + msgLotacao + " com este nome: " + descricao);
 
         if (id != null) {
-            CpMarcador marcadorAnt = new CpMarcador();
             CpMarcador marcador = new CpMarcador();
+            CpMarcador marcadorAnt = dao().consultar(id, CpMarcador.class, false);
 
-            marcadorAnt = dao().consultar(id, CpMarcador.class, false);
             if (marcadorAnt != null) {
                 if (marcadorAnt.getDpLotacaoIni() != null &&
                         !(marcadorAnt.getDpLotacaoIni().getIdInicial().equals(cadastrante.getLotacao().getIdInicial())))
