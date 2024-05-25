@@ -25,10 +25,12 @@ import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 @ApplicationScoped
 @Manager(StorageType.SAMBA)
 public class SmbBlobManager implements BlobManager {
+    public static final Logger LOGGER = Logger.getLogger(SmbBlobManager.class.getName());
 
     private final SmbStorageContext context;
 
@@ -51,7 +53,6 @@ public class SmbBlobManager implements BlobManager {
 
         String filePath = getFilePath(blob, blob.getDataIdentifier());
 
-        BlobData blobData = null;
         try (File f = this.context.getShare().openFile(
                 filePath,
                 EnumSet.of(AccessMask.GENERIC_READ),
@@ -63,25 +64,21 @@ public class SmbBlobManager implements BlobManager {
             byte[] buffer = new byte[4096];
             int length;
 
-            try {
-                InputStream in = f.getInputStream();
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                while ((length = in.read(buffer)) > 0) {
-                    os.write(buffer, 0, length);
-                }
-                os.flush();
-
-                blobData = new SmbBlobData();
-                blobData.setData(os.toByteArray());
-                blobData.setId(blob.getDataIdentifier());
-                return blobData;
-            } catch (Exception e) {
-                e.printStackTrace();
+            InputStream in = f.getInputStream();
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            while ((length = in.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
             }
+            os.flush();
+
+            BlobData blobData = new SmbBlobData();
+            blobData.setData(os.toByteArray());
+            blobData.setId(blob.getDataIdentifier());
+            return blobData;
         } catch (Exception e) {
+            LOGGER.severe("Error while reading blob data: " + e.getMessage());
             return null;
         }
-        return blobData;
     }
 
     @Override
