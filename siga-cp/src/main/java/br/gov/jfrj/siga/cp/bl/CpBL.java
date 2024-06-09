@@ -215,6 +215,10 @@ public class CpBL {
     public CpConfiguracao configurarAcesso(CpPerfil perfil, CpOrgaoUsuario orgao, DpLotacao lotacao, DpPessoa pes,
                                            CpServico servico, CpSituacaoDeConfiguracaoEnum situacao, ITipoDeConfiguracao tpConf,
                                            CpIdentidade identidadeCadastrante) throws Exception {
+
+        if (tpConf ==  CpTipoDeConfiguracao.UTILIZAR_SERVICO && servico == null)
+            throw new AplicacaoException("Não foi possível salvar a configuração. O serviço não foi obtido.");
+
         Date dt = dao().consultarDataEHoraDoServidor();
 
         CpConfiguracao confOld = null;

@@ -170,8 +170,6 @@ public class AcessoController extends GiControllerSupport {
 			HashMap<String, ConfiguracaoAcesso> achm = new HashMap<String, ConfiguracaoAcesso>();
 			for (CpServico srv : l) {
 				ConfiguracaoAcesso ac = ConfiguracaoAcesso.gerar(perfil, pessoa, lotacao, orgao, srv, null);
-
-				System.out.print(ac.getSituacao().getDescr());
 				achm.put(ac.getServico().getSigla(), ac);
 				
 			}

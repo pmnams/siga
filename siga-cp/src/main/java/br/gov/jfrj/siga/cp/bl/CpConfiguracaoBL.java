@@ -486,6 +486,9 @@ public class CpConfiguracaoBL {
         if (cfgFiltro == null)
             cfgFiltro = new CpConfiguracaoCache();
 
+        if (cfgFiltro.cpServico > 0 && cfg.cpServico == 0)
+            return false;
+
         if (desigual(cfg.cpServico, cfgFiltro.cpServico, atributosDesconsiderados, SERVICO))
             return false;
 
@@ -534,10 +537,7 @@ public class CpConfiguracaoBL {
         if (desigual(cfg.orgaoObjeto, cfgFiltro.orgaoObjeto, atributosDesconsiderados, ORGAO_OBJETO))
             return false;
 
-        if (desigual(cfg.cargoObjeto, cfgFiltro.cargoObjeto, atributosDesconsiderados, CARGO_OBJETO))
-            return false;
-
-        return true;
+        return !desigual(cfg.cargoObjeto, cfgFiltro.cargoObjeto, atributosDesconsiderados, CARGO_OBJETO);
     }
 
     protected boolean desigual(long cfg, long filtro, Set<Integer> atributosDesconsiderados, int atributo) {
