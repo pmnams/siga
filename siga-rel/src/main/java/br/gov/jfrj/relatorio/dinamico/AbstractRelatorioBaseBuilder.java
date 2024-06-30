@@ -173,17 +173,18 @@ public abstract class AbstractRelatorioBaseBuilder extends DynamicReportBuilder 
         Style style = new Style();
 
         style.setBackgroundColor(estilo.getBackgroundColor());
-        style.setBorderColor(estilo.getBorderColor());
+        style.setBorder(estilo.getBorder());
         style.setTransparency(estilo.getTransparency());
         style.setTextColor(estilo.getTextColor());
         style.setBorder(estilo.getBorder());
         style.setFont(estilo.getFont());
         style.setPadding(estilo.getPadding());
         style.setRadius(estilo.getRadius());
-        style.setVerticalAlign(estilo.getVerticalAlign());
-        style.setHorizontalAlign(estilo.getHorizontalAlign());
+
+        style.setVerticalImageAlign(estilo.getVerticalImageAlign());
+        style.setVerticalTextAlign(estilo.getVerticalTextAlign());
         style.setRotation(estilo.getRotation());
-        style.setStreching(estilo.getStreching());
+        style.setStretchType(estilo.getStretchType());
 
         return style;
     }

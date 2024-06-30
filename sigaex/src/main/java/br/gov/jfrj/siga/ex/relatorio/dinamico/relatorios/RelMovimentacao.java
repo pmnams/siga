@@ -156,7 +156,7 @@ public class RelMovimentacao extends RelatorioTemplate {
 				} else {
 					d.add("");
 				}
-				if (mov.getLotaSubscritor().getSigla() != null) {
+				if (mov.getLotaSubscritor() != null && mov.getLotaSubscritor().getSigla() != null) {
 					d.add(mov.getLotaSubscritor().getSigla());
 				} else {
 					d.add("");
