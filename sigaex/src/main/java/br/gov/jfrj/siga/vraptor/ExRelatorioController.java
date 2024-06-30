@@ -339,7 +339,12 @@ public class ExRelatorioController extends ExController {
     private void addParametrosPersonalizadosOrgao(final Map<String, String> parameters) {
         parameters.put("titulo", Prop.get("/siga.relat.titulo"));
         parameters.put("subtitulo", Prop.get("/siga.relat.subtitulo"));
-        parameters.put("brasao", Prop.get("/siga.relat.brasao"));
+
+        if  (getTitular() != null && getTitular().getOrgaoUsuario().getBrasao() != null) {
+            parameters.put("brasao", Prop.get("/siga.internal.base.url") + "/siga/public/app/orgaoUsuario/" + getTitular().getOrgaoUsuario().getId() + "/brasao");
+        }
+        else
+            parameters.put("brasao", Prop.get("/siga.relat.brasao"));
     }
 
     private InputStream aGeraRelatorio(final Map<String, String> parameters)
@@ -389,7 +394,7 @@ public class ExRelatorioController extends ExController {
                 + ":" + getRequest().getServerPort()
                 + getRequest().getContextPath()
                 + "/app/expediente/doc/exibir?sigla=");
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
         final RelatorioDocumentosSubordinados rel = new RelatorioDocumentosSubordinados(
                 parametros);
         rel.gerar();
@@ -504,7 +509,7 @@ public class ExRelatorioController extends ExController {
         parametros.put("lotacaoTitular",
                 getRequest().getParameter("lotacaoTitular"));
         parametros.put("idTit", getRequest().getParameter("idTit"));
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
         final RelConsultaDocEntreDatas rel = new RelConsultaDocEntreDatas(
                 parametros);
 
@@ -520,10 +525,15 @@ public class ExRelatorioController extends ExController {
                 "emiteRelDocEntreDatas");
     }
 
-    private void addParametrosPersonalizadosOrgãoString(Map<String, String> parameters) {
+    private void addParametrosPersonalizadosOrgaoString(Map<String, String> parameters) {
         parameters.put("titulo", Prop.get("/siga.relat.titulo"));
         parameters.put("subtitulo", Prop.get("/siga.relat.subtitulo"));
-        parameters.put("brasao", Prop.get("/siga.relat.brasao"));
+
+        if  (getTitular() != null && getTitular().getOrgaoUsuario().getBrasao() != null) {
+            parameters.put("brasao", Prop.get("/siga.internal.base.url") + "/siga/public/app/orgaoUsuario/" + getTitular().getOrgaoUsuario().getId() + "/brasao");
+        }
+        else
+            parameters.put("brasao", Prop.get("/siga.relat.brasao"));
     }
 
     @Get("app/expediente/rel/emiteRelMovimentacao")
@@ -556,7 +566,7 @@ public class ExRelatorioController extends ExController {
         parametros.put("lotacaoTitular",
                 getRequest().getParameter("lotacaoTitular"));
         parametros.put("idTit", getRequest().getParameter("idTit"));
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
         final RelMovimentacao rel = new RelMovimentacao(parametros);
         rel.gerar();
 
@@ -596,7 +606,7 @@ public class ExRelatorioController extends ExController {
         parametros.put("lotacaoTitular",
                 getRequest().getParameter("lotacaoTitular"));
         parametros.put("idTit", getRequest().getParameter("idTit"));
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
         final RelMovCad rel = new RelMovCad(parametros);
         rel.gerar();
 
@@ -637,7 +647,7 @@ public class ExRelatorioController extends ExController {
         parametros.put("lotacaoTitular",
                 getRequest().getParameter("lotacaoTitular"));
         parametros.put("idTit", getRequest().getParameter("idTit"));
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
         final RelOrgao rel = new RelOrgao(parametros);
         rel.gerar();
 
@@ -675,7 +685,7 @@ public class ExRelatorioController extends ExController {
         parametros.put("lotacaoTitular",
                 getRequest().getParameter("lotacaoTitular"));
         parametros.put("idTit", getRequest().getParameter("idTit"));
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
         final RelTipoDoc rel = new RelTipoDoc(parametros);
         rel.gerar();
 
@@ -716,7 +726,7 @@ public class ExRelatorioController extends ExController {
                 + ":" + getRequest().getServerPort()
                 + getRequest().getContextPath()
                 + "/app/expediente/doc/exibir?sigla=");
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
         final RelMovProcesso rel = new RelMovProcesso(parametros);
         rel.gerar();
 
@@ -734,7 +744,7 @@ public class ExRelatorioController extends ExController {
         parametros.put("codificacao", getRequest().getParameter("codificacao"));
         parametros.put("secaoUsuario", getRequest()
                 .getParameter("secaoUsuario"));
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
         final RelClassificacao rel = new RelClassificacao(parametros);
         rel.gerar();
 
@@ -765,7 +775,7 @@ public class ExRelatorioController extends ExController {
         parametros.put("idLotacao", idLotacao);
         parametros.put("idOrgaoUsu", idOrgaoUsu);
         parametros.put("secaoUsuario", secaoUsuario);
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
         final RelDocsClassificados rel = new RelDocsClassificados(parametros);
         rel.gerar();
 
@@ -812,7 +822,7 @@ public class ExRelatorioController extends ExController {
                         + getRequest().getServerPort()
                         + getRequest().getContextPath()
                         + "/app/expediente/doc/exibir?sigla=");
-                addParametrosPersonalizadosOrgãoString(parametros);
+                addParametrosPersonalizadosOrgaoString(parametros);
 
                 final RelDocumentosProduzidos rel = new RelDocumentosProduzidos(
                         parametros);
@@ -906,7 +916,7 @@ public class ExRelatorioController extends ExController {
                 getRequest().getParameter("dataFinal"));
 
 
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
 
         if (Prop.isGovSP()) /* Troca subtítulo por Nome do Relatório */
             parametros.put("subtitulo", "Relatório Gerenciais\nIndicadores de Gestão - Órgão " + getLotaTitular().getOrgaoUsuario());
@@ -972,7 +982,7 @@ public class ExRelatorioController extends ExController {
                 getRequest().getParameter("dataFinal"));
 
 
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
 
         final RelDocumentosProduzidos rel = new RelDocumentosProduzidos(
                 parametros);
@@ -1036,7 +1046,7 @@ public class ExRelatorioController extends ExController {
                         + getRequest().getServerPort()
                         + getRequest().getContextPath()
                         + "/app/expediente/doc/exibir?sigla=");
-                addParametrosPersonalizadosOrgãoString(parametros);
+                addParametrosPersonalizadosOrgaoString(parametros);
 
                 final RelDocsOrgaoInteressado rel = new RelDocsOrgaoInteressado(
                         parametros);
@@ -1103,7 +1113,7 @@ public class ExRelatorioController extends ExController {
         } else {
             parametros.put("lotacaoRel", "Todas");
         }
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
 
 
         final RelDocsOrgaoInteressado rel = new RelDocsOrgaoInteressado(parametros);
@@ -1228,7 +1238,7 @@ public class ExRelatorioController extends ExController {
                         + getRequest().getServerPort()
                         + getRequest().getContextPath()
                         + "/app/expediente/doc/exibir?sigla=");
-                addParametrosPersonalizadosOrgãoString(parametros);
+                addParametrosPersonalizadosOrgaoString(parametros);
 
                 final RelTempoTramitacaoPorEspecie rel = new RelTempoTramitacaoPorEspecie(
                         parametros);
@@ -1291,7 +1301,7 @@ public class ExRelatorioController extends ExController {
                 .getParameter("dataFinal"));
         parametros.put("link_especie", "");
         parametros.put("link_siga", "");
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
         parametros.put("subtitulo", "Relatório Gerenciais\nTempo Médio de Tramitação Por Espécie Documental");
 
         final RelTempoTramitacaoPorEspecie rel = new RelTempoTramitacaoPorEspecie(
@@ -1363,7 +1373,7 @@ public class ExRelatorioController extends ExController {
                 + getRequest().getServerPort()
                 + getRequest().getContextPath()
                 + "/app/expediente/doc/exibir?sigla=");
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
 
         if (Prop.isGovSP()) /* Troca subtítulo por Nome do Relatório */
             parametros.put("subtitulo", "Tempo Médio de Tramitação Por Espécie Documental");
@@ -1428,7 +1438,7 @@ public class ExRelatorioController extends ExController {
                         + getRequest().getServerPort()
                         + getRequest().getContextPath()
                         + "/app/expediente/doc/exibirHistorico?sigla=");
-                addParametrosPersonalizadosOrgãoString(parametros);
+                addParametrosPersonalizadosOrgaoString(parametros);
                 final RelVolumeTramitacaoPorModelo rel = new RelVolumeTramitacaoPorModelo(
                         parametros);
                 if (idMod == null) {
@@ -1503,7 +1513,7 @@ public class ExRelatorioController extends ExController {
                         + getRequest().getServerPort()
                         + getRequest().getContextPath()
                         + "/app/expediente/doc/exibir?sigla=");
-                addParametrosPersonalizadosOrgãoString(parametros);
+                addParametrosPersonalizadosOrgaoString(parametros);
 
                 final RelDocumentosProduzidos rel = new RelDocumentosProduzidos(
                         parametros);
@@ -1616,7 +1626,7 @@ public class ExRelatorioController extends ExController {
                         + getRequest().getServerPort()
                         + getRequest().getContextPath()
                         + "/app/expediente/rel/relDocumentosForaPrazo");
-                addParametrosPersonalizadosOrgãoString(parametros);
+                addParametrosPersonalizadosOrgaoString(parametros);
 
                 final RelDocumentosForaPrazo rel = new RelDocumentosForaPrazo(
                         parametros);
@@ -1690,7 +1700,7 @@ public class ExRelatorioController extends ExController {
         parametros.put("dataInicial", getRequest().getParameter("dataInicial"));
         parametros.put("dataFinal", getRequest().getParameter("dataFinal"));
         parametros.put("link_siga", "");
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
         parametros.put("subtitulo", "Relatório Gerenciais\nDocumentos Fora do Prazo");
 
         final RelDocumentosForaPrazo rel = new RelDocumentosForaPrazo(parametros);
@@ -1760,7 +1770,7 @@ public class ExRelatorioController extends ExController {
                         getRequest().getParameter("dataInicial"));
                 parametros.put("dataFinal",
                         getRequest().getParameter("dataFinal"));
-                addParametrosPersonalizadosOrgãoString(parametros);
+                addParametrosPersonalizadosOrgaoString(parametros);
 
                 final RelTempoMedioSituacao rel = new RelTempoMedioSituacao(
                         parametros);
@@ -1838,7 +1848,7 @@ public class ExRelatorioController extends ExController {
                         + getRequest().getServerPort()
                         + getRequest().getContextPath()
                         + "/app/expediente/rel/relDocumentosDevolucaoProgramada");
-                addParametrosPersonalizadosOrgãoString(parametros);
+                addParametrosPersonalizadosOrgaoString(parametros);
 
                 final RelDocumentosForaPrazo rel = new RelDocumentosForaPrazo(
                         parametros);
@@ -1920,7 +1930,7 @@ public class ExRelatorioController extends ExController {
         parametros.put("dataFinal", getRequest().getParameter("dataFinal"));
         parametros.put("link_siga", "");
         parametros.put("nomeColuna", "Data a Vencer");
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
         parametros.put("subtitulo", "Relatório Gerenciais\nDocumentos por Devolução Programada");
 
         final RelDocumentosForaPrazo rel = new RelDocumentosForaPrazo(parametros);
@@ -2005,7 +2015,7 @@ public class ExRelatorioController extends ExController {
         parametros.put("dataInicial", getRequest().getParameter("dataInicial"));
         parametros.put("dataFinal",
                 getRequest().getParameter("dataFinal"));
-        addParametrosPersonalizadosOrgãoString(parametros);
+        addParametrosPersonalizadosOrgaoString(parametros);
 
         if (Prop.isGovSP()) /* Troca subtítulo por Nome do Relatório */
             parametros.put("subtitulo", "Documentos Por Volume");
