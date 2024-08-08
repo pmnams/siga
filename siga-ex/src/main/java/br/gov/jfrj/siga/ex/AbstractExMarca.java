@@ -27,42 +27,37 @@ import javax.persistence.*;
  * the behavior of this class by editing the class, {@link ExDocumento()}.
  */
 @MappedSuperclass
-@NamedQueries({@NamedQuery(name = "consultarPaginaInicial", query = "SELECT mard.idMarcador, " +
-        "               mard.descrMarcador, " +
-        "               Sum(CASE " +
-        "                     WHEN marca.dpPessoaIni.idPessoa = :idPessoaIni THEN 1 " +
-        "                     ELSE 0 " +
-        "                   END) as cont_pessoa, " +
-        "               Sum(CASE " +
-        "                     WHEN marca.dpLotacaoIni.idLotacao = :idLotacaoIni THEN 1 " +
-        "                     ELSE 0 " +
-        "                   END) as cont_lota, " +
-        "               mard.idFinalidade, " +
-        "               mard.ordem, " +
-        "               mard.idCor, " +
-        "               mard.idIcone , " +
-        "               tpForma.idTipoFormaDoc " +
-        "        FROM   ExMarca marca " +
-        "               JOIN marca.cpMarcador marcador " +
-        "               JOIN CpMarcador mard on (mard.hisIdIni = marcador.hisIdIni and mard.hisAtivo = 1)" +
-        "               JOIN marca.exMobil.exDocumento.exFormaDocumento.exTipoFormaDoc tpForma " +
-        "        WHERE  ( marca.dtIniMarca IS NULL " +
-        "                  OR marca.dtIniMarca < :amanha ) " +
-        "               AND ( marca.dtFimMarca IS NULL " +
-        "                      OR marca.dtFimMarca > CURRENT_DATE ) " +
-        "               AND ( ( marca.dpPessoaIni.idPessoa = :idPessoaIni ) " +
-        "                      OR ( marca.dpLotacaoIni.idLotacao = :idLotacaoIni ) ) " +
-        "               AND marca.cpTipoMarca.idTpMarca = 1 " +
-        "        GROUP  BY mard.idMarcador, " +
-        "                  mard.descrMarcador, " +
-        "                  mard.idFinalidade, " +
-        "                  mard.ordem, " +
-        "                  mard.idCor, " +
-        "                  mard.idIcone, " +
-        "                  tpForma.idTipoFormaDoc " +
-        "ORDER  BY mard.idFinalidade, " +
-        "          mard.ordem, " +
-        "          mard.descrMarcador")
+@NamedQueries({
+        @NamedQuery(
+                name = "consultarPaginaInicial",
+                query = " SELECT mard.idMarcador," +
+                        "   mard.descrMarcador," +
+                        "   Sum(CASE WHEN marca.dpPessoaIni.idPessoa = :idPessoaIni THEN 1 ELSE 0 END) as cont_pessoa," +
+                        "   Sum(CASE WHEN marca.dpLotacaoIni.idLotacao = :idLotacaoIni THEN 1 ELSE 0 END) as cont_lota," +
+                        "   mard.idFinalidade," +
+                        "   mard.ordem," +
+                        "   mard.idCor," +
+                        "   mard.idIcone," +
+                        "   tpForma.idTipoFormaDoc" +
+                        " FROM   ExMarca marca" +
+                        "  JOIN marca.cpMarcador marcador" +
+                        "  JOIN CpMarcador mard on (mard.hisIdIni = marcador.hisIdIni and mard.hisAtivo = 1)" +
+                        "  JOIN marca.exMobil.exDocumento.exFormaDocumento.exTipoFormaDoc tpForma" +
+                        "  LEFT JOIN marca.exMovimentacao mov" +
+                        " WHERE (marca.dtIniMarca IS NULL OR marca.dtIniMarca < :amanha)" +
+                        "   AND (marca.dtFimMarca IS NULL OR marca.dtFimMarca > CURRENT_DATE)" +
+                        "   AND ((marca.dpPessoaIni.idPessoa = :idPessoaIni) OR ( marca.dpLotacaoIni.idLotacao = :idLotacaoIni ))" +
+                        "   AND marca.cpTipoMarca.idTpMarca = 1" +
+                        "   AND (mov IS NULL OR mov.dtParam1 IS NULL OR mov.dtParam1 <= CURRENT_DATE)" +
+                        " GROUP BY mard.idMarcador," +
+                        "   mard.descrMarcador," +
+                        "   mard.idFinalidade," +
+                        "   mard.ordem," +
+                        "   mard.idCor," +
+                        "   mard.idIcone," +
+                        "   tpForma.idTipoFormaDoc" +
+                        " ORDER BY mard.idFinalidade, mard.ordem, mard.descrMarcador"
+        )
 })
 public class AbstractExMarca extends CpMarca {
 
