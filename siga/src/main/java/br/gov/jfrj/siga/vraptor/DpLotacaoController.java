@@ -198,8 +198,7 @@ public class DpLotacaoController extends SigaSelecionavelControllerSupport<DpLot
         DpLotacao lot = dao().getLotacaoFromSigla(sigla);
 
         sb.append("digraph G {");
-
-        sb.append("graph [dpi = 60]; node [shape = rectangle];");
+        sb.append("node [shape = rectangle];");
 
         graphAcrescentarLotacao(sb, lot);
         sb.append("}");
