@@ -782,6 +782,9 @@ public class ExDocumentoController extends ExController {
             exDocumentoDTO.setPodeIncluirSubscrArvoreDocs(exDocumentoDTO.getDoc().paiPossuiMovsVinculacaoPapel(ExPapel.PAPEL_AUTORIZADO) || exDocumentoDTO.getDoc().possuiMovsVinculacaoPapel(ExPapel.PAPEL_AUTORIZADO));
         }
 
+        ExDocumento exPaiDasViasCossigsSubscritor = getExConsTempDocCompleto().getPaiDasViasCossigsSubscritor(exDocumentoDTO.getDoc());
+
+        result.include("paiDasViasCossigsSubscritor", exPaiDasViasCossigsSubscritor != null ? exPaiDasViasCossigsSubscritor.getCodigo() : "");
         result.include("vars", l);
 
         result.include("par", parFreeMarker);

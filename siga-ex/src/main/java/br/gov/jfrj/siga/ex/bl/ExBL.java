@@ -3796,9 +3796,7 @@ public class ExBL extends CpBL {
     }
 
     private void gravarMovimentacao(final ExMovimentacao mov) throws AplicacaoException, SQLException {
-        if (SigaMessages.isSigaSP()) {
-            mov.setNumPaginas(mov.getContarNumeroDePaginas()); //Sempre conta a página para SP
-        } else if (mov.getExTipoMovimentacao() != ExTipoDeMovimentacao.ANEXACAO_DE_ARQUIVO_AUXILIAR) {
+        if (mov.getExTipoMovimentacao() != ExTipoDeMovimentacao.ANEXACAO_DE_ARQUIVO_AUXILIAR) {
             mov.setNumPaginas(mov.getContarNumeroDePaginas());
         }
 

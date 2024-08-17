@@ -21,8 +21,6 @@ public class ExVisualizacaoTempDocCompl {
 
     private static long PAPEL_AUTORIZ_SUBSCR = ExPapel.PAPEL_AUTORIZADO;
     private static long PAPEL_AUTORIZ_COSSIG = ExPapel.PAPEL_AUTORIZADO_COSSIG;
-    private static StringBuffer TEXTO_REMOCAO_TEMP = new StringBuffer("Remoção de Cossignatário ou Responsável pela Assinatura Documento Temporário concluída:");
-    private static StringBuffer TEXTO_REMOCAO_TEMP_ASSINATURA = new StringBuffer("Assinatura de Cossignatário ou Responsável pela Assinatura concluída:");
 
     private static ExVisualizacaoTempDocCompl INSTANCE;
     private ExBL exBL = Ex.getInstance().getBL();
@@ -58,14 +56,22 @@ public class ExVisualizacaoTempDocCompl {
     public boolean podeExibirCheckBoxVisTempDocsComplCossigsSubscritor(DpPessoa cadastrante, DpLotacao lotaCadastrante, ExDocumento doc) {
         boolean podeExibir = Ex.getInstance().getConf().podePorConfiguracao(cadastrante, lotaCadastrante,
                 ExTipoDeConfiguracao.VISUALIZAR_TEMP_DOCS_COMPL_SUBSCRITOR_COSSIGNATARIO);
-        if (podeExibir && doc != null) {
-            List<ExDocumento> viasDocPai = doc.getTodosOsPaisDasViasCossigsSubscritor();
-            if (viasDocPai.iterator().hasNext()) {
-                ExDocumento docPai = viasDocPai.iterator().next();
-                return (docPai != null && docPai.getIdDoc() != null && !docPai.equals(doc)) ? Boolean.TRUE : Boolean.FALSE;
-            }
+
+        if (podeExibir) {
+            ExDocumento docPai = getPaiDasViasCossigsSubscritor(doc);
+            return (docPai != null && docPai.getIdDoc() != null && !docPai.equals(doc)) ? Boolean.TRUE : Boolean.FALSE;
         }
+
         return Boolean.FALSE;
+    }
+
+    public ExDocumento getPaiDasViasCossigsSubscritor(ExDocumento docFilho) {
+        if (docFilho != null) {
+            List<ExDocumento> viasDocPai = docFilho.getTodosOsPaisDasViasCossigsSubscritor();
+            if (viasDocPai.iterator().hasNext())
+                return viasDocPai.iterator().next();
+        }
+        return null;
     }
 
     public boolean possuiInclusaoCossigsSubscritor(ExDocumento doc) {
@@ -203,7 +209,7 @@ public class ExVisualizacaoTempDocCompl {
         DpPessoa subscrAssinante = getUsuarioDoTokenPosAssinatura(doc.getListaCossigsSubscritorAssinouDocHoje(), usuarioDoToken);
         if (subscrAssinante != null) {
             List<ExDocumento> listaViasDocPai = doc.getTodosOsPaisDasViasCossigsSubscritor();
-            removerCossigsESubscritorVisTempDocsCompl(cadastrante, lotaCadastrante, doc, listaViasDocPai, Arrays.asList(subscrAssinante), TEXTO_REMOCAO_TEMP_ASSINATURA);
+            removerCossigsESubscritorVisTempDocsCompl(cadastrante, lotaCadastrante, doc, listaViasDocPai, Arrays.asList(subscrAssinante), getTextoRemocaoTempAssinatura());
         }
     }
 
@@ -359,13 +365,13 @@ public class ExVisualizacaoTempDocCompl {
     private void removerSubscrCossigsVisTempDocsComplDocAtual(DpPessoa cadastrante, DpLotacao lotaCadastrante,
                                                               ExDocumento doc, List<DpPessoa> listaSubscrCancelMovPapel) throws Exception {
         List<ExDocumento> listaViasDoc = Arrays.asList(doc);
-        removerCossigsESubscritorVisTempDocsCompl(cadastrante, lotaCadastrante, doc, listaViasDoc, listaSubscrCancelMovPapel, TEXTO_REMOCAO_TEMP);
+        removerCossigsESubscritorVisTempDocsCompl(cadastrante, lotaCadastrante, doc, listaViasDoc, listaSubscrCancelMovPapel, getTextoRemocaoTemp());
     }
 
     private void removerSubscrCossigsVisTempDocsComplDocPai(DpPessoa cadastrante, DpLotacao lotaCadastrante,
                                                             ExDocumento doc, List<DpPessoa> listaSubscrCancelMovPapel) throws Exception {
         List<ExDocumento> listaViasDoc = doc.getTodosOsPaisDasViasCossigsSubscritor();
-        removerCossigsESubscritorVisTempDocsCompl(cadastrante, lotaCadastrante, doc, listaViasDoc, listaSubscrCancelMovPapel, TEXTO_REMOCAO_TEMP);
+        removerCossigsESubscritorVisTempDocsCompl(cadastrante, lotaCadastrante, doc, listaViasDoc, listaSubscrCancelMovPapel, getTextoRemocaoTemp());
     }
 
     private void removerCossigsESubscritorVisTempDocsCompl(DpPessoa cadastrante,
@@ -386,11 +392,17 @@ public class ExVisualizacaoTempDocCompl {
             // Remover de todas as vias doc pai
             for (ExDocumento docPai : listaViasDocPai) {
                 for (DpPessoa subscritor : listaSubscritor) {
-                    descrMov.append(" ").append(subscritor.getDescricaoIniciaisMaiusculas()).append(" - DOC ORIGEM:")
-                            .append(codDocOrigem);
-                    List<ExMovimentacao> movsPersist = getMovsCossigsSubscritorPorDocOrigem(movsCossigResp, subscritor,
-                            docOrigem.getMobilGeral());
-                    exBL.removerPapel(docPai, movsPersist, codigoPapel, cadastrante, descrMov.toString());
+                    String strMov = descrMov.toString()
+                            + " " + subscritor.getDescricaoIniciaisMaiusculas()
+                            + " - DOC ORIGEM:" + codDocOrigem;
+
+                    List<ExMovimentacao> movsPersist = getMovsCossigsSubscritorPorDocOrigem(
+                            movsCossigResp,
+                            subscritor,
+                            docOrigem.getMobilGeral()
+                    );
+
+                    exBL.removerPapel(docPai, movsPersist, codigoPapel, cadastrante, strMov);
                 }
             }
         }
@@ -446,14 +458,6 @@ public class ExVisualizacaoTempDocCompl {
         return descrMovInsercao.toString();
     }
 
-    private static String getNomeSubscritorOuCossignatario(long idPapel) {
-        if (idPapel == PAPEL_AUTORIZ_SUBSCR)
-            return "Responsável pela Assinatura";
-        if (idPapel == PAPEL_AUTORIZ_COSSIG)
-            return "Cossignatário";
-        return "";
-    }
-
     private List<ExMovimentacao> getMovsCossigsSubscritorPorDocOrigem(List<ExMovimentacao> movs, DpPessoa subscritor,
                                                                       ExMobil mobRefMov) {
         List<ExMovimentacao> movsPessoa = new ArrayList<ExMovimentacao>();
@@ -485,5 +489,21 @@ public class ExVisualizacaoTempDocCompl {
                 return Boolean.TRUE;
         }
         return Boolean.FALSE;
+    }
+
+    private static String getNomeSubscritorOuCossignatario(long idPapel) {
+        if (idPapel == PAPEL_AUTORIZ_SUBSCR)
+            return "Responsável pela Assinatura";
+        if (idPapel == PAPEL_AUTORIZ_COSSIG)
+            return "Cossignatário";
+        return "";
+    }
+
+    private StringBuffer getTextoRemocaoTemp() {
+        return new StringBuffer("Remoção de Cossignatário ou Responsável pela Assinatura Documento Temporário concluída:");
+    }
+
+    private StringBuffer getTextoRemocaoTempAssinatura() {
+        return new StringBuffer("Assinatura de Cossignatário ou Responsável pela Assinatura concluída:");
     }
 }

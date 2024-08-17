@@ -12,44 +12,45 @@
              onLoad="try{var num = document.getElementById('id_number');if (num.value == ''){num.focus();num.select();}else{var cap = document.getElementById('id_captcha');cap.focus();cap.select();}}catch(e){};">
     <div class="container-fluid">
     <div class="row">
-        <div class="col col-12 col-sm-8">
+        <div class="col col-12 col-sm-8" style="margin: 0 auto">
             <div class="card bg-light mb-3">
                 <div class="card-header">
                     <h5>
-                        Acompanhamento e Autenticação de Protocolo - Documento <b>${sigla}</b>
+                        Acompanhamento e Autenticação de Protocolo</b>
                     </h5>
                 </div>
-                <!--
-					<div class="card-body">
-						<div>
-							<c:url var='pdfAssinado'
-								value='/public/app/processoArquivoAutenticado_stream?jwt=${jwt}&assinado=true' />
-							<c:url var='pdf'
-								value='/public/app/processoArquivoAutenticado_stream?jwt=${jwt}&assinado=false' />
-							<iframe src="${pdfAssinado}" width="100%" height="600" align="center" style="margin-top: 10px;"> </iframe>
-						</div>
-					</div>
-					-->
+                <div class="card-body">
+                    <c:if test="${not empty docVO}">
+                        <p class="p-0 m-0">
+                            <b>Documento ${docVO.tipoDocumento}:</b> ${sigla}
+                        </p>
+                        <p class="p-0 m-0">
+                            <b>Protocolo:</b> ${protocolo}
+                        </p>
+                        <p class="p-0 m-0">
+                            <b>Classifica&ccedil;&atilde;o:</b> ${docVO.classificacaoDescricaoCompleta}
+                        </p>
+                        <p class="p-0 m-0">
+                            <b>Descri&ccedil;&atilde;o:</b> ${docVO.descrDocumento}
+                        </p>
+                        <c:if test="${not empty docVO.destinatarioString}">
+                            <p class="p-0 m-0">
+                                <b>Para:</b> ${docVO.destinatarioString}
+                            </p>
+                        </c:if>
+                        <p class="p-0 m-0">
+                            <b>Cadastrante:</b> ${docVO.cadastranteString} ${docVO.lotaCadastranteString}
+                        </p>
+                        <p class="p-0 m-0">
+                            <b>Espécie:</b> ${docVO.forma}
+                        </p>
+                        <p class="p-0 m-0">
+                            <b>Autentica&ccedil;&atilde;o/Assinatura:</b> ${autenticacao}
+                        </p>
+                    </c:if>
+                </div>
             </div>
         </div>
-        <!--
-			<div class="col">
-				<div class="row">
-					<div class="col">
-						<div class="card bg-light mb-3" >
-							<div class="card-header">
-								<h5>
-									<i class="fa fa-file-pdf"></i> Arquivos para Download
-								</h5>
-							</div>
-							<div class="card-body">
-								<i class="fa fa-angle-double-right"></i> <a href="${pdf}" target="_blank">PDF do documento</a>
-							</div>
-						</div>
-					</div>
-				</div>				
-			</div>
-			-->
     </div>
     <div class="row">
         <div class="col-12">
@@ -116,7 +117,7 @@
                                 </tr>
                                 </thead>
                                 <c:set var="evenorodd" value="odd"/>
-                                <%--@elvariable id="mov" type="br.gov.jfrj.siga.ex.ExMovimentacao"--%>
+                                    <%--@elvariable id="mov" type="br.gov.jfrj.siga.ex.ExMovimentacao"--%>
                                 <c:forEach var="mov" items="${movs}">
                                     <tr class="${mov.cancelada ? 'disabled' : ''}">
                                         <c:set var="dt" value="${mov.dtRegMovDDMMYYYYHHMMSS}"/>

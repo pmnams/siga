@@ -581,13 +581,44 @@ public enum ExTipoDeConfiguracao implements ITipoDeConfiguracao {
             CpSituacaoDeConfiguracaoEnum.NAO_PODE},
             CpSituacaoDeConfiguracaoEnum.NAO_PODE, true),
 
-    VISUALIZAR_TEMP_DOCS_COMPL_SUBSCRITOR_COSSIGNATARIO(60, "Exibir Documentos Completo para Subscritores e Cossignatários",
-            "Essa configuração permite exibir Documentos Completo para Subscritores e Cossignatários, tendo como vínculo movimentação de juntadas e documentos inclusos. Você pode configurar "
+    VISUALIZAR_TEMP_DOCS_COMPL_SUBSCRITOR_COSSIGNATARIO(
+            60,
+            "Exibir Documentos Completo para Subscritores e Cossignatários",
+            "Essa configuração permite exibir Documentos Completo para Subscritores e Cossignatários,"
+                    + "tendo como vínculo movimentação de juntadas e documentos inclusos. Você pode configurar "
                     + "para Orgão, Unidade/Lotação e Usuário.  ",
-            new Enum[]{CpParamCfg.ORGAO, CpParamCfg.LOTACAO, CpParamCfg.PESSOA},
+            new Enum[]{
+                    CpParamCfg.ORGAO,
+                    CpParamCfg.LOTACAO,
+                    CpParamCfg.PESSOA},
+            new Enum[]{CpParamCfg.SITUACAO
+            },
+            new CpSituacaoDeConfiguracaoEnum[]{
+                    CpSituacaoDeConfiguracaoEnum.PODE,
+                    CpSituacaoDeConfiguracaoEnum.NAO_PODE
+            },
+            CpSituacaoDeConfiguracaoEnum.NAO_PODE,
+            true
+    ),
+
+    RESTRINGIR_VINCULACAO_DO_ORGAO_NO_CAMPO_BUSCAR(
+            61,
+            "Restringir Vinculação do Órgão no Campo Busca",
+            "Esta configuração define que esse órgão poderá ser exibido aos usuários de outros órgãos.",
+            new Enum[]{
+                    CpParamCfg.PESSOA,
+                    CpParamCfg.LOTACAO,
+                    CpParamCfg.CARGO,
+                    CpParamCfg.FUNCAO,
+                    CpParamCfg.ORGAO
+            },
             new Enum[]{CpParamCfg.SITUACAO},
-            new CpSituacaoDeConfiguracaoEnum[]{CpSituacaoDeConfiguracaoEnum.PODE, CpSituacaoDeConfiguracaoEnum.NAO_PODE},
-            CpSituacaoDeConfiguracaoEnum.NAO_PODE, true
+            new CpSituacaoDeConfiguracaoEnum[]{
+                    CpSituacaoDeConfiguracaoEnum.PODE,
+                    CpSituacaoDeConfiguracaoEnum.NAO_PODE
+            },
+            CpSituacaoDeConfiguracaoEnum.PODE,
+            true
     );
 
     private final int id;

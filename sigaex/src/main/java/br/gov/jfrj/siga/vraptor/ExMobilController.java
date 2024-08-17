@@ -33,11 +33,13 @@ import br.gov.jfrj.siga.cp.model.CpOrgaoSelecao;
 import br.gov.jfrj.siga.cp.model.DpLotacaoSelecao;
 import br.gov.jfrj.siga.cp.model.DpPessoaSelecao;
 import br.gov.jfrj.siga.cp.model.enm.CpTipoDeConfiguracao;
+import br.gov.jfrj.siga.dp.CpOrgaoUsuario;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.*;
 import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.bl.ExBL;
 import br.gov.jfrj.siga.ex.logic.ExPodePorConfiguracao;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.model.GenericoSelecao;
 import br.gov.jfrj.siga.model.Selecionavel;
@@ -118,7 +120,7 @@ public class ExMobilController extends
                         final ExClassificacaoSelecao classificacaoSel, final String descrDocumento, final String fullText, final Long ultMovEstadoDoc,
                         final Integer paramoffset) {
         assertAcesso("");
-        Integer maxDiasPesquisa = Prop.getInt("/siga.pesquisa.limite.dias");
+        Integer maxDiasPesquisa = Prop.getInt("/siga.pesquisa.limite.dias", 31);
 
         if (Prop.getBool("atualiza.anotacao.pesquisa"))
             SigaTransacionalInterceptor.upgradeParaTransacional();
@@ -159,9 +161,12 @@ public class ExMobilController extends
             if (Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(getTitular(), getLotaTitular(),
                     SIGA_DOC_PESQ_DTLIMITADA)) {
                 result.include("msgCabecClass", "alert-warning");
-                result.include("mensagemCabec", "ATENÇÃO: Para os órgãos com grande demanda de documentos, a pesquisa deve ser limitada com uma range de datas de no máximo "
-                        + maxDiasPesquisa.toString() + " dias. Será assumida uma data inicial "
-                        + maxDiasPesquisa.toString() + " dias anterior à hoje.");
+                result.include(
+                        "mensagemCabec",
+                        "ATENÇÃO: Para os órgãos com grande demanda de documentos, a pesquisa deve ser limitada com uma range de datas de no máximo "
+                        + maxDiasPesquisa + " dias. Será assumida uma data inicial "
+                        + maxDiasPesquisa + " dias anterior à hoje."
+                );
             }
         }
         DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -457,11 +462,26 @@ public class ExMobilController extends
             if (Cp.getInstance().getConf().podeUtilizarServicoPorConfiguracao(getTitular(), getLotaTitular(),
                     SIGA_DOC_PESQ_DTLIMITADA)) {
                 result.include("msgCabecClass", "alert-warning");
-                result.include("mensagemCabec", "ATENÇÃO: Para os órgãos com grande demanda de documentos, a pesquisa deve ser limitada com uma range de datas de no máximo "
-                        + maxDiasPesquisa.toString() + " dias. Será assumida uma data inicial "
-                        + maxDiasPesquisa.toString() + " dias anterior à hoje.");
+                result.include(
+                        "mensagemCabec",
+                        "ATENÇÃO: Para os órgãos com grande demanda de documentos, a pesquisa deve ser limitada com uma range de datas de no máximo "
+                        + maxDiasPesquisa + " dias. Será assumida uma data inicial "
+                        + maxDiasPesquisa + " dias anterior à hoje."
+                );
             }
         }
+
+        List<CpOrgaoUsuario> orgaos = this.getOrgaosUsu();
+        try {
+            Cp.getInstance().getConf().podePorConfiguracao(
+                    getTitular(),
+                    getLotaTitular(),
+                    ExTipoDeConfiguracao.RESTRINGIR_VINCULACAO_DO_ORGAO_NO_CAMPO_BUSCAR
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
         result.include("primeiraVez", primeiraVez);
@@ -476,7 +496,7 @@ public class ExMobilController extends
         result.include("ultMovTipoResp", builder.getUltMovTipoResp());
         result.include("ultMovRespSel", builder.getUltMovRespSel());
         result.include("orgaoUsu", builder.getOrgaoUsu());
-        result.include("orgaosUsu", this.getOrgaosUsu());
+        result.include("orgaosUsu", orgaos);
         result.include("tiposDocumento", this.getTiposDocumentoParaConsulta());
         result.include("idTpDoc", builder.getIdTpDoc());
         result.include("dtDocString", (flt.getDtDoc() != null ? df.format(flt.getDtDoc()) : null));

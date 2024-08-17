@@ -1250,9 +1250,13 @@ public class ExMovimentacaoController extends ExController {
 
         //Exibir ou nao Checkbox para acesso que Cossignatarios acessem documentos completos
         result.include("podeExibirArvoreDocsCossig", podeExibirArvoreDocsCossig);
-        if (podeExibirArvoreDocsCossig)
+        if (podeExibirArvoreDocsCossig) {
             //Check automatico de checkbox cossignatarios
             result.include("podeIncluirCossigArvoreDocs", doc.paiPossuiMovsVinculacaoPapel(ExPapel.PAPEL_AUTORIZADO_COSSIG) || doc.possuiMovsVinculacaoPapel(ExPapel.PAPEL_AUTORIZADO_COSSIG));
+
+            ExDocumento exPaiDasViasCossigsSubscritor = getExConsTempDocCompleto().getPaiDasViasCossigsSubscritor(doc);
+            result.include("paiDasViasCossigsSubscritor", exPaiDasViasCossigsSubscritor != null ? exPaiDasViasCossigsSubscritor.getCodigo() : "");
+        }
     }
 
     @Transacional

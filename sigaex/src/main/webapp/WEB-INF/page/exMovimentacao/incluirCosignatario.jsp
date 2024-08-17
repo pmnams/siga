@@ -113,8 +113,7 @@
                                    class="form-check-input ml-3"
                                    <c:if test="${podeIncluirCossigArvoreDocs}">checked</c:if>
                                    onchange="incluirExcluirAcessoTempArvoreDocs(this);"/>
-                            <label class="form-check-label" for="podeIncluirCossigArvoreDocsCheck">Acessar Documento
-                                Completo</label>
+                            <label class="form-check-label" for="podeIncluirCossigArvoreDocsCheck">Acessar Documento ${paiDasViasCossigsSubscritor}</label>
                             <a class="fas fa-info-circle text-secondary ml-1" data-toggle="tooltip" data-trigger="click"
                                data-placement="bottom"
                                title='Selecionar esse campo se houver a necessidade de permitir que o(s) cossignatário(s) acesse(m) o documento completo, enquanto o mesmo estiver pendente
