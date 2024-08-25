@@ -1356,7 +1356,7 @@ public class CpDao extends ModeloDao {
             if (flt.getNmMatricula() != null)
                 query.setParameter("nmMatricula", flt.getNmMatricula());
             else
-                query.setParameter("nmMatricula", 0L);
+                query.setParameter("nmMatricula", "");
 
             if (flt.getLotacao() != null)
                 query.setParameter("lotacao", flt.getLotacao().getId());
@@ -1479,7 +1479,7 @@ public class CpDao extends ModeloDao {
             if (flt.getNmMatricula() != null)
                 query.setParameter("nmMatricula", flt.getNmMatricula());
             else
-                query.setParameter("nmMatricula", 0L);
+                query.setParameter("nmMatricula", "");
 
             if (flt.getLotacao() != null)
                 query.setParameter("lotacao", flt.getLotacao().getId());
@@ -1766,7 +1766,7 @@ public class CpDao extends ModeloDao {
         return pessoasPorLotacao(id, incluirSublotacoes, somenteServidor, SituacaoFuncionalEnum.APENAS_ATIVOS);
     }
 
-    public DpPessoa consultarPorCpfMatricula(final long cpf, long matricula) {
+    public DpPessoa consultarPorCpfMatricula(final long cpf, String matricula) {
 
         final Query qry = em().createNamedQuery("consultarPorCpfMatricula");
         qry.setParameter("cpfPessoa", cpf);
@@ -2349,7 +2349,7 @@ public class CpDao extends ModeloDao {
         }
     }
 
-    public List<DpPessoa> consultarPorMatriculaEOrgao(Long matricula, Long idOrgaoUsu, boolean pessoasFinalizadas,
+    public List<DpPessoa> consultarPorMatriculaEOrgao(String matricula, Long idOrgaoUsu, boolean pessoasFinalizadas,
                                                       boolean ordemDesc) {
         CriteriaQuery<DpPessoa> q = cb().createQuery(DpPessoa.class);
         Root<DpPessoa> c = q.from(DpPessoa.class);

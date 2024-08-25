@@ -32,7 +32,7 @@ public class DpPessoaDaoFiltro extends DaoFiltroSelecionavel {
 
     private String nome;
     private Long idOrgaoUsu;
-    private Long nmMatricula;
+    private String nmMatricula;
     private Long cpf;
     private Long id;
     private String email;
@@ -66,11 +66,11 @@ public class DpPessoaDaoFiltro extends DaoFiltroSelecionavel {
         this.idOrgaoUsu = idOrgaoUsu;
     }
 
-    public Long getNmMatricula() {
+    public String getNmMatricula() {
         return nmMatricula;
     }
 
-    public void setNmMatricula(Long nmMatricula) {
+    public void setNmMatricula(String nmMatricula) {
         this.nmMatricula = nmMatricula;
     }
 

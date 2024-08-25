@@ -750,7 +750,7 @@ public class SigaCpSinc {
 			 * pessoa.getSiglaPessoa(), parseStr(parser, "id"));
 			 */
 			pessoa.setPadraoReferencia(parseStr(parser, "padraoReferencia"));
-			pessoa.setMatricula(parseLong(parser, "matricula"));
+			pessoa.setMatricula(parseStr(parser, "matricula"));
 			criarUnicidade(cpOrgaoUsuario.getSiglaOrgaoUsu(), "pessoa", "matricula",
 					pessoa.getSesbPessoa() + pessoa.getMatricula(), parseStr(parser, "id"));
 			pessoa.setOrgaoUsuario(cpOrgaoUsuario);
@@ -824,9 +824,6 @@ public class SigaCpSinc {
 				 * obterTipoPessoaPorId(Integer.valueOf(parseStr(parser, "tipo_rh")));
 				 * pessoa.setCpTipoPessoa(o);
 				 */
-			} else {
-				// inferir tipo de pessoa para a SJRJ se vier nulo no XML
-				inferirTipoPessoaSJRJ(pessoa);
 			}
 		} catch (Exception e) {
 			throw e;
@@ -919,7 +916,7 @@ public class SigaCpSinc {
 			return null;
 		}
 
-	}
+    }
 
 	private String parseStr(XmlPullParser parser, String campo) {
 		String s = parser.getAttributeValue(null, campo);
@@ -1006,48 +1003,6 @@ public class SigaCpSinc {
 		} else {
 			// Se é exceção, trata como administrativo
 			lot.setCpTipoLotacao(obterTipoLotacaoPorId(Long.valueOf("1")));
-		}
-		return;
-	}
-
-	/**
-	 * Atribui o tipo de pessoa caso ela seja da SJRJ (Provisório)
-	 * 
-	 * @throws Exception
-	 * 
-	 */
-	public void inferirTipoPessoaSJRJ(DpPessoa pes) throws Exception {
-		CpOrgaoUsuario org = pes.getOrgaoUsuario();
-		// SJRJ
-		CpOrgaoUsuario orguSJRJ = obterOrgaoUsuarioSJRJ();
-		if (orguSJRJ != null && org.getSigla().equals(orguSJRJ.getSigla())) {
-			if (pes.getMatricula() != null) {
-				long mat = pes.getMatricula().longValue();
-				int tipid = -1;
-				if (mat >= 10000L && mat <= 14999L) {
-					// servidor (2)
-					tipid = 2;
-				} else if (mat >= 15000L && mat <= 15999L) {
-					// servidor requisitado (2)
-					tipid = 2;
-				} else if (mat >= 16000L && mat <= 17999L) {
-					// magistrado (1)
-					tipid = 1;
-				} else if (mat >= 20000L && mat <= 29999L) {
-					// aposentados na época da implantação do SIRH (2)
-					tipid = 2;
-				} else if (mat >= 30000L && mat <= 69999L) {
-					// Estagiários (3)
-					tipid = 3;
-				} else {
-					// TODO: _LAGS - Verificar como identificar tercerizados
-					return;
-				}
-				CpTipoPessoa tpes = obterTipoPessoaPorId(Integer.valueOf(tipid));
-				if (tpes != null) {
-					pes.setCpTipoPessoa(tpes);
-				}
-			}
 		}
 		return;
 	}

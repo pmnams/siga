@@ -198,7 +198,7 @@ public class CpDaoTest extends TestCase {
 
 		DpPessoa pesSigla = new DpPessoa();
 		pesSigla.setSesbPessoa("RJ");
-		pesSigla.setMatricula(13635L);
+		pesSigla.setMatricula("13635");
 		DpPessoa pes = dao.consultarPorSigla(pesSigla);
 
 		System.out.println(pes.getSigla() + " - " + pes.getDescricao());
