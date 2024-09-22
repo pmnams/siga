@@ -8463,4 +8463,16 @@ public class ExBL extends CpBL {
         }
     }
 
+    //Esse método remove da coleção que será iterada e renderizada na view (não persiste nada no banco)
+    //os órgão que não querem ser vistos por outros órgãos no sistema.
+    public List<CpOrgaoUsuario> removeOrgaosRestritos(List<CpOrgaoUsuario> orgaos, DpPessoa pessoa, DpLotacao lotacao) {
+        Iterator<CpOrgaoUsuario> i = orgaos.iterator();
+        while (i.hasNext()) {
+            CpOrgaoUsuario org = i.next();
+            if (!new ExPodeRestringirOrgao(pessoa, lotacao, org).eval())
+                i.remove();
+
+        }
+        return orgaos;
+    }
 }

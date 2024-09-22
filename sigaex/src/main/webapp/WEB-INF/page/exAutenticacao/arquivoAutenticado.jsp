@@ -1,3 +1,5 @@
+<%--suppress XmlPathReference --%>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          buffer="64kb" %>
@@ -7,6 +9,11 @@
 <%@ taglib uri="http://localhost/jeetags" prefix="siga" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://localhost/functiontag" prefix="f" %>
+
+<%--@elvariable id="jwt" type="String"--%>
+<%--@elvariable id="assinaturas" type="java.util.Set<br.gov.jfrj.siga.ex.ExMovimentacao>"--%>
+<%--@elvariable id="assinaturas" type="java.util.Set<br.gov.jfrj.siga.ex.ExMovimentacao>"--%>
+
 
 <siga:pagina titulo="Movimentação" desabilitarmenu="sim"
              onLoad="try{var num = document.getElementById('id_number');if (num.value == ''){num.focus();num.select();}else{var cap = document.getElementById('id_captcha');cap.focus();cap.select();}}catch(e){};">
@@ -113,7 +120,7 @@
                         <c:forEach var="m" items="${docVO.mobs}" varStatus="loop">
                             <c:if test="${f:podeUtilizarServicoPorConfiguracao(titular,lotaTitular,'SIGA:Sistema Integrado de Gestão Administrativa;WF:Módulo de Workflow')}">
                                 <script type="text/javascript">
-                                    var url = "/sigawf/app/doc?sigla=${m.sigla}&ts=1${currentTimeMillis}";
+                                    var url = "/sigawf/app/doc?sigla=${m.sigla}&amp;ts=1${currentTimeMillis}";
 
                                     $.ajax({
                                         url: url,

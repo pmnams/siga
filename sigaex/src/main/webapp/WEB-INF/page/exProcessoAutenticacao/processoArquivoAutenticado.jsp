@@ -1,179 +1,194 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-         buffer="64kb" %>
+<!DOCTYPE html>
+<%@ page contentType="text/html; charset=UTF-8" buffer="64kb" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
 <%@ taglib uri="http://localhost/customtag" prefix="tags" %>
 <%@ taglib uri="http://localhost/jeetags" prefix="siga" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://localhost/functiontag" prefix="f" %>
 
-<siga:pagina titulo="Movimentação" desabilitarmenu="sim"
-             onLoad="try{var num = document.getElementById('id_number');if (num.value == ''){num.focus();num.select();}else{var cap = document.getElementById('id_captcha');cap.focus();cap.select();}}catch(e){};">
+<%--@elvariable id="jwt" type="String"--%>
+<%--@elvariable id="sigla" type="String"--%>
+<%--@elvariable id="protocolo" type="String"--%>
+<%--@elvariable id="autenticacao" type="String"--%>
+<%--@elvariable id="podeVisualizarExternamente" type="Boolean"--%>
+<%--@elvariable id="docVO" type="br.gov.jfrj.siga.ex.vo.ExDocumentoVO"--%>
+<%--@elvariable id="movs" type="java.util.List<br.gov.jfrj.siga.ex.vo.ExMovimentacao>"--%>
+<%--@elvariable id="titular" type="br.gov.jfrj.siga.dp.DpPessoa"--%>
+<%--@elvariable id="lotaTitular" type="br.gov.jfrj.siga.dp.DpLotacao"--%>
+<%--@elvariable id="cadastrante" type="br.gov.jfrj.siga.dp.DpPessoa"--%>
+<%--@elvariable id="isProtocoloFilho" type="java.lang.Boolean"--%>
+
+<script type="text/javascript">
+    function pageOnLoad() {
+        try {
+            const num = document.getElementById('id_number');
+            if (num.value === '') {
+                num.focus();
+                num.select();
+            } else {
+                const cap = document.getElementById('id_captcha');
+                cap.focus();
+                cap.select();
+            }
+        } catch (e) {
+        }
+    }
+</script>
+
+
+<siga:pagina titulo="Movimentação" desabilitarmenu="sim" onLoad=" pageOnLoad()">
     <div class="container-fluid">
-    <div class="row">
-        <div class="col col-12 col-sm-8" style="margin: 0 auto">
-            <div class="card bg-light mb-3">
-                <div class="card-header">
-                    <h5>
-                        Acompanhamento e Autenticação de Protocolo</b>
+        <div class="row">
+            <div class="col ${podeVisualizarExternamente ? 'col-12 col-sm-8' : 'col-auto'}" style="${podeVisualizarExternamente ? 'margin: 0 auto' : ''}">
+                <div class="card bg-light mb-3">
+                    <h5 class="card-header">
+                        Autenticação de Protocolo${podeVisualizarExternamente ? '' : ' - '.concat(sigla)}
                     </h5>
-                </div>
-                <div class="card-body">
-                    <c:if test="${not empty docVO}">
-                        <p class="p-0 m-0">
-                            <b>Documento ${docVO.tipoDocumento}:</b> ${sigla}
-                        </p>
-                        <p class="p-0 m-0">
-                            <b>Protocolo:</b> ${protocolo}
-                        </p>
-                        <p class="p-0 m-0">
-                            <b>Classifica&ccedil;&atilde;o:</b> ${docVO.classificacaoDescricaoCompleta}
-                        </p>
-                        <p class="p-0 m-0">
-                            <b>Descri&ccedil;&atilde;o:</b> ${docVO.descrDocumento}
-                        </p>
-                        <c:if test="${not empty docVO.destinatarioString}">
+
+                    <c:if test="${not empty docVO  && podeVisualizarExternamente}">
+                        <div class="card-body">
                             <p class="p-0 m-0">
-                                <b>Para:</b> ${docVO.destinatarioString}
+                                <b>Documento ${docVO.tipoDocumento}:</b> ${sigla}
                             </p>
-                        </c:if>
-                        <p class="p-0 m-0">
-                            <b>Cadastrante:</b> ${docVO.cadastranteString} ${docVO.lotaCadastranteString}
-                        </p>
-                        <p class="p-0 m-0">
-                            <b>Espécie:</b> ${docVO.forma}
-                        </p>
-                        <p class="p-0 m-0">
-                            <b>Autentica&ccedil;&atilde;o/Assinatura:</b> ${autenticacao}
-                        </p>
+                            <p class="p-0 m-0">
+                                <b>Protocolo:</b> ${protocolo}
+                            </p>
+                            <p class="p-0 m-0">
+                                <b>Classifica&ccedil;&atilde;o:</b> ${docVO.classificacaoDescricaoCompleta}
+                            </p>
+                            <p class="p-0 m-0">
+                                <b>Descri&ccedil;&atilde;o:</b> ${docVO.descrDocumento}
+                            </p>
+                            <c:if test="${not empty docVO.destinatarioString}">
+                                <p class="p-0 m-0">
+                                    <b>Para:</b> ${docVO.destinatarioString}
+                                </p>
+                            </c:if>
+                            <p class="p-0 m-0">
+                                <b>Cadastrante:</b> ${docVO.cadastranteString} ${docVO.lotaCadastranteString}
+                            </p>
+                            <p class="p-0 m-0">
+                                <b>Espécie:</b> ${docVO.forma}
+                            </p>
+                            <p class="p-0 m-0">
+                                <b>Autentica&ccedil;&atilde;o/Assinatura:</b> ${autenticacao}
+                            </p>
+                        </div>
                     </c:if>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <c:if test="${not empty docVO}">
-            <div class="card bg-light mb-3">
-                <div class="card-header">
-                    <h5>
-                        Últimas Movimentações
-                    </h5>
-                </div>
-                <div class="card-body">
-
-                    <c:forEach var="m" items="${docVO.mobs}" varStatus="loop">
-                        <c:if test="${f:podeUtilizarServicoPorConfiguracao(titular,lotaTitular,'SIGA:Sistema Integrado de Gestão Administrativa;WF:Módulo de Workflow')}">
-                            <script type="text/javascript">
-                                var url = "/sigawf/app/doc?sigla=${m.sigla}&ts=1${currentTimeMillis}";
-                                $.ajax({
-                                    url: url,
-                                    type: "GET"
-                                }).fail(function (jqXHR, textStatus, errorThrown) {
-                                    var div = $(".wf_div${m.mob.codigoCompacto}:last");
-                                    $(div).html(errorThrown);
-                                }).done(function (data, textStatus, jqXHR) {
-                                    var div = $(".wf_div${m.mob.codigoCompacto}:last");
-                                    $(div).html(data);
-                                });
-                            </script>
-                        </c:if>
-                        <li style="margin-top: 10px; margin-bottom: 0px;">
-                                ${m.getDescricaoCompletaEMarcadoresEmHtml(cadastrante,lotaTitular)}
-                            <c:if test="${docVO.digital and not empty m.tamanhoDeArquivo}">
-                                - ${m.tamanhoDeArquivo}
+        <div class="row">
+            <div class="col-12">
+                <c:if test="${not empty docVO}">
+                <div class="card bg-light mb-3">
+                    <h5 class="card-header">Últimas Movimentações</h5>
+                    <div class="card-body">
+                        <c:forEach var="m" items="${docVO.mobs}" varStatus="loop">
+                            <c:if test="${f:podeUtilizarServicoPorConfiguracao(titular,lotaTitular,'SIGA:Sistema Integrado de Gestão Administrativa;WF:Módulo de Workflow')}">
+                                <script type="text/javascript">
+                                    const url = "/sigawf/app/doc?sigla=${m.sigla}";
+                                    $.ajax({
+                                        url: url,
+                                        type: "GET"
+                                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                                        const div = $(".wf_div${m.mob.codigoCompacto}:last");
+                                        $(div).html(errorThrown);
+                                    }).done(function (data, textStatus, jqXHR) {
+                                        const div = $(".wf_div${m.mob.codigoCompacto}:last");
+                                        $(div).html(data);
+                                    });
+                                </script>
                             </c:if>
-                        </li>
-                        <c:set var="ocultarCodigo" value="${true}"/>
-                        <c:set var="dtUlt" value=""/>
-                        <c:set var="temmov" value="${false}"/>
-                        <c:forEach var="mov" items="${movs}">
-                            <c:if test="${ (exibirCompleto == true) or (mov.exTipoMovimentacao != 'CANCELAMENTO_DE_MOVIMENTACAO' and not mov.cancelada)}">
-                                <c:set var="temmov" value="${true}"/>
-                            </c:if>
-                        </c:forEach>
-                        <div class="gt-content-box gt-for-table" style="margin-bottom: 25px;">
-                            <table class="table table-striped">
-                                <thead class="bg-dark text-white">
-                                <tr>
-                                    <th align="left" rowspan="2">Data</th>
-                                    <th rowspan="2">Evento</th>
-                                    <th colspan="2" align="left">Cadastrante</th>
-                                    <c:if test="${ (exibirCompleto == 'true')}">
-                                        <th colspan="2" align="left">Responsável</th>
-                                    </c:if>
-                                    <th colspan="2" align="left">Atendente</th>
-                                </tr>
-                                <tr>
-                                    <th align="left">Lotação</th>
-                                    <th align="left">Pessoa</th>
-                                    <c:if test="${ (exibirCompleto == 'true')}">
+                            <li class="ml-0" style="margin-top: 10px; margin-bottom: 0;">
+                                    ${m.getDescricaoCompletaEMarcadoresEmHtml(cadastrante,lotaTitular)}
+                                <c:if test="${docVO.digital and not empty m.tamanhoDeArquivo}">
+                                    - ${m.tamanhoDeArquivo}
+                                </c:if>
+                            </li>
+                            <c:set var="ocultarCodigo" value="${true}"/>
+                            <c:set var="dtUlt" value=""/>
+                            <c:set var="temmov" value="${false}"/>
+                            <c:forEach var="mov" items="${movs}">
+                                <c:if test="${mov.exTipoMovimentacao != 'CANCELAMENTO_DE_MOVIMENTACAO' and not mov.cancelada}">
+                                    <c:set var="temmov" value="${true}"/>
+                                </c:if>
+                            </c:forEach>
+                            <div class="gt-content-box gt-for-table" style="margin-bottom: 25px;">
+                                <table class="table table-striped">
+                                    <thead class="bg-dark text-white">
+                                    <tr>
+                                        <th align="left" rowspan="2">Data</th>
+                                        <th rowspan="2">Evento</th>
+                                        <th colspan="2" align="left">Cadastrante</th>
+                                        <th colspan="2" align="left">Atendente</th>
+                                    </tr>
+                                    <tr>
                                         <th align="left">Lotação</th>
                                         <th align="left">Pessoa</th>
-                                    </c:if>
-                                    <th align="left">Lotação</th>
-                                    <th align="left">Pessoa</th>
-                                </tr>
-                                </thead>
-                                <c:set var="evenorodd" value="odd"/>
-                                    <%--@elvariable id="mov" type="br.gov.jfrj.siga.ex.ExMovimentacao"--%>
-                                <c:forEach var="mov" items="${movs}">
-                                    <tr class="${mov.cancelada ? 'disabled' : ''}">
-                                        <c:set var="dt" value="${mov.dtRegMovDDMMYYYYHHMMSS}"/>
-                                        <td align="left">${dt}</td>
-                                        <td align="left">${mov.descrTipoMovimentacao}
-                                            <c:if test="${mov.exTipoMovimentacao == 'JUNTADA'}">
-													<span style="font-size: .8rem;color: #9e9e9e;">| documento juntado&nbsp
-														<c:choose>
-                                                            <c:when test="${m.sigla ne mov.exMobil.sigla}">
-                                                                ${mov.exMobil}
-                                                                <c:if test="${(((not isProtocoloFilho)
-																			or (mov.exMobil.doc.descricaoEspecieDespacho)) 
-																		and (mov.exMobil.exibirNoAcompanhamento) and mov.exMobil.juntado)}">
-                                                                    &nbsp<a class="showConteudoDoc link-btn btn btn-sm btn-light" href="#"
-                                                                    onclick="popitup('/sigaex/public/app/processoArquivoAutenticado_stream?sigla=${mov.exMobil}');"
-                                                                    rel="popover" data-title="${mov.exMobil}"
-                                                                    data-content="" onmouseenter="exibeDoc(this);"
-                                                                    >Ver</a>
-                                                                </c:if>
-                                                            </c:when>
-                                                            <c:otherwise>
-																<a class="link-btn btn btn-sm btn-light"
-                                                                   href="/sigaex/public/app/processoArquivoAutenticado?idMovJuntada=${mov.idMov}"
-                                                                >${mov.exMobilRef.sigla}</a>
-                                                            </c:otherwise>
-                                                        </c:choose>
-													</span>
-                                            </c:if>
-                                            <c:if test="${mov.exTipoMovimentacao == 'JUNTADA_EXTERNO'}">
-													<span style="font-size: .8rem;color: #9e9e9e;"
-                                                    >| documento desentranhado ${mov.exMobil}
-													</span>
-                                            </c:if>
-                                            <c:if test="${mov.exTipoMovimentacao == 'CANCELAMENTO_DE_MOVIMENTACAO' and not empty mov.descrMov}">
-                                                <span style="font-size: .8rem;color: #9e9e9e;">| ${mov.descrMov}</span>
-                                            </c:if>
-                                        </td>
-                                        <td align="left">${mov.lotaCadastrante.sigla} </td>
-                                        <td align="left">${mov.cadastrante.nomeAbreviado}</td>
-                                        <td align="left">${mov.lotaResp.sigla}</td>
-                                        <td align="left">${mov.resp.nomeAbreviado}</td>
+                                        <th align="left">Lotação</th>
+                                        <th align="left">Pessoa</th>
                                     </tr>
-                                    <c:choose>
-                                        <c:when test='${evenorodd == "even"}'>
-                                            <c:set var="evenorodd" value="odd"/>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <c:set var="evenorodd" value="even"/>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </c:forEach>
-                            </table>
-                        </div>
-                    </c:forEach>
+                                    </thead>
+                                    <c:set var="evenorodd" value="odd"/>
+                                        <%--@elvariable id="mov" type="br.gov.jfrj.siga.ex.ExMovimentacao"--%>
+                                    <c:forEach var="mov" items="${movs}">
+                                        <tr class="${mov.cancelada ? 'disabled' : ''}">
+                                            <c:set var="dt" value="${mov.dtRegMovDDMMYYYYHHMMSS}"/>
+                                            <td align="left">${dt}</td>
+                                            <td align="left">${mov.descrTipoMovimentacao}
+                                                <c:if test="${mov.exTipoMovimentacao == 'JUNTADA'}">
+                                                        <span style="font-size: .8rem;color: #9e9e9e;">| documento juntado&nbsp
+                                                            <c:choose>
+                                                                <c:when test="${m.sigla ne mov.exMobil.sigla}">
+                                                                    ${mov.exMobil}
+                                                                    <c:if test="${(((not isProtocoloFilho)
+                                                                                or (mov.exMobil.doc.descricaoEspecieDespacho))
+                                                                            and (mov.exMobil.exibirNoAcompanhamento) and mov.exMobil.juntado)}">
+                                                                        &nbsp<a class="showConteudoDoc link-btn btn btn-sm btn-light" href="#"
+                                                                        onclick="popitup('/sigaex/public/app/processoArquivoAutenticado_stream?sigla=${mov.exMobil}');"
+                                                                        rel="popover" data-title="${mov.exMobil}"
+                                                                        data-content="" onmouseenter="exibeDoc(this);"
+                                                                        >Ver</a>
+                                                                    </c:if>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <a class="link-btn btn btn-sm btn-light"
+                                                                       href="/sigaex/public/app/processoArquivoAutenticado?idMovJuntada=${mov.idMov}"
+                                                                    >${mov.exMobilRef.sigla}</a>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </span>
+                                                </c:if>
+                                                <c:if test="${mov.exTipoMovimentacao == 'JUNTADA_EXTERNO'}">
+                                                        <span style="font-size: .8rem;color: #9e9e9e;"
+                                                        >| documento desentranhado ${mov.exMobil}
+                                                        </span>
+                                                </c:if>
+                                                <c:if test="${mov.exTipoMovimentacao == 'CANCELAMENTO_DE_MOVIMENTACAO' and not empty mov.descrMov}">
+                                                    <span style="font-size: .8rem;color: #9e9e9e;">| ${mov.descrMov}</span>
+                                                </c:if>
+                                            </td>
+                                            <td align="left">${mov.lotaCadastrante.sigla} </td>
+                                            <td align="left">${mov.cadastrante.nomeAbreviado}</td>
+                                            <td align="left">${mov.lotaResp.sigla}</td>
+                                            <td align="left">${mov.resp.nomeAbreviado}</td>
+                                        </tr>
+                                        <c:choose>
+                                            <c:when test='${evenorodd == "even"}'>
+                                                <c:set var="evenorodd" value="odd"/>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:set var="evenorodd" value="even"/>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:forEach>
+                                </table>
+                            </div>
+                        </c:forEach>
+                    </div>
+                    </c:if>
                 </div>
-                </c:if>
             </div>
         </div>
     </div>
@@ -181,24 +196,23 @@
 </siga:pagina>
 <script type="text/javascript">
     function exibeDoc(elem) {
-        var timeOut;
         $(elem).popover({
             trigger: "hover",
             placement: "auto",
             html: true
         });
 
-        timeOut = setTimeout(setDataContent, 700, elem);
+        setTimeout(setDataContent, 700, elem);
     }
 
     function setDataContent(elem) {
         if ($(elem).attr('data-content') === ""
-            && ($("." + $(elem).context.className.split(' ')[0] + ":hover")).length > 0) {
-            sigladoc = $(elem).attr("data-title").replace("/", "").replace("-", "");
-            var div_id = "tmp-id-" + sigladoc;
-            $(elem).attr("data-content", '<div id="' + div_id + '" class="spinner-border"></div>');
+            &amp;&amp; ($("." + $(elem).context.className.split(' ')[0] + ":hover")).length > 0) {
+            const sigladoc = $(elem).attr("data-title").replace("/", "").replace("-", "");
+            const div_id = "tmp-id-" + sigladoc;
+            $(elem).attr("data-content", '&lt;div id="' + div_id + '" class="spinner-border"></div>');
             $(elem).popover('show');
-            conteudodoc = exibirBodyDoc(div_id, sigladoc, elem);
+            exibirBodyDoc(div_id, sigladoc, elem);
         }
     }
 
@@ -209,24 +223,26 @@
             headers: {"Authorization": "${jwt}"},
             dataType: 'json',
             success: function (result) {
-                conteudoDoc = new DOMParser().parseFromString(result.html, "text/html");
-                strhtml = conteudoDoc.getElementsByTagName("BODY")[0].outerHTML
+                const conteudoDoc = new DOMParser().parseFromString(result.html, "text/html");
+                const strhtml = conteudoDoc.getElementsByTagName("BODY")[0].outerHTML
                     .replace(/(\r\n|\n|\r)/gm, "")
-                    .replace(/<p[^>]*>/gi, 'PARAGRAFOQUEBRA');
-                conteudo = new DOMParser().parseFromString(strhtml, "text/html")
+                    .replace(/&lt;p[^>]*>/gi, 'PARAGRAFOQUEBRA');
+                let conteudo = new DOMParser().parseFromString(strhtml, "text/html")
                         .documentElement.textContent
-                        .replace(/PARAGRAFOQUEBRA?/g, '<p>').substring(0, 500)
-                    + "... <br /><br /><i>Clique no botão para ver o documento completo.</i>";
-                conteudo = conteudo.split('<p>').slice(0, 16).join('<p>');
-                $('#' + div_id).removeClass("spinner-border");
-                $('#' + div_id).html(conteudo);
+                        .replace(/PARAGRAFOQUEBRA?/g, '&lt;p>').substring(0, 500)
+                    + "... &lt;br />&lt;br />&lt;i>Clique no botão para ver o documento completo.&lt;/i>";
+                conteudo = conteudo.split('&lt;p>').slice(0, 16).join('&lt;p>');
+                const elem = $('#' + div_id);
+                elem.removeClass("spinner-border");
+                elem.html(conteudo);
                 $(elem).attr("data-content", conteudo);
                 $(elem).attr("data-container", "body");
             },
             error: function (response, status, error) {
-                msgErro = "Ocorreu um erro na solicitação: " + response.responseJSON.errormsg;
-                $('#' + div_id).removeClass("spinner-border");
-                $('#' + div_id).html(msgErro);
+                const msgErro = "Ocorreu um erro na solicitação: " + response.responseJSON.errormsg;
+                const elem = $('#' + div_id)
+                elem.removeClass("spinner-border");
+                elem.html(msgErro);
                 $(elem).attr("data-content", "");
             }
         });

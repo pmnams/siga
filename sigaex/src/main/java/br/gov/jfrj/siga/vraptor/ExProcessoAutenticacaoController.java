@@ -16,13 +16,14 @@ import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.*;
 import br.gov.jfrj.siga.ex.bl.Ex;
-import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
+import br.gov.jfrj.siga.ex.logic.ExPodeVisualizarExternamente;
 import br.gov.jfrj.siga.ex.vo.ExDocumentoVO;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.persistencia.ExMobilDaoFiltro;
 import com.auth0.jwt.JWTSigner;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.JWTVerifyException;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
 import javax.inject.Inject;
@@ -43,7 +44,6 @@ import java.util.*;
 public class ExProcessoAutenticacaoController extends ExController {
     private static final String URL_EXIBIR = "/public/app/processoautenticar";
     private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
-    private static final String APPLICATION_PDF = "application/pdf";
 
     /**
      * @deprecated CDI eyes only
@@ -65,62 +65,42 @@ public class ExProcessoAutenticacaoController extends ExController {
     @Get
     @Path("/processoautenticar.action")
     public void redirecionar() throws Exception {
-        result.redirectTo(this).processoautenticar(null, null, null, null, null, null);
+        result.redirectTo(this).processoautenticar(null, null, null, null, null);
     }
 
     @Get
     @Post
     @Path("/public/app/processoautenticar")
-    public void processoautenticar(final String n, final String answer, final String ass, final String assinaturaB64,
+    public void processoautenticar(final String n, final String answer, final String assinaturaB64,
                                    final String certificadoB64, final String atributoAssinavelDataHora) throws Exception {
         String hCaptchaSiteKey = getHcaptchaSiteKey();
         String hCaptchaSitePassword = getHcaptchaSitePassword();
         result.include("hcaptchaSiteKey", hCaptchaSiteKey);
         result.include("n", n);
 
-        if (n == null || n.trim().length() == 0) {
+        if (StringUtils.isBlank(n)) {
             setDefaultResults();
             return;
         }
+        boolean success = false;
 
         String gHcaptchaResponse = request.getParameter("h-captcha-response");
-
-        boolean success = false;
         if (gHcaptchaResponse != null) {
-            String hostname = request.getServerName();
-
-            JSONObject body = Hcaptcha.validar(hCaptchaSitePassword, gHcaptchaResponse,
-                    request.getRemoteAddr());
+            JSONObject body = Hcaptcha.validar(
+                    hCaptchaSitePassword,
+                    gHcaptchaResponse,
+                    request.getRemoteAddr()
+            );
 
             success = body.getBoolean("success");
         }
+
         if (!success) {
             setDefaultResults();
             return;
         }
 
-
-        ExMovimentacao mov = null;
-
-        if (ass != null && ass.trim().length() != 0) {
-            byte[] assinatura = Base64.getDecoder().decode(assinaturaB64 == null ? "" : assinaturaB64);
-            byte[] certificado = Base64.getDecoder().decode(certificadoB64 == null ? "" : certificadoB64);
-            Date dt = mov.getDtMov();
-            if (certificado != null && certificado.length != 0)
-                dt = new Date(Long.parseLong(atributoAssinavelDataHora));
-            else
-                certificado = null;
-
-            try {
-                Ex.getInstance().getBL().assinarMovimentacao(null, null, mov, dt, assinatura, certificado,
-                        ExTipoDeMovimentacao.ASSINATURA_DIGITAL_MOVIMENTACAO);
-            } catch (final Exception e) {
-                throw new AplicacaoException(e.getMessage());
-            }
-        }
-
         setDefaultResults();
-        result.include("ass", ass);
         result.include("assinaturaB64", assinaturaB64);
         result.include("certificadoB64", certificadoB64);
         result.include("atributoAssinavelDataHora", atributoAssinavelDataHora);
@@ -137,7 +117,7 @@ public class ExProcessoAutenticacaoController extends ExController {
             return null;
         }
 
-        String n = "";
+        String n;
         try {
             n = verifyJwtToken(jwt).get("n").toString();
         } catch (InvalidKeyException | NoSuchAlgorithmException | IllegalStateException
@@ -159,7 +139,7 @@ public class ExProcessoAutenticacaoController extends ExController {
             if (mob == null) {
                 throw new AplicacaoException("Documento não encontrado: " + sigla);
             }
-            if (!((idDocPai == mob.getExMobilPai().getDoc().getIdDoc()
+            if (!((Objects.equals(idDocPai, mob.getExMobilPai().getDoc().getIdDoc())
                     || mob.getDoc().isDescricaoEspecieDespacho())
                     && mob.isExibirNoAcompanhamento())) {
                 throw new AplicacaoException("Documento não permitido para visualização: " + sigla);
@@ -194,26 +174,26 @@ public class ExProcessoAutenticacaoController extends ExController {
         }
         final boolean fB64 = getRequest().getHeader("Accept") != null
                 && getRequest().getHeader("Accept").startsWith("text/vnd.siga.b64encoded");
-        if (certificadoB64 != null) {
-            final Date dt = dao().consultarDataEHoraDoServidor();
-            getResponse().setHeader("Atributo-Assinavel-Data-Hora", Long.toString(dt.getTime()));
 
-            // Chamar o BluC para criar o pacote assinavel
-            //
+        if (certificadoB64 != null) {
+            final Date date = dao().consultarDataEHoraDoServidor();
+
             BlucService bluc = Service.getBlucService();
-            HashRequest hashreq = new HashRequest();
-            hashreq.setCertificate(certificadoB64);
-            hashreq.setCrl("true");
-            hashreq.setPolicy("AD-RB");
-            hashreq.setSha1(bluc.bytearray2b64(bluc.calcSha1(bytes)));
-            hashreq.setSha256(bluc.bytearray2b64(bluc.calcSha256(bytes)));
-            hashreq.setTime(dt);
-            HashResponse hashresp = bluc.hash(hashreq);
+            HashRequest hashReq = new HashRequest();
+            hashReq.setCertificate(certificadoB64);
+            hashReq.setCrl("true");
+            hashReq.setPolicy("AD-RB");
+            hashReq.setTime(date);
+            hashReq.setSha1(BlucService.bytearray2b64(BlucService.calcSha1(bytes)));
+            hashReq.setSha256(BlucService.bytearray2b64(BlucService.calcSha256(bytes)));
+
+            HashResponse hashresp = bluc.hash(hashReq);
             if (hashresp.getErrormsg() != null)
                 throw new Exception("BluC não conseguiu produzir o pacote assinável. " + hashresp.getErrormsg());
             byte[] sa = Base64.getDecoder().decode(hashresp.getHash());
-            ;
 
+            //noinspection UastIncorrectHttpHeaderInspection
+            getResponse().setHeader("Atributo-Assinavel-Data-Hora", Long.toString(date.getTime()));
             return new InputStreamDownload(makeByteArrayInputStream(sa, fB64), APPLICATION_OCTET_STREAM, null);
         }
         return new InputStreamDownload(makeByteArrayInputStream(bytes, fB64), contentType, fileName);
@@ -240,9 +220,7 @@ public class ExProcessoAutenticacaoController extends ExController {
 
         ExArquivo arq = Ex.getInstance().getBL().buscarPorProtocolo(n);
         if (idMovJuntada != null) {
-            // Se veio o id da mov de juntada do filho, mostra o documento pai
             final ExMovimentacao movJuntada = dao().consultar(idMovJuntada, ExMovimentacao.class, false);
-            // Confirma que é realmente o documento pai
             if (movJuntada != null && movJuntada.getExMobilRef() != null
                     && !movJuntada.isCancelada()
                     && (((ExDocumento) arq).contemMobil(movJuntada.getExMobil()))) {
@@ -255,82 +233,67 @@ public class ExProcessoAutenticacaoController extends ExController {
         }
         Set<ExMovimentacao> assinaturas = arq.getAssinaturasDigitais();
 
-        /*
-         * ExMovimentacao mov = null; if (arq.isCodigoParaAssinaturaExterna(n)) { mov =
-         * (ExMovimentacao) arq; }
-         */
         setDefaultResults();
         result.include("assinaturas", assinaturas);
-        // result.include("mov", mov);
         result.include("n", n);
         result.include("jwt", jwt);
-        if (arq instanceof ExDocumento) {
-            ExMobil mob = null;
-            ExDocumento doc = (ExDocumento) arq;
-            if (doc.isFinalizado()) {
-                if (doc.isProcesso()) {
-                    mob = doc.getUltimoVolume();
-                } else {
-                    mob = doc.getPrimeiraVia();
-                }
-            }
 
-            final ExDocumentoDTO exDocumentoDTO = new ExDocumentoDTO();
+        if (!(arq instanceof ExDocumento))
+            return;
 
-            exDocumentoDTO.setSigla(doc.getSigla());
-            buscarDocumento(false, exDocumentoDTO);
+        ExDocumento doc = (ExDocumento) arq;
+        final ExDocumentoDTO exDocumentoDTO = new ExDocumentoDTO();
+        exDocumentoDTO.setSigla(doc.getSigla());
+        buscarDocumento(exDocumentoDTO);
 
-            if (doc.isFinalizado()) {
-                if (doc.isProcesso()) {
-                    mob = doc.getUltimoVolume();
-                } else {
-                    mob = doc.getPrimeiraVia();
-                }
-            }
-
-            List<ExMobil> lstMobil = dao().consultarMobilPorDocumento(doc);
-            List<ExMovimentacao> lista = dao().consultarMovimentoIncluindoJuntadaPorMobils(lstMobil);
-
-            DpPessoa p = new DpPessoa();
-            DpLotacao l = new DpLotacao();
-
-            p = doc.getSubscritor();
-            l = doc.getLotaSubscritor();
-
-            if (p == null && !lista.isEmpty()) {
-                p = lista.get(0).getSubscritor();
-            }
-
-            if (l == null && !lista.isEmpty()) {
-                l = lista.get(0).getLotaSubscritor();
-            }
-
-            final ExDocumentoVO docVO = new ExDocumentoVO(doc, mob, getCadastrante(), p, l, true, true, false, true);
-            Cookie cookie = new Cookie("jwt-prot", buildJwtToken(n));
-            cookie.setMaxAge(1 * 60 * 60);
-            this.response.addCookie(cookie);
-            result.include("movs", lista);
-            result.include("sigla", exDocumentoDTO.getDoc().getSigla());
-            result.include("msg", exDocumentoDTO.getMsg());
-            result.include("docVO", docVO);
-            result.include("autenticacao",
-                    exDocumentoDTO.getDoc().getAssinantesCompleto()
-                            + " Documento Nº:  "
-                            + exDocumentoDTO.getDoc().getSiglaAssinatura()
+        ExProtocolo prot = Ex.getInstance().getBL().obterProtocolo(exDocumentoDTO.getDoc());
+        if (prot == null) {
+            throw new AplicacaoException(
+                    "Ocorreu um erro ao obter protocolo do Documento: " + exDocumentoDTO.getDoc().getSigla()
             );
-
-            ExProtocolo prot = Ex.getInstance().getBL().obterProtocolo(exDocumentoDTO.getDoc());
-            if (prot == null) {
-                throw new AplicacaoException(
-                        "Ocorreu um erro ao obter protocolo do Documento: " + exDocumentoDTO.getDoc().getSigla()
-                );
-            }
-
-            result.include("protocolo", prot.getCodigo());
-            result.include("mob", exDocumentoDTO.getMob());
-            result.include("isProtocoloFilho", idMovJuntada != null);
-
         }
+
+        List<ExMobil> lstMobil = dao().consultarMobilPorDocumento(doc);
+        List<ExMovimentacao> lista = dao().consultarMovimentoIncluindoJuntadaPorMobils(lstMobil);
+
+        DpPessoa p = doc.getSubscritor();
+        DpLotacao l = doc.getLotaSubscritor();
+
+        if (p == null && !lista.isEmpty()) {
+            p = lista.get(0).getSubscritor();
+        }
+
+        if (l == null && !lista.isEmpty()) {
+            l = lista.get(0).getLotaSubscritor();
+        }
+
+        ExMobil mob = null;
+        if (doc.isFinalizado()) {
+            if (doc.isProcesso()) {
+                mob = doc.getUltimoVolume();
+            } else {
+                mob = doc.getPrimeiraVia();
+            }
+        }
+
+        final ExDocumentoVO docVO = new ExDocumentoVO(doc, mob, getCadastrante(), p, l, true, true, false, true);
+        final boolean podeVisualizarExternamente = Objects.nonNull(mob) && new ExPodeVisualizarExternamente(mob, p, l).eval();
+
+        result.include("movs", lista);
+        result.include("sigla", exDocumentoDTO.getDoc().getSigla());
+        result.include("msg", exDocumentoDTO.getMsg());
+        result.include("docVO", docVO);
+        result.include("podeVisualizarExternamente", podeVisualizarExternamente);
+        result.include("autenticacao", exDocumentoDTO.getDoc().getAssinantesCompleto()
+                + " Documento Nº:  " + exDocumentoDTO.getDoc().getSiglaAssinatura()
+        );
+        result.include("protocolo", prot.getCodigo());
+        result.include("mob", exDocumentoDTO.getMob());
+        result.include("isProtocoloFilho", idMovJuntada != null);
+
+        Cookie cookie = new Cookie("jwt-prot", buildJwtToken(n));
+        cookie.setMaxAge(60 * 60);
+        this.response.addCookie(cookie);
     }
 
     private static String getHcaptchaSiteKey() {
@@ -349,10 +312,10 @@ public class ExProcessoAutenticacaoController extends ExController {
         String token;
 
         final JWTSigner signer = new JWTSigner(getJwtPassword());
-        final HashMap<String, Object> claims = new HashMap<String, Object>();
+        final HashMap<String, Object> claims = new HashMap<>();
 
         final long iat = System.currentTimeMillis() / 1000L; // issued at claim
-        final long exp = iat + 1 * 60 * 60L; // token expires in 1 hours
+        final long exp = iat + 60 * 60L; // token expires in 1 hours
         claims.put("exp", exp);
         claims.put("iat", iat);
 
@@ -364,25 +327,15 @@ public class ExProcessoAutenticacaoController extends ExController {
 
     private static Map<String, Object> verifyJwtToken(String token) throws Exception {
         final JWTVerifier verifier = new JWTVerifier(getJwtPassword());
-        Map<String, Object> map = verifier.verify(token);
-        return map;
+        return verifier.verify(token);
     }
 
-    /*
-     * Base de historico
-     */
-
-    private void buscarDocumento(final boolean fVerificarAcesso, final ExDocumentoDTO exDocumentoDTO) {
-        buscarDocumento(fVerificarAcesso, false, exDocumentoDTO);
-    }
-
-    private void buscarDocumento(final boolean fVerificarAcesso, final boolean fPodeNaoExistir,
-                                 final ExDocumentoDTO exDocumentoDto) {
-        if (exDocumentoDto.getMob() == null && exDocumentoDto.getSigla() != null
-                && exDocumentoDto.getSigla().length() != 0) {
+    @SuppressWarnings("DuplicatedCode")
+    private void buscarDocumento(final ExDocumentoDTO exDocumentoDto) {
+        if (exDocumentoDto.getMob() == null && StringUtils.isNotBlank(exDocumentoDto.getSigla())) {
             final ExMobilDaoFiltro filter = new ExMobilDaoFiltro();
             filter.setSigla(exDocumentoDto.getSigla());
-            exDocumentoDto.setMob((ExMobil) dao().consultarPorSigla(filter));
+            exDocumentoDto.setMob(dao().consultarPorSigla(filter));
             if (exDocumentoDto.getMob() != null) {
                 exDocumentoDto.setDoc(exDocumentoDto.getMob().getExDocumento());
             }
@@ -393,24 +346,20 @@ public class ExProcessoAutenticacaoController extends ExController {
                 && exDocumentoDto.getIdMob() != 0) {
             exDocumentoDto.setMob(dao().consultar(exDocumentoDto.getIdMob(), ExMobil.class, false));
         }
+
         if (exDocumentoDto.getMob() != null) {
             exDocumentoDto.setDoc(exDocumentoDto.getMob().doc());
         }
+
         if (exDocumentoDto.getDoc() == null) {
             final String id = param("exDocumentoDto.id");
-            if (id != null && id.length() != 0) {
+            if (StringUtils.isNotBlank(id)) {
                 exDocumentoDto.setDoc(daoDoc(Long.parseLong(id)));
             }
         }
+
         if (exDocumentoDto.getDoc() != null && exDocumentoDto.getMob() == null) {
             exDocumentoDto.setMob(exDocumentoDto.getDoc().getMobilGeral());
-        }
-
-        if (!fPodeNaoExistir && exDocumentoDto.getDoc() == null) {
-            throw new AplicacaoException("Documento não informado");
-        }
-        if (fVerificarAcesso && exDocumentoDto.getMob() != null && exDocumentoDto.getMob().getIdMobil() != null) {
-            verificaNivelAcesso(exDocumentoDto.getMob());
         }
     }
 

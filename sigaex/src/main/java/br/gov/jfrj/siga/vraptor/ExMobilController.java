@@ -39,7 +39,6 @@ import br.gov.jfrj.siga.ex.*;
 import br.gov.jfrj.siga.ex.bl.Ex;
 import br.gov.jfrj.siga.ex.bl.ExBL;
 import br.gov.jfrj.siga.ex.logic.ExPodePorConfiguracao;
-import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.model.GenericoSelecao;
 import br.gov.jfrj.siga.model.Selecionavel;
@@ -164,8 +163,8 @@ public class ExMobilController extends
                 result.include(
                         "mensagemCabec",
                         "ATENÇÃO: Para os órgãos com grande demanda de documentos, a pesquisa deve ser limitada com uma range de datas de no máximo "
-                        + maxDiasPesquisa + " dias. Será assumida uma data inicial "
-                        + maxDiasPesquisa + " dias anterior à hoje."
+                                + maxDiasPesquisa + " dias. Será assumida uma data inicial "
+                                + maxDiasPesquisa + " dias anterior à hoje."
                 );
             }
         }
@@ -316,7 +315,7 @@ public class ExMobilController extends
 
             int tamanhoMax = Prop.getInt("max.linhas.pesquisa.doc", 200000);
             if (getTamanho() > tamanhoMax) {
-                throw new RegraNegocioException("Numero máximo (" + tamanhoMax  + ") de registros para exportação excedido. Use os filtros para restringir resultado.");
+                throw new RegraNegocioException("Numero máximo (" + tamanhoMax + ") de registros para exportação excedido. Use os filtros para restringir resultado.");
             }
 
             List lista = dao().consultarPorFiltroOtimizado(flt,
@@ -465,22 +464,14 @@ public class ExMobilController extends
                 result.include(
                         "mensagemCabec",
                         "ATENÇÃO: Para os órgãos com grande demanda de documentos, a pesquisa deve ser limitada com uma range de datas de no máximo "
-                        + maxDiasPesquisa + " dias. Será assumida uma data inicial "
-                        + maxDiasPesquisa + " dias anterior à hoje."
+                                + maxDiasPesquisa + " dias. Será assumida uma data inicial "
+                                + maxDiasPesquisa + " dias anterior à hoje."
                 );
             }
         }
 
-        List<CpOrgaoUsuario> orgaos = this.getOrgaosUsu();
-        try {
-            Cp.getInstance().getConf().podePorConfiguracao(
-                    getTitular(),
-                    getLotaTitular(),
-                    ExTipoDeConfiguracao.RESTRINGIR_VINCULACAO_DO_ORGAO_NO_CAMPO_BUSCAR
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        List<CpOrgaoUsuario> orgaos = Ex.getInstance().getBL()
+                .removeOrgaosRestritos(this.getOrgaosUsu(), getCadastrante(), getLotaCadastrante());
 
         DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
