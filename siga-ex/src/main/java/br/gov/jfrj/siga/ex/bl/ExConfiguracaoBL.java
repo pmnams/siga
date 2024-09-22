@@ -164,7 +164,7 @@ public class ExConfiguracaoBL extends CpConfiguracaoBL {
         CpSituacaoDeConfiguracaoEnum situacao = situacaoPorConfiguracao(cpServico, exTipoFormaDoc, exPapel, exTpDoc,
                 exFormaDoc, exMod, exClassificacao, exVia, exTpMov, cargo, cpOrgaoUsu, dpFuncaoConfianca, dpLotacao,
                 dpPessoa, nivelAcesso, cpTpLotacao, idTpConf, pessoaObjeto, lotacaoObjeto, complexoObjeto, cargoObjeto,
-                funcaoConfiancaObjeto, orgaoObjeto);
+                funcaoConfiancaObjeto, orgaoObjeto, true);
         if (situacao != null && situacao.isPermissiva())
             return true;
         return false;
@@ -179,7 +179,7 @@ public class ExConfiguracaoBL extends CpConfiguracaoBL {
                                                                 DpLotacao dpLotacao, DpPessoa dpPessoa, ExNivelAcesso nivelAcesso, CpTipoLotacao cpTpLotacao,
                                                                 ITipoDeConfiguracao idTpConf, DpPessoa pessoaObjeto,
                                                                 DpLotacao lotacaoObjeto, CpComplexo complexoObjeto, DpCargo cargoObjeto,
-                                                                DpFuncaoConfianca funcaoConfiancaObjeto, CpOrgaoUsuario orgaoObjeto) {
+                                                                DpFuncaoConfianca funcaoConfiancaObjeto, CpOrgaoUsuario orgaoObjeto, boolean deduceDefault) {
 
         ExConfiguracao config = new ExConfiguracao();
         config.setCargo(cargo);
@@ -214,7 +214,7 @@ public class ExConfiguracaoBL extends CpConfiguracaoBL {
         CpSituacaoDeConfiguracaoEnum situacao = null;
         if (cfg != null)
             situacao = cfg.situacao;
-        else if (config.getCpTipoConfiguracao() != null)
+        else if (deduceDefault && config.getCpTipoConfiguracao() != null)
             situacao = config.getCpTipoConfiguracao().getSituacaoDefault();
 
         return situacao;
@@ -235,7 +235,7 @@ public class ExConfiguracaoBL extends CpConfiguracaoBL {
                 exTpMov, cargo,
                 cpOrgaoUsu, dpFuncaoConfianca,
                 dpLotacao, dpPessoa, nivelAcesso, cpTpLotacao,
-                idTpConf, null, null, null, null, null, null);
+                idTpConf, null, null, null, null, null, null, true);
     }
 
     public boolean podePorConfiguracao(CpServico cpServico,
