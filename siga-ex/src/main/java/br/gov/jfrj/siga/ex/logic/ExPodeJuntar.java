@@ -50,8 +50,9 @@ public class ExPodeJuntar extends CompositeExpressionSupport {
      */
     @Override
     protected Expression create() {
-        List<Expression> expressions = new ArrayList<>();
+        Expression canMoveExp = new ExPodeMovimentar(mob, titular, lotaTitular);
 
+        List<Expression> expressions = new ArrayList<>();
         if (Objects.nonNull(doc)) {
             for (ExMovimentacao mov : doc.getMobilGeral().getExMovimentacaoSet()) {
                 if (mov.isCancelada() || mov.getExTipoMovimentacao() != ExTipoDeMovimentacao.VINCULACAO_PAPEL)
@@ -64,9 +65,16 @@ public class ExPodeJuntar extends CompositeExpressionSupport {
                                     .withExTpMov(ExTipoDeMovimentacao.JUNTADA)
                                     .withExMod(mob.doc().getExModelo())
                                     .withExPapel(mov.getExPapel())
-                                    .withDefaultExpression(new ExPodeMovimentar(mob, titular, lotaTitular))
+                                    .withDefaultExpression(canMoveExp)
                     );
             }
+        }
+
+        Expression roleExpression;
+        if (!expressions.isEmpty()) {
+            roleExpression = Or.of(expressions.toArray(new Expression[0]));
+        } else {
+            roleExpression = canMoveExp;
         }
 
         return And.of(
@@ -84,7 +92,7 @@ public class ExPodeJuntar extends CompositeExpressionSupport {
                                 new CpNaoENulo(docPai, "documento onde foi autuado"),
                                 new ExEMobilAutuado(docPai, mob)
                         ),
-                        Or.of(expressions.toArray(new Expression[0]))
+                        roleExpression
                 ),
                 Or.of(
                         Not.of(new ExEstaPendenteDeAssinatura(mob.doc())),
@@ -95,7 +103,11 @@ public class ExPodeJuntar extends CompositeExpressionSupport {
                 Not.of(new ExEstaArquivado(mob)),
                 Not.of(new ExEstaSobrestado(mob)),
                 Not.of(new ExEstaSemEfeito(mob.doc())),
-                Not.of(new ExEstaEmTramiteParalelo(mob))
+                Not.of(new ExEstaEmTramiteParalelo(mob)),
+                new ExPodePorConfiguracao(titular, lotaTitular)
+                        .withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
+                        .withExTpMov(ExTipoDeMovimentacao.JUNTADA)
+                        .withExMod(mob.doc().getExModelo())
         );
     }
 }
