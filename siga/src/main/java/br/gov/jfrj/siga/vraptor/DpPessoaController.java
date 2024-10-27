@@ -187,7 +187,7 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
     }
 
     @Get("app/pessoa/listar")
-    public void lista(Integer paramoffset, Long idOrgaoUsu, Long nmMatricula, String nome, String cpfPesquisa, Long idCargoPesquisa, Long idFuncaoPesquisa, Long idLotacaoPesquisa, String emailPesquisa, String identidadePesquisa) throws Exception {
+    public void lista(Integer paramoffset, Long idOrgaoUsu, String nmMatricula, String nome, String cpfPesquisa, Long idCargoPesquisa, Long idFuncaoPesquisa, Long idLotacaoPesquisa, String emailPesquisa, String identidadePesquisa) throws Exception {
 
         result.include("request", getRequest());
         List<CpOrgaoUsuario> list = new ArrayList<>();
@@ -519,7 +519,7 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
     }
 
     @Post("/app/pessoa/carregarCombos")
-    public void carregarCombos(final Long id, final Long idOrgaoUsu, final Long nmMatricula, final String nmPessoa, final String dtNascimento,
+    public void carregarCombos(final Long id, final Long idOrgaoUsu, final String nmMatricula, final String nmPessoa, final String dtNascimento,
                                final String cpf, final String email, final String cpfPesquisa, final Integer paramoffset,
                                Boolean retornarEnvioEmail) {
         result.include("request", getRequest());
@@ -629,7 +629,7 @@ public class DpPessoaController extends SigaSelecionavelControllerSupport<DpPess
 
     @Transacional
     @Post("/app/pessoa/gravar")
-    public void editarGravar(final Long id, final Long idOrgaoUsu, final Long nmMatricula, final Long idCargo, final Long idFuncao,
+    public void editarGravar(final Long id, final Long idOrgaoUsu, final String nmMatricula, final Long idCargo, final Long idFuncao,
                              final Long idLotacao, final String nmPessoa, final String dtNascimento, final String cpf,
                              final String email, final String identidade, final String orgaoIdentidade, final String ufIdentidade,
                              final String dataExpedicaoIdentidade, final String nomeExibicao, final String enviarEmail) throws Exception {

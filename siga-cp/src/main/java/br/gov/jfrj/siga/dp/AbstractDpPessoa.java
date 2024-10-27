@@ -69,7 +69,7 @@ import java.util.Set;
                 + "  where ((pes.nomePessoaAI like upper('%' || :nome || '%')) or ((pes.sesbPessoa || pes.matricula) like upper('%' || :nome || '%')))"
                 + " and (:cpf = null or :cpf = 0L or pes.cpfPessoa = :cpf) "
                 + " and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or pes.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu)"
-                + " and (:nmMatricula = null or :nmMatricula = 0L or pes.matricula = :nmMatricula)"
+                + " and (:nmMatricula = null or :nmMatricula = '' or pes.matricula = :nmMatricula)"
                 + "	and (:lotacao = null or :lotacao = 0L or pes.lotacao.idLotacao = :lotacao)"
                 + " and (pes.id <> :id or :id = 0)"
                 + " and (:cargo = null or :cargo = 0L or pes.cargo.idCargo = :cargo) "
@@ -101,7 +101,7 @@ import java.util.Set;
         @NamedQuery(name = "consultarQuantidadeDpPessoa", query = "select count(pes) from DpPessoa pes "
                 + " where ((pes.nomePessoaAI like upper('%' || :nome || '%')) or ((pes.sesbPessoa || pes.matricula) like upper('%' || :nome || '%'))) "
                 + " and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or pes.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu)"
-                + " and (:nmMatricula = null or :nmMatricula = 0L or pes.matricula = :nmMatricula)"
+                + " and (:nmMatricula = null or :nmMatricula = '' or pes.matricula = :nmMatricula)"
                 + " and (:cpf = null or :cpf = 0L or pes.cpfPessoa = :cpf) "
                 + " and (:email = null or (upper(pes.emailPessoa) like upper('%' || :email || '%')) ) "
                 + " and (:identidade = null or (upper(pes.identidade) like upper('%' || :identidade || '%')) ) "
@@ -117,7 +117,7 @@ import java.util.Set;
                 + "	from DpPessoa pes"
                 + "	where ((pes.nomePessoaAI like upper('%' || :nome || '%')) or ((pes.sesbPessoa || pes.matricula) like upper('%' || :nome || '%')))"
                 + " and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or pes.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu)"
-                + " and (:nmMatricula = null or :nmMatricula = 0L or pes.matricula = :nmMatricula)"
+                + " and (:nmMatricula = null or :nmMatricula = '' or pes.matricula = :nmMatricula)"
                 + " and (:cpf = null or :cpf = 0L or pes.cpfPessoa like '%' || :cpf || '%') "
                 + " and (:lotacao = null or :lotacao = 0L or pes.lotacao.idLotacao = :lotacao)"
                 + " and (:cargo = null or :cargo = 0L or pes.cargo.idCargo = :cargo) "
@@ -148,7 +148,7 @@ import java.util.Set;
                 + "	from DpPessoa pes"
                 + "	where ((pes.nomePessoaAI like upper('%' || :nome || '%')) or ((pes.sesbPessoa || pes.matricula) like upper('%' || :nome || '%')))"
                 + " and (:idOrgaoUsu = null or :idOrgaoUsu = 0L or pes.orgaoUsuario.idOrgaoUsu = :idOrgaoUsu)"
-                + " and (:nmMatricula = null or :nmMatricula = 0L or pes.matricula = :nmMatricula)"
+                + " and (:nmMatricula = null or :nmMatricula = '' or pes.matricula = :nmMatricula)"
                 + " and (:cpf = null or :cpf = 0L or pes.cpfPessoa like '%' || :cpf || '%') "
                 + " and (:lotacao = null or :lotacao = 0L or pes.lotacao.idLotacao = :lotacao)"
                 + " and (:email = null or (upper(pes.emailPessoa) like upper('%' || :email || '%')) ) "
@@ -223,7 +223,7 @@ public abstract class AbstractDpPessoa extends DpResponsavel implements
     private Long cpfPessoa;
 
     @Column(name = "MATRICULA")
-    private Long matricula;
+    private String matricula;
 
     @Column(name = "SESB_PESSOA", length = 10)
     private String sesbPessoa;
@@ -544,7 +544,7 @@ public abstract class AbstractDpPessoa extends DpResponsavel implements
     /**
      * @return Retorna o atributo matricula.
      */
-    public Long getMatricula() {
+    public String getMatricula() {
         return matricula;
     }
 
@@ -645,7 +645,7 @@ public abstract class AbstractDpPessoa extends DpResponsavel implements
     /**
      * @param matricula Atribui a matricula o valor.
      */
-    public void setMatricula(final Long matricula) {
+    public void setMatricula(final String matricula) {
         this.matricula = matricula;
     }
 
