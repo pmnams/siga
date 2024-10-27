@@ -964,7 +964,7 @@ public class Excel {
                     pe.setUfIdentidade(StringUtils.trimToNull(ufexp));
                     pe.setDataExpedicaoIdentidade(dateExp);
 
-                    pe.setMatricula(Long.valueOf(0));
+                    pe.setMatricula("");
                     pe.setSituacaoFuncionalPessoa(SituacaoFuncionalEnum.APENAS_ATIVOS.getValor()[0]);
                     lista.add(pe);
                 }
@@ -977,8 +977,8 @@ public class Excel {
                 for (DpPessoa dpPessoa : lista) {
                     CpDao.getInstance().gravarComHistorico(dpPessoa, identidade);
 
-                    dpPessoa.setMatricula(10000 + dpPessoa.getId());
-                    dpPessoa.setIdePessoa(dpPessoa.getMatricula().toString());
+                    dpPessoa.setMatricula(String.valueOf(10000 + dpPessoa.getId()));
+                    dpPessoa.setIdePessoa(dpPessoa.getMatricula());
                     CpDao.getInstance().gravar(dpPessoa);
 
                     lista1.clear();

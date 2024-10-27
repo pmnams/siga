@@ -216,7 +216,7 @@ public class CpBL {
                                            CpServico servico, CpSituacaoDeConfiguracaoEnum situacao, ITipoDeConfiguracao tpConf,
                                            CpIdentidade identidadeCadastrante) throws Exception {
 
-        if (tpConf ==  CpTipoDeConfiguracao.UTILIZAR_SERVICO && servico == null)
+        if (tpConf == CpTipoDeConfiguracao.UTILIZAR_SERVICO && servico == null)
             throw new AplicacaoException("Não foi possível salvar a configuração. O serviço não foi obtido.");
 
         Date dt = dao().consultarDataEHoraDoServidor();
@@ -267,7 +267,7 @@ public class CpBL {
                 List<CpIdentidade> lista = null;
 
                 if (matricula != null) {
-                    final long longmatricula = MatriculaUtils.getParteNumericaDaMatricula(matricula);
+                    final String longmatricula = MatriculaUtils.getParteNumericaDaMatricula(matricula);
                     DpPessoa pessoa = dao().consultarPorCpfMatricula(Long.parseLong(cpf), longmatricula);
                     lista = dao().consultaIdentidades(pessoa);
                 }
@@ -323,7 +323,7 @@ public class CpBL {
             throw new AplicacaoException("O CPF informado está incorreto, tente novamente!");
         }
 
-        final long longmatricula = MatriculaUtils.getParteNumericaDaMatricula(matricula);
+        final String longmatricula = MatriculaUtils.getParteNumericaDaMatricula(matricula);
         final DpPessoa pessoa = dao().consultarPorCpfMatricula(Long.parseLong(cpf), longmatricula);
 
         if (pessoa != null && pessoa.getSigla().equals(matricula) && pessoa.getEmailPessoaAtual() != null) {
@@ -419,7 +419,7 @@ public class CpBL {
             throw new AplicacaoException("O CPF informado está incorreto, tente novamente!");
         }
 
-        final long longMatricula = MatriculaUtils.getParteNumericaDaMatricula(matricula);
+        final String longMatricula = MatriculaUtils.getParteNumericaDaMatricula(matricula);
 
         final DpPessoa pessoa = dao().consultarPorCpfMatricula(longCpf, longMatricula);
 
@@ -968,20 +968,17 @@ public class CpBL {
     public boolean podeAlterarSenha(String auxiliar1, String cpf1, String senha1, String auxiliar2, String cpf2,
                                     String senha2, String matricula, String cpf, String novaSenha) throws AplicacaoException {
         try {
-            final long matAux1 = Long.parseLong(auxiliar1.substring(2));
-            final DpPessoa pesAux1 = dao().consultarPorCpfMatricula(Long.parseLong(cpf1), matAux1);
+            final DpPessoa pesAux1 = dao().consultarPorCpfMatricula(Long.parseLong(cpf1), auxiliar1.substring(2));
             if (pesAux1 == null) {
                 throw new AplicacaoException("Auxiliar 1 inválido!");
             }
 
-            final long matAux2 = Long.parseLong(auxiliar2.substring(2));
-            final DpPessoa pesAux2 = dao().consultarPorCpfMatricula(Long.parseLong(cpf2), matAux2);
+            final DpPessoa pesAux2 = dao().consultarPorCpfMatricula(Long.parseLong(cpf2), auxiliar2.substring(2));
             if (pesAux2 == null) {
                 throw new AplicacaoException("Auxiliar 2 inválido!");
             }
 
-            final long longmatricula = Long.parseLong(matricula.substring(2));
-            final DpPessoa pessoa = dao().consultarPorCpfMatricula(Long.parseLong(cpf), longmatricula);
+            final DpPessoa pessoa = dao().consultarPorCpfMatricula(Long.parseLong(cpf), matricula.substring(2));
             if (pessoa == null) {
                 throw new AplicacaoException("A pessoa que terá a senha definida inválida!");
             }
@@ -1181,7 +1178,7 @@ public class CpBL {
         return excel.uploadPessoa(file, orgaoUsuario, extensao, i);
     }
 
-    public DpPessoa criarUsuario(final Long id, final CpIdentidade identidadeCadastrante, final Long idOrgaoUsu, final Long mnMatricula, final Long idCargo, final Long idFuncao,
+    public DpPessoa criarUsuario(final Long id, final CpIdentidade identidadeCadastrante, final Long idOrgaoUsu, final String mnMatricula, final Long idCargo, final Long idFuncao,
                                  final Long idLotacao, final String nmPessoa, final String dtNascimento, final String cpf,
                                  final String email, final String identidade, final String orgaoIdentidade, final String ufIdentidade,
                                  final String dataExpedicaoIdentidade, final String nomeExibicao, final String enviarEmail) {
@@ -1193,13 +1190,13 @@ public class CpBL {
         if (idLotacao == null || idLotacao == 0)
             throw new AplicacaoException("Lotação não informado");
 
-        if (nmPessoa == null || nmPessoa.trim().equals(""))
+        if (nmPessoa == null || nmPessoa.trim().isEmpty())
             throw new AplicacaoException("Nome não informado");
 
-        if (cpf == null || cpf.trim().equals(""))
+        if (cpf == null || cpf.trim().isEmpty())
             throw new AplicacaoException("CPF não informado");
 
-        if (email == null || email.trim().equals(""))
+        if (email == null || email.trim().isEmpty())
             throw new AplicacaoException("E-mail não informado");
 
         if (!Utils.isEmailValido(email)) {
@@ -1261,7 +1258,8 @@ public class CpBL {
                         );
 
                 }
-            }
+            } else
+                pessoaAnt = new DpPessoa();
         }
 
         int i = CpDao.getInstance().consultarQtdePorEmailIgualCpfDiferente(
@@ -1283,7 +1281,7 @@ public class CpBL {
 
         Date data = new Date(System.currentTimeMillis());
         pessoa.setDataInicio(data);
-        pessoa.setMatricula(0L);
+        pessoa.setMatricula("");
         pessoa.setSituacaoFuncionalPessoa(SituacaoFuncionalEnum.APENAS_ATIVOS.getValor()[0]);
         pessoa.setNomeExibicao(nomeExibicao);
 
@@ -1374,7 +1372,6 @@ public class CpBL {
         if (Objects.nonNull(pessoaMatricula) && Objects.nonNull(pessoaAnt.getIdPessoaIni()) && !Objects.equals(pessoaAnt.getIdPessoaIni(), pessoaMatricula.getIdPessoaIni()))
             throw new AplicacaoException("Já existe uma pessoa com o mesmo numero de matrícula cadastrada no órgão informado");
 
-        // ÓRGÃO / CARGO / FUNÇÃO DE CONFIANÇA / LOTAÇÃO e CPF iguais.
         DpPessoaDaoFiltro dpPessoa = new DpPessoaDaoFiltro();
         dpPessoa.setIdOrgaoUsu(pessoa.getOrgaoUsuario().getId());
         dpPessoa.setCargo(pessoa.getCargo());
@@ -1405,15 +1402,21 @@ public class CpBL {
 
                 CpIdentidade ident = null;
                 if (!pessoa.getOrgaoUsuario().equivale(pessoaAnt.getOrgaoUsuario()) || alteracaoMatricula) {
-                    ident = new CpIdentidade();
-                    CpIdentidade identAnt;
-                    identAnt = CpDao.getInstance().consultaIdentidadeCadastrante(pessoaAnt.getSesbPessoa() + pessoaAnt.getMatricula(), true);
-                    PropertyUtils.copyProperties(ident, identAnt);
-                    ident.setCpOrgaoUsuario(pessoa.getOrgaoUsuario());
-                    ident.setNmLoginIdentidade(pessoa.getSesbPessoa() + pessoa.getMatricula());
-                    ident.setDtCriacaoIdentidade(data);
-                    ident.setId(null);
-                    CpDao.getInstance().gravarComHistorico(ident, identAnt, data, identidadeCadastrante);
+
+                    try {
+                        CpIdentidade identAnt;
+                        identAnt = CpDao.getInstance().consultaIdentidadeCadastrante(pessoaAnt.getSesbPessoa() + pessoaAnt.getMatricula(), true);
+
+                        ident = new CpIdentidade();
+                        PropertyUtils.copyProperties(ident, identAnt);
+
+                        ident.setCpOrgaoUsuario(pessoa.getOrgaoUsuario());
+                        ident.setNmLoginIdentidade(pessoa.getSesbPessoa() + pessoa.getMatricula());
+                        ident.setDtCriacaoIdentidade(data);
+                        ident.setId(null);
+                        CpDao.getInstance().gravarComHistorico(ident, identAnt, data, identidadeCadastrante);
+                    } catch (Exception ignored) {
+                    }
                 }
 
                 CpDao.getInstance().gravarComHistorico(pessoa, pessoaAnt, data, identidadeCadastrante);
@@ -1442,16 +1445,16 @@ public class CpBL {
                 CpDao.getInstance().gravar(pessoa);
                 pessoa.setIdPessoaIni(pessoa.getId());
 
-                if (pessoa.getMatricula() == null || pessoa.getMatricula() <= 0)
-                    pessoa.setMatricula(10000 + pessoa.getId());
+                if (pessoa.getMatricula() == null || pessoa.getMatricula().isEmpty())
+                    pessoa.setMatricula(String.valueOf(10000 + pessoa.getId()));
 
                 CpDao.getInstance().gravar(pessoa);
-                pessoa.setIdePessoa(pessoa.getMatricula().toString());
+                pessoa.setIdePessoa(pessoa.getMatricula());
 
                 lista = CpDao.getInstance()
                         .consultaIdentidadesPorCpf(cpf.replace(".", "").replace("-", ""));
                 CpIdentidade usu = null;
-                if (lista.size() > 0) {
+                if (!lista.isEmpty()) {
                     CpIdentidade usuarioExiste = lista.get(0);
                     usu = new CpIdentidade();
                     usu.setCpTipoIdentidade(CpDao.getInstance().consultar(1, CpTipoIdentidade.class, false));
@@ -1492,7 +1495,7 @@ public class CpBL {
                 }
             }
 
-            if (enviarEmail != null && lista.size() == 0) {
+            if (enviarEmail != null && lista.isEmpty()) {
                 Cp.getInstance().getBL().criarIdentidade(pessoa.getSesbPessoa() + pessoa.getMatricula(),
                         pessoa.getCpfFormatado(), identidadeCadastrante, null, new String[1], Boolean.FALSE);
             }
