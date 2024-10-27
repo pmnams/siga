@@ -136,10 +136,10 @@ public class DpPessoa extends AbstractDpPessoa implements Serializable,
 
     public String getSigla() {
         String sesbPessoa = getSesbPessoa();
-        Long matricula = getMatricula();
+        String matricula = getMatricula();
 
         return sesbPessoa != null && matricula != null ? getSesbPessoa()
-                + getMatricula().toString() : "";
+                + getMatricula() : "";
     }
 
     public String getIniciais() {
@@ -208,7 +208,7 @@ public class DpPessoa extends AbstractDpPessoa implements Serializable,
             String orgao = m.group("orgao");
             String numero = m.group("numero");
             setSesbPessoa(orgao.toUpperCase());
-            setMatricula(Long.parseLong(numero));
+            setMatricula(numero);
         }
     }
 
