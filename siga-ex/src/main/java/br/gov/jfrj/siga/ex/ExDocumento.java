@@ -42,6 +42,7 @@ import br.gov.jfrj.siga.ex.util.*;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.model.CarimboDeTempo;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicUpdate;
 import org.jboss.logging.Logger;
@@ -2766,26 +2767,46 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
         if (getDnmAcesso() == null || isDnmAcessoMAisAntigoQueODosPais()) {
             Ex.getInstance().getBL().atualizarDnmAcesso(this);
         }
+
         if (getExNivelAcessoAtual().getIdNivelAcesso().equals(
                 ExNivelAcesso.NIVEL_ACESSO_PUBLICO)
                 && ExAcesso.ACESSO_PUBLICO.equals(getDnmAcesso()))
             return null;
-        ExDao dao = ExDao.getInstance();
-        List<Object> l = new ArrayList<Object>();
-        String a[] = getDnmAcesso().split(",");
 
-        for (String s : a) {
-            if (s.equals(ExAcesso.ACESSO_PUBLICO))
+        ExDao dao = ExDao.getInstance();
+        List<Object> l = new ArrayList<>();
+
+        for (String s : getDnmAcesso().split(",")) {
+            if (s.equals(ExAcesso.ACESSO_PUBLICO)) {
                 l.add(s);
-            else if (s.startsWith("O"))
-                l.add(dao.consultar(Long.parseLong(s.substring(1)),
-                        CpOrgaoUsuario.class, false));
-            else if (s.startsWith("L"))
-                l.add(dao.consultar(Long.parseLong(s.substring(1)),
-                        DpLotacao.class, false).getLotacaoAtual());
-            else if (s.startsWith("P"))
-                l.add(dao.consultar(Long.parseLong(s.substring(1)),
-                        DpPessoa.class, false).getPessoaAtual());
+                continue;
+            }
+
+            final String strId = s.substring(1);
+            if (!NumberUtils.isParsable(strId))
+                continue;
+
+            Class<?> targetType = null;
+            switch (s.charAt(0)) {
+                case 'O':
+                    targetType = CpOrgaoUsuario.class;
+                    break;
+                case 'L':
+                    targetType = DpLotacao.class;
+                    break;
+                case 'P':
+                    targetType = DpPessoa.class;
+                    break;
+                default:
+                    break;
+            }
+
+            if (targetType != null)
+                l.add(dao.consultar(
+                        Long.parseLong(strId),
+                        targetType,
+                        false)
+                );
         }
 
         return l;

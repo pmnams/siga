@@ -5,9 +5,14 @@ import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.ExDocumento;
 import br.gov.jfrj.siga.ex.ExMobil;
+import br.gov.jfrj.siga.ex.ExMovimentacao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import com.crivano.jlogic.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class ExPodeJuntar extends CompositeExpressionSupport {
 
@@ -15,18 +20,18 @@ public class ExPodeJuntar extends CompositeExpressionSupport {
     private ExDocumento docPai;
     private final DpPessoa titular;
     private final DpLotacao lotaTitular;
+    private final ExDocumento doc;
 
     public ExPodeJuntar(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;
         this.titular = titular;
         this.lotaTitular = lotaTitular;
+        this.doc = mob.getDoc();
     }
 
     public ExPodeJuntar(ExDocumento docPai, ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
-        this.mob = mob;
+        this(mob, titular, lotaTitular);
         this.docPai = docPai;
-        this.titular = titular;
-        this.lotaTitular = lotaTitular;
     }
 
     /**
@@ -45,6 +50,33 @@ public class ExPodeJuntar extends CompositeExpressionSupport {
      */
     @Override
     protected Expression create() {
+        Expression canMoveExp = new ExPodeMovimentar(mob, titular, lotaTitular);
+
+        List<Expression> expressions = new ArrayList<>();
+        if (Objects.nonNull(doc)) {
+            for (ExMovimentacao mov : doc.getMobilGeral().getExMovimentacaoSet()) {
+                if (mov.isCancelada() || mov.getExTipoMovimentacao() != ExTipoDeMovimentacao.VINCULACAO_PAPEL)
+                    continue;
+
+                if (Objects.equals(mov.getSubscritor(), titular))
+                    expressions.add(
+                            new ExPodePorConfiguracao(titular, lotaTitular)
+                                    .withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
+                                    .withExTpMov(ExTipoDeMovimentacao.JUNTADA)
+                                    .withExMod(mob.doc().getExModelo())
+                                    .withExPapel(mov.getExPapel())
+                                    .withDefaultExpression(canMoveExp)
+                    );
+            }
+        }
+
+        Expression roleExpression;
+        if (!expressions.isEmpty()) {
+            roleExpression = Or.of(expressions.toArray(new Expression[0]));
+        } else {
+            roleExpression = canMoveExp;
+        }
+
         return And.of(
                 new ExEMobilVia(mob),
                 Not.of(new ExEstaPendenteDeAnexacao(mob)),
@@ -60,7 +92,8 @@ public class ExPodeJuntar extends CompositeExpressionSupport {
                                 new CpNaoENulo(docPai, "documento onde foi autuado"),
                                 new ExEMobilAutuado(docPai, mob)
                         ),
-                        new ExPodeMovimentar(mob, titular, lotaTitular)),
+                        roleExpression
+                ),
                 Or.of(
                         Not.of(new ExEstaPendenteDeAssinatura(mob.doc())),
                         new ExEInternoCapturado(mob.doc())

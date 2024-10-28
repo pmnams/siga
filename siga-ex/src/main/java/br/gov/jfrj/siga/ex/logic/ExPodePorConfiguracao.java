@@ -8,8 +8,11 @@ import br.gov.jfrj.siga.cp.model.enm.ITipoDeMovimentacao;
 import br.gov.jfrj.siga.dp.*;
 import br.gov.jfrj.siga.ex.*;
 import br.gov.jfrj.siga.ex.bl.Ex;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import com.crivano.jlogic.Expression;
 import com.crivano.jlogic.JLogic;
+
+import java.util.*;
 
 public class ExPodePorConfiguracao implements Expression {
     private CpServico cpServico;
@@ -38,6 +41,7 @@ public class ExPodePorConfiguracao implements Expression {
     private boolean aceitarPode = true;
     private boolean aceitarDefault = true;
     private boolean aceitarObrigatorio = true;
+    private Expression defaultExpression;
 
     public ExPodePorConfiguracao(DpPessoa titular, DpLotacao lotaTitular) {
         super();
@@ -47,13 +51,19 @@ public class ExPodePorConfiguracao implements Expression {
 
     @Override
     public boolean eval() {
+        boolean deduceDefault = defaultExpression == null;
+
         CpSituacaoDeConfiguracaoEnum situacao = Ex.getInstance().getConf().situacaoPorConfiguracao(cpServico,
                 exTipoFormaDoc, exPapel, exTpDoc, exFormaDoc, exMod, exClassificacao, exVia, exTpMov, cargo, cpOrgaoUsu,
                 dpFuncaoConfianca, dpLotacao, dpPessoa, nivelAcesso, cpTpLotacao, idTpConf, pessoaObjeto, lotacaoObjeto,
-                complexoObjeto, cargoObjeto, funcaoConfiancaObjeto, orgaoObjeto);
+                complexoObjeto, cargoObjeto, funcaoConfiancaObjeto, orgaoObjeto, deduceDefault);
 
-        if (situacao == null)
+        if (situacao == null) {
+            if (!deduceDefault)
+                return defaultExpression.eval();
+
             return false;
+        }
 
         return aceitarPode && situacao == CpSituacaoDeConfiguracaoEnum.PODE
                 || aceitarDefault && situacao == CpSituacaoDeConfiguracaoEnum.DEFAULT
@@ -195,6 +205,11 @@ public class ExPodePorConfiguracao implements Expression {
 
     public ExPodePorConfiguracao withAceitarObrigatorio(boolean f) {
         this.aceitarObrigatorio = f;
+        return this;
+    }
+
+    public ExPodePorConfiguracao withDefaultExpression(Expression exp) {
+        this.defaultExpression = exp;
         return this;
     }
 }
