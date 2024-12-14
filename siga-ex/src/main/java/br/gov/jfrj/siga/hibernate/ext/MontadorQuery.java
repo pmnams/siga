@@ -40,12 +40,17 @@ public class MontadorQuery implements IMontadorQuery {
             sbf.append(" INNER JOIN doc.exModelo exMod ");
         }
 
+        if (flt.getUltMovIdEstadoDoc() != null && flt.getUltMovIdEstadoDoc() != 0) {
+            sbf.append(" LEFT JOIN label.exMovimentacao mov ");
+        }
+
         sbf.append(" where");
 
         if (flt.getUltMovIdEstadoDoc() != null && flt.getUltMovIdEstadoDoc() != 0) {
             sbf.append(" and marcador.hisIdIni = :idMarcadorIni");
             sbf.append(" and (dt_ini_marca is null or dt_ini_marca < :dbDatetime)");
             sbf.append(" and (dt_fim_marca is null or dt_fim_marca > :dbDatetime)");
+            sbf.append(" AND (mov IS NULL OR mov.dtParam1 IS NULL OR mov.dtParam1 <= CURRENT_DATE)");
         } else {
             sbf.append(" and marcador.listavelPesquisaDefault = 1");
         }
