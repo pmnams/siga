@@ -266,6 +266,7 @@ public class ExApiV1Servlet extends SwaggerServlet implements IPropertyProvider 
         addPublicProperty("arquivo.contagem.gc", "25"); //HTML - 25 documentos
 
         addPublicProperty("doc.acesso.limitado", "false"); //HTML - 25 documentos
+        addPublicProperty("doc.comp.assinatura.senha", "false");
     }
 
     @Override
