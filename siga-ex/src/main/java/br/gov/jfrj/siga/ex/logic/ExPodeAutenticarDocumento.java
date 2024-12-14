@@ -40,35 +40,23 @@ public class ExPodeAutenticarDocumento extends CompositeExpressionSupport {
     @Override
     protected Expression create() {
         return And.of(
-
                 new ExEEletronico(doc),
-
                 Not.of(new ExEstaAutenticadoComTokenOuSenha(doc)),
-
-                new ExPodePorConfiguracao(titular, lotaTitular).withExMod(doc.getExModelo())
+                new ExPodePorConfiguracao(titular, lotaTitular)
+                        .withExMod(doc.getExModelo())
                         .withExFormaDoc(doc.getExFormaDocumento()).withPessoaObjeto(doc.getSubscritor())
                         .withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
                         .withExTpMov(ExTipoDeMovimentacao.CONFERENCIA_COPIA_DOCUMENTO),
-
                 Or.of(
-
                         Not.of(new ExEGovSP()),
-
                         new ExEExternoCapturado(doc),
-
-                        new ExEInternoCapturado(doc)),
-
+                        new ExEInternoCapturado(doc)
+                ),
                 Or.of(
-
                         new ExEExternoCapturado(doc),
-
                         new ExEInternoCapturado(doc),
-
                         new ExEstaAssinadoComSenha(doc)
-
                 )
-
         );
-
     }
 }
