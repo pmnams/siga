@@ -3,6 +3,7 @@ package br.gov.jfrj.siga.vraptor;
 import br.com.caelum.vraptor.*;
 import br.com.caelum.vraptor.observer.download.Download;
 import br.com.caelum.vraptor.observer.download.InputStreamDownload;
+import br.com.caelum.vraptor.view.Results;
 import br.gov.jfrj.siga.Service;
 import br.gov.jfrj.siga.base.AplicacaoException;
 import br.gov.jfrj.siga.base.Prop;
@@ -170,9 +171,15 @@ public class ExAutenticacaoController extends ExController {
                 case ASSINATURA_MOVIMENTACAO_COM_SENHA:
                     fileName = arq.getReferencia() + "_" + mov.getIdMov() + ".jwt";
                     contentType = "application/jwt";
-                    if (mov.getAuditHash() == null)
-                        throw new AplicacaoException(
-                                "Esta é uma assinatura digital com login e senha e não há nenhum artefato comprobatório disponível para download.");
+
+                    if (mov.getAuditHash() == null) {
+                        if (Prop.getBool("doc.comp.assinatura.senha", false)) {
+                            result.use(Results.page()).forwardTo("/WEB-INF/jsp/compAssiSenha.jsp");
+                            return null;
+                        }
+
+                        throw new AplicacaoException("Esta é uma assinatura digital com login e senha e não há nenhum artefato comprobatório disponível para download.");
+                    }
                     bytes = mov.getAuditHash().getBytes(StandardCharsets.UTF_8);
                     break;
 
