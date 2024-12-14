@@ -35,7 +35,7 @@
 							<c:set var = "brasao_file" value="${brasao}"/>
 						</c:when>
 						<c:otherwise>
-							<c:set var = "brasao_file" value="${pageContext.request.contextPath}/imagens/${brasao}"/>
+							<c:set var = "brasao_file" value="/siga${brasao}"/>
 						</c:otherwise>
 					</c:choose>
 
