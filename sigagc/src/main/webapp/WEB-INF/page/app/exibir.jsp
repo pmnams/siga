@@ -146,15 +146,6 @@
 	</script>
 
 	<script type="text/javascript">
-		$(document).ready(function() {
-			$("img").css({
-				"max-width" : "100%",
-				"height" : "auto",
-			});
-		});
-	</script>
-
-	<script type="text/javascript">
 		function visualizaImpressao(divId) {
 			var printContents = document.getElementById(divId).innerHTML;
 			var popupWin = window.open('', '_blank');
