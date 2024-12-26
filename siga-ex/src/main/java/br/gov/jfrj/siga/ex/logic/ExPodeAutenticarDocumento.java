@@ -1,22 +1,17 @@
 package br.gov.jfrj.siga.ex.logic;
 
-import com.crivano.jlogic.And;
-import com.crivano.jlogic.CompositeExpressionSupport;
-import com.crivano.jlogic.Expression;
-import com.crivano.jlogic.Not;
-import com.crivano.jlogic.Or;
-
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.ExDocumento;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeConfiguracao;
 import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
+import com.crivano.jlogic.*;
 
 public class ExPodeAutenticarDocumento extends CompositeExpressionSupport {
 
-    private ExDocumento doc;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final ExDocumento doc;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     /*
      * Retorna se pode autenticar um documento que só foi assinado com senha.
@@ -47,11 +42,6 @@ public class ExPodeAutenticarDocumento extends CompositeExpressionSupport {
                         .withExFormaDoc(doc.getExFormaDocumento()).withPessoaObjeto(doc.getSubscritor())
                         .withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
                         .withExTpMov(ExTipoDeMovimentacao.CONFERENCIA_COPIA_DOCUMENTO),
-                Or.of(
-                        Not.of(new ExEGovSP()),
-                        new ExEExternoCapturado(doc),
-                        new ExEInternoCapturado(doc)
-                ),
                 Or.of(
                         new ExEExternoCapturado(doc),
                         new ExEInternoCapturado(doc),
