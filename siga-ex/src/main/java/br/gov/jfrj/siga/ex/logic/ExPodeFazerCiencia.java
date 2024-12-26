@@ -1,6 +1,5 @@
 package br.gov.jfrj.siga.ex.logic;
 
-import br.gov.jfrj.siga.cp.logic.CpEGovSP;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
 import br.gov.jfrj.siga.ex.ExMobil;
@@ -10,9 +9,9 @@ import com.crivano.jlogic.*;
 
 public class ExPodeFazerCiencia extends CompositeExpressionSupport {
 
-    private ExMobil mob;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
+    private final ExMobil mob;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
 
     public ExPodeFazerCiencia(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         super();
@@ -42,27 +41,21 @@ public class ExPodeFazerCiencia extends CompositeExpressionSupport {
     @Override
     protected Expression create() {
         return And.of(
-
-                NAnd.of(new ExEExternoCapturado(mob.doc()), Not.of(new ExEstaAutenticadoComTokenOuSenha(mob.doc()))),
-
-                new CpEGovSP(),
-
+                NAnd.of(
+                        new ExEExternoCapturado(mob.doc()),
+                        Not.of(new ExEstaAutenticadoComTokenOuSenha(mob.doc()))
+                ),
                 Not.of(new ExEstaPendenteDeAssinatura(mob.doc())),
-
                 Not.of(new ExEstaCiente(mob, titular, lotaTitular)),
-
                 Not.of(new ExEstaEmTransito(mob, titular, lotaTitular)),
-
                 Not.of(new ExEstaEliminado(mob)),
-
                 Not.of(new ExEstaJuntado(mob)),
-
                 Not.of(new ExEstaArquivado(mob)),
-
                 Not.of(new ExEstaEncerrado(mob)),
-
-                new ExPodePorConfiguracao(titular, lotaTitular).withExMod(mob.doc().getExModelo())
-                        .withExFormaDoc(mob.doc().getExFormaDocumento()).withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
+                new ExPodePorConfiguracao(titular, lotaTitular)
+                        .withExMod(mob.doc().getExModelo())
+                        .withExFormaDoc(mob.doc().getExFormaDocumento())
+                        .withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
                         .withExTpMov(ExTipoDeMovimentacao.CIENCIA));
 
     }

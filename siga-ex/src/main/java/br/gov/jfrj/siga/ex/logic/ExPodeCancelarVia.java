@@ -11,11 +11,11 @@ import com.crivano.jlogic.*;
 
 public class ExPodeCancelarVia extends CompositeExpressionSupport {
 
-    private ExMobil mob;
-    private DpPessoa titular;
-    private DpLotacao lotaTitular;
-    private ExMovimentacao exUltMovNaoCanc;
-    private ExMovimentacao exUltMov;
+    private final ExMobil mob;
+    private final DpPessoa titular;
+    private final DpLotacao lotaTitular;
+    private final ExMovimentacao exUltMovNaoCanc;
+    private final ExMovimentacao exUltMov;
 
     public ExPodeCancelarVia(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;
@@ -44,47 +44,42 @@ public class ExPodeCancelarVia extends CompositeExpressionSupport {
     @Override
     protected Expression create() {
         return And.of(
-
                 new ExEMobilVia(mob),
-
-                Or.of(
-
-                        new ExEstaPendenteDeAssinatura(mob.doc()),
-
-                        new ExEGovSP()),
-
+                new ExEstaPendenteDeAssinatura(mob.doc()),
                 NAnd.of(
-
-                        new ExEGovSP(),
-
-                        Not.of(new ExTemMovimentacaoNaoCanceladaDoTipo(mob.doc(),
-                                ExTipoDeMovimentacao.ASSINATURA_COM_SENHA)),
-
+                        Not.of(
+                                new ExTemMovimentacaoNaoCanceladaDoTipo(
+                                        mob.doc(),
+                                        ExTipoDeMovimentacao.ASSINATURA_COM_SENHA
+                                )
+                        ),
                         Or.of(
-
-                                new ExTemMovimentacaoNaoCanceladaDoTipo(mob.doc(),
-                                        ExTipoDeMovimentacao.TRANSFERENCIA),
-
-                                new ExTemMovimentacaoNaoCanceladaDoTipo(mob.doc(),
-                                        ExTipoDeMovimentacao.JUNTADA),
-
+                                new ExTemMovimentacaoNaoCanceladaDoTipo(
+                                        mob.doc(),
+                                        ExTipoDeMovimentacao.TRANSFERENCIA
+                                ),
+                                new ExTemMovimentacaoNaoCanceladaDoTipo(
+                                        mob.doc(),
+                                        ExTipoDeMovimentacao.JUNTADA
+                                ),
                                 new ExTemDocumentosFilhos(mob),
-
-                                new ExTemJuntados(mob))),
-
+                                new ExTemJuntados(mob)
+                        )
+                ),
                 Not.of(new ExEMobilCancelado(mob)),
-
                 new ExMovimentacaoEDoTipo(exUltMovNaoCanc, ExTipoDeMovimentacao.CRIACAO),
-
-                new CpIgual(exUltMovNaoCanc, "última movimentação não cancelada", exUltMov, "última movimentação"),
-
+                new CpIgual(
+                        exUltMovNaoCanc,
+                        "última movimentação não cancelada",
+                        exUltMov,
+                        "última movimentação"
+                ),
                 new ExEstaResponsavel(mob, titular, lotaTitular),
-
                 // Não é possível cancelar a última via de um documento pois estava gerando
                 // erros nas marcas do mobil geral.
                 new ExTemMaisDeUmMobilNaoCancelado(mob.doc()),
-
-                new ExPodePorConfiguracao(titular, lotaTitular).withIdTpConf(ExTipoDeConfiguracao.CANCELAR_VIA));
+                new ExPodePorConfiguracao(titular, lotaTitular)
+                        .withIdTpConf(ExTipoDeConfiguracao.CANCELAR_VIA));
 
     }
 
