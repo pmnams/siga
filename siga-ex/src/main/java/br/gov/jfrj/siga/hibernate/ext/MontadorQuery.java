@@ -33,9 +33,6 @@ public class MontadorQuery implements IMontadorQuery {
         else
             sbf.append("select label.idMarca from ExMarca label inner join label.cpMarcador marcador inner join label.exMobil mob inner join mob.exDocumento doc");
 
-        //Nato: desabilitei este where pois causava muito impacto na velocidade da consulta. Precisamos criar uma variavel denormalizada mais a frente para resolver esse problema.
-        //sbf.append(" where not exists (from ExMovimentacao where exTipoMovimentacao.idTpMov = 10 and (exMobil.idMobil = mob.idMobil ");
-        //sbf.append("    or exMobil.idMobil = (from ExMobil where exTipoMobil.idTipoMobil = 1 and exDocumento.idDoc = mob.exDocumento.idDoc)))");
         if (flt.getIdMod() != null && flt.getIdMod() != 0) {
             sbf.append(" INNER JOIN doc.exModelo exMod ");
         }
@@ -101,20 +98,9 @@ public class MontadorQuery implements IMontadorQuery {
             sbf.append(" and doc.exClassificacao.hisIdIni = :classificacaoSelId");
         }
 
-        if (flt.getDescrDocumento() != null && !flt.getDescrDocumento().trim().equals("") && flt.getListaIdDoc() == null) {
+        if (flt.getDescrDocumento() != null && !flt.getDescrDocumento().trim().isEmpty() && flt.getListaIdDoc() == null) {
             sbf.append(" and doc.descrDocumentoAI like :descrDocumento");
         }
-
-        // if (flt.getFullText() != null &&
-        // !flt.getFullText().trim().equals("")) {
-        // String s = flt.getFullText();
-        // while (s.contains("  "))
-        // s = s.replace("  ", " ");
-        // s = s.replaceAll(" ", " AND ");
-        // sbf.append(" and CONTAINS(conteudo_blob_doc, '");
-        // sbf.append(s);
-        // sbf.append("', 1) > 0");
-        // }
 
         if (flt.getDtDoc() != null) {
             if (((Long) CpMarcadorEnum.EM_ELABORACAO.getId()).equals(flt.getUltMovIdEstadoDoc())) {
@@ -135,7 +121,7 @@ public class MontadorQuery implements IMontadorQuery {
         }
 
         if (flt.getNumAntigoDoc() != null
-                && !flt.getNumAntigoDoc().trim().equals("")) {
+                && !flt.getNumAntigoDoc().trim().isEmpty()) {
             sbf.append(" and upper(doc.numAntigoDoc) like :numAntigoDoc");
         }
 
@@ -150,7 +136,7 @@ public class MontadorQuery implements IMontadorQuery {
         }
 
         if (flt.getNmDestinatario() != null
-                && !flt.getNmDestinatario().trim().equals("")) {
+                && !flt.getNmDestinatario().trim().isEmpty()) {
             sbf.append(" and upper(doc.nmDestinatario) like :nmDestinatario");
         }
 
@@ -177,7 +163,7 @@ public class MontadorQuery implements IMontadorQuery {
         }
 
         if (flt.getNmSubscritorExt() != null
-                && !flt.getNmSubscritorExt().trim().equals("")) {
+                && !flt.getNmSubscritorExt().trim().isEmpty()) {
             sbf.append(" and upper(doc.nmSubscritorExt) like :nmSubscritorExt");
         }
 
@@ -186,7 +172,7 @@ public class MontadorQuery implements IMontadorQuery {
             sbf.append(" and doc.orgaoExterno.idOrgao = :orgaoExternoSelId");
         }
 
-        if (flt.getNumExtDoc() != null && !flt.getNumExtDoc().trim().equals("")) {
+        if (flt.getNumExtDoc() != null && !flt.getNumExtDoc().trim().isEmpty()) {
             sbf.append(" and upper(doc.numExtDoc) like :numExtDoc");
         }
 
@@ -197,10 +183,10 @@ public class MontadorQuery implements IMontadorQuery {
         if (flt.getListaIdDoc() != null && !flt.getListaIdDoc().isEmpty()) {
             sbf.append(" and (");
 
-            for(int i=0; i <= flt.getListaIdDoc().size()/1000; i++)
-                sbf.append(" doc.idDoc IN :listaIdDoc" + i + " or");
+            for (int i = 0; i <= flt.getListaIdDoc().size() / 1000; i++)
+                sbf.append(" doc.idDoc IN :listaIdDoc").append(i).append(" or");
 
-            sbf.delete(sbf.length()-3, sbf.length()).append(")");
+            sbf.delete(sbf.length() - 3, sbf.length()).append(")");
         }
 
         if (!apenasCount) {
