@@ -42,6 +42,7 @@ import br.gov.jfrj.siga.ex.util.*;
 import br.gov.jfrj.siga.hibernate.ExDao;
 import br.gov.jfrj.siga.model.CarimboDeTempo;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicUpdate;
 import org.jboss.logging.Logger;
@@ -2766,26 +2767,42 @@ public class ExDocumento extends AbstractExDocumento implements Serializable,
         if (getDnmAcesso() == null || isDnmAcessoMAisAntigoQueODosPais()) {
             Ex.getInstance().getBL().atualizarDnmAcesso(this);
         }
-        if (getExNivelAcessoAtual().getIdNivelAcesso().equals(
-                ExNivelAcesso.NIVEL_ACESSO_PUBLICO)
-                && ExAcesso.ACESSO_PUBLICO.equals(getDnmAcesso()))
+
+        if (getExNivelAcessoAtual().getIdNivelAcesso().equals(ExNivelAcesso.NIVEL_ACESSO_PUBLICO)
+                && ExAcesso.ACESSO_PUBLICO.equals(getDnmAcesso()
+        ))
             return null;
+
         ExDao dao = ExDao.getInstance();
-        List<Object> l = new ArrayList<Object>();
-        String a[] = getDnmAcesso().split(",");
+        List<Object> l = new ArrayList<>();
+        String[] a = getDnmAcesso().split(",");
 
         for (String s : a) {
-            if (s.equals(ExAcesso.ACESSO_PUBLICO))
+            if (s.equals(ExAcesso.ACESSO_PUBLICO)) {
                 l.add(s);
-            else if (s.startsWith("O"))
-                l.add(dao.consultar(Long.parseLong(s.substring(1)),
-                        CpOrgaoUsuario.class, false));
-            else if (s.startsWith("L"))
-                l.add(dao.consultar(Long.parseLong(s.substring(1)),
-                        DpLotacao.class, false).getLotacaoAtual());
-            else if (s.startsWith("P"))
-                l.add(dao.consultar(Long.parseLong(s.substring(1)),
-                        DpPessoa.class, false).getPessoaAtual());
+                continue;
+            }
+
+            if (!StringUtils.startsWithAny(s, "O", "L", "P"))
+                continue;
+
+            Long id;
+            try {
+                id = Long.parseLong(s.substring(1));
+            } catch (NumberFormatException | NullPointerException e) {
+                continue;
+            }
+
+            switch (s.charAt(0)) {
+                case 'O':
+                    l.add(dao.consultar(id, CpOrgaoUsuario.class, false));
+                    break;
+                case 'L':
+                    l.add(dao.consultar(id, DpLotacao.class, false).getLotacaoAtual());
+                    break;
+                case 'P':
+                    l.add(dao.consultar(id, DpPessoa.class, false).getPessoaAtual());
+            }
         }
 
         return l;
