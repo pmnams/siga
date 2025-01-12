@@ -101,7 +101,15 @@
                         <div class="col-12">
                             <a class="btn btn-sm btn-primary" title="Atualiza a situação do documento (marcas)"
                                href="${linkTo[ExDocumentoController].aAtualizarMarcasDoc()}?sigla=${docVO.sigla}&redir=/app/expediente/painel/exibir?documentoRefSel.sigla=${docVO.sigla}"
-                                ${popup? 'target="_blank" ': ''}><i class="fas fa-pen-square"></i> Atualizar Marcas</a>
+                                ${popup? 'target="_blank" ': ''}>
+                                <i class="fas fa-pen-square"></i> Atualizar Marcas
+                            </a>
+                            <a class="btn btn-sm btn-primary" title="Atualiza a situação do documento (marcas)"
+                               href="${linkTo[ExDocumentoController].aRemoverPapeis()}?sigla=${docVO.sigla}&redir=/app/expediente/painel/exibir?documentoRefSel.sigla=${docVO.sigla}"
+                                ${popup? 'target="_blank" ': ''}
+                               onclick="return confirm(&quot;Tem certeza de que deseja remover todos os perfis?&quot;);">
+                                <i class="fas fa-trash"></i> Remover perfis
+                            </a>
                         </div>
                     </div>
                     <div class="row">
@@ -307,7 +315,7 @@
                                         </div>
                                         <div class="d-box-col col-md-3">
                                             <div class="text-sm font-weight-bold">IdSigaBlob</div>
-                                            <div >${docVO.doc.exBlob.id} - ${docVO.doc.exBlob.type}</div>
+                                            <div>${docVO.doc.exBlob.id} - ${docVO.doc.exBlob.type}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -522,7 +530,8 @@
                                                         </div>
                                                         <div class="d-box-col col-9">
                                                             <div class="text-sm font-weight-bold">IdSigaBlob</div>
-                                                            <div >${docFilho.doc.exBlob.id} - ${docFilho.doc.exBlob.type}</div>
+                                                            <div>${docFilho.doc.exBlob.id}
+                                                                - ${docFilho.doc.exBlob.type}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -571,7 +580,8 @@
                                                             </div>
                                                             <div class="d-box-col col-9">
                                                                 <div class="text-sm font-weight-bold">IdSigaBlob</div>
-                                                                <div >${docFilho.doc.exBlob.id} - ${docFilho.doc.exBlob.type}</div>
+                                                                <div>${docFilho.doc.exBlob.id}
+                                                                    - ${docFilho.doc.exBlob.type}</div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -620,7 +630,8 @@
                                                         </div>
                                                         <div class="d-box-col col-9">
                                                             <div class="text-sm font-weight-bold">IdSigaBlob</div>
-                                                            <div >${mobItem.mob.doc.exBlob.id} - ${mobItem.mob.doc.exBlob.type}</div>
+                                                            <div>${mobItem.mob.doc.exBlob.id}
+                                                                - ${mobItem.mob.doc.exBlob.type}</div>
                                                         </div>
                                                     </div>
                                                 </div>
