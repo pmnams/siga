@@ -136,6 +136,44 @@ public class ExDocumentoController extends ExController {
     }
 
     @Transacional
+    @Get("app/expediente/doc/remover_papeis")
+    public void aRemoverPapeis(final String sigla, final String redir) {
+        assertAcesso("");
+
+        final BuscaDocumentoBuilder builder = BuscaDocumentoBuilder
+                .novaInstancia().setSigla(sigla);
+        final ExDocumento doc = buscarDocumento(builder, false);
+
+        List<ExMovimentacao> movs = doc.getMobilGeral().getMovimentacoesPorTipo(
+                ExTipoDeMovimentacao.VINCULACAO_PAPEL,
+                Boolean.TRUE
+        );
+
+        List<Long> papeis = new ArrayList<>();
+        for (ExMovimentacao mov : movs) {
+            if (mov.isCancelada())
+                continue;
+
+            long papel = mov.getExPapel().getIdPapel();
+            if (!papeis.contains(papel))
+                papeis.add(papel);
+        }
+
+        for (long papel : papeis) {
+            try {
+                Ex.getInstance().getBL().removerPapel(doc, movs, papel, getTitular(),"Papel removido por meio do painel administrativo");
+            } catch (Exception ignored) {
+            }
+        }
+
+        if (redir != null) {
+            result.redirectTo(redir);
+            return;
+        }
+        result.redirectTo("/app/expediente/doc/exibir?sigla=" + sigla);
+    }
+
+    @Transacional
     @Get("/app/expediente/doc/recalcular_acesso")
     public void aRecalcularAcesso(final String sigla) {
         final BuscaDocumentoBuilder builder = BuscaDocumentoBuilder
