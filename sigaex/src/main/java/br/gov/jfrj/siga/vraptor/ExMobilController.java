@@ -869,10 +869,12 @@ public class ExMobilController extends
     private Map<Integer, String> getListaOrdem() {
         final Map<Integer, String> map = new TreeMap<Integer, String>();
         map.put(0, "Data do documento");
-        map.put(1, "Data da situação");
-        map.put(2, "Ano e número");
-        map.put(3, "Data de finalização");
-        map.put(4, "Data de criação do temporário");
+        map.put(1, "Data do documento (Mais antigos)");
+        map.put(2, "Data da situação");
+        map.put(3, "Data da situação (Mais antigos)");
+        map.put(4, "Ano e número");
+        map.put(5, "Data de finalização");
+        map.put(6, "Data de criação do temporário");
         return map;
     }
 
