@@ -48,11 +48,11 @@ public class ExPodeJuntar extends CompositeExpressionSupport {
      */
     @Override
     protected Expression create() {
-        Expression movExpression = null;
         ExPodePorConfiguracao roleExpression = new ExPodePorConfiguracao(titular, lotaTitular)
                 .withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
                 .withExTpMov(ExTipoDeMovimentacao.JUNTADA)
                 .withExMod(mob.doc().getExModelo());
+        boolean titularAutorizado = false;
 
         if (Objects.nonNull(doc)) {
             for (ExMovimentacao mov : doc.getMobilGeral().getExMovimentacaoSet()) {
@@ -74,15 +74,12 @@ public class ExPodeJuntar extends CompositeExpressionSupport {
 
                 if (Objects.nonNull(cfg)) {
                     roleExpression.withExPapel(mov.getExPapel());
-                    movExpression = roleExpression;
+                    titularAutorizado = true;
                 }
 
                 break;
             }
         }
-
-        if (Objects.isNull(movExpression))
-            movExpression = new ExPodeMovimentar(mob, titular, lotaTitular);
 
         return And.of(
                 new ExEMobilVia(mob),
@@ -99,7 +96,7 @@ public class ExPodeJuntar extends CompositeExpressionSupport {
                                 new CpNaoENulo(docPai, "documento onde foi autuado"),
                                 new ExEMobilAutuado(docPai, mob)
                         ),
-                        movExpression
+                        new ExPodeMovimentar(mob, titular, lotaTitular, titularAutorizado)
                 ),
                 Or.of(
                         Not.of(new ExEstaPendenteDeAssinatura(mob.doc())),
