@@ -1,6 +1,7 @@
 package br.gov.jfrj.siga.ex.logic;
 
 import br.gov.jfrj.siga.cp.logic.CpNaoENulo;
+import br.gov.jfrj.siga.cp.logic.CpPodeBoolean;
 import br.gov.jfrj.siga.cp.model.enm.ITipoDeMovimentacao;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.DpPessoa;
@@ -16,6 +17,7 @@ public class ExPodeMovimentar extends CompositeExpressionSupport {
     private final ITipoDeMovimentacao tpMov;
     private final DpPessoa titular;
     private final DpLotacao lotaTitular;
+    private boolean estaAutorizado;
 
     public ExPodeMovimentar(ExMobil mob, ITipoDeMovimentacao tpMov, DpPessoa titular, DpLotacao lotaTitular) {
         this.mob = mob;
@@ -36,6 +38,13 @@ public class ExPodeMovimentar extends CompositeExpressionSupport {
         this.tpMov = tpMov;
         this.titular = titular;
         this.lotaTitular = lotaTitular;
+        this.estaAutorizado = false;
+    }
+
+    public ExPodeMovimentar(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular, boolean estaAutorizado) {
+        this(mob, null, titular, lotaTitular);
+
+        this.estaAutorizado = estaAutorizado;
     }
 
     public ExPodeMovimentar(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
@@ -44,17 +53,25 @@ public class ExPodeMovimentar extends CompositeExpressionSupport {
 
     @Override
     protected Expression create() {
+
+        Expression expResp;
+        if (this.estaAutorizado)
+            expResp = new CpPodeBoolean(true, "Autorizada por meio movimentoa de papel autorizado");
+        else
+            expResp = new ExEstaResponsavel(mob, titular, lotaTitular);
+
+
         if (tpMov != null)
             return And.of(
                     new CpNaoENulo(mob, "móbile"),
-                    new ExEstaResponsavel(mob, titular, lotaTitular),
+                    expResp,
                     new ExPodeMovimentarPorConfiguracao(tpMov, titular, lotaTitular)
             );
 
         return And.of(
                 new CpNaoENulo(mob, "móbile"),
                 new ExPodeSerMovimentado(mob, titular, lotaTitular),
-                new ExEstaResponsavel(mob, titular, lotaTitular),
+                expResp,
                 new ExPodePorConfiguracao(titular, lotaTitular)
                         .withIdTpConf(ExTipoDeConfiguracao.MOVIMENTAR)
         );
