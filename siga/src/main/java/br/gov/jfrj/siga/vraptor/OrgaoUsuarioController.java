@@ -1,23 +1,9 @@
 package br.gov.jfrj.siga.vraptor;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.WeakHashMap;
-
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletRequest;
-
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.observer.download.ByteArrayDownload;
-import br.com.caelum.vraptor.observer.download.Download;
 import br.com.caelum.vraptor.observer.upload.UploadSizeLimit;
 import br.com.caelum.vraptor.observer.upload.UploadedFile;
 import br.gov.jfrj.siga.base.AplicacaoException;
@@ -30,8 +16,24 @@ import br.gov.jfrj.siga.dp.dao.CpOrgaoUsuarioDaoFiltro;
 import br.gov.jfrj.siga.model.ContextoPersistencia;
 import br.gov.jfrj.siga.model.dao.DaoFiltroSelecionavel;
 
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.WeakHashMap;
+
 @Controller
 public class OrgaoUsuarioController extends SigaSelecionavelControllerSupport<CpOrgaoUsuario, DaoFiltroSelecionavel> {
+
+    @Inject
+    private HttpServletResponse response;
 
     private static WeakHashMap<Long, ByteBuffer> brasaoCache = new WeakHashMap<>();
 
@@ -75,7 +77,7 @@ public class OrgaoUsuarioController extends SigaSelecionavelControllerSupport<Cp
 
     @Get("/app/orgaoUsuario/editar")
     public void edita(final Long id) {
-        CpOrgaoUsuario orgaoUsuario= null;
+        CpOrgaoUsuario orgaoUsuario = null;
 
         if (id != null) {
             orgaoUsuario = daoOrgaoUsuario(id);
@@ -231,7 +233,7 @@ public class OrgaoUsuarioController extends SigaSelecionavelControllerSupport<Cp
     }
 
     @Get("/public/app/orgaoUsuario/{orgaoId}/brasao")
-    public Download brasao(Long orgaoId) {
+    public void brasao(Long orgaoId) throws IOException {
         ByteBuffer data;
 
         if (brasaoCache.containsKey(orgaoId)) {
@@ -244,15 +246,61 @@ public class OrgaoUsuarioController extends SigaSelecionavelControllerSupport<Cp
 
             byte[] content = orgaoUsuario.getBrasaoBytes();
             if (content == null)
-                return null;
+                return;
 
             data = ByteBuffer.wrap(content);
             brasaoCache.put(orgaoId, data);
         }
 
-        return new ByteArrayDownload(data.array(), "application/octet-stream", "brasao_" + orgaoId);
+        byte[] content = data.array();
+        String imageType = detectarTipo(data);
+
+        if (imageType != null) {
+            response.setHeader("Content-Type", "image/" + imageType);
+        } else {
+            response.setHeader("Content-Type", "application/octet-stream");
+        }
+
+        response.setHeader("Accept-Ranges", "bytes");
+        response.setHeader("Cache-Control", "public,max-age=3600");
+        response.setContentType("image/png");
+        response.setContentLength(content.length);
+        response.getOutputStream().write(content);
+        response.getOutputStream().flush();
+
     }
 
+    public static boolean startsWith(ByteBuffer buffer, byte[] prefix) {
+        if (buffer.remaining() < prefix.length) {
+            return false;
+        }
+
+        int originalPosition = buffer.position();
+        for (int i = 0; i < prefix.length; i++) {
+            if (buffer.get(originalPosition + i) != prefix[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private String detectarTipo(ByteBuffer data) {
+        if (startsWith(data, new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF})) {
+            return "jpeg";
+        } else if (startsWith(data, new byte[]{(byte) 0x89, 'P', 'N', 'G', 0x0D, 0x0A, 0x1A, 0x0A})) {
+            return "png";
+        } else if (startsWith(data, "GIF87a".getBytes()) || startsWith(data, "GIF89a".getBytes())) {
+            return "gif";
+        } else if (startsWith(data, new byte[]{'B', 'M'})) {
+            return "bmp";
+        } else if (startsWith(data, new byte[]{0x00, 0x00, 0x01, 0x00})) {
+            return "ico";
+        } else if ((startsWith(data, new byte[]{'I', 'I', 0x2A, 0x00})) || (startsWith(data, new byte[]{'M', 'M', 0x00, 0x2A}))) {
+            return "tiff";
+        } else {
+            return null;
+        }
+    }
 
     private CpOrgaoUsuario daoOrgaoUsuario(long id) {
         return dao().consultar(id, CpOrgaoUsuario.class, false);

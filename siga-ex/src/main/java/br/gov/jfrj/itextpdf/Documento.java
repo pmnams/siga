@@ -521,7 +521,7 @@ public class Documento {
                 an.evict();
                 an = null;
 
-                if(Prop.get("arquivo.tamanho.gc") != null) {
+                if (Prop.get("arquivo.tamanho.gc") != null) {
                     garbage += ab.length;
                     if (garbage > Long.parseLong(Prop.get("arquivo.tamanho.gc"))) {
                         garbage = 0;
@@ -720,7 +720,7 @@ public class Documento {
     public static String realPath() {
 
         RequestInfo ri = CurrentRequest.get();
-        String realPath = Contexto.internallUrlBase(ri.getRequest()) + ri.getRequest().getContextPath();
+        String realPath = Contexto.internallUrlBase() + ri.getRequest().getContextPath();
 
         if (realPath.endsWith("/siga-le"))
             realPath = realPath.replace("/siga-le", "/sigaex");
