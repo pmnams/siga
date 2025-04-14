@@ -192,12 +192,7 @@ public class DpPessoa extends AbstractDpPessoa implements Serializable,
                 mapAcronimo.put(ou.getAcronimoOrgaoUsu(), ou);
                 mapAcronimo.put(ou.getSiglaOrgaoUsu(), ou);
             }
-            String acronimos = "";
-            for (String s : mapAcronimo.keySet()) {
-                acronimos += "|" + s;
-            }
-
-            p1 = Pattern.compile("^(?<orgao>" + acronimos + ")?(?<numero>[0-9]+)$");
+            p1 = Pattern.compile("^(?<orgao>" + String.join("|", mapAcronimo.keySet()) + ")?(?<numero>[A-Z0-9]+)$");
         }
 
         sigla = sigla.trim().toUpperCase();
