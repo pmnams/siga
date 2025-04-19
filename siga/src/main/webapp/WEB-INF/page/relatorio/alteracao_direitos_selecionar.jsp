@@ -94,16 +94,11 @@
 		} else {
 			t_intCodSel = "-1";
 		}
-		setTimeout( 
-				function () {
-					exibirAguarde();
-				}
-		, 50); 
 		var t_strUrl = "emitir_alteracao_direitos";
 		t_strUrl += "?dataInicio=" + t_strDataInicio;
 		t_strUrl += "&dataFim=" + t_strDataFim;
 		t_strUrl += "&idOrgaoUsuario=" + t_intCodSel;
-		location.href = t_strUrl;
+		window.open(t_strUrl, '_blank');
 		
 	}
 	function verificarData(p_nodData) {
@@ -148,35 +143,6 @@
 	} 
 </script>
 <script type="text/javascript">
-	 /*
-		 ***** Exibição do  Aguarde **** 
-	*/
-	function exibirAguarde() {
-		var nodDivConteudo = document.getElementById("tblfrm");
-		if (nodDivConteudo) {
-			var nodDivTempo = document.getElementById("div-tempo");
-			if (nodDivTempo) {
-				nodDivTempo.style.display = "block"
-				var intScrollYSize = getScrollingYSize(); 
-				var intScrollXSize = getScrollingXSize(); 
-				var intScrollYPos = getScrollingYPos() ; 
-				var intScrollXPos = getScrollingXPos() ; 
-				nodDivTempo.style.zIndex = '3';
-				nodDivTempo.style.left = intScrollXPos.toString()     + 'px' ;
-				nodDivTempo.style.top =  intScrollYPos.toString()     + 'px' ;
-				nodDivTempo.style.width =  intScrollXSize.toString() + 'px' ;
-				nodDivTempo.style.height =  intScrollYSize.toString() + 'px' ;
-				// correção do bug do IE
-				var arr1NodSelect = document.getElementsByTagName('select');
-				if (arr1NodSelect) {
-					for (var intConta = 0; intConta < arr1NodSelect.length; intConta++) {
-						var nodSelect = arr1NodSelect[intConta];
-						nodSelect.disabled=true;
-					}
-				}
-			}
-		} 
-	}
 	function voltarDoAguarde() {
 	 var nodDivConteudo = document.getElementById("tblfrm");
 		if (nodDivConteudo) {

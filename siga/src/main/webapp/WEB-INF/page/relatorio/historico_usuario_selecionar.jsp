@@ -46,12 +46,7 @@ function submeter() {
 	var t_strIdPessoa = document.getElementsByName("pessoa_pessoaSel.id")[0];
 	if (t_strIdPessoa) {
 		if (t_strIdPessoa.value) {
-			location.href = 'emitir_historico_usuario?idPessoa=' + t_strIdPessoa.value;
-			setTimeout( 
-					function () {
-						exibirAguarde();
-					}
-			, 50); 
+			window.open('emitir_historico_usuario?idPessoa=' + t_strIdPessoa.value, '_blank');
 		} else {
 			sigaModal.alerta("Por favor, é necessário preencher o campo pessoa!");
 		}
@@ -59,35 +54,6 @@ function submeter() {
 }
 </script>
 <script type="text/javascript">
-	 /*
-		 ***** Exibição do  Aguarde **** 
-	*/
-	function exibirAguarde() {
-		var nodDivConteudo = document.getElementById("tblfrm");
-		if (nodDivConteudo) {
-			var nodDivTempo = document.getElementById("div-tempo");
-			if (nodDivTempo) {
-				nodDivTempo.style.display = "block"
-				var intScrollYSize = getScrollingYSize(); 
-				var intScrollXSize = getScrollingXSize(); 
-				var intScrollYPos = getScrollingYPos() ; 
-				var intScrollXPos = getScrollingXPos() ; 
-				nodDivTempo.style.zIndex = '3';
-				nodDivTempo.style.left = intScrollXPos.toString()     + 'px' ;
-				nodDivTempo.style.top =  intScrollYPos.toString()     + 'px' ;
-				nodDivTempo.style.width =  intScrollXSize.toString() + 'px' ;
-				nodDivTempo.style.height =  intScrollYSize.toString() + 'px' ;
-				// correção do bug do IE
-				var arr1NodSelect = document.getElementsByTagName('select');
-				if (arr1NodSelect) {
-					for (var intConta = 0; intConta < arr1NodSelect.length; intConta++) {
-						var nodSelect = arr1NodSelect[intConta];
-						nodSelect.disabled=true;
-					}
-				}
-			}
-		} 
-	}
 	function voltarDoAguarde() {
 	 var nodDivConteudo = document.getElementById("tblfrm");
 		if (nodDivConteudo) {
