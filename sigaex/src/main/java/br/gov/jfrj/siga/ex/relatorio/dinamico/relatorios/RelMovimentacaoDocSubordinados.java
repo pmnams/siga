@@ -233,22 +233,22 @@ public class RelMovimentacaoDocSubordinados extends RelatorioTemplate {
                         pai_idDoc, pai_siglaOrgaoUsu, pai_acronimoOrgaoUsu, pai_siglaFormaDoc, pai_anoEmissao, pai_numExpediente, pai_numSequencia, pai_idTipoMobil, pai_mobilNumSequencia);
 
                 String codigoMobil = ExMobil.getSigla(codigoDocumento, mobilNumSequencia, idTipoMobil);
-
                 String url = ((String) array[21]).trim() + codigoMobil;
-
                 String descricao = (String) array[22];
-
                 String nomePessoa = (String) array[23];
-
                 String descrMarcador = (String) array[24];
 
-                long identificador = movimentacao.getExMobil().getId();
                 datatual = System.currentTimeMillis();
                 movimentacao.getExMobil().getId();
                 ExMovimentacao ultimaTransferencia = mob.getUltimaMovimentacao(ExTipoDeMovimentacao.TRANSFERENCIA);
                 ExMovimentacao ultimaDespachoInternoTransferencia = mob.getUltimaMovimentacao(ExTipoDeMovimentacao.DESPACHO_INTERNO_TRANSFERENCIA);
                 if ((ultimaTransferencia == null) || (ultimaDespachoInternoTransferencia == null)) {
-                    dataant = mob.getUltimaMovimentacao(ExTipoDeMovimentacao.CRIACAO).getData().getTime();
+                    try {
+                        dataant = mob.getUltimaMovimentacao(ExTipoDeMovimentacao.CRIACAO).getData().getTime();
+                    } catch (Exception e) {
+                       ExMovimentacao ultMov = mob.getUltimaMovimentacaoNaoCancelada();
+                       dataant = ultMov.getData().getTime();
+                    }
                     durentrelots = (((datatual - dataant) / 86400000L) + 1);
                 } else {
                     if (ultimaTransferencia.getData().getTime() > ultimaDespachoInternoTransferencia.getData().getTime()) {
