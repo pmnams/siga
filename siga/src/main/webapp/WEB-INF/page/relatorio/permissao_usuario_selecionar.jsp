@@ -38,7 +38,7 @@
 		var t_strIdPessoa = document.getElementsByName("pessoa_pessoaSel.id")[0];
 		if (t_strIdPessoa) {
 			if (t_strIdPessoa.value) {
-				location.href = 'emitir_permissao_usuario?idPessoa=' + t_strIdPessoa.value;
+				window.open('emitir_permissao_usuario?idPessoa=' + t_strIdPessoa.value, '_blank');
 			} else {
 				sigaModal.alerta("Por favor, é necessário preencher o campo pessoa!");
 			}

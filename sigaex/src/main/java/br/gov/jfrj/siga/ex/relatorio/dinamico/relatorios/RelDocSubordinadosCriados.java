@@ -211,16 +211,18 @@ public class RelDocSubordinadosCriados extends RelatorioTemplate {
 
                 String descrMarcador = (String) array[24];
 
-                long identificador = mov.getExMobil().getId();
-
                 listaFinal.add(nomeLotacao);
                 listaFinal.add(codigoMobil);
-                //testar se a criação foi cancelada
-                //if (mob.getUltimaMovimentacao(1).isCancelada() == false)
-                listaFinal.add(mob.getUltimaMovimentacao(ExTipoDeMovimentacao.CRIACAO).getDtMovDDMMYY().toString());
-                listaFinal.add(mob.getUltimaMovimentacao(ExTipoDeMovimentacao.CRIACAO).getLotaCadastrante().getSiglaLotacao().toString());
+
+                ExMovimentacao ultMov = mob.getUltimaMovimentacao(ExTipoDeMovimentacao.CRIACAO);
+                if (Objects.isNull(ultMov)) {
+                    ultMov = mob.getUltimaMovimentacaoNaoCancelada();
+                }
+
+                listaFinal.add(ultMov.getDtMovDDMMYY());
+                listaFinal.add(ultMov.getLotaCadastrante().getSiglaLotacao());
                 listaFinal.add(descrMarcador);
-                listaFinal.add(mov.getLotaResp().getSigla().toString());
+                listaFinal.add(mov.getLotaResp().getSigla());
                 if (mob.getUltimaMovimentacao(ExTipoDeMovimentacao.ANOTACAO) != null) {
                     listaFinal.add(mob.getUltimaMovimentacao(ExTipoDeMovimentacao.ANOTACAO).toString());
                 } else {

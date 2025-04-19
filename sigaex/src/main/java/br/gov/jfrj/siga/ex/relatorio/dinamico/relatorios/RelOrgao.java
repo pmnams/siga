@@ -1,21 +1,5 @@
 package br.gov.jfrj.siga.ex.relatorio.dinamico.relatorios;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.persistence.Query;
-
 import ar.com.fdvs.dj.domain.builders.DJBuilderException;
 import ar.com.fdvs.dj.domain.constants.Font;
 import br.gov.jfrj.relatorio.dinamico.AbstractRelatorioBaseBuilder;
@@ -25,14 +9,20 @@ import br.gov.jfrj.siga.base.AplicacaoException;
 import br.gov.jfrj.siga.base.util.Utils;
 import br.gov.jfrj.siga.dp.DpLotacao;
 import br.gov.jfrj.siga.dp.dao.CpDao;
+import br.gov.jfrj.siga.ex.model.enm.ExTipoDeMovimentacao;
 import br.gov.jfrj.siga.model.ContextoPersistencia;
 import net.sf.jasperreports.engine.JRException;
+
+import javax.persistence.Query;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class RelOrgao extends RelatorioTemplate {
 	
 	private String nomelotacao;
 
-	public RelOrgao(Map<String, String> parametros) throws Exception {
+	public RelOrgao(Map<String, String> parametros) {
  		super(parametros);
 		if (Utils.empty(parametros.get("secaoUsuario"))) {
 			throw new AplicacaoException(
@@ -73,7 +63,7 @@ public class RelOrgao extends RelatorioTemplate {
 			throws DJBuilderException, JRException {
 		String titulo = "Relatório de Despachos e Transferências de " + parametros.get("dataInicial").toString() + " a " + parametros.get("dataFinal").toString();
 		this.setTitle(titulo);
-		if (this.nomelotacao != "") {
+		if (!this.nomelotacao.isEmpty()) {
 			String subtitulo = "Do(a) " + this.nomelotacao;
 			this.setSubtitle(subtitulo);
 		}
@@ -101,16 +91,16 @@ public class RelOrgao extends RelatorioTemplate {
 	}
 
 	@Override
-	public Collection processarDados() throws Exception {
+	public Collection<String> processarDados() throws Exception {
 
 		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-		List<String> d = new ArrayList<String>();
+		List<String> d = new ArrayList<>();
 
 		if (parametros.get("lotacao").equals("")) {
 			Query query = ContextoPersistencia.em()
 			.createQuery( "select mov.lotaCadastrante.siglaLotacao, mob.idMobil.exDocumento.exFormaDocumento.exTipoFormaDoc.descTipoFormaDoc, "
-							+ "mov.exTipoMovimentacao.descrTipoMovimentacao, count(distinct mob.idMobil.exDocumento.idDoc) "
+							+ "mov.exTipoMovimentacao, count(distinct mob.idMobil.exDocumento.idDoc) "
 							+ "from ExMovimentacao mov inner join mov.exMobil mob "
 							+ "where mov.lotaCadastrante.orgaoUsuario.idOrgaoUsu = :orgaoUsu " 
 							+ "and mov.exTipoMovimentacao in (3,6,4,9,21) "
@@ -120,28 +110,28 @@ public class RelOrgao extends RelatorioTemplate {
 							+ "and mov.dtIniMov <= :dtfim " 
 							+ "group by mov.lotaCadastrante.siglaLotacao, " 
 							+ "mob.idMobil.exDocumento.exFormaDocumento.exTipoFormaDoc.descTipoFormaDoc, " 
-							+ "mov.exTipoMovimentacao.descrTipoMovimentacao");
+							+ "mov.exTipoMovimentacao");
 			
 			Long orgaoUsu = Long.valueOf((String) parametros.get("orgao"));
 			query.setParameter("orgaoUsu", orgaoUsu);
-			Date dtini = formatter.parse((String) (parametros.get("dataInicial") + " 00:00:00"));
+			Date dtini = formatter.parse((parametros.get("dataInicial") + " 00:00:00"));
 			query.setParameter("dtini", dtini);
-			Date dtfim = formatter.parse((String) (parametros.get("dataFinal") + " 23:59:59"));
+			Date dtfim = formatter.parse((parametros.get("dataFinal") + " 23:59:59"));
 			query.setParameter("dtfim", dtfim);
 
-			SortedSet<String> set = new TreeSet<String>();
-			TreeMap<String, Long> map = new TreeMap<String, Long>();
+			SortedSet<String> set = new TreeSet<>();
+			TreeMap<String, Long> map = new TreeMap<>();
 
-			Iterator it = query.getResultList().iterator();
-			while (it.hasNext()) {
-				Object[] obj = (Object[]) it.next();
-				String lotacao = (String) obj[0];
-				String tipodoc = (String) obj[1];
-				String tipomov = (String) obj[2];
-				Long totaldesp = Long.valueOf(obj[3].toString());
-				set.add(lotacao);
-				map.put(chave(lotacao, tipodoc, tipomov), totaldesp);
-			}
+            for (Object o : query.getResultList()) {
+                Object[] obj = (Object[]) o;
+                String lotacao = (String) obj[0];
+                String tipodoc = (String) obj[1];
+                String tipomov = ((ExTipoDeMovimentacao) obj[2]).getDescr();
+                Long totaldesp = Long.valueOf(obj[3].toString());
+                set.add(lotacao);
+                map.put(chave(lotacao, tipodoc, tipomov), totaldesp);
+            }
+
 			for (String s : set) {
 				d.add(s);
 				acrescentarColuna(d, map, s, "Expediente", "Recebimento");
@@ -158,7 +148,7 @@ public class RelOrgao extends RelatorioTemplate {
 		} else {
 			Query query = ContextoPersistencia.em()
 					.createQuery( "select mov.lotaCadastrante.siglaLotacao, mob.idMobil.exDocumento.exFormaDocumento.exTipoFormaDoc.descTipoFormaDoc, "
-							+ "mov.exTipoMovimentacao.descrTipoMovimentacao, count(distinct mob.idMobil.exDocumento.idDoc) "
+							+ "mov.exTipoMovimentacao, count(distinct mob.idMobil.exDocumento.idDoc) "
 							+ "from ExMovimentacao mov inner join mov.exMobil mob "
 							+ "where mov.lotaCadastrante.orgaoUsuario.idOrgaoUsu = :orgaoUsu " 
 							+ "and mov.lotaCadastrante.idLotacao in (select l.idLotacao from DpLotacao as l where l.idLotacaoIni = :lotacaodest) "
@@ -169,7 +159,7 @@ public class RelOrgao extends RelatorioTemplate {
 							+ "and mov.dtIniMov <= :dtfim " 
 							+ "group by mov.lotaCadastrante.siglaLotacao, " 
 							+ "mob.idMobil.exDocumento.exFormaDocumento.exTipoFormaDoc.descTipoFormaDoc, " 
-							+ "mov.exTipoMovimentacao.descrTipoMovimentacao");
+							+ "mov.exTipoMovimentacao");
 			
 			Long orgaoUsu = Long.valueOf((String) parametros.get("orgao"));
 			query.setParameter("orgaoUsu", orgaoUsu);
@@ -177,31 +167,27 @@ public class RelOrgao extends RelatorioTemplate {
 			// Obtém a lotação com o id passado...
 			Query qrySetor = ContextoPersistencia.em().createQuery(
 					"from DpLotacao lot where lot.idLotacao = " + parametros.get("lotacao"));
-						
-			Set<DpLotacao> lotacaoSet = new HashSet<DpLotacao>();
+
 			DpLotacao lotacaodest = (DpLotacao)qrySetor.getResultList().get(0);
-			lotacaoSet.add(lotacaodest);		
-			
 			query.setParameter("lotacaodest", lotacaodest.getIdInicial());
 			
-			Date dtini = formatter.parse((String) (parametros.get("dataInicial") + " 00:00:00"));
+			Date dtini = formatter.parse((parametros.get("dataInicial") + " 00:00:00"));
 			query.setParameter("dtini", dtini);
-			Date dtfim = formatter.parse((String) (parametros.get("dataFinal") + " 23:59:59"));
+			Date dtfim = formatter.parse((parametros.get("dataFinal") + " 23:59:59"));
 			query.setParameter("dtfim", dtfim);
 	
-			SortedSet<String> set = new TreeSet<String>();
-			TreeMap<String, Long> map = new TreeMap<String, Long>();
+			SortedSet<String> set = new TreeSet<>();
+			TreeMap<String, Long> map = new TreeMap<>();
 
-			Iterator it = query.getResultList().iterator();
-			while (it.hasNext()) {
-				Object[] obj = (Object[]) it.next();
-				String lotacao = (String) obj[0];
-				String tipodoc = (String) obj[1];
-				String tipomov = (String) obj[2];
-				Long totaldesp = Long.valueOf(obj[3].toString());
-				set.add(lotacao);
-				map.put(chave(lotacao, tipodoc, tipomov), totaldesp);
-			}
+            for (Object o : query.getResultList()) {
+                Object[] obj = (Object[]) o;
+                String lotacao = (String) obj[0];
+                String tipodoc = (String) obj[1];
+                String tipomov = ((ExTipoDeMovimentacao) obj[2]).getDescr();
+                Long totaldesp = Long.valueOf(obj[3].toString());
+                set.add(lotacao);
+                map.put(chave(lotacao, tipodoc, tipomov), totaldesp);
+            }
 			for (String s : set) {
 				d.add(s);
 				acrescentarColuna(d, map, s, "Expediente", "Recebimento");

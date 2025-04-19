@@ -5,7 +5,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://localhost/jeetags" prefix="siga"%>
 	
-<siga:pagina titulo="Relatório de Acesso à Utilização de Serviço">
+<siga:pagina titulo="Relatório de Acesso à Utilização de Serviços">
 <link rel="stylesheet" href="/siga/javascript/select2/select2.css" type="text/css" media="screen, projection" />
 <link rel="stylesheet" href="/siga/javascript/select2/select2-bootstrap.css" type="text/css" media="screen, projection" />
 
@@ -13,7 +13,7 @@
 	<div class="container-fluid">
 		<div class="card bg-light mb-3" >
 			<div class="card-header">
-				<h5>Relatório de Permissão de Usuários</h5>
+				<h5>Relatório de Acesso à Utilização de Serviço</h5>
 			</div>
 			<div class="card-body">
 			<form id="frm" method="post" action="#">
@@ -77,8 +77,8 @@
 	 	 	 var t_nodForm = document.getElementById('frm');
 	 	 	 if (t_nodForm) {
 		 	 	 t_nodForm.setAttribute("action","emitir_acesso_servico");
+				 t_nodForm.setAttribute("target","_blank")
 	 	 	 	 t_nodForm.submit();
-	 	 	 	 exibirAguarde();
 	 	 	 	 return true;
 	 	 	 }
  	 	 } else {
