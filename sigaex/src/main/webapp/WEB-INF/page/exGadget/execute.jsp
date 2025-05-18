@@ -89,7 +89,7 @@
                                 <c:set var="titulo2"
                                        value="Documentos que já foram assinados ou tiveram a assinatura manual registrada. Também contém os documentos que já foram recebidos pelo usuário ${titular.nomePessoa}."/>
                                 <c:set var="titulo3" value="${titulo1}"/>
-                                <c:set var="ordem" value="1"/>
+                                <c:set var="ordem" value="2"/>
                                 <c:set var="visualizacao" value="1"/>
                             </c:when>
                             <c:when test="${listEstado[0]==3}">
@@ -98,7 +98,7 @@
                                 <c:set var="titulo2"
                                        value="Documentos não eletrônicos transferidos para o usuário ${titular.nomePessoa} que estão aguardando recebimento."/>
                                 <c:set var="titulo3" value="${titulo1}"/>
-                                <c:set var="ordem" value="1"/>
+                                <c:set var="ordem" value="2"/>
                             </c:when>
                             <c:when test="${listEstado[0]==14}">
                                 <c:set var="titulo1"
@@ -106,7 +106,7 @@
                                 <c:set var="titulo2"
                                        value="Documentos eletrônicos transferidos para o usuário ${titular.nomePessoa} que estão aguardando recebimento."/>
                                 <c:set var="titulo3" value="${titulo1}"/>
-                                <c:set var="ordem" value="1"/>
+                                <c:set var="ordem" value="2"/>
                             </c:when>
                             <c:when test="${listEstado[0]==15}">
                                 <c:set var="titulo1"
@@ -114,7 +114,7 @@
                                 <c:set var="titulo2"
                                        value="Documentos que foram finalizados mas ainda não foram assinados."/>
                                 <c:set var="titulo3" value="${titulo1}"/>
-                                <c:set var="ordem" value="1"/>
+                                <c:set var="ordem" value="2"/>
                             </c:when>
                             <c:when test="${listEstado[0]==23}">
                                 <c:set var="titulo1"
@@ -122,7 +122,7 @@
                                 <c:set var="titulo2"
                                        value="Documentos não eletrônicos que foram transferidos, pelo usuário ${titular.nomePessoa}, para outra lotação/pessoa mas ainda não foram recebidos."/>
                                 <c:set var="titulo3" value="${titulo1}"/>
-                                <c:set var="ordem" value="1"/>
+                                <c:set var="ordem" value="2"/>
                             </c:when>
                             <c:when test="${listEstado[0]==24}">
                                 <c:set var="titulo1"
@@ -130,14 +130,14 @@
                                 <c:set var="titulo2"
                                        value="Documentos eletrônicos que foram transferidos, pelo usuário ${titular.nomePessoa}, para outra lotação/pessoa mas ainda não foram recebidos."/>
                                 <c:set var="titulo3" value="${titulo1}"/>
-                                <c:set var="ordem" value="1"/>
+                                <c:set var="ordem" value="2"/>
                             </c:when>
                             <c:when test="${listEstado[0]==25}">
                                 <c:set var="titulo1"
                                        value="Documentos pendentes de assinatura cujo subscritor é o usuário ${titular.nomePessoa}."/>
                                 <c:set var="titulo2" value="${titulo1}"/>
                                 <c:set var="titulo3" value=""/>
-                                <c:set var="ordem" value="1"/>
+                                <c:set var="ordem" value="2"/>
                             </c:when>
                             <c:when test="${listEstado[0]==31}">
                                 <c:set var="visualizacao" value="1"/>
