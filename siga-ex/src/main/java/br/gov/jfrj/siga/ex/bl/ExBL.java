@@ -3274,7 +3274,7 @@ public class ExBL extends CpBL {
 
     public static String anotacaoConfidencial(ExMobil mob, DpPessoa titular, DpLotacao lotaTitular) {
         if (mob.isGeral())
-            return "";
+            mob = mob.getDoc().getUltimoVolume();
 
         if (mostraDescricaoConfidencial(mob.doc(), titular, lotaTitular))
             return "CONFIDENCIAL";
