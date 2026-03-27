@@ -963,7 +963,7 @@ public class ExDocumentoController extends ExController {
             }
 
             if (exDocumentoDTO.getMob().doc().isSemEfeito()) {
-                if (!Objects.equals(exDocumentoDTO.getMob().doc().getCadastrante(), getTitular())
+                if (!Objects.equals(exDocumentoDTO.getMob().doc().getCadastrante().getIdPessoaIni(), getTitular().getIdPessoaIni())
                         && !exDocumentoDTO.getMob().doc().getSubscritor().equals(getTitular())
                         && !isInteressado) {
                     throw new AplicacaoException("Documento " + exDocumentoDTO.getMob().getSigla() + " cancelado ");
